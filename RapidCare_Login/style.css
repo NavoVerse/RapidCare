@@ -1,0 +1,338 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: #3f3650; /* Light purple type ambient background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #ffffff;
+}
+
+.container {
+    width: 100%;
+    max-width: 1050px;
+    padding: 20px;
+}
+
+.card {
+    background-color: #2b2831; /* Darker box */
+    border-radius: 12px;
+    display: flex;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    min-height: 560px;
+}
+
+/* LEFT PANEL (Slider) */
+.left-panel {
+    flex: 0 0 45%;
+    position: relative;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.slider-container, .slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.slide.active {
+    opacity: 1;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(43,40,49,0.1) 0%, rgba(43,40,49,0.6) 100%);
+    z-index: 2;
+}
+
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 3;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.back-link {
+    color: #e5e5e5;
+    text-decoration: none;
+    font-size: 13px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6px 16px;
+    border-radius: 20px;
+    transition: background 0.3s;
+}
+
+.back-link:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.bottom-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+.bottom-content h1 {
+    font-size: 26px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    line-height: 1.4;
+    letter-spacing: -0.5px;
+}
+
+.indicators {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.dot {
+    width: 24px;
+    height: 3px;
+    border-radius: 2px;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: background-color 0.3s;
+}
+
+.dot.active {
+    background-color: #ffffff;
+}
+
+
+/* RIGHT PANEL (Form) */
+.right-panel {
+    flex: 1;
+    padding: 50px 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.right-panel h2 {
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.subtitle {
+    color: #a3a1ab;
+    font-size: 14px;
+    margin-bottom: 35px;
+}
+
+.subtitle a {
+    color: #8c7fe0;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.input-row {
+    display: flex;
+    gap: 16px;
+}
+
+.input-group {
+    flex: 1;
+    position: relative;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 16px;
+    background-color: #383540;
+    border: 1px solid #4a4652;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #7b61ff;
+    background-color: #3a3743;
+}
+
+/* Simulated focused state for the "Fletcher" field to match screenshot */
+#firstName {
+    border-color: #7b61ff;
+}
+
+input::placeholder {
+    color: #7f7b87;
+}
+
+.password-group .eye-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7f7b87;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0 10px 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+    appearance: none;
+    background-color: #ffffff;
+    margin: 0;
+    font: inherit;
+    color: currentColor;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    display: grid;
+    place-content: center;
+    cursor: pointer;
+    border: none;
+}
+
+.checkbox-group input[type="checkbox"]::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em #2b2831;
+    background-color: #2b2831;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+.checkbox-group input[type="checkbox"]:checked::before {
+    transform: scale(1);
+}
+
+.checkbox-group label {
+    font-size: 13px;
+    color: #d8d7db;
+    cursor: pointer;
+}
+
+.checkbox-group label a {
+    color: #8c7fe0;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+.create-btn {
+    width: 100%;
+    padding: 16px;
+    background-color: #7b61ff;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.create-btn:hover {
+    background-color: #6a4ec0;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 12px 0;
+    color: #7f7b87;
+    font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #4a4652;
+}
+
+.divider span {
+    padding: 0 16px;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 16px;
+}
+
+.social-btn {
+    flex: 1;
+    padding: 14px;
+    background-color: transparent;
+    border: 1px solid #4a4652;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.social-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.social-btn svg {
+    width: 18px;
+    height: 18px;
+}
