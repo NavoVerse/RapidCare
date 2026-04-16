@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RapidCare Login</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/xirod" rel="stylesheet">
 </head>
 
 <body>
@@ -15,23 +18,22 @@
             <!-- Left Side -->
             <div class="left-panel">
                 <div class="slider" id="slider">
-                    <img src="RapidCare_Login\Login_Images\images.jpg" class="slide active" alt="Capturing Moments">
-                    <img src="RapidCare_Login\Login_Images\Screenshot 2025-10-22 125739.png" class="slide"
-                        alt="Creating Memories">
-                    <img src="RapidCare_Login\Login_Images\Jon_Snow.jpg" class="slide" alt="Visual Journey">
+                    <img src="Login_Images/image_1.png" class="slide active" alt="Capturing Moments">
+                    <img src="Login_Images/image_2.png" class="slide" alt="Creating Memories">
+                    <img src="Login_Images/image_3.png" class="slide" alt="Visual Journey">
                 </div>
                 <div class="overlay"></div>
 
                 <div class="top-nav">
                     <div class="logo">
                         <!-- We emulate the AMU logo styling from the image -->
-                        <span style="font-size: 24px; font-weight: bold; letter-spacing: 2px;">AMU</span>
+                        <span class="logo-text">RapidCare</span>
                     </div>
                     <a href="#" class="back-link">Back to website &rarr;</a>
                 </div>
 
                 <div class="bottom-content">
-                    <h1>Capturing Moments,<br>Creating Memories</h1>
+                    <h1>Every second counts<br>Every life matters</h1>
                     <div class="indicators">
                         <span class="dot active"></span>
                         <span class="dot"></span>
@@ -48,19 +50,19 @@
                 <form action="#" class="login-form">
                     <div class="input-row">
                         <div class="input-group">
-                            <input type="text" id="firstName" value="Fletcher" required>
+                            <input type="text" id="firstName" placeholder="First Name" required>
                         </div>
                         <div class="input-group">
-                            <input type="text" id="lastName" placeholder="Last name" required>
+                            <input type="text" id="lastName" placeholder="Last Name" required>
                         </div>
                     </div>
 
                     <div class="input-group">
-                        <input type="email" id="email" placeholder="Email" required>
+                        <input type="text" id="email" placeholder="Email / Phone Number" required>
                     </div>
 
                     <div class="input-group password-group">
-                        <input type="password" id="password" placeholder="Enter your passwrod" required>
+                        <input type="password" id="password" placeholder="Enter a Password" required>
                         <span class="eye-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

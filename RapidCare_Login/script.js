@@ -9,13 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function nextSlide() {
         slides[currentSlide].classList.remove('active');
         dots[currentSlide].classList.remove('active');
-        
+
         currentSlide = (currentSlide + 1) % slideCount;
-        
+
         slides[currentSlide].classList.add('active');
         dots[currentSlide].classList.add('active');
     }
 
-    // Auto scroll every 2 seconds
-    setInterval(nextSlide, 2000);
+    // Login Images Auto scroll every 5 seconds
+    setInterval(nextSlide, 5000);
 });

@@ -87,6 +87,14 @@ body {
     align-items: center;
 }
 
+.logo-text {
+    font-family: 'Xirod', sans-serif;
+    font-size: 20px;
+    font-weight: normal;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
 .back-link {
     color: #e5e5e5;
     text-decoration: none;
@@ -200,10 +208,7 @@ input[type="password"]:focus {
     background-color: #3a3743;
 }
 
-/* Simulated focused state for the "Fletcher" field to match screenshot */
-#firstName {
-    border-color: #7b61ff;
-}
+
 
 input::placeholder {
     color: #7f7b87;
