@@ -341,3 +341,59 @@ input::placeholder {
     width: 18px;
     height: 18px;
 }
+
+/* SOS Button Styles */
+.sos-button {
+    width: 100%;
+    margin-top: 24px;
+    padding: 20px;
+    background-color: #ff3b30; /* Vibrant red */
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(255, 59, 48, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.sos-button:hover {
+    background-color: #ff453a;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(255, 59, 48, 0.4);
+}
+
+.sos-button:active {
+    transform: translateY(0);
+}
+
+.sos-button::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
