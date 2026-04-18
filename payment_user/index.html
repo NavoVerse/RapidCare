@@ -46,7 +46,7 @@
 
         <div class="action-buttons">
             <button class="action-btn" id="detailsBtn">DETAILS OF CHARGE</button>
-            <button class="action-btn">ADD DISCOUNT OR COUPONS</button>
+            <button class="action-btn" id="addDiscountBtn">ADD DISCOUNT OR COUPONS</button>
         </div>
 
         <div class="details-panel" id="detailsPanel">
@@ -63,8 +63,8 @@
                 <span>100 RS</span>
             </div>
             <div class="charge-row">
-                <span>Platform Charge (First Ride Free)</span>
-                <span><del>40 RS</del> 0 RS</span>
+                <span>Platform Charge <span id="firstRideLabel" style="display: none; color: var(--primary-green); font-size: 0.85em;">(First Ride Free)</span></span>
+                <span id="platformChargeDisplay">40 RS</span>
             </div>
             <div class="charge-row" id="rideDiscountRow" style="display: none; color: var(--primary-green);">
                 <span>High Value Ride Discount (>600 RS)</span>
