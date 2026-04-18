@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapidCare Payment</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="payment-container">
+        <h1>RapidCare Always On Your Service</h1>
+
+        <div class="location-indicator">
+            <div class="marker start"></div>
+            <div class="arrow-line"></div>
+            <div class="marker end"></div>
+        </div>
+        <div class="distance-text">your destination is 5 km away</div>
+
+        <div class="payable-amount" id="payableAmountDisplay">
+            payable amount-500 RS
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-btn" id="detailsBtn">DETAILS OF CHARGE</button>
+            <button class="action-btn">ADD DISCOUNT OR COUPONS</button>
+        </div>
+
+        <div class="details-panel" id="detailsPanel">
+            <div class="charge-row">
+                <span>Distance Charge (5 km)</span>
+                <span><del>500 RS</del></span>
+            </div>
+            <div class="charge-row">
+                <span>Discounted Fare</span>
+                <span>350 RS</span>
+            </div>
+            <div class="charge-row">
+                <span>Emergency Equipment</span>
+                <span>100 RS</span>
+            </div>
+            <div class="charge-row">
+                <span>Platform Charge</span>
+                <span>40 RS</span>
+            </div>
+            <div class="charge-row">
+                <span>Donation</span>
+                <span id="donationDisplay">10 RS</span>
+            </div>
+            <div class="charge-row total">
+                <span>Total</span>
+                <span id="totalDisplay">500 RS</span>
+            </div>
+        </div>
+
+        <div class="donation-section">
+            <h3>Donate for poor patients</h3>
+            <div class="donation-grid">
+                <button class="donate-btn selected" data-amount="10">10 RS</button>
+                <button class="donate-btn" data-amount="20">20 RS</button>
+                <button class="donate-btn" data-amount="40">40 RS</button>
+                <button class="donate-btn" data-amount="50">50 RS</button>
+                <button class="donate-btn" data-amount="100">100 RS</button>
+                <button class="donate-btn" data-amount="200">200 RS</button>
+                <input type="number" class="donate-custom" id="customDonation" placeholder="Custom RS" min="0">
+            </div>
+        </div>
+
+        <div class="payment-methods">
+            <h3>Payment methods</h3>
+            <div class="method-options">
+                <label class="method-label">
+                    <input type="radio" name="payment" value="upi" checked> UPI
+                </label>
+                <label class="method-label">
+                    <input type="radio" name="payment" value="card" id="cardRadio"> Card
+                </label>
+                <label class="method-label">
+                    <input type="radio" name="payment" value="cash"> Cash
+                </label>
+            </div>
+
+            <div class="card-details" id="cardDetailsForm">
+                <input type="text" class="card-input" placeholder="Card Number">
+                <div class="row">
+                    <input type="text" class="card-input" placeholder="MM/YY">
+                    <input type="text" class="card-input" placeholder="CVV">
+                </div>
+                <input type="text" class="card-input" placeholder="Name on Card">
+            </div>
+
+            <button class="pay-now-btn">Pay <span id="payBtnAmount">500</span> RS</button>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
