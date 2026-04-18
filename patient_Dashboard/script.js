@@ -144,6 +144,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     locationText.textContent = location.address;
                 }
 
+                // Sync with Database
+                if (window.DBManager) {
+                    await window.DBManager.updateUserLocation(location.lat, location.lng, location.address);
+                }
+
                 if (userMarker) {
                     map.removeLayer(userMarker);
                 }
