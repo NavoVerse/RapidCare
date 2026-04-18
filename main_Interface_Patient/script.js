@@ -84,10 +84,82 @@ document.addEventListener('DOMContentLoaded', () => {
             .bindPopup(`<b>${h.name}</b><br>Status: ${h.status}`);
     });
 
-    // Add User/Ambulance Location (e.g. Park Street area)
-    L.marker([22.5535, 88.3514]).addTo(map)
-        .bindPopup('<b>Current Location</b>')
-        .openPopup();
+    let userMarker = null;
+
+    function renderHospitalsList(userLat, userLng) {
+        const container = document.getElementById('hospitalListContainer');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        // Calculate distances using Leaflet's built-in distanceTo method
+        const hospitalsWithDistance = hospitals.map(h => {
+            const userLatLng = L.latLng(userLat, userLng);
+            const hospitalLatLng = L.latLng(h.lat, h.lng);
+            const distanceInMeters = userLatLng.distanceTo(hospitalLatLng);
+            const distanceInKm = (distanceInMeters / 1000).toFixed(1);
+            return { ...h, distance: distanceInKm };
+        });
+
+        // Sort by distance
+        hospitalsWithDistance.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+
+        hospitalsWithDistance.forEach(h => {
+            const item = document.createElement('div');
+            item.className = 'hospital-item';
+            
+            const statusClass = h.status.toLowerCase();
+            
+            item.innerHTML = \`
+                <div class="hospital-info">
+                    <span class="h-name">\${h.name}</span>
+                    <span class="h-distance">\${h.distance} km away</span>
+                </div>
+                <span class="h-status \${statusClass}">\${h.status}</span>
+            \`;
+            container.appendChild(item);
+        });
+    }
+
+    function updateUserLocation(lat, lng) {
+        if (userMarker) {
+            map.removeLayer(userMarker);
+        }
+        
+        userMarker = L.marker([lat, lng]).addTo(map)
+            .bindPopup('<b>Your Location</b>')
+            .openPopup();
+            
+        map.setView([lat, lng], 12);
+        
+        renderHospitalsList(lat, lng);
+        
+        // Update location text in stats
+        const locationStat = document.querySelector('.stat-card .value');
+        if (locationStat && locationStat.textContent === 'Berlin, DE') {
+            locationStat.textContent = 'Kolkata, IN'; // Can be reverse geocoded if needed
+        }
+    }
+
+    // Try to get actual location
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                updateUserLocation(lat, lng);
+            },
+            (error) => {
+                console.log("Geolocation error or denied. Using default Kolkata location.", error);
+                // Default to Park Street area if denied
+                updateUserLocation(22.5535, 88.3514);
+            },
+            { timeout: 10000, enableHighAccuracy: true }
+        );
+    } else {
+        console.log("Geolocation not available. Using default Kolkata location.");
+        updateUserLocation(22.5535, 88.3514);
+    }
 
     console.log('RapidCare Dashboard and Map Initialized');
 });
