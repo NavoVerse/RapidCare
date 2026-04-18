@@ -63,9 +63,22 @@ document.addEventListener('DOMContentLoaded', () => {
         radio.addEventListener('change', () => {
             if (cardRadio.checked) {
                 cardDetailsForm.classList.add('active');
+                upiDetailsForm.classList.remove('active');
+            } else if (upiRadio.checked) {
+                cardDetailsForm.classList.remove('active');
+                upiDetailsForm.classList.add('active');
             } else {
                 cardDetailsForm.classList.remove('active');
+                upiDetailsForm.classList.remove('active');
             }
+        });
+    });
+
+    // Handle UPI App Selection
+    upiApps.forEach(app => {
+        app.addEventListener('click', () => {
+            upiApps.forEach(a => a.classList.remove('selected'));
+            app.classList.add('selected');
         });
     });
 
