@@ -171,5 +171,121 @@ document.addEventListener('DOMContentLoaded', () => {
 
     detectAutoLocation();
 
+    // Manual Location Selection Logic
+    const locationCard = document.getElementById('locationCard');
+    const locationModal = document.getElementById('locationModal');
+    const closeLocationModal = document.getElementById('closeLocationModal');
+    const quickSelect = document.getElementById('quickLocationSelect');
+    const searchInput = document.getElementById('locationSearchInput');
+    const searchResults = document.getElementById('searchResults');
+    const useGPSBtn = document.getElementById('useCurrentGPS');
+    const locationStatus = document.getElementById('locationStatus');
+
+    if (locationCard) {
+        locationCard.addEventListener('click', () => {
+            locationModal.style.display = 'flex';
+        });
+    }
+
+    const closeModal = () => {
+        locationModal.style.display = 'none';
+        searchResults.innerHTML = '';
+        searchInput.value = '';
+    };
+
+    if (closeLocationModal) {
+        closeLocationModal.addEventListener('click', closeModal);
+    }
+
+    // Close on outside click
+    window.addEventListener('click', (e) => {
+        if (e.target === locationModal) closeModal();
+    });
+
+    // Quick Selection Change
+    if (quickSelect) {
+        quickSelect.addEventListener('change', (e) => {
+            const [lat, lng] = e.target.value.split(',').map(Number);
+            const cityName = e.target.options[e.target.selectedIndex].text;
+            
+            updateUserLocation(lat, lng);
+            const locText = document.getElementById('userLocationText');
+            if (locText) locText.textContent = cityName;
+            
+            if (locationStatus) {
+                locationStatus.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Manual Set`;
+            }
+
+            // Sync with DB
+            if (window.DBManager) {
+                window.DBManager.updateUserLocation(lat, lng, cityName);
+            }
+
+            closeModal();
+        });
+    }
+
+    // Live Search Functionality
+    let searchTimeout;
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            const query = e.target.value;
+            if (query.length < 3) {
+                searchResults.innerHTML = '';
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+                    const data = await response.json();
+                    
+                    searchResults.innerHTML = data.map(item => `
+                        <div class="search-item" data-lat="${item.lat}" data-lon="${item.lon}" data-name="${item.display_name}">
+                            ${item.display_name}
+                        </div>
+                    `).join('');
+
+                    document.querySelectorAll('.search-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const lat = parseFloat(item.dataset.lat);
+                            const lng = parseFloat(item.dataset.lon);
+                            const fullName = item.dataset.name;
+                            const shortName = fullName.split(',')[0];
+
+                            updateUserLocation(lat, lng);
+                            const locText = document.getElementById('userLocationText');
+                            if (locText) locText.textContent = shortName;
+
+                            if (locationStatus) {
+                                locationStatus.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Searched`;
+                            }
+
+                            if (window.DBManager) {
+                                window.DBManager.updateUserLocation(lat, lng, shortName);
+                            }
+
+                            closeModal();
+                        });
+                    });
+                } catch (error) {
+                    console.error("Search failed:", error);
+                }
+            }, 500);
+        });
+    }
+
+    // Use GPS Button
+    if (useGPSBtn) {
+        useGPSBtn.addEventListener('click', () => {
+            if (locationStatus) {
+                locationStatus.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 19V5M5 12l7-7 7 7" /></svg> GPS Active`;
+            }
+            detectAutoLocation();
+            closeModal();
+        });
+    }
+
     console.log('RapidCare Dashboard and Map Initialized');
 });
