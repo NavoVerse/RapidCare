@@ -8,7 +8,7 @@
     --bg-light: #f0fdf4;
     --text-dark: #14532d;
     --text-muted: #4d7c0f;
-    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.1), 0 8px 10px -6px rgba(21, 128, 61, 0.05);
 }
 
 body.dark-mode {
@@ -31,7 +31,7 @@ body.dark-mode {
 }
 
 body {
-    background: linear-gradient(135deg, #fef9c3 0%, var(--primary-yellow) 100%);
+    background: radial-gradient(circle at 0% 0%, var(--bg-light) 0%, #ffffff 100%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -39,10 +39,8 @@ body {
     color: var(--text-dark);
 }
 
-@media (prefers-color-scheme: dark) {
-    body {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    }
+body.dark-mode {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
 
 .main-container {
