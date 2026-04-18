@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Map Initialization
-    const map = L.map('map').setView([28.6139, 77.2090], 11);
+    const map = L.map('map').setView([22.5726, 88.3639], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -60,19 +60,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mock Hospital Data (Simulated from Backend/map_Integration/hospital_locations.json)
     const hospitals = [
-        { name: "AIIMS New Delhi", lat: 28.5672, lng: 77.2100, status: "Available" },
-        { name: "Fortis Escorts", lat: 28.5583, lng: 77.2764, status: "Limited" },
-        { name: "Max Super Speciality", lat: 28.5273, lng: 77.2185, status: "Available" },
-        { name: "Apollo Hospital", lat: 28.5412, lng: 77.2831, status: "Available" },
-        { name: "Safdarjung Hospital", lat: 28.5683, lng: 77.2064, status: "Busy" }
+        { name: "AMRI Hospital, Dhakuria", lat: 22.5135, lng: 88.3629, status: "Available" },
+        { name: "Apollo Gleneagles Hospitals", lat: 22.5710, lng: 88.4055, status: "Limited" },
+        { name: "Fortis Hospital, Anandapur", lat: 22.5165, lng: 88.4042, status: "Available" },
+        { name: "Medica Superspecialty Hospital", lat: 22.4939, lng: 88.3980, status: "Busy" },
+        { name: "NRS Medical College and Hospital", lat: 22.5645, lng: 88.3685, status: "Available" },
+        { name: "Peerless Hospital", lat: 22.4770, lng: 88.3900, status: "Available" },
+        { name: "SSKM Hospital", lat: 22.5392, lng: 88.3444, status: "Busy" }
     ];
 
     // Custom Icon for Hospitals
     const hospitalIcon = L.divIcon({
         className: 'custom-div-icon',
-        html: `<div style="background: var(--primary-green); width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.3);"></div>`,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6]
+        html: `<div style="background: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 2px solid #dc2626;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#dc2626"><path d="M19 10h-5V5c0-1.1-.9-2-2-2s-2 .9-2 2v5H5c-1.1 0-2 .9-2 2s.9 2 2 2h5v5c0 1.1.9 2 2 2s2-.9 2-2v-5h5c1.1 0 2-.9 2-2s-.9-2-2-2z"/></svg></div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
     });
 
     // Add markers
@@ -82,8 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .bindPopup(`<b>${h.name}</b><br>Status: ${h.status}`);
     });
 
-    // Add User/Ambulance Location
-    L.marker([28.6139, 77.2090]).addTo(map)
+    // Add User/Ambulance Location (e.g. Park Street area)
+    L.marker([22.5535, 88.3514]).addTo(map)
         .bindPopup('<b>Current Location</b>')
         .openPopup();
 
