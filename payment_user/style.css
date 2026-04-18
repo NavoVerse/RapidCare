@@ -216,7 +216,7 @@ h1 {
 }
 
 .donate-custom {
-    grid-column: span 2;
+    grid-column: 1 / -1;
     padding: 12px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -387,7 +387,7 @@ h1 {
     }
 
     .donate-custom {
-        grid-column: span 3;
+        grid-column: 1 / -1;
     }
 }
 
