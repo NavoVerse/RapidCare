@@ -36,5 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
         loginView.style.display = 'none';
         signupView.style.display = 'block';
     });
+
+    // Redirection logic for Login/Signup buttons
+    const loginForms = document.querySelectorAll('.login-form');
+    loginForms.forEach(form => {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Redirect to patient interface
+            window.location.href = '../main_Interface_Patient/index.html';
+        });
+    });
 });
 
