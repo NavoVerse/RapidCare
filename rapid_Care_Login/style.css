@@ -13,6 +13,20 @@
     --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
+body.dark-mode {
+    --primary-green: #22c55e;
+    --acc-green: #4ade80;
+    --primary-yellow: #ca8a04;
+    --acc-yellow: #eab308;
+    --white: #1e293b;
+    --bg-light: #0f172a;
+    --text-dark: #f8fafc;
+    --text-muted: #cbd5e1; /* Even lighter for better visibility */
+    --input-bg: #334155;
+    --input-border: #475569;
+    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -27,6 +41,10 @@ body {
     align-items: center;
     min-height: 100vh;
     color: var(--text-dark);
+}
+
+body.dark-mode {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
 
 .container {
@@ -359,7 +377,7 @@ input::placeholder {
 .social-btn {
     flex: 1;
     padding: 14px;
-    background-color: #ffffff;
+    background-color: var(--white);
     border: 1.5px solid var(--input-border);
     border-radius: 10px;
     color: var(--text-dark);

@@ -21,3 +21,17 @@
     --border-color: var(--input-border);
     --accent-dark: var(--primary-green);
 }
+
+body.dark-mode {
+    --primary-green: #22c55e;
+    --acc-green: #4ade80;
+    --primary-yellow: #ca8a04;
+    --acc-yellow: #eab308;
+    --white: #1e293b;
+    --bg-light: #0f172a;
+    --text-dark: #f8fafc;
+    --text-muted: #cbd5e1; /* Even lighter for better visibility */
+    --input-bg: #334155;
+    --input-border: #475569;
+    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+}
