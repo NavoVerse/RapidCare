@@ -130,36 +130,41 @@ document.addEventListener('DOMContentLoaded', () => {
             .bindPopup('<b>Your Location</b>')
             .openPopup();
             
-        map.setView([lat, lng], 12);
-        
+        map.setView([lat, lng], 13);
         renderHospitalsList(lat, lng);
-        
-        // Update location text in stats
-        const locationStat = document.querySelector('.stat-card .value');
-        if (locationStat && locationStat.textContent === 'Berlin, DE') {
-            locationStat.textContent = 'Kolkata, IN'; // Can be reverse geocoded if needed
+    }
+
+    async function detectAutoLocation() {
+        const locationText = document.getElementById('userLocationText');
+        try {
+            if (window.LocationService) {
+                const location = await window.LocationService.getCurrentLocation();
+                
+                if (locationText) {
+                    locationText.textContent = location.address;
+                }
+
+                if (userMarker) {
+                    map.removeLayer(userMarker);
+                }
+                
+                userMarker = L.marker([location.lat, location.lng]).addTo(map)
+                    .bindPopup(`<b>Your Detected Location</b><br>${location.address}`)
+                    .openPopup();
+                    
+                map.setView([location.lat, location.lng], 13);
+                
+                renderHospitalsList(location.lat, location.lng);
+            }
+        } catch (error) {
+            console.error("Auto-location failed:", error);
+            if (locationText) locationText.textContent = "Location Blocked";
+            // Fallback to default
+            updateUserLocation(22.5535, 88.3514);
         }
     }
 
-    // Try to get actual location
-    if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-                updateUserLocation(lat, lng);
-            },
-            (error) => {
-                console.log("Geolocation error or denied. Using default Kolkata location.", error);
-                // Default to Park Street area if denied
-                updateUserLocation(22.5535, 88.3514);
-            },
-            { timeout: 10000, enableHighAccuracy: true }
-        );
-    } else {
-        console.log("Geolocation not available. Using default Kolkata location.");
-        updateUserLocation(22.5535, 88.3514);
-    }
+    detectAutoLocation();
 
     console.log('RapidCare Dashboard and Map Initialized');
 });
