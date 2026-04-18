@@ -32,8 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Platform charge = 40
     let baseFare = 350; 
     let equipmentCharge = 100;
-    let platformCharge = 0; // First ride free
+    let platformCharge = 40; // Default before discount
     let donationAmount = 10;
+    
+    // Active discount states
+    let isPlatformFree = false;
+    let isHighValueApplied = false;
+    let selectedBankOffer = 'none';
 
     // Elements
     const detailsBtn = document.getElementById('detailsBtn');
@@ -50,7 +55,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const bankDiscountRow = document.getElementById('bankDiscountRow');
     const bankDiscountName = document.getElementById('bankDiscountName');
     const bankDiscountAmount = document.getElementById('bankDiscountAmount');
-    const bankSelect = document.getElementById('bankSelect');
+
+    const addDiscountBtn = document.getElementById('addDiscountBtn');
+    const firstRideLabel = document.getElementById('firstRideLabel');
+    const platformChargeDisplay = document.getElementById('platformChargeDisplay');
+
+    const discountModal = document.getElementById('discountModal');
+    const closeModal = document.getElementById('closeModal');
+    const applyDiscountsBtn = document.getElementById('applyDiscountsBtn');
+    const cbPlatformFree = document.getElementById('cbPlatformFree');
+    const cbHighValue = document.getElementById('cbHighValue');
+    const bankRadios = document.getElementsByName('bankOffer');
 
     const cardRadio = document.getElementById('cardRadio');
     const upiRadio = document.getElementById('upiRadio');
@@ -63,6 +78,46 @@ document.addEventListener('DOMContentLoaded', () => {
     detailsBtn.addEventListener('click', () => {
         detailsPanel.classList.toggle('active');
     });
+
+    // Modal Logic
+    if (addDiscountBtn) {
+        addDiscountBtn.addEventListener('click', () => {
+            if (discountModal) discountModal.classList.add('active');
+        });
+    }
+
+    if (closeModal) {
+        closeModal.addEventListener('click', () => {
+            if (discountModal) discountModal.classList.remove('active');
+        });
+    }
+
+    if (applyDiscountsBtn) {
+        applyDiscountsBtn.addEventListener('click', () => {
+            isPlatformFree = cbPlatformFree && cbPlatformFree.checked;
+            isHighValueApplied = cbHighValue && cbHighValue.checked;
+            
+            if (bankRadios) {
+                for (let radio of bankRadios) {
+                    if (radio.checked) {
+                        selectedBankOffer = radio.value;
+                        break;
+                    }
+                }
+            }
+
+            platformCharge = isPlatformFree ? 0 : 40;
+
+            // Update button UI
+            addDiscountBtn.textContent = 'DISCOUNTS APPLIED';
+            addDiscountBtn.style.backgroundColor = 'var(--primary-color)';
+            addDiscountBtn.style.color = 'white';
+            addDiscountBtn.style.borderColor = 'var(--primary-color)';
+            
+            updateTotal();
+            if (discountModal) discountModal.classList.remove('active');
+        });
+    }
 
     // Handle Donation Buttons
     donateBtns.forEach(btn => {
@@ -107,10 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    if (bankSelect) {
-        bankSelect.addEventListener('change', updateTotal);
-    }
-
     // Handle UPI App Selection
     upiApps.forEach(app => {
         app.addEventListener('click', () => {
@@ -124,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let subtotal = baseFare + equipmentCharge + platformCharge;
         
         let rideDiscount = 0;
-        if (subtotal > 600) {
+        if (isHighValueApplied && subtotal > 600) {
             rideDiscount = 10;
             if (rideDiscountRow) rideDiscountRow.style.display = 'flex';
         } else {
@@ -134,12 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let bankDiscount = 0;
         let bankName = "";
         
-        if (cardRadio.checked && bankSelect && bankSelect.value !== 'none' && bankSelect.value !== 'other') {
-            const bank = bankSelect.value;
-            if (bank === 'hdfc') {
+        if (cardRadio.checked && selectedBankOffer !== 'none') {
+            if (selectedBankOffer === 'hdfc') {
                 bankDiscount = Math.round((subtotal - rideDiscount) * 0.05);
                 bankName = "HDFC Bank (5% Off)";
-            } else if (bank === 'sbi') {
+            } else if (selectedBankOffer === 'sbi') {
                 bankDiscount = Math.round((subtotal - rideDiscount) * 0.06);
                 bankName = "SBI Bank (6% Off)";
             }
@@ -151,6 +201,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (bankDiscountRow) bankDiscountRow.style.display = 'flex';
         } else {
             if (bankDiscountRow) bankDiscountRow.style.display = 'none';
+        }
+
+        // Update platform charge display based on discount status
+        if (platformChargeDisplay) {
+            if (isPlatformFree) {
+                platformChargeDisplay.innerHTML = '<del>40 RS</del> 0 RS';
+                if (firstRideLabel) firstRideLabel.style.display = 'inline';
+            } else {
+                platformChargeDisplay.textContent = '40 RS';
+                if (firstRideLabel) firstRideLabel.style.display = 'none';
+            }
         }
 
         const total = subtotal - rideDiscount - bankDiscount + donationAmount;

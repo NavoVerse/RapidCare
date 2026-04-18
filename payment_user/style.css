@@ -390,3 +390,103 @@ h1 {
         grid-column: span 3;
     }
 }
+
+/* Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    width: 90%;
+    max-width: 450px;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-align: left;
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.modal-header h2 {
+    font-size: 1.3rem;
+    font-family: var(--font-family);
+    color: var(--text-main);
+    margin: 0;
+}
+
+.close-modal {
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.discount-option {
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.discount-option:hover {
+    border-color: var(--primary-color);
+    background: rgba(39, 174, 96, 0.05);
+}
+
+.discount-option label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    width: 100%;
+}
+
+.discount-option input[type="radio"],
+.discount-option input[type="checkbox"] {
+    accent-color: var(--primary-color);
+    width: 16px;
+    height: 16px;
+}
+
+.apply-modal-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 15px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.apply-modal-btn:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2);
+}
