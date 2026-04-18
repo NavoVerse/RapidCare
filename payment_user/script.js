@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const payNowBtn = document.querySelector('.pay-now-btn');
     payNowBtn.addEventListener('click', () => {
         alert('PAYMENT SUCCESSFUL!\n\nTransaction ID: RC' + Math.floor(Math.random() * 1000000) + '\nThank you for choosing RapidCare.');
-        window.location.href = '../main_Interface_Patient/index.html';
+        window.location.href = '../patient_Dashboard/index.html';
     });
 
     // Handle Payment Method Toggle
