@@ -1,22 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RapidCare Payment</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <div class="payment-container">
-        <div class="theme-toggle" id="theme-toggle" style="position: absolute; top: 30px; right: 30px; cursor: pointer; color: var(--text-dark); z-index: 1000;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <div class="theme-toggle" id="theme-toggle"
+            style="position: absolute; top: 30px; right: 30px; cursor: pointer; color: var(--text-dark); z-index: 1000;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
         </div>
         <h1>RapidCare Always On Your Service</h1>
 
         <div class="location-indicator">
             <div class="marker-icon ambulance">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
                     <rect x="1" y="10" width="18" height="8" rx="2" />
                     <path d="M19 18h2a1 1 0 0 0 1-1v-4l-3-3h-3" />
                     <circle cx="5" cy="18" r="2" />
@@ -27,7 +41,8 @@
             </div>
             <div class="arrow-line"></div>
             <div class="marker-icon hospital">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
                     <path d="M18 21V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16" />
                     <path d="M22 21H2" />
                     <path d="M10 7h4M12 5v4" />
@@ -63,7 +78,9 @@
                 <span>100 RS</span>
             </div>
             <div class="charge-row">
-                <span>Platform Charge <span id="firstRideLabel" style="display: none; color: var(--primary-green); font-size: 0.85em;">(First Ride Free)</span></span>
+                <span>Platform Charge <span id="firstRideLabel"
+                        style="display: none; color: var(--primary-green); font-size: 0.85em;">(First Ride
+                        Free)</span></span>
                 <span id="platformChargeDisplay">40 RS</span>
             </div>
             <div class="charge-row" id="rideDiscountRow" style="display: none; color: var(--primary-green);">
@@ -114,7 +131,8 @@
             <div class="upi-details active" id="upiDetailsForm">
                 <div class="upi-apps">
                     <div class="upi-app selected" data-app="gpay">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="GPay">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+                            alt="GPay">
                         <span>GPay</span>
                     </div>
                     <div class="upi-app" data-app="phonepe">
@@ -126,7 +144,8 @@
                         <span>Amazon</span>
                     </div>
                     <div class="upi-app" data-app="bhim">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="BHIM UPI">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg"
+                            alt="BHIM UPI">
                         <span>BHIM</span>
                     </div>
                 </div>
@@ -135,11 +154,36 @@
             </div>
 
             <div class="card-details" id="cardDetailsForm">
-                <select class="card-input" id="bankSelect" style="margin-bottom: 12px; cursor: pointer; background: white;">
-                    <option value="none">Select Bank for Offers</option>
-                    <option value="hdfc">HDFC Bank (5% Off)</option>
-                    <option value="sbi">SBI Bank (6% Off)</option>
-                    <option value="other">Other Bank</option>
+                <select class="card-input" id="paymentBankSelect"
+                    style="margin-bottom: 12px; cursor: pointer; background: white;">
+                    <option value="" disabled selected>Select Your Bank</option>
+                    <option value="sbi">State Bank of India (SBI)</option>
+                    <option value="hdfc">HDFC Bank</option>
+                    <option value="icici">ICICI Bank</option>
+                    <option value="pnb">Punjab National Bank (PNB)</option>
+                    <option value="axis">Axis Bank</option>
+                    <option value="canara">Canara Bank</option>
+                    <option value="bob">Bank of Baroda (BoB)</option>
+                    <option value="union">Union Bank of India</option>
+                    <option value="boi">Bank of India (BOI)</option>
+                    <option value="indian">Indian Bank</option>
+                    <option value="central">Central Bank of India</option>
+                    <option value="iob">Indian Overseas Bank (IOB)</option>
+                    <option value="uco">UCO Bank</option>
+                    <option value="bom">Bank of Maharashtra</option>
+                    <option value="psb">Punjab & Sind Bank</option>
+                    <option value="kotak">Kotak Mahindra Bank</option>
+                    <option value="indusind">IndusInd Bank</option>
+                    <option value="yes">Yes Bank</option>
+                    <option value="idfc">IDFC First Bank</option>
+                    <option value="federal">Federal Bank</option>
+                    <option value="southindian">South Indian Bank</option>
+                    <option value="karur">Karur Vysya Bank</option>
+                    <option value="rbl">RBL Bank</option>
+                    <option value="bandhan">Bandhan Bank</option>
+                    <option value="cityunion">City Union Bank</option>
+                    <option value="idbi">IDBI Bank</option>
+                    <option value="jkb">Jammu & Kashmir Bank</option>
                 </select>
                 <input type="text" class="card-input" placeholder="Card Number">
                 <div class="row">
@@ -154,6 +198,51 @@
 
     </div>
 
+    <!-- Discount Modal -->
+    <div class="modal-overlay" id="discountModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Discounts & Coupons</h2>
+                <span class="close-modal" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="discount-option">
+                    <label>
+                        <input type="checkbox" id="cbPlatformFree" value="platform">
+                        <strong>First Ride Offer:</strong> Platform Charge Free
+                    </label>
+                </div>
+                <div class="discount-option" id="optHighValue">
+                    <label>
+                        <input type="checkbox" id="cbHighValue" value="highvalue">
+                        <strong>High Value Ride:</strong> 10 RS off on rides > 600 RS
+                    </label>
+                </div>
+                <div class="discount-option">
+                    <label>
+                        <input type="radio" name="bankOffer" id="rbHdfc" value="hdfc">
+                        <strong>HDFC Bank Card:</strong> 5% Off
+                    </label>
+                </div>
+                <div class="discount-option">
+                    <label>
+                        <input type="radio" name="bankOffer" id="rbSbi" value="sbi">
+                        <strong>SBI Bank Card:</strong> 6% Off
+                    </label>
+                </div>
+                <div class="discount-option">
+                    <label>
+                        <input type="radio" name="bankOffer" id="rbNone" value="none" checked>
+                        No Bank Offer
+                    </label>
+                </div>
+            </div>
+            <button class="apply-modal-btn" id="applyDiscountsBtn">Apply Discounts</button>
+        </div>
+    </div>
+
+    xv
     <script src="script.js"></script>
 </body>
+
 </html>
