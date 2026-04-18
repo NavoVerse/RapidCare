@@ -1,3 +1,4 @@
+@import url('https://fonts.cdnfonts.com/css/blending');
 :root {
     --primary-green: #15803d;
     --acc-green: #22c55e;
@@ -58,10 +59,10 @@ body {
 }
 
 .logo-text {
-    font-size: 20px;
-    font-weight: 700;
+    font-family: 'Blending', cursive;
+    font-size: 24px;
+    font-weight: 400;
     color: var(--primary-green);
-    letter-spacing: -0.5px;
 }
 
 .nav-menu {

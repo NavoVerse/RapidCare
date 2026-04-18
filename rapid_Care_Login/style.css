@@ -1,3 +1,4 @@
+@import url('https://fonts.cdnfonts.com/css/blending');
 :root {
     --primary-green: #15803d;
     --acc-green: #22c55e;
@@ -104,10 +105,9 @@ body {
 }
 
 .logo-text {
-    font-family: 'Inter', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
+    font-family: 'Blending', cursive;
+    font-size: 32px;
+    font-weight: 400;
     color: var(--white);
 }
 
