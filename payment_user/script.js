@@ -47,8 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const payBtnAmount = document.getElementById('payBtnAmount');
 
     const cardRadio = document.getElementById('cardRadio');
+    const upiRadio = document.getElementById('upiRadio');
     const paymentRadios = document.querySelectorAll('input[name="payment"]');
     const cardDetailsForm = document.getElementById('cardDetailsForm');
+    const upiDetailsForm = document.getElementById('upiDetailsForm');
+    const upiApps = document.querySelectorAll('.upi-app');
 
     // Toggle Details Panel
     detailsBtn.addEventListener('click', () => {
@@ -86,9 +89,22 @@ document.addEventListener('DOMContentLoaded', () => {
         radio.addEventListener('change', () => {
             if (cardRadio.checked) {
                 cardDetailsForm.classList.add('active');
+                upiDetailsForm.classList.remove('active');
+            } else if (upiRadio.checked) {
+                cardDetailsForm.classList.remove('active');
+                upiDetailsForm.classList.add('active');
             } else {
                 cardDetailsForm.classList.remove('active');
+                upiDetailsForm.classList.remove('active');
             }
+        });
+    });
+
+    // Handle UPI App Selection
+    upiApps.forEach(app => {
+        app.addEventListener('click', () => {
+            upiApps.forEach(a => a.classList.remove('selected'));
+            app.classList.add('selected');
         });
     });
 

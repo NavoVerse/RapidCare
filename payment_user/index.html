@@ -93,14 +93,37 @@
             <h3>Payment methods</h3>
             <div class="method-options">
                 <label class="method-label">
-                    <input type="radio" name="payment" value="upi" checked> UPI
+                    <input type="radio" name="payment" value="upi" id="upiRadio" checked> UPI
                 </label>
                 <label class="method-label">
                     <input type="radio" name="payment" value="card" id="cardRadio"> Card
                 </label>
                 <label class="method-label">
-                    <input type="radio" name="payment" value="cash"> Cash
+                    <input type="radio" name="payment" value="cash" id="cashRadio"> Cash
                 </label>
+            </div>
+
+            <div class="upi-details active" id="upiDetailsForm">
+                <div class="upi-apps">
+                    <div class="upi-app selected" data-app="gpay">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="GPay">
+                        <span>GPay</span>
+                    </div>
+                    <div class="upi-app" data-app="phonepe">
+                        <img src="https://download.logo.wine/logo/PhonePe/PhonePe-Logo.wine.png" alt="PhonePe">
+                        <span>PhonePe</span>
+                    </div>
+                    <div class="upi-app" data-app="amazon">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg" alt="Amazon Pay">
+                        <span>Amazon</span>
+                    </div>
+                    <div class="upi-app" data-app="bhim">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="BHIM UPI">
+                        <span>BHIM</span>
+                    </div>
+                </div>
+                <p style="text-align: center; margin: 10px 0; color: #666; font-size: 0.9rem;">OR</p>
+                <input type="text" class="card-input" placeholder="Enter UPI ID (e.g., name@okbank)">
             </div>
 
             <div class="card-details" id="cardDetailsForm">

@@ -258,6 +258,62 @@ h1 {
     font-weight: 500;
 }
 
+.upi-details {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.upi-details.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.upi-apps {
+    display: flex;
+    gap: 15px;
+    justify-content: space-around;
+    margin-bottom: 5px;
+}
+
+.upi-app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 80px;
+}
+
+.upi-app img {
+    height: 30px;
+    max-width: 50px;
+    object-fit: contain;
+}
+
+.upi-app span {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.upi-app:hover {
+    border-color: var(--primary-color);
+}
+
+.upi-app.selected {
+    border-color: var(--primary-color);
+    background-color: rgba(39, 174, 96, 0.05);
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.15);
+}
+
 .card-details {
     display: none;
     flex-direction: column;
