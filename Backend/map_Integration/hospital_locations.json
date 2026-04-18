@@ -1,42 +1,51 @@
 [
     {
         "id": 1,
-        "name": "City General Hospital",
-        "lat": 52.5200,
-        "lng": 13.4050,
-        "status": "Available",
-        "distance": "1.2 km"
+        "name": "AMRI Hospital, Dhakuria",
+        "lat": 22.5135,
+        "lng": 88.3629,
+        "status": "Available"
     },
     {
         "id": 2,
-        "name": "St. Mary's Medical Center",
-        "lat": 52.5300,
-        "lng": 13.3900,
-        "status": "Limited",
-        "distance": "2.5 km"
+        "name": "Apollo Gleneagles Hospitals",
+        "lat": 22.5710,
+        "lng": 88.4055,
+        "status": "Limited"
     },
     {
         "id": 3,
-        "name": "Metro Health Institute",
-        "lat": 52.5100,
-        "lng": 13.4200,
-        "status": "Available",
-        "distance": "3.8 km"
+        "name": "Fortis Hospital, Anandapur",
+        "lat": 22.5165,
+        "lng": 88.4042,
+        "status": "Available"
     },
     {
         "id": 4,
-        "name": "Sunshine Pediatric Care",
-        "lat": 52.5400,
-        "lng": 13.4100,
-        "status": "Available",
-        "distance": "4.1 km"
+        "name": "Medica Superspecialty Hospital",
+        "lat": 22.4939,
+        "lng": 88.3980,
+        "status": "Busy"
     },
     {
         "id": 5,
-        "name": "Hope Emergency Clinic",
-        "lat": 52.5000,
-        "lng": 13.3800,
-        "status": "Busy",
-        "distance": "5.5 km"
+        "name": "NRS Medical College & Hospital",
+        "lat": 22.5645,
+        "lng": 88.3685,
+        "status": "Available"
+    },
+    {
+        "id": 6,
+        "name": "Peerless Hospital",
+        "lat": 22.4770,
+        "lng": 88.3900,
+        "status": "Available"
+    },
+    {
+        "id": 7,
+        "name": "SSKM Hospital",
+        "lat": 22.5392,
+        "lng": 88.3444,
+        "status": "Busy"
     }
 ]
