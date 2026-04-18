@@ -121,15 +121,20 @@
         <div class="dashboard-container">
             <!-- Stats -->
             <div class="stats-grid">
-                <div class="stat-card">
-                    <label>Your Location</label>
+                <div class="stat-card clickable-stat" id="locationCard">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                        <label>Your Location</label>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-green);">
+                            <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                    </div>
                     <div class="value" id="userLocationText">Detecting...</div>
-                    <div class="trend positive">
+                    <div class="trend positive" id="locationStatus">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="3">
                             <path d="M12 19V5M5 12l7-7 7 7" />
                         </svg>
-                        On Track
+                        GPS Active
                     </div>
                 </div>
                 <div class="stat-card">
@@ -194,7 +199,40 @@
                 </div>
             </div>
         </div>
-    </main>
+    <!-- Location Selection Modal -->
+    <div class="modal-overlay" id="locationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Set Your Location</h2>
+                <span class="close-modal" id="closeLocationModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="search-box-container" style="margin-bottom: 20px;">
+                    <input type="text" id="locationSearchInput" placeholder="Search city or hospital area..." 
+                        style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; outline: none;">
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+                
+                <div class="dropdown-section">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Quick Selection</label>
+                    <select id="quickLocationSelect" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); color: var(--text-main);">
+                        <option value="" disabled selected>Choose a major area...</option>
+                        <option value="22.5726,88.3639">Central Kolkata</option>
+                        <option value="22.5165,88.4042">Bypass / Anandapur</option>
+                        <option value="22.5850,88.3470">Howrah Station</option>
+                        <option value="22.6547,88.4467">Kolkata Airport (CCU)</option>
+                        <option value="22.5135,88.3629">Dhakuria / Jadavpur</option>
+                        <option value="22.4939,88.3980">Southend / Mukundapur</option>
+                    </select>
+                </div>
+
+                <button id="useCurrentGPS" style="width: 100%; margin-top: 20px; padding: 12px; background: var(--primary-green); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    Use My Live GPS
+                </button>
+            </div>
+        </div>
+    </div>
 
 
 
