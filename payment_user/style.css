@@ -18,6 +18,12 @@ body {
     min-height: 100vh;
 }
 
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+}
+
 .payment-container {
     background: var(--card-bg);
     width: 100%;
