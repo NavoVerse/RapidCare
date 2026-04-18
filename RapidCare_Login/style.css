@@ -55,7 +55,8 @@ body {
     overflow: hidden;
 }
 
-.slider-container, .slider {
+.slider-container,
+.slider {
     position: absolute;
     top: 0;
     left: 0;
@@ -388,7 +389,7 @@ input::placeholder {
     width: 100%;
     margin-top: 30px;
     padding: 22px;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    background: linear-gradient(135deg, #ef4444 0%, #ed0d0d 100%);
     color: #ffffff;
     border: none;
     border-radius: 15px;
@@ -430,10 +431,12 @@ input::placeholder {
         transform: scale(0.95);
         box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.8);
     }
+
     70% {
         transform: scale(1.1);
         box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
     }
+
     100% {
         transform: scale(0.95);
         box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
@@ -445,10 +448,12 @@ input::placeholder {
         box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
         transform: scale(1);
     }
+
     50% {
         box-shadow: 0 0 25px 10px rgba(239, 68, 68, 0.5);
         transform: scale(1.03);
     }
+
     100% {
         box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
         transform: scale(1);
@@ -461,9 +466,11 @@ input::placeholder {
         flex-direction: column;
         min-height: auto;
     }
+
     .left-panel {
         flex: 0 0 300px;
     }
+
     .right-panel {
         padding: 40px 30px;
     }
