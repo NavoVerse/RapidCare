@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             // Redirect to patient interface
-            window.location.href = '../main_Interface_Patient/index.html';
+            window.location.href = '../patient_Dashboard/index.html';
         });
     });
 });
