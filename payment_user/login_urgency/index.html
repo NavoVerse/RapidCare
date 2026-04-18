@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RapidCare Emergency Login — Verify your identity and categorize your emergency for rapid dispatch.">
+    <title>RapidCare — Emergency Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/blending" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="themeToggle">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </div>
+
+    <div class="page-wrapper">
+        <!-- Emergency Header with Glassmorphism -->
+        <header class="emergency-header" id="emergencyHeader">
+            <div class="header-inner">
+                <div class="header-left">
+                    <div class="pulse-dot"></div>
+                    <h1 class="brand-name">RapidCare</h1>
+                </div>
+                <div class="header-center">
+                    <span class="header-title">EMERGENCY LOGIN</span>
+                    <span class="header-subtitle">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                        Secure Protocol Active
+                    </span>
+                </div>
+                <div class="header-right">
+                    <div class="step-indicator">
+                        <span class="step active" id="stepDot1">1</span>
+                        <span class="step-line" id="stepLine1"></span>
+                        <span class="step" id="stepDot2">2</span>
+                        <span class="step-line" id="stepLine2"></span>
+                        <span class="step" id="stepDot3">3</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Slides Container -->
+        <main class="slides-viewport">
+            <div class="slides-track" id="slidesTrack">
+
+                <!-- ===================== SLIDE 1: Mobile / Email ===================== -->
+                <section class="slide" id="slide1">
+                    <div class="card">
+                        <div class="card-body slide-content">
+                            <div class="slide-icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                    <path d="M12 8v4M12 16h.01"></path>
+                                </svg>
+                            </div>
+                            <h2 class="slide-title">Emergency Login</h2>
+                            <p class="slide-subtitle">Verify your identity to request emergency services</p>
+
+                            <!-- Mobile / Email Toggle -->
+                            <div class="toggle-group" id="contactToggle">
+                                <button class="toggle-btn active" data-mode="mobile" id="toggleMobile">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                                        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                                    </svg>
+                                    Mobile
+                                </button>
+                                <button class="toggle-btn" data-mode="email" id="toggleEmail">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                    </svg>
+                                    Email
+                                </button>
+                            </div>
+
+                            <!-- Phone Input -->
+                            <div class="input-section" id="mobileSection">
+                                <label class="input-label" for="phoneInput">PHONE NUMBER</label>
+                                <div class="phone-input-wrapper">
+                                    <span class="country-code">+91</span>
+                                    <input type="tel" class="form-input phone-input" id="phoneInput" placeholder="Enter your mobile number" maxlength="10" autocomplete="tel">
+                                </div>
+                            </div>
+
+                            <!-- Email Input (hidden by default) -->
+                            <div class="input-section" id="emailSection" style="display: none;">
+                                <label class="input-label" for="emailInput">EMAIL ADDRESS</label>
+                                <input type="email" class="form-input" id="emailInput" placeholder="Enter your email address" autocomplete="email">
+                            </div>
+
+                            <button class="primary-btn" id="sendCodeBtn" disabled>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                                SEND VERIFICATION CODE
+                            </button>
+
+                            <p class="disclaimer">By continuing, you agree to RapidCare's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===================== SLIDE 2: OTP Verification ===================== -->
+                <section class="slide" id="slide2">
+                    <div class="card">
+                        <div class="card-body slide-content">
+                            <div class="slide-icon verified-icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                    <polyline points="9 12 12 15 16 10"></polyline>
+                                </svg>
+                            </div>
+                            <h2 class="slide-title">Enter Verification Code</h2>
+                            <p class="slide-subtitle">Code sent to <strong id="sentToDisplay">+91 ••••••••••</strong></p>
+
+                            <!-- 6-Digit OTP Input -->
+                            <div class="otp-container" id="otpContainer">
+                                <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="0" aria-label="Digit 1" autocomplete="one-time-code">
+                                <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="1" aria-label="Digit 2">
+                                <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="2" aria-label="Digit 3">
+                                <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="3" aria-label="Digit 4">
+                                <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="4" aria-label="Digit 5">
+                                <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="5" aria-label="Digit 6">
+                            </div>
+
+                            <button class="primary-btn" id="verifyBtn" disabled>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                SECURE VERIFY
+                            </button>
+
+                            <div class="resend-section">
+                                <p class="resend-text">Didn't receive code?</p>
+                                <button class="resend-btn" id="resendBtn" disabled>
+                                    Resend Code <span id="resendTimer">(30s)</span>
+                                </button>
+                            </div>
+
+                            <button class="back-link-btn" id="backToSlide1">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                                    <polyline points="12 19 5 12 12 5"></polyline>
+                                </svg>
+                                Change number
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===================== SLIDE 3: Emergency Categorization ===================== -->
+                <section class="slide" id="slide3">
+                    <div class="card">
+                        <!-- Verified Badge -->
+                        <div class="verified-badge" id="verifiedBadge">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Verified — Patient Identity Confirmed</span>
+                        </div>
+
+                        <div class="card-body">
+                            <h2 class="slide-title" style="margin-top: 0;">Emergency Categorization</h2>
+                            <p class="slide-subtitle" style="margin-bottom: 28px;">Select the patient's symptoms and the required vehicle category for rapid dispatch.</p>
+
+                            <div class="form-grid">
+                                <!-- Component 1: Patient Symptoms -->
+                                <div class="form-block" id="symptomsBlock">
+                                    <label class="form-label" for="symptomSearch">
+                                        <span class="label-icon symptoms-icon">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M12 2v8m0 0v8m0-8h8m-8 0H4"></path>
+                                            </svg>
+                                        </span>
+                                        Patient Symptoms
+                                    </label>
+                                    <div class="dropdown-wrapper" id="symptomDropdownWrapper">
+                                        <div class="search-input-wrapper">
+                                            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="11" cy="11" r="8"></circle>
+                                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                            </svg>
+                                            <input type="text" class="search-input" id="symptomSearch" placeholder="Search symptoms..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="symptomList">
+                                            <span class="clear-btn" id="symptomClear" title="Clear">&times;</span>
+                                        </div>
+                                        <div class="dropdown-list" id="symptomList" role="listbox"></div>
+                                    </div>
+                                    <div class="selected-tags" id="selectedSymptoms"></div>
+                                </div>
+
+                                <!-- Component 2: Vehicle Category -->
+                                <div class="form-block" id="vehicleBlock">
+                                    <label class="form-label" for="vehicleSearch">
+                                        <span class="label-icon vehicle-icon">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="1" y="10" width="18" height="8" rx="2" />
+                                                <path d="M19 18h2a1 1 0 0 0 1-1v-4l-3-3h-3" />
+                                                <circle cx="5" cy="18" r="2" />
+                                                <circle cx="15" cy="18" r="2" />
+                                                <path d="M13 10V6a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v4" />
+                                                <path d="M7 14h4M9 12v4" />
+                                            </svg>
+                                        </span>
+                                        Vehicle Category
+                                    </label>
+                                    <div class="dropdown-wrapper" id="vehicleDropdownWrapper">
+                                        <div class="search-input-wrapper">
+                                            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="11" cy="11" r="8"></circle>
+                                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                            </svg>
+                                            <input type="text" class="search-input" id="vehicleSearch" placeholder="Select vehicle type..." autocomplete="off" readonly role="combobox" aria-expanded="false" aria-controls="vehicleList">
+                                            <svg class="chevron-icon" id="vehicleChevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </div>
+                                        <div class="dropdown-list vehicle-dropdown" id="vehicleList" role="listbox"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Button -->
+                            <button class="primary-btn dispatch-btn" id="submitBtn" disabled>
+                                <span class="btn-pulse"></span>
+                                Confirm &amp; Dispatch Emergency
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+        <footer class="page-footer">
+            <p>&copy; 2026 RapidCare &mdash; Always On Your Service</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -72,5 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = '../patient_Dashboard/index.html';
         });
     });
+
+    // SOS Button Redirection
+    const sosButton = document.querySelector('.sos-button');
+    if (sosButton) {
+        sosButton.addEventListener('click', () => {
+            window.location.href = '../payment_user/login_urgency/index.html';
+        });
+    }
 });
 
