@@ -80,16 +80,15 @@ body {
     box-shadow: 0 25px 35px -5px rgba(21, 128, 61, 0.15), 0 15px 15px -5px rgba(21, 128, 61, 0.1);
 }
 
-.driver-card {
+.driver-card, .patient-card {
     position: relative;
     overflow: hidden;
 }
 
-.driver-card::before {
+.driver-card::before, .patient-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-image: url('ambulance.png');
     background-size: cover;
     background-position: center;
     filter: blur(4px);
@@ -98,13 +97,21 @@ body {
     transition: all 0.4s ease;
 }
 
-.role-card.driver-card:hover::before {
+.driver-card::before {
+    background-image: url('ambulance.png');
+}
+
+.patient-card::before {
+    background-image: url('patient.jpg');
+}
+
+.role-card.driver-card:hover::before, .role-card.patient-card:hover::before {
     opacity: 0.4;
     filter: blur(2px);
     transform: scale(1.1);
 }
 
-.driver-card > * {
+.driver-card > *, .patient-card > * {
     position: relative;
     z-index: 2;
 }
