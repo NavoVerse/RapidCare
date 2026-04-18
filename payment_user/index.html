@@ -104,6 +104,7 @@
         <div class="donation-section">
             <h3>Donate for poor patients</h3>
             <div class="donation-grid">
+                <button class="donate-btn" data-amount="0" style="grid-column: span 2;">No Donation</button>
                 <button class="donate-btn selected" data-amount="10">10 RS</button>
                 <button class="donate-btn" data-amount="20">20 RS</button>
                 <button class="donate-btn" data-amount="40">40 RS</button>
@@ -154,37 +155,6 @@
             </div>
 
             <div class="card-details" id="cardDetailsForm">
-                <select class="card-input" id="paymentBankSelect"
-                    style="margin-bottom: 12px; cursor: pointer; background: white;">
-                    <option value="" disabled selected>Select Your Bank</option>
-                    <option value="sbi">State Bank of India (SBI)</option>
-                    <option value="hdfc">HDFC Bank</option>
-                    <option value="icici">ICICI Bank</option>
-                    <option value="pnb">Punjab National Bank (PNB)</option>
-                    <option value="axis">Axis Bank</option>
-                    <option value="canara">Canara Bank</option>
-                    <option value="bob">Bank of Baroda (BoB)</option>
-                    <option value="union">Union Bank of India</option>
-                    <option value="boi">Bank of India (BOI)</option>
-                    <option value="indian">Indian Bank</option>
-                    <option value="central">Central Bank of India</option>
-                    <option value="iob">Indian Overseas Bank (IOB)</option>
-                    <option value="uco">UCO Bank</option>
-                    <option value="bom">Bank of Maharashtra</option>
-                    <option value="psb">Punjab & Sind Bank</option>
-                    <option value="kotak">Kotak Mahindra Bank</option>
-                    <option value="indusind">IndusInd Bank</option>
-                    <option value="yes">Yes Bank</option>
-                    <option value="idfc">IDFC First Bank</option>
-                    <option value="federal">Federal Bank</option>
-                    <option value="southindian">South Indian Bank</option>
-                    <option value="karur">Karur Vysya Bank</option>
-                    <option value="rbl">RBL Bank</option>
-                    <option value="bandhan">Bandhan Bank</option>
-                    <option value="cityunion">City Union Bank</option>
-                    <option value="idbi">IDBI Bank</option>
-                    <option value="jkb">Jammu & Kashmir Bank</option>
-                </select>
                 <input type="text" class="card-input" placeholder="Card Number">
                 <div class="row">
                     <input type="text" class="card-input" placeholder="MM/YY">
@@ -240,6 +210,7 @@
             <button class="apply-modal-btn" id="applyDiscountsBtn">Apply Discounts</button>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 
