@@ -542,3 +542,21 @@ body.dark-mode .modal-content {
 body.dark-mode .search-item:hover {
     background: #334155;
 }
+
+/* Dark Mode Map Filter */
+body.dark-mode .leaflet-tile {
+    filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+body.dark-mode .leaflet-container {
+    background: #0f172a !important;
+}
+
+body.dark-mode .map-overlay {
+    background-color: rgba(30, 41, 59, 0.9);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
