@@ -63,8 +63,16 @@
                 <span>100 RS</span>
             </div>
             <div class="charge-row">
-                <span>Platform Charge</span>
-                <span>40 RS</span>
+                <span>Platform Charge (First Ride Free)</span>
+                <span><del>40 RS</del> 0 RS</span>
+            </div>
+            <div class="charge-row" id="rideDiscountRow" style="display: none; color: var(--primary-green);">
+                <span>High Value Ride Discount (>600 RS)</span>
+                <span>-10 RS</span>
+            </div>
+            <div class="charge-row" id="bankDiscountRow" style="display: none; color: var(--primary-green);">
+                <span id="bankDiscountName">Bank Discount</span>
+                <span id="bankDiscountAmount">-0 RS</span>
             </div>
             <div class="charge-row">
                 <span>Donation</span>
@@ -127,6 +135,12 @@
             </div>
 
             <div class="card-details" id="cardDetailsForm">
+                <select class="card-input" id="bankSelect" style="margin-bottom: 12px; cursor: pointer; background: white;">
+                    <option value="none">Select Bank for Offers</option>
+                    <option value="hdfc">HDFC Bank (5% Off)</option>
+                    <option value="sbi">SBI Bank (6% Off)</option>
+                    <option value="other">Other Bank</option>
+                </select>
                 <input type="text" class="card-input" placeholder="Card Number">
                 <div class="row">
                     <input type="text" class="card-input" placeholder="MM/YY">
