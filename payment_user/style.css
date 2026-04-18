@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/blending');
 @import 'theme.css';
 
 * {
@@ -9,7 +10,7 @@
 }
 
 body {
-    background-color: var(--bg-color);
+    background: linear-gradient(135deg, #fef9c3 0%, var(--primary-yellow) 100%);
     color: var(--text-main);
     display: flex;
     justify-content: center;
@@ -20,7 +21,7 @@ body {
 .payment-container {
     background: var(--card-bg);
     width: 100%;
-    max-width: 550px;
+    max-width: 1000px;
     padding: 40px;
     border-radius: 20px;
     box-shadow: var(--shadow);
@@ -29,12 +30,13 @@ body {
 }
 
 h1 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 40px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--accent-dark);
+    font-family: 'Blending', cursive;
+    font-size: 3rem;
+    font-weight: 400;
+    margin-bottom: 10px;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--primary-green);
 }
 
 .location-indicator {
@@ -44,21 +46,24 @@ h1 {
     margin-bottom: 12px;
 }
 
-.marker {
-    width: 24px;
-    height: 30px;
-    background: var(--accent-dark);
-    position: relative;
-    border-radius: 12px 12px 0 12px;
+.marker-icon {
+    width: 42px;
+    height: 42px;
+    color: var(--primary-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: none;
 }
 
-.marker.start {
-    transform: rotate(45deg);
+.marker-icon.ambulance svg {
+    transform: scaleX(-1);
+    /* Make ambulance face the arrow direction */
 }
 
-.marker.end {
-    border-radius: 12px 12px 12px 0;
-    transform: rotate(-45deg);
+.marker-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
 .arrow-line {
@@ -69,6 +74,7 @@ h1 {
     position: relative;
     border-radius: 3px;
 }
+
 .arrow-line::after {
     content: '';
     position: absolute;
@@ -80,7 +86,7 @@ h1 {
 }
 
 .distance-text {
-    font-size: 0.95rem;
+    font-size: 1.0rem;
     color: var(--text-muted);
     margin-bottom: 35px;
     font-weight: 500;
@@ -89,13 +95,13 @@ h1 {
 .payable-amount {
     background: var(--primary-color);
     color: white;
-    padding: 16px 40px;
+    padding: 16px 100px;
     border-radius: 50px;
     font-size: 1.25rem;
     font-weight: 600;
     display: inline-block;
     margin-bottom: 30px;
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+    box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.3);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -151,10 +157,12 @@ h1 {
     margin-bottom: 12px;
     color: var(--text-main);
 }
+
 .charge-row del {
     color: var(--text-muted);
     margin-right: 5px;
 }
+
 .charge-row.total {
     border-top: 1px dashed var(--border-color);
     padding-top: 12px;
@@ -167,16 +175,19 @@ h1 {
     margin-bottom: 30px;
     text-align: left;
 }
+
 .donation-section h3 {
     font-size: 1.05rem;
     margin-bottom: 15px;
     color: var(--accent-dark);
 }
+
 .donation-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
 }
+
 .donate-btn {
     padding: 12px;
     border: 1px solid var(--border-color);
@@ -187,16 +198,19 @@ h1 {
     transition: all 0.2s ease;
     font-size: 0.9rem;
 }
+
 .donate-btn:hover {
     border-color: var(--primary-color);
     color: var(--primary-color);
 }
+
 .donate-btn.selected {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
     box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2);
 }
+
 .donate-custom {
     grid-column: span 2;
     padding: 12px;
@@ -207,6 +221,7 @@ h1 {
     font-size: 0.9rem;
     transition: border-color 0.2s;
 }
+
 .donate-custom:focus {
     border-color: var(--primary-color);
 }
@@ -217,6 +232,7 @@ h1 {
     padding: 25px;
     text-align: left;
 }
+
 .payment-methods h3 {
     font-size: 1.05rem;
     margin-bottom: 20px;
@@ -227,6 +243,7 @@ h1 {
     gap: 20px;
     margin-bottom: 20px;
 }
+
 .method-label {
     display: flex;
     align-items: center;
@@ -243,10 +260,12 @@ h1 {
     padding-top: 20px;
     border-top: 1px solid var(--border-color);
 }
+
 .card-details.active {
     display: flex;
     animation: fadeIn 0.3s ease;
 }
+
 .card-input {
     padding: 12px;
     border: 1px solid var(--border-color);
@@ -256,6 +275,7 @@ h1 {
     outline: none;
     transition: border-color 0.2s;
 }
+
 .card-input:focus {
     border-color: var(--accent-dark);
 }
@@ -278,22 +298,34 @@ h1 {
     cursor: pointer;
     transition: background-color 0.2s;
 }
+
 .pay-now-btn:hover {
-    background: #000;
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.3);
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 480px) {
     .action-buttons {
         flex-direction: column;
     }
+
     .donation-grid {
         grid-template-columns: repeat(3, 1fr);
     }
+
     .donate-custom {
         grid-column: span 3;
     }

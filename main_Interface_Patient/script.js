@@ -14,13 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchBar = document.querySelector('.search-bar');
     
     searchInput.addEventListener('focus', () => {
-        searchBar.style.boxShadow = '0 0 0 2px #3b82f644';
+        searchBar.style.boxShadow = '0 0 0 2px rgba(21, 128, 61, 0.2)';
         searchBar.style.backgroundColor = '#ffffff';
     });
     
     searchInput.addEventListener('blur', () => {
         searchBar.style.boxShadow = 'none';
-        searchBar.style.backgroundColor = '#f1f5f9';
+        searchBar.style.backgroundColor = 'var(--white)';
     });
 
     // SOS Button action
