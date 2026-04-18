@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Map Initialization
-    const map = L.map('map').setView([52.5200, 13.4050], 13);
+    const map = L.map('map').setView([28.6139, 77.2090], 11);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -60,11 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mock Hospital Data (Simulated from Backend/map_Integration/hospital_locations.json)
     const hospitals = [
-        { name: "City General Hospital", lat: 52.5200, lng: 13.4050, status: "Available" },
-        { name: "St. Mary's Medical Center", lat: 52.5300, lng: 13.3900, status: "Limited" },
-        { name: "Metro Health Institute", lat: 52.5100, lng: 13.4200, status: "Available" },
-        { name: "Sunshine Pediatric Care", lat: 52.5400, lng: 13.4100, status: "Available" },
-        { name: "Hope Emergency Clinic", lat: 52.5000, lng: 13.3800, status: "Busy" }
+        { name: "AIIMS New Delhi", lat: 28.5672, lng: 77.2100, status: "Available" },
+        { name: "Fortis Escorts", lat: 28.5583, lng: 77.2764, status: "Limited" },
+        { name: "Max Super Speciality", lat: 28.5273, lng: 77.2185, status: "Available" },
+        { name: "Apollo Hospital", lat: 28.5412, lng: 77.2831, status: "Available" },
+        { name: "Safdarjung Hospital", lat: 28.5683, lng: 77.2064, status: "Busy" }
     ];
 
     // Custom Icon for Hospitals
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Add User/Ambulance Location
-    L.marker([52.5150, 13.4000]).addTo(map)
+    L.marker([28.6139, 77.2090]).addTo(map)
         .bindPopup('<b>Current Location</b>')
         .openPopup();
 
