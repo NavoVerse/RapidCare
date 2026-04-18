@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Platform charge = 40
     let baseFare = 350; 
     let equipmentCharge = 100;
-    let platformCharge = 40;
+    let platformCharge = 0; // First ride free
     let donationAmount = 10;
 
     // Elements
@@ -45,6 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const donationDisplay = document.getElementById('donationDisplay');
     const totalDisplay = document.getElementById('totalDisplay');
     const payBtnAmount = document.getElementById('payBtnAmount');
+
+    const rideDiscountRow = document.getElementById('rideDiscountRow');
+    const bankDiscountRow = document.getElementById('bankDiscountRow');
+    const bankDiscountName = document.getElementById('bankDiscountName');
+    const bankDiscountAmount = document.getElementById('bankDiscountAmount');
+    const bankSelect = document.getElementById('bankSelect');
 
     const cardRadio = document.getElementById('cardRadio');
     const upiRadio = document.getElementById('upiRadio');
@@ -97,8 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 cardDetailsForm.classList.remove('active');
                 upiDetailsForm.classList.remove('active');
             }
+            updateTotal();
         });
     });
+
+    if (bankSelect) {
+        bankSelect.addEventListener('change', updateTotal);
+    }
 
     // Handle UPI App Selection
     upiApps.forEach(app => {
@@ -110,12 +121,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update Total Calculation
     function updateTotal() {
-        const total = baseFare + equipmentCharge + platformCharge + donationAmount;
+        let subtotal = baseFare + equipmentCharge + platformCharge;
         
-        donationDisplay.textContent = `${donationAmount} RS`;
-        totalDisplay.textContent = `${total} RS`;
-        payableAmountDisplay.textContent = `payable amount-${total} RS`;
-        payBtnAmount.textContent = total;
+        let rideDiscount = 0;
+        if (subtotal > 600) {
+            rideDiscount = 10;
+            if (rideDiscountRow) rideDiscountRow.style.display = 'flex';
+        } else {
+            if (rideDiscountRow) rideDiscountRow.style.display = 'none';
+        }
+
+        let bankDiscount = 0;
+        let bankName = "";
+        
+        if (cardRadio.checked && bankSelect && bankSelect.value !== 'none' && bankSelect.value !== 'other') {
+            const bank = bankSelect.value;
+            if (bank === 'hdfc') {
+                bankDiscount = Math.round((subtotal - rideDiscount) * 0.05);
+                bankName = "HDFC Bank (5% Off)";
+            } else if (bank === 'sbi') {
+                bankDiscount = Math.round((subtotal - rideDiscount) * 0.06);
+                bankName = "SBI Bank (6% Off)";
+            }
+        }
+
+        if (bankDiscount > 0) {
+            if (bankDiscountName) bankDiscountName.textContent = bankName;
+            if (bankDiscountAmount) bankDiscountAmount.textContent = `-${bankDiscount} RS`;
+            if (bankDiscountRow) bankDiscountRow.style.display = 'flex';
+        } else {
+            if (bankDiscountRow) bankDiscountRow.style.display = 'none';
+        }
+
+        const total = subtotal - rideDiscount - bankDiscount + donationAmount;
+        
+        if (donationDisplay) donationDisplay.textContent = `${donationAmount} RS`;
+        if (totalDisplay) totalDisplay.textContent = `${total} RS`;
+        if (payableAmountDisplay) payableAmountDisplay.textContent = `payable amount-${total} RS`;
+        if (payBtnAmount) payBtnAmount.textContent = total;
     }
 
     // Initialize
