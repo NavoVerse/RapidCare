@@ -54,12 +54,15 @@ body {
 }
 
 .role-card {
-    background-color: var(--white);
-    border-radius: 20px;
-    padding: 40px 30px;
     flex: 1;
     min-width: 280px;
     max-width: 350px;
+}
+
+.role-card {
+    background-color: var(--white);
+    border-radius: 20px;
+    padding: 40px 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -75,6 +78,35 @@ body {
     transform: translateY(-10px);
     border-color: var(--acc-green);
     box-shadow: 0 25px 35px -5px rgba(21, 128, 61, 0.15), 0 15px 15px -5px rgba(21, 128, 61, 0.1);
+}
+
+.driver-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.driver-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('ambulance.png');
+    background-size: cover;
+    background-position: center;
+    filter: blur(4px);
+    opacity: 0.2; /* Light watermark effect so text remains highly legible */
+    z-index: 1;
+    transition: all 0.4s ease;
+}
+
+.role-card.driver-card:hover::before {
+    opacity: 0.4;
+    filter: blur(2px);
+    transform: scale(1.1);
+}
+
+.driver-card > * {
+    position: relative;
+    z-index: 2;
 }
 
 .card-icon {
