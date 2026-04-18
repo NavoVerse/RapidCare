@@ -11,6 +11,18 @@
     --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
+body.dark-mode {
+    --primary-green: #22c55e;
+    --acc-green: #4ade80;
+    --primary-yellow: #ca8a04;
+    --acc-yellow: #eab308;
+    --white: #1e293b;
+    --bg-light: #0f172a;
+    --text-dark: #f8fafc;
+    --text-muted: #cbd5e1; /* Even lighter for better visibility */
+    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -25,6 +37,12 @@ body {
     align-items: center;
     min-height: 100vh;
     color: var(--text-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
 }
 
 .main-container {

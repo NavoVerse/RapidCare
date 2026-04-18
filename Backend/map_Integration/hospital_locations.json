@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "name": "City General Hospital",
+        "lat": 52.5200,
+        "lng": 13.4050,
+        "status": "Available",
+        "distance": "1.2 km"
+    },
+    {
+        "id": 2,
+        "name": "St. Mary's Medical Center",
+        "lat": 52.5300,
+        "lng": 13.3900,
+        "status": "Limited",
+        "distance": "2.5 km"
+    },
+    {
+        "id": 3,
+        "name": "Metro Health Institute",
+        "lat": 52.5100,
+        "lng": 13.4200,
+        "status": "Available",
+        "distance": "3.8 km"
+    },
+    {
+        "id": 4,
+        "name": "Sunshine Pediatric Care",
+        "lat": 52.5400,
+        "lng": 13.4100,
+        "status": "Available",
+        "distance": "4.1 km"
+    },
+    {
+        "id": 5,
+        "name": "Hope Emergency Clinic",
+        "lat": 52.5000,
+        "lng": 13.3800,
+        "status": "Busy",
+        "distance": "5.5 km"
+    }
+]
