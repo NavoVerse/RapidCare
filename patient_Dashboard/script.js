@@ -17,6 +17,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Sidebar Toggle Logic
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    
+    // Check for saved state
+    const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+    if (isCollapsed && sidebar) {
+        sidebar.classList.add('collapsed');
+    }
+
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', () => {
+            const nowCollapsed = sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebar-collapsed', nowCollapsed);
+            
+            // Trigger a map resize if needed, since the container size changes
+            if (typeof map !== 'undefined' && map.invalidateSize) {
+                setTimeout(() => map.invalidateSize(), 300);
+            }
+        });
+    }
+
     function updateToggleIcon(isDark) {
         if (!themeToggle) return;
         themeToggle.innerHTML = isDark 

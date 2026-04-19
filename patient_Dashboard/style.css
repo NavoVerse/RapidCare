@@ -50,6 +50,14 @@ body {
     flex-direction: column;
     padding: 24px;
     flex-shrink: 0;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sidebar.collapsed {
+    width: 88px;
+    padding: 24px 16px;
 }
 
 .logo {
@@ -76,6 +84,16 @@ body {
     font-size: 24px;
     font-weight: 400;
     color: var(--primary-green);
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.sidebar.collapsed .logo-text {
+    display: none;
+}
+
+.sidebar.collapsed .logo {
+    justify-content: center;
+    gap: 0;
 }
 
 .nav-menu {
@@ -93,6 +111,26 @@ body {
     margin-bottom: 8px;
     transition: all 0.2s;
     font-weight: 500;
+    overflow: hidden;
+}
+
+.sidebar.collapsed .nav-item span {
+    display: none;
+}
+
+/* Better way to hide text but keep icons */
+.nav-item {
+    position: relative;
+    white-space: nowrap;
+}
+
+.sidebar.collapsed .nav-item {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .nav-item.active {
@@ -126,14 +164,36 @@ body {
     border: 2px solid var(--primary-green);
 }
 
-.user-info h4 {
-    font-size: 14px;
-    font-weight: 600;
+.user-info {
+    transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
-.user-info p {
-    font-size: 12px;
-    color: var(--text-muted);
+.sidebar.collapsed .user-info,
+.sidebar.collapsed .user-profile > svg {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+}
+
+.sidebar.collapsed .user-profile {
+    justify-content: center;
+    padding-left: 0;
+}
+
+.sidebar.collapsed .user-avatar {
+    margin: 0;
+}
+
+button#sidebar-toggle {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+button#sidebar-toggle:hover {
+    background-color: var(--bg-main);
 }
 
 /* Main Content */
