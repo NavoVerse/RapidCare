@@ -102,7 +102,7 @@ const mockData = {
     patients: [
         {
             "Timestamp": "2024-05-15",
-            "Patient Name": "Ahmed Ali Hussain",
+            "Patient Name": "Samim Uddin Molla",
             "Gender": "Male",
             "Age": 38,
             "Location": "Elshiekh zayed, Giza",
