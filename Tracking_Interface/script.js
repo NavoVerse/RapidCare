@@ -51,14 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── Leaflet Map Setup ───────────────────────────
     let map = null;
     let ambulanceMarker = null;
-    let routeLine = null;
 
     // Default coords: Kolkata area
     const patientCoords   = [22.5726, 88.3639]; // Central Kolkata
     const hospitalCoords  = [22.5165, 88.3958]; // Apollo Gleneagles approx
-    const ambStartCoords  = [22.5520, 88.3740]; // Ambulance start (mid-route)
 
-    function initMap() {
+    async function initMap() {
         const mapEl = document.getElementById('map');
         if (!mapEl || !window.L) return;
 
@@ -116,50 +114,70 @@ document.addEventListener('DOMContentLoaded', () => {
             .addTo(map)
             .bindPopup('<b style="font-family:Inter,sans-serif;">Apollo Gleneagles</b><br>Destination Hospital');
 
-        ambulanceMarker = L.marker(ambStartCoords, { icon: ambIcon })
+        // Ambulance starts at patient location
+        ambulanceMarker = L.marker(patientCoords, { icon: ambIcon })
             .addTo(map)
             .bindPopup('<b style="font-family:Inter,sans-serif;">Matt Smith</b><br>ALS Ambulance · WB-04A<br><span style="color:#15803d;font-weight:600;">EN ROUTE</span>');
 
-        // Dashed Route Line
-        routeLine = L.polyline(
-            [patientCoords, ambStartCoords, hospitalCoords],
-            {
-                color: '#15803d',
-                weight: 4,
-                opacity: 0.85,
-                dashArray: '12, 10',
-                lineJoin: 'round'
+        // Fetch Real Road Route via OSRM
+        try {
+            const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${patientCoords[1]},${patientCoords[0]};${hospitalCoords[1]},${hospitalCoords[0]}?overview=full&geometries=geojson`);
+            const data = await response.json();
+            
+            let coords = [];
+            if (data.routes && data.routes.length > 0) {
+                coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]); // GeoJSON [lng, lat] to Leaflet [lat, lng]
+            } else {
+                coords = [patientCoords, hospitalCoords];
             }
-        ).addTo(map);
 
-        // Fit map to route
-        map.fitBounds(routeLine.getBounds(), { padding: [60, 60] });
+            // Draw Background Thick Line (Dark Green Border)
+            L.polyline(coords, {
+                color: '#14532d',
+                weight: 8,
+                opacity: 0.8,
+                lineJoin: 'round',
+                lineCap: 'round'
+            }).addTo(map);
 
-        // Animate ambulance along route
-        animateAmbulance();
+            // Draw Foreground Thin Line (Bright Accent Green Core)
+            const actualRoute = L.polyline(coords, {
+                color: '#22c55e',
+                weight: 4,
+                opacity: 1,
+                lineJoin: 'round',
+                lineCap: 'round'
+            }).addTo(map);
+
+            // Fit map to route
+            map.fitBounds(actualRoute.getBounds(), { padding: [60, 60] });
+
+            // Animate ambulance along actual road points
+            animateAmbulance(coords);
+
+        } catch (err) {
+            console.error("OSRM Routing failed", err);
+            // Fallback to straight line
+            const fallbackLine = L.polyline([patientCoords, hospitalCoords], { color: '#22c55e', weight: 5 }).addTo(map);
+            map.fitBounds(fallbackLine.getBounds());
+        }
     }
 
     // Ambulance animation along route
-    function animateAmbulance() {
-        if (!ambulanceMarker) return;
-
-        const routePoints = [
-            [22.5520, 88.3740],
-            [22.5480, 88.3780],
-            [22.5420, 88.3840],
-            [22.5340, 88.3870],
-            [22.5260, 88.3920],
-            [22.5200, 88.3950],
-            [22.5165, 88.3958]
-        ];
+    function animateAmbulance(routePoints) {
+        if (!ambulanceMarker || !routePoints || routePoints.length === 0) return;
 
         let idx = 0;
+        const totalPoints = routePoints.length;
+        
+        // Dynamically adjust speed so the whole trip takes ~15-20 seconds visually
+        const stepTime = Math.max(50, 15000 / totalPoints); 
 
         const step = () => {
-            if (idx >= routePoints.length) idx = 0;
+            if (idx >= totalPoints) idx = 0;
             ambulanceMarker.setLatLng(routePoints[idx]);
             idx++;
-            setTimeout(step, 1800);
+            setTimeout(step, stepTime);
         };
 
         step();
