@@ -48,14 +48,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Nav menu interaction
     const navItems = document.querySelectorAll('.nav-item');
+    const dashboardView = document.getElementById('dashboard-view');
+    const detailsView = document.getElementById('details-view');
+
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
+            const label = item.querySelector('span').textContent.trim();
+            
             // Only prevent default for # links
             if (item.getAttribute('href') === '#') {
                 e.preventDefault();
             }
+
             navItems.forEach(nav => nav.classList.remove('active'));
             item.classList.add('active');
+
+            // View Switching Logic
+            if (label === 'Details') {
+                if (dashboardView) dashboardView.style.display = 'none';
+                if (detailsView) detailsView.style.display = 'block';
+            } else if (label === 'Overview') {
+                if (dashboardView) dashboardView.style.display = 'block';
+                if (detailsView) detailsView.style.display = 'none';
+                // Trigger map resize since it was hidden
+                if (typeof map !== 'undefined' && map.invalidateSize) {
+                    setTimeout(() => map.invalidateSize(), 100);
+                }
+            } else {
+                // For other items, we can either keep showing the current view or clear it
+                // For now, let's keep the dashboard view as the default for other tabs
+                if (dashboardView) dashboardView.style.display = 'block';
+                if (detailsView) detailsView.style.display = 'none';
+            }
         });
     });
 
