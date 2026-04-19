@@ -186,23 +186,57 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     // HLIGHIGHT DISTANCE & STATUS PANEL LOGIC
     // =============================================
+    let distanceBackgroundLine = null;
     let distancePolyline = null;
 
-    window.highlightDistance = function(lat, lng) {
+    window.highlightDistance = async function(lat, lng) {
         if (!userMarker) return;
         const userLatLng = userMarker.getLatLng();
         
         if (distancePolyline) map.removeLayer(distancePolyline);
+        if (distanceBackgroundLine) map.removeLayer(distanceBackgroundLine);
         
-        distancePolyline = L.polyline([userLatLng, [lat, lng]], {
-            color: '#15803d',
-            weight: 4,
-            opacity: 0.7,
-            dashArray: '10, 10',
-            lineJoin: 'round'
-        }).addTo(map);
-        
-        map.fitBounds(distancePolyline.getBounds(), { padding: [50, 50] });
+        try {
+            // Fetch real road route using OSRM public API
+            const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${userLatLng.lng},${userLatLng.lat};${lng},${lat}?overview=full&geometries=geojson`);
+            const data = await response.json();
+            
+            let coords = [];
+            if (data.routes && data.routes.length > 0) {
+                // GeoJSON uses [lng, lat], Leaflet uses [lat, lng]
+                coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+            } else {
+                coords = [userLatLng, [lat, lng]];
+            }
+
+            // Draw outer thick border
+            distanceBackgroundLine = L.polyline(coords, {
+                color: '#14532d',
+                weight: 8,
+                opacity: 0.8,
+                lineJoin: 'round',
+                lineCap: 'round'
+            }).addTo(map);
+
+            // Draw inner smooth path
+            distancePolyline = L.polyline(coords, {
+                color: '#22c55e',
+                weight: 4,
+                opacity: 1,
+                lineJoin: 'round',
+                lineCap: 'round'
+            }).addTo(map);
+
+            map.fitBounds(distanceBackgroundLine.getBounds(), { padding: [50, 50] });
+
+        } catch (e) {
+            console.error("Routing error:", e);
+            // Fallback to straight dashed line if offline
+            distancePolyline = L.polyline([userLatLng, [lat, lng]], {
+                color: '#15803d', weight: 4, opacity: 0.7, dashArray: '10, 10', lineJoin: 'round'
+            }).addTo(map);
+            map.fitBounds(distancePolyline.getBounds(), { padding: [50, 50] });
+        }
     };
 
     window.showHospitalStatus = function(hospitalName) {
