@@ -390,15 +390,38 @@ input:focus + label, select:focus + label {
 
 /* Responsive */
 @media (max-width: 1024px) {
-    .registration-wrapper { width: 95%; }
-    .named-stepper { padding: 0 10px; }
+    .registration-wrapper { width: 92%; }
+    .named-stepper { padding: 0 20px; }
     .step-label { font-size: 0.8rem; }
 }
 
 @media (max-width: 768px) {
+    .registration-wrapper { width: 95%; }
     .form-row { flex-direction: column; gap: 0; }
     .three-cols { grid-template-columns: 1fr; }
-    .named-stepper { flex-wrap: wrap; gap: 10px; }
-    .step-item { flex: none; width: 45%; }
-    .premium-container { padding: 25px; }
+    .named-stepper { 
+        flex-direction: column; 
+        gap: 15px; 
+        align-items: flex-start;
+        padding: 0 10px;
+    }
+    .step-item { 
+        width: 100%; 
+        text-align: left;
+        padding-bottom: 5px;
+    }
+    .step-indicator {
+        left: 0;
+        transform: none;
+        width: 3px !important;
+        height: 0;
+        top: 0;
+        bottom: auto;
+    }
+    .step-item.active .step-indicator {
+        height: 100%;
+        width: 3px !important;
+    }
+    .premium-container { padding: 30px 20px; border-radius: 20px; }
+    .brand-title { font-size: 2rem; }
 }
