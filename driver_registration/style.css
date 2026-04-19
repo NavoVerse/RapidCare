@@ -12,7 +12,11 @@
 body {
     background: linear-gradient(135deg, #fef9c3 0%, var(--primary-yellow) 100%);
     color: var(--text-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     min-height: 100vh;
+    padding: 5px; /* Extremely small margin to use "more little space" */
     transition: background 0.3s ease;
 }
 
@@ -22,15 +26,17 @@ body.dark-mode {
 }
 
 .registration-container {
-    width: 100%;
-    min-height: 100vh;
+    width: 99.5%; /* Near total coverage */
+    max-width: 1800px;
     display: flex;
     flex-direction: column;
     gap: 30px;
     background: var(--white);
     padding: 40px 60px;
-    border: none;
-    box-shadow: none;
+    border-radius: 30px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(21, 128, 61, 0.1);
+    margin: 5px auto;
 }
 
 /* Branding Header */
@@ -102,9 +108,10 @@ body.dark-mode {
 /* Stepper styling */
 .stepper {
     display: flex;
-    background: var(--bg-light);
-    border-bottom: 2px solid var(--input-border);
-    margin: 0 -60px; /* Offset the container padding */
+    background: var(--input-bg);
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid var(--input-border);
 }
 
 .step {
@@ -132,14 +139,19 @@ body.dark-mode {
 }
 
 .step.active {
-    background: var(--white);
+    background: var(--bg-light);
     color: var(--primary-green);
     position: relative;
-    box-shadow: inset 0 -4px 0 var(--primary-green);
 }
 
 .step.active::after {
-    display: none;
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary-green);
 }
 
 /* Form section styling */
