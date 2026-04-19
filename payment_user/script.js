@@ -40,6 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let isHighValueApplied = false;
     let selectedBankOffer = 'none';
 
+    // Cash Loyalty Reward System
+    let cashRideCount = parseInt(localStorage.getItem('rapidcare_cash_rides') || '0');
+    let isCashRewardActive = (cashRideCount >= 5); // 6th ride is free
+
     // Elements
     const detailsBtn = document.getElementById('detailsBtn');
     const detailsPanel = document.getElementById('detailsPanel');
@@ -69,10 +73,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const cardRadio = document.getElementById('cardRadio');
     const upiRadio = document.getElementById('upiRadio');
+    const cashRadio = document.getElementById('cashRadio');
     const paymentRadios = document.querySelectorAll('input[name="payment"]');
     const cardDetailsForm = document.getElementById('cardDetailsForm');
     const upiDetailsForm = document.getElementById('upiDetailsForm');
+    const cashDetailsForm = document.getElementById('cashDetailsForm');
     const upiApps = document.querySelectorAll('.upi-app');
+
+    // Cash reward elements
+    const cashProgressFill = document.getElementById('cashProgressFill');
+    const cashRidesDots = document.getElementById('cashRidesDots');
+    const cashRidesRemaining = document.getElementById('cashRidesRemaining');
+    const cashStatus = document.getElementById('cashStatus');
+    const cashStatusText = document.getElementById('cashStatusText');
+    const cashRewardUnlocked = document.getElementById('cashRewardUnlocked');
+    const cashRewardRow = document.getElementById('cashRewardRow');
 
     // Toggle Details Panel
     detailsBtn.addEventListener('click', () => {
@@ -141,6 +156,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle Pay Now Button
     const payNowBtn = document.querySelector('.pay-now-btn');
     payNowBtn.addEventListener('click', () => {
+        // If paying with cash, increment the ride counter
+        if (cashRadio && cashRadio.checked) {
+            if (isCashRewardActive) {
+                // Reward was used on this ride — reset counter
+                cashRideCount = 0;
+                isCashRewardActive = false;
+            } else {
+                cashRideCount++;
+            }
+            localStorage.setItem('rapidcare_cash_rides', cashRideCount.toString());
+        }
+
         alert('PAYMENT SUCCESSFUL!\n\nTransaction ID: RC' + Math.floor(Math.random() * 1000000) + '\nThank you for choosing RapidCare.');
         window.location.href = '../patient_Dashboard/index.html';
     });
@@ -148,15 +175,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle Payment Method Toggle
     paymentRadios.forEach(radio => {
         radio.addEventListener('change', () => {
+            // Hide all panels first
+            cardDetailsForm.classList.remove('active');
+            upiDetailsForm.classList.remove('active');
+            if (cashDetailsForm) cashDetailsForm.classList.remove('active');
+
             if (cardRadio.checked) {
                 cardDetailsForm.classList.add('active');
-                upiDetailsForm.classList.remove('active');
             } else if (upiRadio.checked) {
-                cardDetailsForm.classList.remove('active');
                 upiDetailsForm.classList.add('active');
-            } else {
-                cardDetailsForm.classList.remove('active');
-                upiDetailsForm.classList.remove('active');
+            } else if (cashRadio.checked) {
+                if (cashDetailsForm) cashDetailsForm.classList.add('active');
             }
             updateTotal();
         });
@@ -170,12 +199,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // ===== Cash Loyalty Reward Functions =====
+    function updateCashRewardUI() {
+        const ridesCompleted = Math.min(cashRideCount, 5);
+        isCashRewardActive = (cashRideCount >= 5);
+
+        // Update progress bar
+        if (cashProgressFill) {
+            const progress = isCashRewardActive ? 100 : (ridesCompleted / 5) * 100;
+            cashProgressFill.style.width = progress + '%';
+        }
+
+        // Update ride dots
+        if (cashRidesDots) {
+            const dots = cashRidesDots.querySelectorAll('.ride-dot');
+            dots.forEach(dot => {
+                const rideNum = parseInt(dot.getAttribute('data-ride'));
+                if (rideNum <= ridesCompleted) {
+                    dot.classList.add('completed');
+                } else if (rideNum === 6 && isCashRewardActive) {
+                    dot.classList.add('completed');
+                } else {
+                    dot.classList.remove('completed');
+                }
+            });
+        }
+
+        // Update status text
+        if (isCashRewardActive) {
+            if (cashStatus) cashStatus.style.display = 'none';
+            if (cashRewardUnlocked) cashRewardUnlocked.style.display = 'block';
+        } else {
+            if (cashStatus) cashStatus.style.display = 'block';
+            if (cashRewardUnlocked) cashRewardUnlocked.style.display = 'none';
+            const remaining = 5 - ridesCompleted;
+            if (cashRidesRemaining) cashRidesRemaining.textContent = remaining;
+            if (cashStatusText) {
+                cashStatusText.innerHTML = `Complete <strong id="cashRidesRemaining">${remaining}</strong> more cash ride${remaining !== 1 ? 's' : ''} to unlock free platform fee (₹40 saved!)`;
+            }
+        }
+    }
+
     // Update Total Calculation
     function updateTotal() {
-        let subtotal = baseFare + equipmentCharge + platformCharge;
+        // Determine if cash reward applies the platform fee waiver
+        let cashRewardDiscount = 0;
+        if (cashRadio && cashRadio.checked && isCashRewardActive) {
+            cashRewardDiscount = 40; // waive the platform fee
+        }
+
+        let effectivePlatformCharge = platformCharge;
+        if (cashRewardDiscount > 0) {
+            effectivePlatformCharge = 0;
+        }
+
+        let subtotal = baseFare + equipmentCharge + effectivePlatformCharge;
         
         let rideDiscount = 0;
-        if (isHighValueApplied && subtotal > 600) {
+        if (isHighValueApplied && (baseFare + equipmentCharge + platformCharge) > 600) {
             rideDiscount = 10;
             if (rideDiscountRow) rideDiscountRow.style.display = 'flex';
         } else {
@@ -203,11 +284,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (bankDiscountRow) bankDiscountRow.style.display = 'none';
         }
 
+        // Cash reward row in details
+        if (cashRewardRow) {
+            if (cashRewardDiscount > 0) {
+                cashRewardRow.style.display = 'flex';
+            } else {
+                cashRewardRow.style.display = 'none';
+            }
+        }
+
         // Update platform charge display based on discount status
         if (platformChargeDisplay) {
-            if (isPlatformFree) {
+            if (isPlatformFree || cashRewardDiscount > 0) {
                 platformChargeDisplay.innerHTML = '<del>40 RS</del> 0 RS';
-                if (firstRideLabel) firstRideLabel.style.display = 'inline';
+                if (firstRideLabel && isPlatformFree) firstRideLabel.style.display = 'inline';
             } else {
                 platformChargeDisplay.textContent = '40 RS';
                 if (firstRideLabel) firstRideLabel.style.display = 'none';
@@ -223,5 +313,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Initialize
+    updateCashRewardUI();
     updateTotal();
 });
