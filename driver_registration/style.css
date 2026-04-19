@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Outfit:wght@300;400;500;600;700&display=swap');
 @import 'theme.css';
 
 * {
@@ -40,28 +41,39 @@ body.dark-mode {
 }
 
 .brand-logo {
-    font-size: 1.5rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5rem;
     font-weight: 800;
-    color: #f8fafc;
-    letter-spacing: 2px;
-    margin-bottom: 5px;
+    background: linear-gradient(90deg, #ffffff 0%, #facc15 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 5px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.2));
 }
 
 .page-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #e2e8f0;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #94a3b8;
     text-transform: uppercase;
     margin-bottom: 15px;
-    letter-spacing: 1px;
+    letter-spacing: 3px;
 }
 
 .service-quote {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--primary-yellow); /* Yellow color as requested */
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: var(--primary-yellow);
     font-style: italic;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
 }
 
 @keyframes fadeInDown {
@@ -314,6 +326,25 @@ select option {
 @media (max-width: 650px) {
     .registration-container {
         padding: 10px;
+    }
+
+    .branding-header {
+        margin-bottom: 20px;
+    }
+
+    .brand-logo {
+        font-size: 1.8rem;
+        letter-spacing: 3px;
+    }
+
+    .page-title {
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+    }
+
+    .service-quote {
+        font-size: 1rem;
+        padding: 0 10px;
     }
 
     .form-section {
