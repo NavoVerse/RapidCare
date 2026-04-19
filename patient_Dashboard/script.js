@@ -62,6 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const dashboardView = document.getElementById('dashboard-view');
     const detailsView = document.getElementById('details-view');
     const trackingView = document.getElementById('tracking-view');
+    const insuranceView = document.getElementById('insurance-view');
+    const paymentsView = document.getElementById('payments-view');
 
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -79,6 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
             dashboardView.style.display = 'none';
             detailsView.style.display = 'none';
             trackingView.style.display = 'none';
+            insuranceView.style.display = 'none';
+            paymentsView.style.display = 'none';
 
             if (label === 'Details') {
                 detailsView.style.display = 'block';
@@ -96,6 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     setTimeout(() => trackingMap.invalidateSize(), 150);
                 }
+            } else if (label === 'Insurance') {
+                insuranceView.style.display = 'block';
+            } else if (label === 'Payments') {
+                paymentsView.style.display = 'block';
             } else {
                 dashboardView.style.display = 'block';
             }
@@ -682,6 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+<<<<<<< HEAD
     // =============================================
     // DETAILS VIEW SUB-TABS & EDIT LOGIC
     // =============================================
@@ -804,6 +813,434 @@ document.addEventListener('DOMContentLoaded', () => {
             editModal.style.display = 'none';
         });
     }
+
+    // =============================================
+    // INSURANCE VIEW LOGIC
+    // =============================================
+    const iModal = document.getElementById('add-scheme-modal');
+    const iForm = document.getElementById('add-scheme-form');
+    const iTypeInput = document.getElementById('scheme-type');
+    let iCurrentContainer = null;
+    let iCurrentPill = null;
+    let iCurrentAccordion = null;
+
+    if (iModal && iForm) {
+        const stateAcc = document.querySelector('.icon-state')?.closest('.accordion-item-insurance');
+        const centralAcc = document.querySelector('.icon-central')?.closest('.accordion-item-insurance');
+        const mediclaimAcc = document.querySelector('.icon-mediclaim')?.closest('.accordion-item-insurance');
+        const privateAcc = document.querySelector('.icon-private')?.closest('.accordion-item-insurance');
+
+        const accEntries = [
+            { id: 'State', el: stateAcc },
+            { id: 'Central', el: centralAcc },
+            { id: 'Mediclaim', el: mediclaimAcc },
+            { id: 'Private', el: privateAcc }
+        ];
+
+        accEntries.forEach(acc => {
+            if (acc.el) {
+                const addBtn = acc.el.querySelector('.add-scheme-btn');
+                if (addBtn) {
+                    addBtn.addEventListener('click', () => {
+                        openInsuranceModal(acc.id, acc.el.querySelector('.scheme-list'), acc.el.querySelector('.count-pill'), acc.el);
+                    });
+                }
+            }
+        });
+
+        const globalAddBtn = document.getElementById('global-add-btn');
+        if (globalAddBtn) {
+            globalAddBtn.addEventListener('click', () => {
+                openInsuranceModal('Global', null, null, null);
+            });
+        }
+
+        function openInsuranceModal(type, listContainer, pillElement, accordionItem) {
+            const headerText = iModal.querySelector('.modal-header h3');
+            const typeGroup = document.getElementById('scheme-type-group');
+            
+            if (type === 'Global') {
+                iTypeInput.value = 'Global';
+                if(headerText) headerText.textContent = `Add New Insurance`;
+                if(typeGroup) typeGroup.style.display = 'flex';
+                iCurrentContainer = null;
+                iCurrentPill = null;
+                iCurrentAccordion = null;
+            } else {
+                iTypeInput.value = type;
+                if(headerText) headerText.textContent = `Add ${type} Insurance Scheme`;
+                if(typeGroup) typeGroup.style.display = 'none';
+                iCurrentContainer = listContainer;
+                iCurrentPill = pillElement;
+                iCurrentAccordion = accordionItem;
+            }
+            
+            iModal.style.display = 'flex';
+            setTimeout(() => iModal.classList.add('active'), 10);
+        }
+
+        const iCloseBtn = iModal.querySelector('.close-modal-btn');
+        if (iCloseBtn) {
+            iCloseBtn.addEventListener('click', () => {
+                iModal.classList.remove('active');
+                setTimeout(() => iModal.style.display = 'none', 300);
+                iForm.reset();
+            });
+        }
+
+        iModal.addEventListener('click', (e) => {
+            if (e.target === iModal) {
+                iModal.classList.remove('active');
+                setTimeout(() => iModal.style.display = 'none', 300);
+                iForm.reset();
+            }
+        });
+
+        iForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            let targetType = iTypeInput.value;
+            let targetContainer = iCurrentContainer;
+            let targetPill = iCurrentPill;
+            let targetAccordion = iCurrentAccordion;
+
+            if (targetType === 'Global') {
+                const selected = document.getElementById('scheme-category-select').value;
+                const accMap = {
+                    'State': document.querySelector('.icon-state')?.closest('.accordion-item-insurance'),
+                    'Central': document.querySelector('.icon-central')?.closest('.accordion-item-insurance'),
+                    'Mediclaim': document.querySelector('.icon-mediclaim')?.closest('.accordion-item-insurance'),
+                    'Private': document.querySelector('.icon-private')?.closest('.accordion-item-insurance')
+                };
+                targetAccordion = accMap[selected];
+                targetContainer = targetAccordion?.querySelector('.scheme-list');
+                targetPill = targetAccordion?.querySelector('.count-pill');
+            }
+
+            if (!targetContainer) return;
+
+            const name = document.getElementById('scheme-name').value;
+            const desc = document.getElementById('scheme-desc').value;
+            const link = document.getElementById('scheme-link').value;
+
+            const newCard = document.createElement('div');
+            newCard.className = 'scheme-card';
+            newCard.style.opacity = '0';
+            newCard.style.transform = 'translateY(10px)';
+            newCard.style.transition = 'all 0.3s ease';
+
+            newCard.innerHTML = `
+                <div class="scheme-header-insurance">
+                    <div class="scheme-title">
+                        <h4>${name}</h4>
+                        <p>${desc}</p>
+                    </div>
+                    <span class="badge-insurance active">Linked</span>
+                </div>
+                <div class="scheme-actions">
+                    <button class="btn btn-primary btn-sm">Raise Claim</button>
+                    <a href="${link}" target="_blank" class="btn btn-outline btn-sm">View Portal</a>
+                </div>
+            `;
+
+            const divider = targetContainer.querySelector('.section-divider');
+            if (divider) {
+                targetContainer.insertBefore(newCard, divider);
+            } else {
+                targetContainer.appendChild(newCard);
+            }
+
+            requestAnimationFrame(() => {
+                newCard.style.opacity = '1';
+                newCard.style.transform = 'none';
+            });
+
+            if (targetPill) {
+                let currentCount = parseInt(targetPill.textContent);
+                if (!isNaN(currentCount)) {
+                    targetPill.textContent = (currentCount + 1) + " Linked";
+                }
+            }
+
+            if (targetAccordion && targetAccordion.classList.contains('active')) {
+                const content = targetAccordion.querySelector('.accordion-content-insurance');
+                setTimeout(() => {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }, 50);
+            }
+
+            iModal.classList.remove('active');
+            setTimeout(() => iModal.style.display = 'none', 300);
+            iForm.reset();
+
+            // Show success toast
+            const toast = document.createElement('div');
+            toast.style.cssText = "position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--primary-green);color:white;padding:12px 24px;border-radius:10px;z-index:10000;box-shadow:0 10px 30px rgba(0,0,0,0.1);";
+            toast.textContent = "Insurance scheme added successfully!";
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        });
+    }
+
+    const iAccordions = document.querySelectorAll('.accordion-header-insurance');
+
+    iAccordions.forEach(header => {
+        header.addEventListener('click', () => {
+            const item = header.parentElement;
+            const content = header.nextElementSibling;
+            
+            const isActive = item.classList.toggle('active');
+
+            if (isActive) {
+                content.style.maxHeight = content.scrollHeight + "px";
+            } else {
+                content.style.maxHeight = '0';
+            }
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        document.querySelectorAll('.accordion-item-insurance.active .accordion-content-insurance').forEach(content => {
+            content.style.maxHeight = content.scrollHeight + "px";
+        });
+    });
+
+    // =============================================
+    // INTEGRATED PAYMENT LOGIC
+    // =============================================
+    let baseFarePayment = 350; 
+    let equipmentChargePayment = 100;
+    let platformChargePayment = 40; 
+    let donationAmountPayment = 10;
+    
+    let isPlatformFreePayment = false;
+    let isHighValueAppliedPayment = false;
+    let selectedBankOfferPayment = 'none';
+
+    let cashRideCountPayment = parseInt(localStorage.getItem('rapidcare_cash_rides') || '0');
+    let isCashRewardActivePayment = (cashRideCountPayment >= 5);
+
+    const detailsBtnPay = document.getElementById('detailsBtnPayment');
+    const detailsPanelPay = document.getElementById('detailsPanelIntegrated');
+    const donateBtnsPay = document.querySelectorAll('.donate-btn-integrated');
+    const customDonationPay = document.getElementById('customDonation');
+    
+    const payableDisplayPay = document.getElementById('payableAmountDisplay');
+    const donationDisplayPay = document.getElementById('donationDisplay');
+    const totalDisplayPay = document.getElementById('totalDisplay');
+    const payBtnAmtPay = document.getElementById('payBtnAmount');
+
+    const rideDiscRowPay = document.getElementById('rideDiscountRow');
+    const bankDiscRowPay = document.getElementById('bankDiscountRow');
+    const bankDiscNamePay = document.getElementById('bankDiscountName');
+    const bankDiscAmtPay = document.getElementById('bankDiscountAmount');
+
+    const addDiscBtnPay = document.getElementById('addDiscountBtn');
+    const firstRideLblPay = document.getElementById('firstRideLabel');
+    const platChargeDispPay = document.getElementById('platformChargeDisplay');
+
+    const discModalPay = document.getElementById('discountModal');
+    const closeDiscModalPay = document.getElementById('closeDiscountModal');
+    const applyDiscBtnPay = document.getElementById('applyDiscountsBtn');
+    const cbPlatFreePay = document.getElementById('cbPlatformFree');
+    const cbHighValPay = document.getElementById('cbHighValue');
+    const bankRadsPay = document.getElementsByName('bankOffer');
+
+    const payMethodsPay = document.querySelectorAll('input[name="payment-method"]');
+    const cardFormPay = document.getElementById('cardDetailsForm');
+    const upiFormPay = document.getElementById('upiDetailsForm');
+    const cashFormPay = document.getElementById('cashDetailsForm');
+    const upiAppsPay = document.querySelectorAll('.upi-app-integrated');
+
+    const cashFillPay = document.getElementById('cashProgressFill');
+    const cashStatusTxtPay = document.getElementById('cashStatusText');
+    const cashRowPay = document.getElementById('cashRewardRow');
+
+    if (detailsBtnPay) {
+        detailsBtnPay.addEventListener('click', () => {
+            detailsPanelPay.classList.toggle('active');
+        });
+    }
+
+    if (addDiscBtnPay) {
+        addDiscBtnPay.addEventListener('click', () => {
+            discModalPay.style.display = 'flex';
+        });
+    }
+
+    if (closeDiscModalPay) {
+        closeDiscModalPay.addEventListener('click', () => {
+            discModalPay.style.display = 'none';
+        });
+    }
+
+    if (applyDiscBtnPay) {
+        applyDiscBtnPay.addEventListener('click', () => {
+            isPlatformFreePayment = cbPlatFreePay && cbPlatFreePay.checked;
+            isHighValueAppliedPayment = cbHighValPay && cbHighValPay.checked;
+            
+            for (let radio of bankRadsPay) {
+                if (radio.checked) {
+                    selectedBankOfferPayment = radio.value;
+                    break;
+                }
+            }
+
+            platformChargePayment = isPlatformFreePayment ? 0 : 40;
+            addDiscBtnPay.textContent = 'Discounts Applied';
+            addDiscBtnPay.style.background = 'var(--primary-green)';
+            addDiscBtnPay.style.color = 'white';
+            
+            updateTotalPayment();
+            discModalPay.style.display = 'none';
+        });
+    }
+
+    donateBtnsPay.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            donateBtnsPay.forEach(b => b.classList.remove('selected'));
+            e.target.classList.add('selected');
+            if (customDonationPay) customDonationPay.value = '';
+            donationAmountPayment = parseInt(e.target.getAttribute('data-amount'));
+            updateTotalPayment();
+        });
+    });
+
+    if (customDonationPay) {
+        customDonationPay.addEventListener('input', (e) => {
+            donateBtnsPay.forEach(b => b.classList.remove('selected'));
+            donationAmountPayment = parseInt(e.target.value) || 0;
+            updateTotalPayment();
+        });
+    }
+
+    const confirmPayBtn = document.querySelector('.pay-now-btn-integrated');
+    if (confirmPayBtn) {
+        confirmPayBtn.addEventListener('click', () => {
+            const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            if (selectedMethod === 'cash') {
+                if (isCashRewardActivePayment) {
+                    cashRideCountPayment = 0;
+                    isCashRewardActivePayment = false;
+                } else {
+                    cashRideCountPayment++;
+                }
+                localStorage.setItem('rapidcare_cash_rides', cashRideCountPayment.toString());
+            }
+
+            alert('PAYMENT SUCCESSFUL!\n\nThank you for choosing RapidCare.\nYour bill is settled.');
+            updateCashRewardUIPayment();
+            updateTotalPayment();
+            // Return to dashboard overview
+            document.querySelector('.nav-item[data-view="overview"]')?.click();
+        });
+    }
+
+    payMethodsPay.forEach(radio => {
+        radio.addEventListener('change', () => {
+            cardFormPay.style.display = 'none';
+            upiFormPay.style.display = 'none';
+            cashFormPay.style.display = 'none';
+
+            if (radio.value === 'card') cardFormPay.style.display = 'block';
+            else if (radio.value === 'upi') upiFormPay.style.display = 'block';
+            else if (radio.value === 'cash') cashFormPay.style.display = 'block';
+            
+            updateTotalPayment();
+        });
+    });
+
+    upiAppsPay.forEach(app => {
+        app.addEventListener('click', () => {
+            upiAppsPay.forEach(a => a.classList.remove('selected'));
+            app.classList.add('selected');
+        });
+    });
+
+    function updateCashRewardUIPayment() {
+        const ridesCompleted = Math.min(cashRideCountPayment, 5);
+        isCashRewardActivePayment = (cashRideCountPayment >= 5);
+
+        if (cashFillPay) {
+            const progress = isCashRewardActivePayment ? 100 : (ridesCompleted / 5) * 100;
+            cashFillPay.style.width = progress + '%';
+        }
+
+        if (cashStatusTxtPay) {
+            if (isCashRewardActivePayment) {
+                cashStatusTxtPay.innerHTML = '<strong style="color: var(--primary-green);">Reward Unlocked!</strong> This ride\'s platform fee is waived.';
+            } else {
+                const remaining = 5 - ridesCompleted;
+                cashStatusTxtPay.textContent = `${remaining} more cash ride${remaining !== 1 ? 's' : ''} to unlock free platform fee!`;
+            }
+        }
+    }
+
+    function updateTotalPayment() {
+        const selectedMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
+        let cashRewardDiscount = 0;
+        if (selectedMethod === 'cash' && isCashRewardActivePayment) {
+            cashRewardDiscount = 40;
+        }
+
+        let effectivePlatformCharge = platformChargePayment;
+        if (cashRewardDiscount > 0) effectivePlatformCharge = 0;
+
+        let subtotal = baseFarePayment + equipmentChargePayment + effectivePlatformCharge;
+        
+        let rideDiscount = 0;
+        if (isHighValueAppliedPayment && (baseFarePayment + equipmentChargePayment + platformChargePayment) > 600) {
+            rideDiscount = 10;
+            if (rideDiscRowPay) rideDiscRowPay.style.display = 'flex';
+        } else {
+            if (rideDiscRowPay) rideDiscRowPay.style.display = 'none';
+        }
+
+        let bankDiscount = 0;
+        let bankName = "";
+        
+        if (selectedMethod === 'card' && selectedBankOfferPayment !== 'none') {
+            if (selectedBankOfferPayment === 'hdfc') {
+                bankDiscount = Math.round((subtotal - rideDiscount) * 0.05);
+                bankName = "HDFC Bank (5% Off)";
+            } else if (selectedBankOfferPayment === 'sbi') {
+                bankDiscount = Math.round((subtotal - rideDiscount) * 0.06);
+                bankName = "SBI Bank (6% Off)";
+            }
+        }
+
+        if (bankDiscount > 0) {
+            if (bankDiscNamePay) bankDiscNamePay.textContent = bankName;
+            if (bankDiscAmtPay) bankDiscAmtPay.textContent = `-₹${bankDiscount}`;
+            if (bankDiscRowPay) bankDiscRowPay.style.display = 'flex';
+        } else {
+            if (bankDiscRowPay) bankDiscRowPay.style.display = 'none';
+        }
+
+        if (cashRowPay) {
+            cashRowPay.style.display = (cashRewardDiscount > 0) ? 'flex' : 'none';
+        }
+
+        if (platChargeDispPay) {
+            if (isPlatformFreePayment || cashRewardDiscount > 0) {
+                platChargeDispPay.innerHTML = '<del>₹40</del> ₹0';
+                if (firstRideLblPay && isPlatformFreePayment) firstRideLblPay.style.display = 'inline';
+            } else {
+                platChargeDispPay.textContent = '₹40';
+                if (firstRideLblPay) firstRideLblPay.style.display = 'none';
+            }
+        }
+
+        const total = subtotal - rideDiscount - bankDiscount + donationAmountPayment;
+        
+        if (donationDisplayPay) donationDisplayPay.textContent = `₹${donationAmountPayment}`;
+        if (totalDisplayPay) totalDisplayPay.textContent = `₹${total}`;
+        if (payableDisplayPay) payableDisplayPay.textContent = `Payable Amount: ₹${total}`;
+        if (payBtnAmtPay) payBtnAmtPay.textContent = total;
+    }
+
+    updateCashRewardUIPayment();
+    updateTotalPayment();
 
     console.log('RapidCare Dashboard Initialized');
 });
