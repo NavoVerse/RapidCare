@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapidCare | Dev Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>RapidCare <span>Developer</span> Dashboard</h1>
+        <p style="color: var(--text-dim);">Live Database Inspection System</p>
+    </header>
+
+    <div class="dashboard-grid">
+        <!-- Patients Section -->
+        <section id="patients-section">
+            <h2><span class="badge badge-patient">Patients</span> Database</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Password (Hashed)</th>
+                            <th>Medical Details / Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patients-list">
+                        <tr><td colspan="5" class="loading">Loading records...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Drivers Section -->
+        <section id="drivers-section">
+            <h2><span class="badge badge-driver">Drivers</span> Database</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Password (Hashed)</th>
+                            <th>Vehicle & License</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="drivers-list">
+                        <tr><td colspan="6" class="loading">Loading records...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Hospitals Section -->
+        <section id="hospitals-section">
+            <h2><span class="badge badge-hospital">Hospitals</span> Database</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Password (Hashed)</th>
+                            <th>Location / Specialty</th>
+                            <th>Total Beds</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hospitals-list">
+                        <tr><td colspan="6" class="loading">Loading records...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/data');
+                const data = await response.json();
+
+                updateTable('patients-list', data.patients, (p) => `
+                    <td>${p.id}</td>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${p.email}</td>
+                    <td><code>${p.password.substring(0, 15)}...</code></td>
+                    <td>
+                        <small>Blood: ${p.blood_group || 'N/A'}</small><br>
+                        <small>History: ${p.medical_history || 'None'}</small>
+                    </td>
+                `);
+
+                updateTable('drivers-list', data.drivers, (d) => `
+                    <td>${d.id}</td>
+                    <td><strong>${d.name}</strong></td>
+                    <td>${d.email}</td>
+                    <td><code>${d.password.substring(0, 15)}...</code></td>
+                    <td>
+                        <small>License: ${d.license_number || 'N/A'}</small><br>
+                        <small>Vehicle: ${d.vehicle_number || 'N/A'}</small>
+                    </td>
+                    <td><span class="badge" style="background: rgba(0,0,0,0.2)">${d.status}</span></td>
+                `);
+
+                updateTable('hospitals-list', data.hospitals, (h) => `
+                    <td>${h.id}</td>
+                    <td><strong>${h.name}</strong></td>
+                    <td>${h.email}</td>
+                    <td><code>${h.password.substring(0, 15)}...</code></td>
+                    <td>
+                        <small>Address: ${h.address || 'N/A'}</small><br>
+                        <small>Spec: ${h.specialty || 'General'}</small>
+                    </td>
+                    <td>${h.total_beds || 0}</td>
+                `);
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        }
+
+        function updateTable(id, records, template) {
+            const tbody = document.getElementById(id);
+            if (!records || records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">No records found</td></tr>';
+                return;
+            }
+            tbody.innerHTML = records.map(r => `<tr>${template(r)}</tr>`).join('');
+        }
+
+        fetchData();
+        // Refresh every 30 seconds
+        setInterval(fetchData, 30000);
+    </script>
+</body>
+</html>
