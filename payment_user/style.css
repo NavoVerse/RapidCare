@@ -14,23 +14,55 @@ body {
     color: var(--text-main);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
+    height: 100vh;
     min-height: 100vh;
+    overflow: hidden;
+    padding: 16px 24px;
 }
 
 body.dark-mode {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
 
+.theme-toggle {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    cursor: pointer;
+    color: var(--text-dark);
+    z-index: 1000;
+}
+
 .payment-container {
     background: var(--card-bg);
     width: 100%;
-    max-width: 1000px;
-    padding: 40px;
+    max-width: 100%;
     border-radius: 20px;
     box-shadow: var(--shadow);
     text-align: center;
-    margin: 20px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+}
+
+.payment-content-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px;
+}
+
+.payment-content-inner {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
 }
 
 h1 {
@@ -385,18 +417,40 @@ h1 {
     }
 }
 
+@media (max-width: 768px) {
+    body { padding: 10px 12px; }
+    .payment-container { border-radius: 16px; }
+    .payment-content-wrapper { padding: 24px 16px; }
+    h1 { font-size: 2.2rem; }
+    .payable-amount { padding: 14px 40px; font-size: 1.1rem; }
+}
+
 @media (max-width: 480px) {
+    body { padding: 8px; }
+    .payment-container { border-radius: 12px; }
+    .payment-content-wrapper { padding: 20px 12px; }
+    h1 { font-size: 1.8rem; margin-top: 10px; }
+    .theme-toggle { top: 16px; right: 16px; }
     .action-buttons {
         flex-direction: column;
     }
-
     .donation-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-
     .donate-custom {
         grid-column: 1 / -1;
     }
+    .payable-amount { padding: 12px 30px; font-size: 1rem; width: 100%; }
+}
+
+@media (max-height: 640px) {
+    body { padding: 8px 14px; }
+    .payment-content-wrapper { padding: 16px; }
+    h1 { font-size: 1.6rem; }
+    .payable-amount { margin-bottom: 20px; }
+    .location-indicator { margin-bottom: 8px; }
+    .distance-text { margin-bottom: 20px; }
+    .theme-toggle { top: 12px; right: 16px; }
 }
 
 /* ===== CASH DETAILS ===== */
