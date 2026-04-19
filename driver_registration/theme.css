@@ -1,37 +1,39 @@
 :root {
-    --primary-green: #15803d;
-    --acc-green: #22c55e;
-    --primary-yellow: #facc15;
-    --acc-yellow: #eab308;
+    /* Premium Light Mode Palette */
+    --primary-green: #059669; /* Rich Emerald */
+    --acc-green: #10b981;    /* Vibrant Emerald */
+    --primary-yellow: #f59e0b; /* Amber */
+    --acc-yellow: #fbbf24;    /* Vibrant Amber */
     --white: #ffffff;
-    --bg-light: #f0fdf4;
-    --text-dark: #14532d;
-    --text-muted: #4d7c0f;
-    --input-bg: #f9fafb;
-    --input-border: #d1d5db;
-    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    --font-family: 'Inter', sans-serif;
+    --bg-light: #f0fdf4;     /* Very soft green tint for sections */
+    --text-dark: #064e3b;    /* Deepest green for text */
+    --text-muted: #4b5563;   /* Slate Gray for secondary text */
+    --input-bg: #f9fafb;     /* Very light gray */
+    --input-border: #e5e7eb; /* Soft border */
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    --font-family: 'Outfit', 'Inter', sans-serif;
     
-    /* Mapping original variables to new ones for compatibility */
-    --primary-color: var(--primary-green);
-    --primary-hover: var(--acc-green);
-    --bg-color: var(--primary-yellow);
-    --card-bg: var(--white);
-    --text-main: var(--text-dark);
-    --border-color: var(--input-border);
-    --accent-dark: var(--primary-green);
+    /* Body Background */
+    --body-bg: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
 }
 
 body.dark-mode {
-    --primary-green: #22c55e;
-    --acc-green: #4ade80;
-    --primary-yellow: #ca8a04;
-    --acc-yellow: #eab308;
-    --white: #1e293b;
-    --bg-light: #0f172a;
-    --text-dark: #f8fafc;
-    --text-muted: #cbd5e1; /* Even lighter for better visibility */
-    --input-bg: #334155;
-    --input-border: #475569;
-    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+    /* Sleek Dark Mode Palette */
+    --primary-green: #10b981; /* Bright Emerald */
+    --acc-green: #34d399;    /* Lighter Mint */
+    --primary-yellow: #fbbf24;
+    --acc-yellow: #fcd34d;
+    --white: #111827;        /* Deepest Slate/Gray-900 */
+    --bg-light: #1f2937;     /* Slate-800 for card sub-sections */
+    --text-dark: #f9fafb;    /* Near white */
+    --text-muted: #9ca3af;   /* Muted gray */
+    --input-bg: #374151;     /* Gray-700 */
+    --input-border: #4b5563; /* Gray-600 */
+    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    
+    /* Body Background */
+    --body-bg: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+    
+    /* Calendar filter for dark mode */
+    --calendar-filter: invert(1);
 }
