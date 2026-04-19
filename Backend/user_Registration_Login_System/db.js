@@ -18,7 +18,18 @@ async function initializeDB() {
     // Run existing schema if tables don't exist
     if (fs.existsSync(schemaPath)) {
         const schema = fs.readFileSync(schemaPath, 'utf8');
-        await db.exec(schema);
+        // Split and run statements individually to handle seed data errors gracefully
+        const statements = schema.split(';').map(s => s.trim()).filter(s => s.length > 0);
+        for (const stmt of statements) {
+            try {
+                await db.exec(stmt);
+            } catch (err) {
+                // Ignore duplicate seed data errors, log others
+                if (!err.message.includes('UNIQUE constraint')) {
+                    console.warn('Schema statement warning:', err.message);
+                }
+            }
+        }
         console.log('Base schema initialized.');
     }
 
