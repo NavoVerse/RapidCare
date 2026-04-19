@@ -256,17 +256,18 @@
             <div class="profile-container">
                 <!-- Profile Header Tabs -->
                 <div class="profile-tabs">
-                    <span class="tab">Overview</span>
-                    <span class="tab active">Patient profile</span>
-                    <span class="tab">BGL Analysis</span>
-                    <span class="tab">Medications</span>
-                    <span class="tab">Lab results</span>
-                    <span class="tab">Mini Goals</span>
+                    <span class="tab sub-tab" data-tab="details-overview">Overview</span>
+                    <span class="tab sub-tab active" data-tab="patient-profile">Patient profile</span>
+                    <span class="tab sub-tab" data-tab="bgl-analysis">BGL Analysis</span>
+                    <span class="tab sub-tab" data-tab="patient-medications">Medications</span>
+                    <span class="tab sub-tab" data-tab="lab-results">Lab results</span>
+                    <span class="tab sub-tab" data-tab="mini-goals">Mini Goals</span>
                 </div>
 
                 <!-- Main Profile Content -->
                 <div class="profile-content">
-                    <!-- Profile Card -->
+                    <div id="patient-profile-view" class="sub-tab-content active">
+                        <!-- Profile Card -->
                     <div class="profile-main-card">
                         <div class="profile-info-grid">
                             <div class="profile-image-section">
@@ -280,18 +281,18 @@
                             </div>
                             <div class="profile-details-section">
                                 <div class="name-header">
-                                    <h2>Samim Uddin Molla</h2>
+                                    <h2 id="displayProfileName">Samim Uddin Molla</h2>
                                     <div class="action-icons">
                                         <button class="call-btn">📞</button>
                                         <button class="mail-btn">✉️</button>
                                     </div>
-                                    <button class="edit-profile-btn">✏️ Edit</button>
+                                    <button class="edit-profile-btn" id="editGeneralProfile">✏️ Edit</button>
                                 </div>
                                 <div class="demographics">
-                                    <span>👤 Male</span>
-                                    <span>📍 Elshiekh zayed, Giza</span>
-                                    <span>💼 Accountant</span>
-                                    <span>🎂 12 Dec 1992 (38 years)</span>
+                                    <span id="displayProfileGender">👤 Male</span>
+                                    <span id="displayProfileLocation">📍 Elshiekh zayed, Giza</span>
+                                    <span id="displayProfileJob">💼 Accountant</span>
+                                    <span id="displayProfileBirth">🎂 12 Dec 1992 (38 years)</span>
                                 </div>
                                 <div class="vitals-row">
                                     <div class="vital-item">
@@ -337,7 +338,7 @@
                         <div class="profile-panel timeline-panel">
                             <div class="panel-header">
                                 <h3>📅 Timeline</h3>
-                                <button class="link-btn">Edit</button>
+                                <button class="link-btn" id="editTimeline">Edit</button>
                             </div>
                             <div class="timeline-list">
                                 <div class="timeline-item">
@@ -371,7 +372,7 @@
                         <div class="profile-panel history-panel">
                             <div class="panel-header">
                                 <h3>📋 Medical history</h3>
-                                <button class="link-btn">Edit</button>
+                                <button class="link-btn" id="editMedicalHistory">Edit</button>
                             </div>
                             <div class="history-grid">
                                 <div class="history-item">
@@ -412,11 +413,69 @@
                             </div>
                         </div>
 
-                        <!-- Medications -->
+                        <!-- Diet -->
+                        <div class="profile-panel diet-panel">
+                            <div class="panel-header">
+                                <h3>🍳 Diet</h3>
+                                <button class="notes-btn" id="editDietNotes">+ Notes</button>
+                            </div>
+                            <div class="diet-list">
+                                <div class="diet-card">
+                                    <span>🥃 8 Cups - <small>per day</small></span>
+                                </div>
+                                <div class="diet-card">
+                                    <span>☕ 3 Cups - <small>per day</small></span>
+                                </div>
+                                <div class="diet-card full">
+                                    <span>⏰ Intermittent fasting, Intermittent fasting,</span>
+                                </div>
+                                <div class="diet-card full">
+                                    <span>🍭 Table sugar, Daily Avg 3 / 6</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- Placeholder views for other sub-tabs -->
+                    <div id="details-overview-view" class="sub-tab-content" style="display: none;">
+                        <div class="profile-panel">
+                            <h3>Health Summary</h3>
+                            <div class="history-grid" style="margin-top: 20px;">
+                                <div class="history-item">
+                                    <div class="icon">📈</div>
+                                    <div class="text"><label>Avg BGL</label><p>145 mg/dL</p></div>
+                                </div>
+                                <div class="history-item">
+                                    <div class="icon">🥗</div>
+                                    <div class="text"><label>Diet Adherence</label><p>85% Success</p></div>
+                                </div>
+                                <div class="history-item">
+                                    <div class="icon">🚶</div>
+                                    <div class="text"><label>Activity</label><p>4,200 steps today</p></div>
+                                </div>
+                                <div class="history-item">
+                                    <div class="icon">🛌</div>
+                                    <div class="text"><label>Sleep</label><p>7h 20m</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="bgl-analysis-view" class="sub-tab-content" style="display: none;">
+                        <div class="profile-panel">
+                            <h3>Blood Glucose Analysis</h3>
+                            <div style="padding: 40px; text-align: center; border: 2px dashed var(--border); border-radius: 12px; margin-top: 20px;">
+                                <div style="font-size: 2rem; margin-bottom: 10px;">📊</div>
+                                <p>Detailed BGL Charts and Insulin trends are preparing for sync.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="patient-medications-view" class="sub-tab-content" style="display: none;">
+                        <!-- Medications moved here -->
                         <div class="profile-panel medications-panel">
                             <div class="panel-header">
-                                <h3>💊 Medications</h3>
-                                <button class="link-btn">Edit</button>
+                                <h3>💊 Active Medications</h3>
+                                <button class="link-btn" id="editMedicationsListTab">Edit</button>
                             </div>
                             <table class="med-table">
                                 <thead>
@@ -455,25 +514,34 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <!-- Diet -->
-                        <div class="profile-panel diet-panel">
-                            <div class="panel-header">
-                                <h3>🍳 Diet</h3>
-                                <button class="notes-btn">+ Notes</button>
+                    </div>
+                    <div id="lab-results-view" class="sub-tab-content" style="display: none;">
+                        <div class="profile-panel">
+                            <h3>Laboratory Results</h3>
+                            <div class="history-grid" style="margin-top: 20px;">
+                                <div class="history-item" style="cursor: pointer;">
+                                    <div class="icon">📄</div>
+                                    <div class="text"><label>Blood Test</label><p>View Report (PDF)</p></div>
+                                </div>
+                                <div class="history-item" style="cursor: pointer;">
+                                    <div class="icon">📄</div>
+                                    <div class="text"><label>Liver Function</label><p>View Report (PDF)</p></div>
+                                </div>
                             </div>
-                            <div class="diet-list">
+                        </div>
+                    </div>
+                    <div id="mini-goals-view" class="sub-tab-content" style="display: none;">
+                        <div class="profile-panel">
+                            <h3>Health Mini Goals</h3>
+                            <div class="diet-list" style="margin-top: 20px;">
                                 <div class="diet-card">
-                                    <span>🥃 8 Cups - <small>per day</small></span>
+                                    <span>💧 Drink 3L Water <small>70% Done</small></span>
                                 </div>
                                 <div class="diet-card">
-                                    <span>☕ 3 Cups - <small>per day</small></span>
+                                    <span>🚶 5000 Steps <small>80% Done</small></span>
                                 </div>
                                 <div class="diet-card full">
-                                    <span>⏰ Intermittent fasting, Intermittent fasting,</span>
-                                </div>
-                                <div class="diet-card full">
-                                    <span>🍭 Table sugar, Daily Avg 3 / 6</span>
+                                    <span>🧘 Morning Meditation (10 mins)</span>
                                 </div>
                             </div>
                         </div>
@@ -674,6 +742,24 @@
         </div>
 
 
+
+        <!-- Edit Modal -->
+        <div class="modal-overlay" id="editModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="editModalTitle">Edit Information</h2>
+                    <span class="close-modal" id="closeEditModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <div id="editFields"></div>
+                        <button type="submit" style="width: 100%; margin-top: 20px; padding: 12px; background: var(--primary-green); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Leaflet Map (Free, no API key required) -->
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
