@@ -227,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     let hospitals = [];
+    let hospitalMarkers = [];
     let userMarker = null;
 
     // Custom hospital marker icon
@@ -246,21 +247,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Load hospitals from backend MapAPI
-    async function initHospitals() {
-        if (window.MapAPI) {
-            hospitals = await window.MapAPI.getHospitals();
+    async function initHospitals(forced = false) {
+        const storedHospitals = localStorage.getItem('hospitalData');
+        
+        if (!forced && storedHospitals) {
+            hospitals = JSON.parse(storedHospitals);
         } else {
-            // Inline fallback
-            hospitals = [
-                { name: "AMRI Hospital, Dhakuria", lat: 22.5135, lng: 88.3629, status: "Available", beds: 12, facilities: ["ICU", "Emergency", "Cardiology"] },
-                { name: "Apollo Gleneagles Hospitals", lat: 22.5710, lng: 88.4055, status: "Limited", beds: 3, facilities: ["Neurology", "Trauma Care", "Oxygen Support"] },
-                { name: "Fortis Hospital, Anandapur", lat: 22.5165, lng: 88.4042, status: "Available", beds: 21, facilities: ["General Surgery", "Pediatrics", "Diagnostic Lab"] },
-                { name: "Medica Superspecialty Hospital", lat: 22.4939, lng: 88.3980, status: "Busy", beds: 0, facilities: ["Organ Transplant", "Advanced Imaging", "Reentry Care"] },
-                { name: "NRS Medical College and Hospital", lat: 22.5645, lng: 88.3685, status: "Available", beds: 45, facilities: ["Government Funded", "Free Pharmacy", "Maternity"] },
-                { name: "Peerless Hospital", lat: 22.4770, lng: 88.3900, status: "Available", beds: 18, facilities: ["Orthopedic", "Oncology", "Dialysis"] },
-                { name: "SSKM Hospital", lat: 22.5392, lng: 88.3444, status: "Busy", beds: 1, facilities: ["Cardiac Surgery", "Burn Ward", "Medical Research"] }
-            ];
+            if (window.MapAPI) {
+                hospitals = await window.MapAPI.getHospitals();
+            } else {
+                // Inline fallback
+                hospitals = [
+                    { name: "AMRI Hospital, Dhakuria", lat: 22.5135, lng: 88.3629, status: "Available", beds: 12, facilities: ["ICU", "Emergency", "Cardiology"] },
+                    { name: "Apollo Gleneagles Hospitals", lat: 22.5710, lng: 88.4055, status: "Limited", beds: 3, facilities: ["Neurology", "Trauma Care", "Oxygen Support"] },
+                    { name: "Fortis Hospital, Anandapur", lat: 22.5165, lng: 88.4042, status: "Available", beds: 21, facilities: ["General Surgery", "Pediatrics", "Diagnostic Lab"] },
+                    { name: "Medica Superspecialty Hospital", lat: 22.4939, lng: 88.3980, status: "Busy", beds: 0, facilities: ["Organ Transplant", "Advanced Imaging", "Reentry Care"] },
+                    { name: "NRS Medical College and Hospital", lat: 22.5645, lng: 88.3685, status: "Available", beds: 45, facilities: ["Government Funded", "Free Pharmacy", "Maternity"] },
+                    { name: "Peerless Hospital", lat: 22.4770, lng: 88.3900, status: "Available", beds: 18, facilities: ["Orthopedic", "Oncology", "Dialysis"] },
+                    { name: "SSKM Hospital", lat: 22.5392, lng: 88.3444, status: "Busy", beds: 1, facilities: ["Cardiac Surgery", "Burn Ward", "Medical Research"] }
+                ];
+            }
+            localStorage.setItem('hospitalData', JSON.stringify(hospitals));
         }
+
+        // Clear existing markers
+        hospitalMarkers.forEach(m => overviewMap.removeLayer(m));
+        hospitalMarkers = [];
 
         hospitals.forEach(h => {
             const statusColor = h.status === 'Available' ? '#15803d' : (h.status === 'Busy' ? '#dc2626' : '#eab308');
@@ -270,9 +282,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p style="margin: 0 0 10px 0; font-size: 0.85rem;">Status: <strong style="color: ${statusColor}">${h.status}</strong></p>
                     <button onclick="window.bookAmbulance('${h.name.replace(/'/g, "\\'")}')" style="width: 100%; padding: 8px; background: #15803d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">🚑 Book RapidCare</button>
                 </div>`;
-            L.marker([h.lat, h.lng], { icon: hospitalIcon })
+            const m = L.marker([h.lat, h.lng], { icon: hospitalIcon })
                 .addTo(overviewMap)
                 .bindPopup(popupContent);
+            hospitalMarkers.push(m);
+        });
+
+        // Re-render the list if we have location
+        const lat = localStorage.getItem('userLat');
+        const lng = localStorage.getItem('userLng');
+        if (lat && lng) {
+            renderHospitalsList(parseFloat(lat), parseFloat(lng));
+        }
+    }
+
+    // Refresh Hospitals Button Event
+    const refreshHospitalsBtn = document.getElementById('refreshHospitalsBtn');
+    if (refreshHospitalsBtn) {
+        refreshHospitalsBtn.addEventListener('click', () => {
+            initHospitals(true);
         });
     }
 
@@ -478,16 +506,37 @@ document.addEventListener('DOMContentLoaded', () => {
             
         overviewMap.setView([lat, lng], 13);
         renderHospitalsList(lat, lng);
+
+        // PERSISTENCE: Save to localStorage
+        localStorage.setItem('userLat', lat);
+        localStorage.setItem('userLng', lng);
     }
 
-    async function detectAutoLocation() {
+    async function detectAutoLocation(forced = false) {
         const locationText = document.getElementById('userLocationText');
         const locationStatus = document.getElementById('locationStatus');
+
+        // Check if we already have saved location and this isn't a forced refresh
+        const savedLat = localStorage.getItem('userLat');
+        const savedLng = localStorage.getItem('userLng');
+        const savedName = localStorage.getItem('userLocationName');
+
+        if (!forced && savedLat && savedLng) {
+            if (locationText) locationText.textContent = savedName || "Saved Location";
+            if (locationStatus) {
+                locationStatus.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Stored`;
+            }
+            updateUserLocation(parseFloat(savedLat), parseFloat(savedLng));
+            return;
+        }
+
         try {
+            if (locationText) locationText.textContent = "Detecting...";
             if (window.LocationService) {
                 const location = await window.LocationService.getCurrentLocation();
                 
                 if (locationText) locationText.textContent = location.address;
+                localStorage.setItem('userLocationName', location.address);
 
                 // Sync with Database
                 if (window.DBManager) {
@@ -508,6 +557,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             updateUserLocation(22.5726, 88.3639);
         }
+    }
+
+    // Refresh Button Event
+    const refreshBtn = document.getElementById('refreshLocationBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Don't trigger the modal open
+            detectAutoLocation(true); // Force re-detection
+        });
     }
 
     detectAutoLocation();
@@ -549,6 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateUserLocation(lat, lng);
             const locText = document.getElementById('userLocationText');
             if (locText) locText.textContent = cityName;
+            localStorage.setItem('userLocationName', cityName);
             
             const locationStatus = document.getElementById('locationStatus');
             if (locationStatus) {
@@ -592,6 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 updateUserLocation(lat, lng);
                                 const locText = document.getElementById('userLocationText');
                                 if (locText) locText.textContent = shortName;
+                                localStorage.setItem('userLocationName', shortName);
 
                                 const locationStatus = document.getElementById('locationStatus');
                                 if (locationStatus) {

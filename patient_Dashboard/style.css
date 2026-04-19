@@ -1273,8 +1273,15 @@ body.dark-mode .map-overlay {
     filter: saturate(0.45) brightness(1.05) hue-rotate(60deg);
 }
 
-body.dark-mode .leaflet-tile-pane {
-    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%) saturate(1.3);
+body.dark-mode .leaflet-layer,
+body.dark-mode .leaflet-control-zoom-in,
+body.dark-mode .leaflet-control-zoom-out,
+body.dark-mode .leaflet-control-attribution {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(120%) saturate(1.6);
+}
+
+body.dark-mode .leaflet-container {
+    background: #0f172a;
 }
 
 .map-live-badge {
