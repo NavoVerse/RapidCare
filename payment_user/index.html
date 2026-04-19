@@ -91,6 +91,10 @@
                 <span id="bankDiscountName">Bank Discount</span>
                 <span id="bankDiscountAmount">-0 RS</span>
             </div>
+            <div class="charge-row" id="cashRewardRow" style="display: none; color: var(--primary-green);">
+                <span>🎉 Cash Loyalty Reward (6th Ride Free Platform Fee)</span>
+                <span id="cashRewardAmount">-40 RS</span>
+            </div>
             <div class="charge-row">
                 <span>Donation</span>
                 <span id="donationDisplay">10 RS</span>
@@ -197,6 +201,58 @@
                     <input type="text" class="card-input" placeholder="CVV">
                 </div>
                 <input type="text" class="card-input" placeholder="Name on Card">
+            </div>
+
+            <div class="cash-details" id="cashDetailsForm">
+                <div class="cash-reward-card">
+                    <div class="cash-reward-header">
+                        <div class="cash-reward-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                <line x1="1" y1="10" x2="23" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="cash-reward-title">Cash Loyalty Rewards</h4>
+                            <p class="cash-reward-desc">Pay 5 rides with cash → 6th ride platform fee FREE!</p>
+                        </div>
+                    </div>
+
+                    <div class="cash-progress-section">
+                        <div class="cash-progress-bar">
+                            <div class="cash-progress-fill" id="cashProgressFill"></div>
+                        </div>
+                        <div class="cash-rides-dots" id="cashRidesDots">
+                            <div class="ride-dot" data-ride="1"><span>1</span></div>
+                            <div class="ride-dot" data-ride="2"><span>2</span></div>
+                            <div class="ride-dot" data-ride="3"><span>3</span></div>
+                            <div class="ride-dot" data-ride="4"><span>4</span></div>
+                            <div class="ride-dot" data-ride="5"><span>5</span></div>
+                            <div class="ride-dot reward-dot" data-ride="6">
+                                <span>🎁</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cash-status" id="cashStatus">
+                        <span class="cash-status-text" id="cashStatusText">Complete <strong id="cashRidesRemaining">5</strong> more cash rides to unlock free platform fee (₹40 saved!)</span>
+                    </div>
+
+                    <div class="cash-reward-unlocked" id="cashRewardUnlocked" style="display: none;">
+                        <div class="reward-confetti">🎉</div>
+                        <strong>Reward Unlocked!</strong>
+                        <p>Platform fee of ₹40 is waived for this ride!</p>
+                    </div>
+
+                    <div class="cash-info-note">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        <span>Cash is collected by the driver after service. The loyalty counter resets after every reward redemption.</span>
+                    </div>
+                </div>
             </div>
 
             <button class="pay-now-btn">Pay <span id="payBtnAmount">500</span> RS</button>
