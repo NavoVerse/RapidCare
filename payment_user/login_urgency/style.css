@@ -49,10 +49,11 @@ body {
     background: linear-gradient(135deg, #fef9c3 0%, var(--primary-yellow) 100%);
     color: var(--text-dark);
     min-height: 100vh;
+    height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    overflow-x: hidden;
+    align-items: stretch;
+    overflow: hidden;
     transition: background 0.4s ease;
 }
 body.dark-mode { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
@@ -73,8 +74,9 @@ body.dark-mode .theme-toggle { background: rgba(30,41,59,0.7); border-color: rgb
 
 /* ===== PAGE WRAPPER ===== */
 .page-wrapper {
-    width: 100%; max-width: 960px; margin: 0 auto; padding: 20px;
-    display: flex; flex-direction: column; min-height: 100vh;
+    width: 100%; max-width: 100%; margin: 0 auto; padding: 16px 24px;
+    display: flex; flex-direction: column; height: 100vh;
+    overflow: hidden;
 }
 
 /* ===== EMERGENCY HEADER ===== */
@@ -151,20 +153,29 @@ body.dark-mode .theme-toggle { background: rgba(30,41,59,0.7); border-color: rgb
 .slides-viewport {
     position: relative;
     flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 .slides-track {
     position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 .slide {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
+    height: 100%;
     opacity: 0;
     visibility: hidden;
     transform: translateX(40px);
     transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s;
     pointer-events: none;
+    display: flex;
+    flex-direction: column;
 }
 .slide.active-slide {
     position: relative;
@@ -172,6 +183,7 @@ body.dark-mode .theme-toggle { background: rgba(30,41,59,0.7); border-color: rgb
     visibility: visible;
     transform: translateX(0);
     pointer-events: auto;
+    flex: 1;
 }
 .slide.exit-left {
     transform: translateX(-40px);
@@ -186,16 +198,27 @@ body.dark-mode .theme-toggle { background: rgba(30,41,59,0.7); border-color: rgb
     overflow: visible;
     border: 1px solid rgba(21,128,61,0.08);
     animation: fadeUp 0.5s ease-out;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
-.card-body { padding: 36px 32px 40px; }
+.card-body {
+    padding: 36px 48px 40px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow-y: auto;
+}
 
 .slide-content {
     display: flex; flex-direction: column; align-items: center;
-    text-align: center; max-width: 480px; margin: 0 auto;
+    text-align: center; max-width: 520px; margin: 0 auto;
+    width: 100%;
 }
 
 /* ===== SLIDE ICON ===== */
@@ -386,7 +409,7 @@ body.dark-mode .theme-toggle { background: rgba(30,41,59,0.7); border-color: rgb
 .verified-badge svg { color: var(--acc-green); flex-shrink: 0; }
 
 /* ===== SLIDE 3 — FORM GRID ===== */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 28px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 28px; flex: 1; align-content: start; }
 .form-block { display: flex; flex-direction: column; }
 .form-label {
     display: flex; align-items: center; gap: 10px;
@@ -511,33 +534,85 @@ body.dark-mode .theme-toggle { background: rgba(30,41,59,0.7); border-color: rgb
 .tag .tag-remove:hover { opacity: 1; background: rgba(0,0,0,0.08); }
 
 /* ===== FOOTER ===== */
-.page-footer { text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 12px; font-weight: 500; opacity: 0.7; }
+.page-footer {
+    text-align: center; padding: 8px 0; color: var(--text-muted);
+    font-size: 11px; font-weight: 500; opacity: 0.7;
+    flex-shrink: 0;
+}
 
 /* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .page-wrapper { padding: 12px 16px; }
+    .card-body { padding: 28px 32px 32px; }
+}
+
 @media (max-width: 768px) {
-    .page-wrapper { padding: 12px; }
-    .emergency-header { padding: 14px 16px; border-radius: var(--radius-md); margin-bottom: 16px; }
-    .header-inner { flex-direction: column; gap: 10px; align-items: center; }
+    .page-wrapper { padding: 10px 12px; }
+    .emergency-header { padding: 12px 16px; border-radius: var(--radius-md); margin-bottom: 12px; }
+    .header-inner { flex-direction: column; gap: 8px; align-items: center; }
     .header-center { order: -1; }
-    .brand-name { font-size: 22px; }
+    .brand-name { font-size: 20px; }
     .card { border-radius: var(--radius-lg); }
-    .card-body { padding: 24px 20px 28px; }
-    .slide-title { font-size: 22px; }
-    .form-grid { grid-template-columns: 1fr; gap: 24px; }
+    .card-body { padding: 20px 18px 24px; }
+    .slide-title { font-size: 21px; }
+    .slide-subtitle { font-size: 13px; margin-bottom: 20px; }
+    .form-grid { grid-template-columns: 1fr; gap: 20px; }
     .otp-box { width: 46px; height: 56px; font-size: 22px; }
     .otp-container { gap: 8px; }
+    .slide-icon { width: 60px; height: 60px; margin-bottom: 14px; }
+    .slide-icon svg { width: 32px; height: 32px; }
+    .toggle-group { margin-bottom: 20px; }
+    .input-section { margin-bottom: 18px; }
+    .primary-btn { padding: 16px 24px; }
+    .page-footer { padding: 6px 0; font-size: 10px; }
 }
 
 @media (max-width: 480px) {
-    .emergency-header { padding: 12px 14px; }
-    .step { width: 24px; height: 24px; font-size: 11px; }
-    .step-line { width: 16px; }
-    .header-title { font-size: 11px; letter-spacing: 1.5px; }
-    .card-body { padding: 20px 16px 24px; }
-    .slide-title { font-size: 20px; }
-    .slide-subtitle { font-size: 13px; }
-    .otp-box { width: 42px; height: 52px; font-size: 20px; }
-    .otp-container { gap: 6px; }
-    .toggle-btn { padding: 10px 14px; font-size: 13px; }
-    .primary-btn { font-size: 13px; padding: 16px 20px; }
+    .page-wrapper { padding: 8px; }
+    .emergency-header { padding: 10px 12px; margin-bottom: 8px; }
+    .step { width: 22px; height: 22px; font-size: 10px; }
+    .step-line { width: 14px; }
+    .header-title { font-size: 10px; letter-spacing: 1.2px; }
+    .header-subtitle { font-size: 10px; }
+    .brand-name { font-size: 18px; }
+    .card-body { padding: 16px 14px 20px; }
+    .slide-title { font-size: 19px; }
+    .slide-subtitle { font-size: 12px; margin-bottom: 16px; }
+    .slide-icon { width: 52px; height: 52px; margin-bottom: 12px; }
+    .slide-icon svg { width: 28px; height: 28px; }
+    .otp-box { width: 40px; height: 50px; font-size: 20px; }
+    .otp-container { gap: 6px; margin-bottom: 20px; }
+    .toggle-btn { padding: 10px 12px; font-size: 13px; }
+    .toggle-group { margin-bottom: 16px; max-width: 280px; }
+    .primary-btn { font-size: 13px; padding: 14px 18px; }
+    .form-input { padding: 14px; font-size: 14px; }
+    .country-code { padding: 0 12px; font-size: 14px; }
+    .phone-input { padding: 14px !important; }
+    .form-label { font-size: 12px; }
+    .search-input { padding: 12px 38px 12px 40px; font-size: 13px; }
+    .dispatch-btn { font-size: 13px; padding: 14px 16px; }
+    .verified-badge { padding: 10px 16px; font-size: 12px; }
+    .page-footer { padding: 4px 0; font-size: 9px; }
+}
+
+/* Ultra-short screens (landscape phones) */
+@media (max-height: 640px) {
+    .emergency-header { padding: 8px 14px; margin-bottom: 6px; }
+    .brand-name { font-size: 18px; }
+    .header-inner { gap: 4px; }
+    .slide-icon { width: 44px; height: 44px; margin-bottom: 8px; }
+    .slide-icon svg { width: 24px; height: 24px; }
+    .slide-title { font-size: 18px; margin-bottom: 4px; }
+    .slide-subtitle { font-size: 12px; margin-bottom: 12px; }
+    .card-body { padding: 12px 16px 16px; }
+    .toggle-group { margin-bottom: 12px; }
+    .input-section { margin-bottom: 12px; }
+    .otp-box { width: 38px; height: 46px; font-size: 18px; }
+    .otp-container { gap: 6px; margin-bottom: 16px; }
+    .primary-btn { padding: 12px 16px; font-size: 13px; }
+    .page-footer { display: none; }
+    .resend-section { margin-top: 10px; }
+    .back-link-btn { margin-top: 6px; }
+    .verified-badge { padding: 8px 14px; font-size: 11px; }
+    .form-grid { gap: 14px; margin-bottom: 14px; }
 }
