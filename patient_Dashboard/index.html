@@ -47,7 +47,7 @@
                 </svg>
                 <span>Tracking</span>
             </a>
-            <a href="../Insurance_Interface/index.html" class="nav-item">
+            <a href="#" class="nav-item">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
@@ -631,6 +631,564 @@
                 </aside>
             </div>
         </div>
+
+        <div id="insurance-view" style="display: none;">
+            <div class="insurance-tab">
+                <!-- Header -->
+                <div class="header-section-insurance">
+                    <div class="patient-info-insurance">
+                        <h1>Samim Uddin Molla</h1>
+                        <span class="hospital-id-insurance">ID: RC-89214-KOL</span>
+                        <span class="badge-insurance active">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>
+                            Active Coverage
+                        </span>
+                    </div>
+                    <button class="btn btn-primary" id="global-add-btn">+ Add Insurance</button>
+                </div>
+
+                <!-- Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="label">Total Coverage</span>
+                        <span class="value">₹13,50,000</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="label">Used This Year</span>
+                        <span class="value">₹45,000</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="label">Pending Claims</span>
+                        <span class="value">1</span>
+                    </div>
+                </div>
+
+                <!-- Accordions -->
+                <div class="accordions-container">
+
+                    <!-- 1. State Government Insurance -->
+                    <div class="accordion-item-insurance active">
+                        <div class="accordion-header-insurance">
+                            <div class="accordion-title-area">
+                                <div class="accordion-icon icon-state">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path
+                                            d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3" />
+                                    </svg>
+                                </div>
+                                <div class="accordion-title-text">
+                                    <h3>State Government Insurance</h3>
+                                    <p>West Bengal Schemes</p>
+                                </div>
+                            </div>
+                            <div class="accordion-right">
+                                <span class="count-pill">2 Linked</span>
+                                <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="accordion-content-insurance" style="max-height: 2000px;">
+                            <div class="accordion-body">
+                                <div class="scheme-list">
+
+                                    <!-- Swasthya Sathi -->
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4>Swasthya Sathi</h4>
+                                                <p>Family ID: SS-492-XXXX-192</p>
+                                            </div>
+                                            <span class="badge-insurance active">Linked</span>
+                                        </div>
+                                        <div class="scheme-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Members Covered</span>
+                                                <span class="detail-value">4 Members</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Annual Limit</span>
+                                                <span class="detail-value">₹5,00,000</span>
+                                            </div>
+                                            <div class="detail-item" style="grid-column: span 2;">
+                                                <div class="progress-container">
+                                                    <div class="progress-header">
+                                                        <span>₹25,000 Used</span>
+                                                        <span>₹4,75,000 Remaining</span>
+                                                    </div>
+                                                    <div class="progress-bar">
+                                                        <div class="progress-fill" style="width: 5%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <button class="btn btn-outline btn-sm">Verify Eligibility</button>
+                                            <button class="btn btn-primary btn-sm">Raise Claim</button>
+                                            <a href="https://swasthyasathi.gov.in/" target="_blank"
+                                                class="btn btn-outline btn-sm">View Portal</a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Sishu Sathi -->
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4>Sishu Sathi</h4>
+                                                <p>Paediatric Cardiac Care Scheme</p>
+                                            </div>
+                                            <span class="badge-insurance active">Linked</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://www.wbhealth.gov.in/sishu-sathi" target="_blank"
+                                                class="btn btn-outline btn-sm">Read Guidelines</a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Khadya Sathi -->
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4 style="color: var(--semantic-grey);">Khadya Sathi</h4>
+                                                <p>Digital Ration Card Subsidies</p>
+                                            </div>
+                                            <span class="badge-insurance not-linked">Not Enrolled</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://food.wb.gov.in/" target="_blank"
+                                                class="btn btn-primary btn-sm">Apply Now</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <button class="add-scheme-btn">+ Link another state scheme</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Central Government Insurance -->
+                    <div class="accordion-item-insurance">
+                        <div class="accordion-header-insurance">
+                            <div class="accordion-title-area">
+                                <div class="accordion-icon icon-central">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    </svg>
+                                </div>
+                                <div class="accordion-title-text">
+                                    <h3>Central Government Insurance</h3>
+                                    <p>National Schemes</p>
+                                </div>
+                            </div>
+                            <div class="accordion-right">
+                                <span class="count-pill">2 Linked</span>
+                                <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="accordion-content-insurance">
+                            <div class="accordion-body">
+                                <div class="scheme-list">
+
+                                    <!-- Ayushman Bharat PMJAY -->
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4>Ayushman Bharat PMJAY</h4>
+                                                <p>Beneficiary ID: PM-883-991A</p>
+                                            </div>
+                                            <span class="badge-insurance active">Aadhaar Verified</span>
+                                        </div>
+                                        <div class="scheme-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Annual Limit</span>
+                                                <span class="detail-value">₹5,00,000</span>
+                                            </div>
+                                            <div class="detail-item" style="grid-column: span 2;">
+                                                <div class="progress-container">
+                                                    <div class="progress-header">
+                                                        <span>₹0 Used</span>
+                                                        <span>₹5,00,000 Remaining</span>
+                                                    </div>
+                                                    <div class="progress-bar">
+                                                        <div class="progress-fill" style="width: 0%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://pmjay.gov.in/" target="_blank"
+                                                class="btn btn-outline btn-sm">Verify on NHA</a>
+                                            <button class="btn btn-primary btn-sm">Raise Claim</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- CGHS -->
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4>CGHS</h4>
+                                                <p>For Central Govt Employees • Card: 882193</p>
+                                            </div>
+                                            <span class="badge-insurance active">Active</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <button class="btn btn-primary btn-sm">Book Appointment</button>
+                                            <a href="https://cghs.nic.in/" target="_blank"
+                                                class="btn btn-outline btn-sm">View CGHS Portal</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="section-divider">Available Central Schemes</div>
+
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4 style="color: var(--semantic-grey);">ECHS</h4>
+                                                <p>For Ex-Servicemen Contributory Health Scheme</p>
+                                            </div>
+                                            <span class="badge-insurance not-linked">Not Linked</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://echs.gov.in/" target="_blank"
+                                                class="btn btn-outline btn-sm">Apply for ECHS</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4 style="color: var(--semantic-grey);">ESIS</h4>
+                                                <p>Employee State Insurance Scheme</p>
+                                            </div>
+                                            <span class="badge-insurance not-linked">Not Linked</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://www.esic.gov.in/" target="_blank"
+                                                class="btn btn-outline btn-sm">Check Eligibility</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <button class="add-scheme-btn">+ Link central scheme</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Mediclaim Policies -->
+                    <div class="accordion-item-insurance">
+                        <div class="accordion-header-insurance">
+                            <div class="accordion-title-area">
+                                <div class="accordion-icon icon-mediclaim">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                        <path d="M12 18v-6" />
+                                        <path d="M9 15h6" />
+                                    </svg>
+                                </div>
+                                <div class="accordion-title-text">
+                                    <h3>Mediclaim Policies</h3>
+                                    <p>PSU & Bank-backed</p>
+                                </div>
+                            </div>
+                            <div class="accordion-right">
+                                <span class="count-pill">2 Linked</span>
+                                <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="accordion-content-insurance">
+                            <div class="accordion-body">
+                                <div class="scheme-list">
+                                    <div class="section-divider" style="margin-top: 0;">Linked PSU Insurers</div>
+
+                                    <!-- National Insurance -->
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4>National Insurance Mediclaim Plus</h4>
+                                                <p>Policy No: NIP-49910-XX</p>
+                                            </div>
+                                            <span class="badge-insurance active">Active</span>
+                                        </div>
+                                        <div class="scheme-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Sum Insured</span>
+                                                <span class="detail-value">₹3,00,000</span>
+                                            </div>
+                                            <div class="detail-item" style="grid-column: span 2;">
+                                                <div class="progress-container">
+                                                    <div class="progress-header">
+                                                        <span>₹20,000 Used</span>
+                                                        <span>₹2,80,000 Remaining</span>
+                                                    </div>
+                                                    <div class="progress-bar">
+                                                        <div class="progress-fill" style="width: 7%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <button class="btn btn-primary btn-sm">Raise Claim</button>
+                                            <a href="https://nationalinsurance.nic.co.in/" target="_blank"
+                                                class="btn btn-outline btn-sm">View Policy</a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bank of Baroda -->
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4>Bank of Baroda Health Insurance</h4>
+                                                <p>BOB Swasthya Bima • Pol: BO-921A</p>
+                                            </div>
+                                            <span class="badge-insurance active">Active</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://www.bankofbaroda.in/" target="_blank"
+                                                class="btn btn-outline btn-sm">Manage Policy</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="section-divider">Available Mediclaim Providers</div>
+
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4 style="color: var(--semantic-grey);">United India Insurance
+                                                    Individual Mediclaim</h4>
+                                            </div>
+                                            <span class="badge-insurance not-linked">Not Linked</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://uiic.co.in/" target="_blank"
+                                                class="btn btn-outline btn-sm">Get Quote</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4 style="color: var(--semantic-grey);">SBI Arogya Premier Policy</h4>
+                                            </div>
+                                            <span class="badge-insurance not-linked">Not Linked</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://www.sbigeneral.in/" target="_blank"
+                                                class="btn btn-outline btn-sm">Explore Policies</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <button class="add-scheme-btn">+ Link mediclaim policy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Private Insurance -->
+                    <div class="accordion-item-insurance">
+                        <div class="accordion-header-insurance">
+                            <div class="accordion-title-area">
+                                <div class="accordion-icon icon-private">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5-10-5z" />
+                                        <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
+                                    </svg>
+                                </div>
+                                <div class="accordion-title-text">
+                                    <h3>Private Insurance</h3>
+                                    <p>Private Underwriters</p>
+                                </div>
+                            </div>
+                            <div class="accordion-right">
+                                <span class="count-pill">3 Linked</span>
+                                <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="accordion-content-insurance">
+                            <div class="accordion-body">
+                                <div class="scheme-list">
+
+                                    <div class="section-divider" style="margin-top: 0;">Linked Policies</div>
+
+                                    <!-- Star Health -->
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4>Star Health Comprehensive Plan</h4>
+                                                <p>via Policybazaar • Policy: ST-8812C</p>
+                                            </div>
+                                            <span class="badge-insurance active">Active</span>
+                                        </div>
+                                        <div class="scheme-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Sum Insured</span>
+                                                <span class="detail-value">₹50,000</span>
+                                            </div>
+                                            <div class="detail-item" style="grid-column: span 2;">
+                                                <div class="progress-container">
+                                                    <div class="progress-header">
+                                                        <span>₹0 Used</span>
+                                                        <span>₹50,000 Remaining</span>
+                                                    </div>
+                                                    <div class="progress-bar">
+                                                        <div class="progress-fill" style="width: 0%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <button class="btn btn-primary btn-sm">Raise Claim</button>
+                                            <a href="https://www.starhealth.in/" target="_blank"
+                                                class="btn btn-outline btn-sm">View Official Portal</a>
+                                        </div>
+                                    </div>
+
+                                    <!-- HDFC Ergo -->
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4>HDFC Ergo Optima Secure</h4>
+                                                <p>Corporate Policy • 4X Coverage Base</p>
+                                            </div>
+                                            <span class="badge-insurance active">Valid Till 2029</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://www.hdfcergo.com/" target="_blank"
+                                                class="btn btn-outline btn-sm">Manage on HDFC Ergo</a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Niva Bupa -->
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4>Niva Bupa ReAssure 2.0</h4>
+                                                <p>Self & Spouse • No Room Capping</p>
+                                            </div>
+                                            <span class="badge-insurance active">Active</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://www.nivabupa.com/" target="_blank"
+                                                class="btn btn-outline btn-sm">View e-Card</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="section-divider">Available Private Insurers</div>
+
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4 style="color: var(--semantic-grey);">Care Health Care Supreme</h4>
+                                                <p>Unlimited automatic recharge option</p>
+                                            </div>
+                                            <span class="badge-insurance not-linked">Not Linked</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://www.careinsurance.com/" target="_blank"
+                                                class="btn btn-outline btn-sm">Visit Care Insurance</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="scheme-card">
+                                        <div class="scheme-header-insurance">
+                                            <div class="scheme-title">
+                                                <h4 style="color: var(--semantic-grey);">ICICI Lombard iHealth Plus</h4>
+                                            </div>
+                                            <span class="badge-insurance not-linked">Not Linked</span>
+                                        </div>
+                                        <div class="scheme-actions">
+                                            <a href="https://www.icicilombard.com/" target="_blank"
+                                                class="btn btn-outline btn-sm">Visit ICICI Lombard</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="scheme-actions" style="margin-top: 16px; margin-bottom: 8px;">
+                                    <button class="btn btn-outline btn-sm" style="flex: 1;"
+                                        onclick="alert('QR Scanner opening...')">Scan QR / Upload card</button>
+                                </div>
+                                <button class="add-scheme-btn">+ Link private policy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Claim History Table -->
+                <div class="claim-history">
+                    <div class="history-header-insurance">
+                        <h3>Claim History</h3>
+                        <a href="#" class="view-all-insurance">View all →</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Scheme</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Ref Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>12 Mar 2026</td>
+                                    <td>Swasthya Sathi</td>
+                                    <td>OPD Consult</td>
+                                    <td class="amt">₹1,500</td>
+                                    <td><span class="badge-insurance active">Approved</span></td>
+                                    <td>CLM-9821A</td>
+                                </tr>
+                                <tr>
+                                    <td>08 Feb 2026</td>
+                                    <td>National Insurance</td>
+                                    <td>Pharmacy</td>
+                                    <td class="amt">₹4,200</td>
+                                    <td><span class="badge-insurance active">Approved</span></td>
+                                    <td>CLM-5490X</td>
+                                </tr>
+                                <tr>
+                                    <td>15 Jan 2026</td>
+                                    <td>National Insurance</td>
+                                    <td>Diagnostics</td>
+                                    <td class="amt">₹1,200</td>
+                                    <td><span class="badge-insurance pending">Pending</span></td>
+                                    <td>CLM-2009F</td>
+                                </tr>
+                                <tr>
+                                    <td>03 Nov 2025</td>
+                                    <td>Ayushman Bharat</td>
+                                    <td>Inpatient (Minor)</td>
+                                    <td class="amt">₹12,000</td>
+                                    <td><span class="badge-insurance rejected">Rejected</span></td>
+                                    <td>CLM-4112E</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
         <!-- Location Selection Modal -->
         <div class="modal-overlay" id="locationModal">
             <div class="modal-content">
@@ -674,6 +1232,46 @@
         </div>
 
 
+
+        <!-- Add Scheme Modal -->
+        <div id="add-scheme-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add Government Scheme</h3>
+                    <button class="close-modal-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-scheme-form">
+                        <input type="hidden" id="scheme-type" value="">
+
+                        <div class="form-group" id="scheme-type-group" style="display: none;">
+                            <label>Insurance Category</label>
+                            <select id="scheme-category-select">
+                                <option value="State">State Government</option>
+                                <option value="Central">Central Government</option>
+                                <option value="Mediclaim">Mediclaim Policy</option>
+                                <option value="Private">Private Insurance</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Scheme Name</label>
+                            <input type="text" id="scheme-name" placeholder="e.g., State Health Scheme" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Beneficiary ID or Description</label>
+                            <input type="text" id="scheme-desc" placeholder="e.g., Policy Number or ID" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Portal Link</label>
+                            <input type="url" id="scheme-link" placeholder="https://" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Add
+                            Scheme</button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Leaflet Map (Free, no API key required) -->
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

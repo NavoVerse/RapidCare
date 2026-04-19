@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dashboardView = document.getElementById('dashboard-view');
     const detailsView = document.getElementById('details-view');
     const trackingView = document.getElementById('tracking-view');
+    const insuranceView = document.getElementById('insurance-view');
 
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -79,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dashboardView.style.display = 'none';
             detailsView.style.display = 'none';
             trackingView.style.display = 'none';
+            insuranceView.style.display = 'none';
 
             if (label === 'Details') {
                 detailsView.style.display = 'block';
@@ -96,6 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     setTimeout(() => trackingMap.invalidateSize(), 150);
                 }
+            } else if (label === 'Insurance') {
+                insuranceView.style.display = 'block';
             } else {
                 dashboardView.style.display = 'block';
             }
@@ -681,6 +685,191 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         });
     }
+
+    // --- Insurance View Logic ---
+    const iModal = document.getElementById('add-scheme-modal');
+    const iForm = document.getElementById('add-scheme-form');
+    const iTypeInput = document.getElementById('scheme-type');
+    let iCurrentContainer = null;
+    let iCurrentPill = null;
+    let iCurrentAccordion = null;
+
+    if (iModal && iForm) {
+        // We hook for all plans
+        const stateAcc = document.querySelector('.icon-state')?.closest('.accordion-item-insurance');
+        const centralAcc = document.querySelector('.icon-central')?.closest('.accordion-item-insurance');
+        const mediclaimAcc = document.querySelector('.icon-mediclaim')?.closest('.accordion-item-insurance');
+        const privateAcc = document.querySelector('.icon-private')?.closest('.accordion-item-insurance');
+
+        const accEntries = [
+            { id: 'State', el: stateAcc },
+            { id: 'Central', el: centralAcc },
+            { id: 'Mediclaim', el: mediclaimAcc },
+            { id: 'Private', el: privateAcc }
+        ];
+
+        accEntries.forEach(acc => {
+            if (acc.el) {
+                const addBtn = acc.el.querySelector('.add-scheme-btn');
+                if (addBtn) {
+                    addBtn.addEventListener('click', () => {
+                        openInsuranceModal(acc.id, acc.el.querySelector('.scheme-list'), acc.el.querySelector('.count-pill'), acc.el);
+                    });
+                }
+            }
+        });
+
+        const globalAddBtn = document.getElementById('global-add-btn');
+        if (globalAddBtn) {
+            globalAddBtn.addEventListener('click', () => {
+                openInsuranceModal('Global', null, null, null);
+            });
+        }
+
+        function openInsuranceModal(type, listContainer, pillElement, accordionItem) {
+            const headerText = iModal.querySelector('.modal-header h3');
+            const typeGroup = document.getElementById('scheme-type-group');
+            
+            if (type === 'Global') {
+                iTypeInput.value = 'Global';
+                if(headerText) headerText.textContent = `Add New Insurance`;
+                if(typeGroup) typeGroup.style.display = 'flex';
+                iCurrentContainer = null;
+                iCurrentPill = null;
+                iCurrentAccordion = null;
+            } else {
+                iTypeInput.value = type;
+                if(headerText) headerText.textContent = `Add ${type} Insurance Scheme`;
+                if(typeGroup) typeGroup.style.display = 'none';
+                iCurrentContainer = listContainer;
+                iCurrentPill = pillElement;
+                iCurrentAccordion = accordionItem;
+            }
+            
+            iModal.classList.add('active');
+        }
+
+        const iCloseBtn = iModal.querySelector('.close-modal-btn');
+        if (iCloseBtn) {
+            iCloseBtn.addEventListener('click', () => {
+                iModal.classList.remove('active');
+                iForm.reset();
+            });
+        }
+
+        iModal.addEventListener('click', (e) => {
+            if (e.target === iModal) {
+                iModal.classList.remove('active');
+                iForm.reset();
+            }
+        });
+
+        iForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            let targetType = iTypeInput.value;
+            let targetContainer = iCurrentContainer;
+            let targetPill = iCurrentPill;
+            let targetAccordion = iCurrentAccordion;
+
+            if (targetType === 'Global') {
+                const selected = document.getElementById('scheme-category-select').value;
+                const accMap = {
+                    'State': document.querySelector('.icon-state')?.closest('.accordion-item-insurance'),
+                    'Central': document.querySelector('.icon-central')?.closest('.accordion-item-insurance'),
+                    'Mediclaim': document.querySelector('.icon-mediclaim')?.closest('.accordion-item-insurance'),
+                    'Private': document.querySelector('.icon-private')?.closest('.accordion-item-insurance')
+                };
+                targetAccordion = accMap[selected];
+                targetContainer = targetAccordion?.querySelector('.scheme-list');
+                targetPill = targetAccordion?.querySelector('.count-pill');
+            }
+
+            if (!targetContainer) return;
+
+            const name = document.getElementById('scheme-name').value;
+            const desc = document.getElementById('scheme-desc').value;
+            const link = document.getElementById('scheme-link').value;
+
+            const newCard = document.createElement('div');
+            newCard.className = 'scheme-card';
+            newCard.style.opacity = '0';
+            newCard.style.transform = 'translateY(10px)';
+            newCard.style.transition = 'all 0.3s ease';
+
+            newCard.innerHTML = `
+                <div class="scheme-header-insurance">
+                    <div class="scheme-title">
+                        <h4>${name}</h4>
+                        <p>${desc}</p>
+                    </div>
+                    <span class="badge-insurance active">Linked</span>
+                </div>
+                <div class="scheme-actions">
+                    <button class="btn btn-primary btn-sm">Raise Claim</button>
+                    <a href="${link}" target="_blank" class="btn btn-outline btn-sm">View Portal</a>
+                </div>
+            `;
+
+            const divider = targetContainer.querySelector('.section-divider');
+            if (divider) {
+                targetContainer.insertBefore(newCard, divider);
+            } else {
+                targetContainer.appendChild(newCard);
+            }
+
+            requestAnimationFrame(() => {
+                newCard.style.opacity = '1';
+                newCard.style.transform = 'none';
+            });
+
+            if (targetPill) {
+                let currentCount = parseInt(targetPill.textContent);
+                if (!isNaN(currentCount)) {
+                    targetPill.textContent = (currentCount + 1) + " Linked";
+                }
+            }
+
+            if (targetAccordion && targetAccordion.classList.contains('active')) {
+                const content = targetAccordion.querySelector('.accordion-content-insurance');
+                setTimeout(() => {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }, 50);
+            }
+
+            iModal.classList.remove('active');
+            iForm.reset();
+        });
+    }
+
+    const iAccordions = document.querySelectorAll('.accordion-header-insurance');
+
+    iAccordions.forEach(header => {
+        header.addEventListener('click', () => {
+            const item = header.parentElement;
+            const content = header.nextElementSibling;
+            
+            item.classList.toggle('active');
+
+            if (item.classList.contains('active')) {
+                content.style.maxHeight = content.scrollHeight + "px";
+            } else {
+                content.style.maxHeight = null;
+            }
+            
+            setTimeout(() => {
+                if (item.classList.contains('active')) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            }, 300);
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        document.querySelectorAll('.accordion-item-insurance.active .accordion-content-insurance').forEach(content => {
+            content.style.maxHeight = content.scrollHeight + "px";
+        });
+    });
 
     console.log('RapidCare Dashboard Initialized');
 });
