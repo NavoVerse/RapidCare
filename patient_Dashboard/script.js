@@ -682,6 +682,129 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // =============================================
+    // DETAILS VIEW SUB-TABS & EDIT LOGIC
+    // =============================================
+    const subTabs = document.querySelectorAll('.sub-tab');
+    const subTabContents = document.querySelectorAll('.sub-tab-content');
+
+    subTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetId = tab.dataset.tab;
+            
+            subTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            subTabContents.forEach(content => {
+                content.style.display = 'none';
+                if (content.id === `${targetId}-view`) {
+                    content.style.display = 'block';
+                }
+            });
+        });
+    });
+
+    // Modal elements for Editing
+    const editModal = document.getElementById('editModal');
+    const closeEditModal = document.getElementById('closeEditModal');
+    const editForm = document.getElementById('editForm');
+    const editFields = document.getElementById('editFields');
+    const editModalTitle = document.getElementById('editModalTitle');
+
+    if (closeEditModal) {
+        closeEditModal.addEventListener('click', () => {
+            editModal.style.display = 'none';
+        });
+    }
+
+    // Dynamic Edit Logic
+    const editButtons = [
+        { 
+          id: 'editGeneralProfile', 
+          title: 'Edit Patient Profile', 
+          fields: [
+            { label: 'Full Name', id: 'edit-name', target: 'displayProfileName', prefix: '' },
+            { label: 'Location', id: 'edit-loc', target: 'displayProfileLocation', prefix: '📍 ' },
+            { label: 'Job Title', id: 'edit-job', target: 'displayProfileJob', prefix: '💼 ' },
+            { label: 'Birth Date', id: 'edit-birth', target: 'displayProfileBirth', prefix: '🎂 ' }
+          ] 
+        },
+        { 
+          id: 'editTimeline', 
+          title: 'Edit Timeline', 
+          fields: [
+            { label: 'Event Title', id: 't-e', target: null },
+            { label: 'Date', id: 't-d', target: null },
+            { label: 'A1c Level', id: 't-a', target: null }
+          ] 
+        },
+        { id: 'editMedicalHistory', title: 'Edit Medical History', fields: [] },
+        { id: 'editMedicationsList', title: 'Edit Medications', fields: [] },
+        { id: 'editMedicationsListTab', title: 'Edit Medications', fields: [] },
+        { id: 'editDietNotes', title: 'Edit Diet & Notes', fields: [] }
+    ];
+
+    let activeEditConfig = null;
+
+    editButtons.forEach(btnConfig => {
+        const btn = document.getElementById(btnConfig.id);
+        if (btn) {
+            btn.addEventListener('click', () => {
+                activeEditConfig = btnConfig;
+                editModalTitle.textContent = btnConfig.title;
+                
+                editFields.innerHTML = btnConfig.fields.map(f => {
+                    let currentVal = '';
+                    if (f.target) {
+                        const targetEl = document.getElementById(f.target);
+                        currentVal = targetEl ? targetEl.textContent.replace(f.prefix, '') : '';
+                    }
+                    
+                    return `
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label style="display:block; margin-bottom:5px; font-weight:600; font-size:0.9rem;">${f.label}</label>
+                            <input type="text" id="${f.id}" value="${currentVal}" placeholder="Enter ${f.label}..." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+                        </div>
+                    `;
+                }).join('');
+                
+                // For empty field configs (placeholder for complex ones)
+                if (btnConfig.fields.length === 0) {
+                    editFields.innerHTML = `<p style="color: var(--text-muted); padding: 10px;">Detailed editor for this section is coming soon.</p>`;
+                }
+                
+                editModal.style.display = 'flex';
+            });
+        }
+    });
+
+    if (editForm) {
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (activeEditConfig && activeEditConfig.fields) {
+                activeEditConfig.fields.forEach(f => {
+                    const input = document.getElementById(f.id);
+                    if (input && f.target) {
+                        const targetEl = document.getElementById(f.target);
+                        if (targetEl) {
+                            targetEl.textContent = f.prefix + input.value;
+                        }
+                    }
+                });
+            }
+
+            // Show success toast
+            const toast = document.createElement('div');
+            toast.style.cssText = "position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--primary-green);color:white;padding:12px 24px;border-radius:10px;z-index:10000;box-shadow:0 10px 30px rgba(0,0,0,0.1);animation:slideUp 0.3s ease-out;";
+            toast.textContent = "Profile updated successfully!";
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+
+            editModal.style.display = 'none';
+        });
+    }
+
     console.log('RapidCare Dashboard Initialized');
 });
 
