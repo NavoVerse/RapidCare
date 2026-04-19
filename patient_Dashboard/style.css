@@ -53,6 +53,7 @@ body {
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
     overflow: hidden;
     white-space: nowrap;
+    z-index: 1100;
 }
 
 .sidebar.collapsed {
@@ -1185,7 +1186,7 @@ body.dark-mode .map-overlay {
         grid-template-columns: 1fr;
     }
     .search-bar {
-        width: 180px;
+        text-align: center;
     }
     .profile-tabs {
         flex-wrap: wrap;
@@ -1194,6 +1195,28 @@ body.dark-mode .map-overlay {
     .profile-tabs .tab {
         flex: 1 1 30%;
         text-align: center;
+    }
+
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card.tracking-card {
+        min-height: 450px;
+    }
+
+    .map-overlay {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        padding: 12px;
+    }
+
+    .map-overlay button {
+        width: 100%;
     }
 }
 
@@ -1541,4 +1564,86 @@ body.dark-mode .leaflet-container {
 }
 
 body.dark-mode .eta-card { background: rgba(30,41,59,0.88); border-color: rgba(255,255,255,0.1); }
-body.dark-mode .driver-profile-card, body.dark-mode .info-card { background: #1e293b; border-color: #334155; }
+body.dark-mode .driver-profile-card, body.dark-mode .info-card { background: #1e293b; border-color: #334155; }
+
+/* Responsive Tracking View */
+@media (max-width: 868px) {
+    #tracking-view {
+        height: auto;
+        min-height: calc(100vh - 64px);
+        overflow-y: auto;
+    }
+
+    .tracking-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: 50vh auto;
+        height: auto;
+        overflow: visible;
+    }
+
+    .map-area {
+        height: 100%;
+        min-height: 50vh;
+    }
+
+    .detail-panel {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        overflow-y: visible;
+        padding-bottom: 40px;
+    }
+
+    .eta-card {
+        bottom: 15px;
+        left: 15px;
+        min-width: 180px;
+        padding: 14px 18px;
+    }
+    
+    .eta-minutes {
+        font-size: 28px;
+    }
+
+    .driver-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .safety-alert {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .map-live-badge {
+        top: 10px;
+        left: 10px;
+        padding: 4px 10px;
+        font-size: 10px;
+    }
+
+    .map-controls {
+        top: 10px;
+        right: 10px;
+    }
+
+    .control-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+
+    .driver-avatar-main {
+        width: 48px;
+        height: 48px;
+    }
+
+    .driver-name {
+        font-size: 15px;
+    }
+
+    .info-card {
+        padding: 12px;
+    }
+}
