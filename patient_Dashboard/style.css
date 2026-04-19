@@ -196,6 +196,12 @@ button#sidebar-toggle:hover {
     background-color: var(--bg-main);
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 /* Main Content */
 .main-content {
     flex-grow: 1;
@@ -267,9 +273,9 @@ header {
 /* Dashboard Content */
 .dashboard-container {
     padding: 32px;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 100%;
     width: 100%;
+    transition: max-width 0.3s ease;
 }
 
 .stats-grid {
@@ -353,6 +359,24 @@ header {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-height: 520px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-green) transparent;
+}
+
+.hospital-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.hospital-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.hospital-list::-webkit-scrollbar-thumb {
+    background-color: var(--primary-green);
+    border-radius: 20px;
+    border: 3px solid transparent;
 }
 
 .hospital-item {
@@ -370,6 +394,12 @@ header {
     transform: translateY(-2px);
     border-color: var(--primary-green);
     box-shadow: 0 4px 12px rgba(21, 128, 61, 0.08);
+}
+
+.hospital-item.active-hospital {
+    border-color: var(--primary-green);
+    background-color: var(--bg-main);
+    box-shadow: inset 0 0 0 1px var(--primary-green);
 }
 
 .hospital-info {
@@ -409,6 +439,58 @@ header {
 .h-status.busy {
     background-color: #fef2f2;
     color: #b91c1c;
+}
+
+.book-btn {
+    padding: 8px 12px;
+    background: var(--primary-green);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.uni-btn {
+    flex: 1;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    text-align: center;
+}
+
+.book-btn:hover {
+    background: var(--acc-green);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(21, 128, 62, 0.2);
+}
+
+.action-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.action-btn:hover {
+    border-color: var(--primary-green);
+    color: var(--primary-green);
+    background: var(--bg-main);
+}
+
+.status-btn {
+    border-width: 1.5px;
 }
 
 /* Map Card */
