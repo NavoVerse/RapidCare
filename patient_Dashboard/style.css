@@ -1078,3 +1078,128 @@ body.dark-mode .map-overlay {
     font-weight: 600;
     cursor: pointer;
 }
+
+/* ====================================================
+   EXTENDED RESPONSIVE DESIGN FOR OVERVIEW & DETAILS
+   ==================================================== */
+
+@media (max-width: 1024px) {
+    .profile-info-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        text-align: center;
+    }
+    .profile-avatar-wrapper {
+        margin: 0 auto;
+    }
+    .name-header {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .edit-profile-btn {
+        margin: 10px auto;
+    }
+    .demographics {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .vitals-row {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .diagnosis-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .diag-group label {
+        text-align: center;
+    }
+    .tags {
+        justify-content: center;
+    }
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 1000;
+        transform: translateX(-100%);
+        width: 260px;
+    }
+    
+    /* Using 'collapsed' to ACTIVATE mobile menu */
+    .sidebar.collapsed {
+        transform: translateX(0);
+        width: 260px;
+        padding: 24px;
+    }
+    
+    .sidebar.collapsed .logo-text { display: block; opacity: 1; pointer-events: auto; width: auto; }
+    .sidebar.collapsed .nav-label, .sidebar.collapsed .nav-item span { display: block; opacity: 1; pointer-events: auto; width: auto;}
+    .sidebar.collapsed .user-info { display: block; opacity: 1; visibility: visible; }
+    .sidebar.collapsed .nav-item { padding: 12px 16px; justify-content: flex-start; width: auto; height: auto; }
+    .sidebar.collapsed .logo { justify-content: flex-start; gap: 12px; }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .search-bar {
+        width: 180px;
+    }
+    .profile-tabs {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .profile-tabs .tab {
+        flex: 1 1 30%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-bar {
+        display: none;
+    }
+    .header-actions {
+        gap: 5px;
+    }
+    .dashboard-container, .profile-container {
+        padding: 16px;
+    }
+    .vitals-row {
+        gap: 10px;
+    }
+    .vital-item {
+        width: calc(50% - 5px);
+        min-width: 0;
+        padding: 10px;
+    }
+    .history-grid {
+        grid-template-columns: 1fr;
+    }
+    .history-full-width {
+        grid-column: 1 / -1;
+    }
+    .diet-list {
+        grid-template-columns: 1fr;
+    }
+    .diet-card.full {
+        grid-column: 1 / -1;
+    }
+    .medications-panel {
+        overflow-x: auto;
+    }
+    .med-table {
+        min-width: 600px;
+    }
+    .timeline-item {
+        gap: 15px;
+    }
+}
