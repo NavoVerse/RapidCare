@@ -367,6 +367,15 @@ select option {
         padding: 0 10px;
     }
 
+    .two-cols {
+        grid-template-columns: 1fr;
+    }
+
+    .four-cols {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
     .form-section {
         padding: 20px 15px;
     }
