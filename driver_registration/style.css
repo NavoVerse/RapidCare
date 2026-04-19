@@ -16,7 +16,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 40px 20px;
+    padding: 5px; /* Extremely small margin to use "more little space" */
     transition: background 0.3s ease;
 }
 
@@ -26,16 +26,17 @@ body.dark-mode {
 }
 
 .registration-container {
-    width: 100%;
-    max-width: 1100px;
+    width: 99.5%; /* Near total coverage */
+    max-width: 1800px;
     display: flex;
     flex-direction: column;
     gap: 30px;
     background: var(--white);
-    padding: 40px;
-    border-radius: 20px;
+    padding: 40px 60px;
+    border-radius: 30px;
     box-shadow: var(--shadow);
     border: 1px solid rgba(21, 128, 61, 0.1);
+    margin: 5px auto;
 }
 
 /* Branding Header */
@@ -108,7 +109,7 @@ body.dark-mode {
 .stepper {
     display: flex;
     background: var(--input-bg);
-    border-radius: 12px;
+    border-radius: 15px;
     overflow: hidden;
     border: 1px solid var(--input-border);
 }
@@ -116,14 +117,17 @@ body.dark-mode {
 .step {
     flex: 1;
     text-align: center;
-    padding: 16px 10px;
-    font-size: 0.9rem;
+    padding: 20px 10px;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--text-muted);
     background: transparent;
     border-right: 1px solid var(--input-border);
     transition: all 0.3s ease;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .step:hover:not(.active) {
