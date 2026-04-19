@@ -142,6 +142,54 @@
         </div>
     </main>
 
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Schedule New Appointment</h3>
+                <span class="close-modal" id="close-booking-modal" onclick="closeBookingModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="booking-form" onsubmit="handleBookingSubmit(event)">
+                    <div class="form-group">
+                        <label>Doctor Name</label>
+                        <input type="text" id="book-doctor" placeholder="e.g. Dr. Sarah Mitchell" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Specialty</label>
+                        <input type="text" id="book-specialty" placeholder="e.g. Cardiology" required>
+                    </div>
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="book-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Time</label>
+                            <input type="time" id="book-time" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Hospital/Clinic</label>
+                        <input type="text" id="book-hospital" placeholder="e.g. City General Hospital" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Appointment Type</label>
+                        <select id="book-type">
+                            <option value="Checkup">Regular Checkup</option>
+                            <option value="Consultation">Consultation</option>
+                            <option value="Follow-up">Follow-up Visit</option>
+                            <option value="Diagnostics">Diagnostics/Lab</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="primary-btn" style="width: 100%; margin-top: 20px; justify-content: center;">
+                        Confirm Booking
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

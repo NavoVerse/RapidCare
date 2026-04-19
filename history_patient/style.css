@@ -46,7 +46,7 @@ body {
     background-color: var(--bg-main);
     color: var(--text-main);
     display: flex;
-    min-height: 100vh;
+    height: 100vh; /* Fixed height to enable internal scrolling */
     overflow: hidden;
     transition: background-color 0.3s, color 0.3s;
 }
@@ -223,6 +223,7 @@ header {
     overflow: hidden;
     padding: 24px;
     gap: 24px;
+    min-height: 0; /* Ensures container doesn't expand beyond main-content */
 }
 
 /* Timeline Pane */
@@ -351,6 +352,8 @@ header {
     flex-direction: column;
     overflow-y: auto;
     padding: 32px;
+    min-height: 0; /* Crucial for scrolling inside flex containers */
+    position: relative;
 }
 
 .detail-header {
@@ -610,9 +613,13 @@ header {
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { 
+    background: #cbd5e1; /* More visible scrollbar thumb */
+    border-radius: 10px; 
+    border: 2px solid var(--bg-main);
+}
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 @media (max-width: 1024px) {
@@ -719,5 +726,92 @@ header {
 @media (max-width: 768px) {
     .mobile-back-btn {
         display: flex;
+    }
+}
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--white);
+    padding: 32px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeInScale 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.close-modal {
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--text-muted);
+    line-height: 1;
+}
+
+.form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.form-group input, 
+.form-group select {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 20px;
+        padding: 24px;
     }
 }
