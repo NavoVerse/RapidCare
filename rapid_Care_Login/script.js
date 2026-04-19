@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sosButton = document.querySelector('.sos-button');
     if (sosButton) {
         sosButton.addEventListener('click', () => {
-            window.location.href = '../payment_user/login_urgency/index.html';
+            window.location.href = '../login_urgency/index.html';
         });
     }
 });
