@@ -28,13 +28,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', () => {
+        sidebarToggle.addEventListener('click', (e) => {
+            e.stopPropagation(); // prevent immediate close on mobile
             const nowCollapsed = sidebar.classList.toggle('collapsed');
             localStorage.setItem('sidebar-collapsed', nowCollapsed);
             
             // Trigger a map resize if needed, since the container size changes
             if (typeof map !== 'undefined' && map.invalidateSize) {
                 setTimeout(() => map.invalidateSize(), 300);
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (sidebar.classList.contains('collapsed') && !sidebar.contains(e.target) && e.target !== sidebarToggle) {
+                    sidebar.classList.remove('collapsed');
+                    localStorage.setItem('sidebar-collapsed', false);
+                }
             }
         });
     }
