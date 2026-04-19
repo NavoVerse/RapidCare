@@ -1,0 +1,331 @@
+d
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Registration - RapidCare</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dark-mode">
+    <!-- Branding Header -->
+    <div class="main-branding">
+        <h1 class="brand-title">RAPIDCARE</h1>
+        <div class="brand-divider"></div>
+        <p class="brand-quote">"Precision in details, excellence in care. Building the future of emergency response."
+        </p>
+    </div>
+
+    <div class="registration-wrapper">
+        <!-- Named Stepper (Non-linear) -->
+        <nav class="named-stepper">
+            <div class="step-item active" onclick="goToStep(1)">
+                <span class="step-label">Identity</span>
+                <div class="step-indicator"></div>
+            </div>
+            <div class="step-item" onclick="goToStep(2)">
+                <span class="step-label">Compliance</span>
+                <div class="step-indicator"></div>
+            </div>
+            <div class="step-item" onclick="goToStep(3)">
+                <span class="step-label">Connectivity</span>
+                <div class="step-indicator"></div>
+            </div>
+            <div class="step-item" onclick="goToStep(4)">
+                <span class="step-label">Infrastructure</span>
+                <div class="step-indicator"></div>
+            </div>
+            <div class="step-item" onclick="goToStep(5)">
+                <span class="step-label">Admin Setup</span>
+                <div class="step-indicator"></div>
+            </div>
+        </nav>
+
+        <div class="premium-container">
+            <!-- Stage 1: Hospital Identity -->
+            <div class="form-section active" id="step1">
+                <div class="section-header">
+                    <h2>BASIC HOSPITAL INFORMATION <span class="badge badge-required">REQUIRED</span></h2>
+                </div>
+                <form id="identityForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full hospital name</label>
+                            <input type="text" placeholder="City General Hospital" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Hospital type</label>
+                            <select required>
+                                <option value="" disabled selected>Select Category</option>
+                                <option value="govt">Government</option>
+                                <option value="pvt">Private</option>
+                                <option value="trust">Charitable Trust</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Year established</label>
+                            <input type="number" placeholder="e.g. 2005" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Total beds (capacity)</label>
+                            <input type="number" placeholder="Total current beds" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Full registered address</label>
+                        <textarea placeholder="Complete official address with Landmark" rows="3" required></textarea>
+                    </div>
+                    <div class="form-row three-cols">
+                        <div class="form-group">
+                            <label>District</label>
+                            <input type="text" placeholder="District name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            <select required>
+                                <option value="" disabled selected>Select State</option>
+                                <option value="WB">West Bengal</option>
+                                <option value="MH">Maharashtra</option>
+                                <option value="DL">Delhi</option>
+                                <option value="KA">Karnataka</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>PIN code</label>
+                            <input type="text" placeholder="6-digit PIN" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-next animate-btn" onclick="nextStep(1)">Continue to
+                            Compliance</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Stage 2: Statutory Compliance -->
+            <div class="form-section" id="step2">
+                <div class="section-header">
+                    <h2>LICENSES & ACCREDITATIONS <span class="badge badge-required">REQUIRED</span></h2>
+                </div>
+                <form id="complianceForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>State health authority license no.</label>
+                            <input type="text" placeholder="License Number" required>
+                        </div>
+                        <div class="form-group">
+                            <label>License expiry date</label>
+                            <input type="date" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>NABH accreditation no.</label>
+                            <input type="text" placeholder="If applicable">
+                        </div>
+                        <div class="form-group">
+                            <label>NABL lab accreditation no.</label>
+                            <input type="text" placeholder="If applicable">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Pharmacy license no.</label>
+                            <input type="text" placeholder="Drug License Number">
+                        </div>
+                        <div class="form-group">
+                            <label>Fire NOC certificate no.</label>
+                            <input type="text" placeholder="Fire Safety Ref">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>PAN/TAN number</label>
+                            <input type="text" placeholder="AAAAA0000A" required>
+                        </div>
+                        <div class="form-group">
+                            <label>GST number</label>
+                            <input type="text" placeholder="GSTIN (Optional)">
+                        </div>
+                    </div>
+                    <div class="form-actions dual-actions">
+                        <button type="button" class="btn-prev animate-btn" onclick="goToStep(1)">Back</button>
+                        <button type="button" class="btn-next animate-btn" onclick="nextStep(2)">Save &
+                            Continue</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Stage 3: Emergency Connectivity -->
+            <div class="form-section" id="step3">
+                <div class="section-header">
+                    <h2>CONTACT & EMERGENCY NUMBERS <span class="badge badge-required">REQUIRED</span></h2>
+                </div>
+                <form id="contactForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Main reception number</label>
+                            <input type="tel" placeholder="Primary Contact" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Emergency/casualty (24hr)</label>
+                            <input type="tel" placeholder="Emergency Hotline" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ambulance dispatch number</label>
+                            <input type="tel" placeholder="Dispatch Contact">
+                        </div>
+                        <div class="form-group">
+                            <label>ICU/critical care helpline</label>
+                            <input type="tel" placeholder="ICU Hotline">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Admin/billing number</label>
+                            <input type="tel" placeholder="Accounts/Billing">
+                        </div>
+                        <div class="form-group">
+                            <label>Official website</label>
+                            <input type="url" placeholder="https://yourhospital.in">
+                        </div>
+                    </div>
+                    <div class="form-actions dual-actions">
+                        <button type="button" class="btn-prev animate-btn" onclick="goToStep(2)">Back</button>
+                        <button type="button" class="btn-next animate-btn" onclick="nextStep(3)">Continue to
+                            Infrastructure</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Stage 4: Medical Infrastructure -->
+            <div class="form-section" id="step4">
+                <div class="section-header">
+                    <h2>CRITICAL CARE UNIT COUNTS <span class="badge badge-required">REQUIRED</span></h2>
+                </div>
+                <form id="infraForm">
+                    <div class="infra-grid">
+                        <div class="infra-item animate-hover">
+                            <label>ICU Beds (general)</label>
+                            <input type="number" value="0">
+                        </div>
+                        <div class="infra-item animate-hover">
+                            <label>NICU (neonatal ICU) beds</label>
+                            <input type="number" value="0">
+                        </div>
+                        <div class="infra-item animate-hover">
+                            <label>PICU (pediatric ICU) beds</label>
+                            <input type="number" value="0">
+                        </div>
+                        <div class="infra-item animate-hover">
+                            <label>CCU (cardiac ICU) beds</label>
+                            <input type="number" value="0">
+                        </div>
+                        <div class="infra-item animate-hover">
+                            <label>Ventilators (Invasive)</label>
+                            <input type="number" value="0">
+                        </div>
+                        <div class="infra-item animate-hover">
+                            <label>Dialysis machines</label>
+                            <input type="number" value="0">
+                        </div>
+                        <div class="infra-item animate-hover">
+                            <label>Operation theatres (OT)</label>
+                            <input type="number" value="0">
+                        </div>
+                        <div class="infra-item animate-hover">
+                            <label>Ambulances</label>
+                            <input type="number" value="0">
+                        </div>
+                    </div>
+
+                    <div class="section-header mt-40">
+                        <h2>DEPARTMENTS & FACILITIES <span class="badge badge-select">SELECT ALL AVAILABLE</span></h2>
+                    </div>
+                    <div class="checkbox-grid">
+                        <label class="check-item"><input type="checkbox" checked> Emergency/casualty (24hr)</label>
+                        <label class="check-item"><input type="checkbox" checked> Diagnostic imaging (MRI, CT)</label>
+                        <label class="check-item"><input type="checkbox"> Cardiology & cardiac surgery</label>
+                        <label class="check-item"><input type="checkbox" checked> Pathology & laboratory</label>
+                        <label class="check-item"><input type="checkbox"> Neurology & neurosurgery</label>
+                        <label class="check-item"><input type="checkbox" checked> Pharmacy (in-house)</label>
+                        <label class="check-item"><input type="checkbox"> Oncology (cancer care)</label>
+                        <label class="check-item"><input type="checkbox" checked> General surgery</label>
+                        <label class="check-item"><input type="checkbox"> Orthopaedics</label>
+                        <label class="check-item"><input type="checkbox"> Gynecology & maternity</label>
+                        <label class="check-item"><input type="checkbox"> Pediatrics</label>
+                        <label class="check-item"><input type="checkbox"> Dental</label>
+                    </div>
+
+                    <div class="form-actions dual-actions">
+                        <button type="button" class="btn-prev animate-btn" onclick="goToStep(3)">Back</button>
+                        <button type="button" class="btn-next animate-btn" onclick="nextStep(4)">Continue to Final
+                            Setup</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Stage 5: Administrative Setup -->
+            <div class="form-section" id="step5">
+                <div class="section-header">
+                    <h2>INSURANCE & ADMIN SETUP <span class="badge badge-required">REQUIRED</span></h2>
+                </div>
+                <form id="adminForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ayushman Bharat empaneled</label>
+                            <select>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>State insurance scheme</label>
+                            <input type="text" placeholder="Scheme Name (if any)">
+                        </div>
+                    </div>
+
+                    <div class="divider-line"></div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Admin full name</label>
+                            <input type="text" placeholder="Account Manager / Super" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Designation</label>
+                            <input type="text" placeholder="Official Role" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Official email</label>
+                            <input type="email" placeholder="admin@hospital.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions submit-actions">
+                        <button type="submit" class="submit-full-btn animate-btn">Complete Hospital Onboarding
+                            ↗</button>
+                    </div>
+                    <p class="terms-text">By joining RapidCare, you agree to our automated emergency dispatch protocols.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
