@@ -7,6 +7,7 @@
     <title>RapidCare Dashboard</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap"
         rel="stylesheet">
@@ -38,7 +39,7 @@
                 </svg>
                 <span>Details</span>
             </a>
-            <a href="../Tracking_Interface/index.html" class="nav-item">
+            <a href="#" class="nav-item">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -95,6 +96,7 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        <header>
             <div class="header-left">
                 <button class="icon-btn" id="sidebar-toggle" title="Toggle Sidebar">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -110,25 +112,33 @@
                     </svg>
                     <input type="text" placeholder="Search for hospitals, routes...">
                 </div>
-                <div class="header-actions">
-                    <div class="icon-btn theme-toggle" id="theme-toggle">
-                        <!-- Sun/Moon icon will be swapped by JS -->
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sun-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    </div>
-                    <div class="icon-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
-                    </div>
-                    <div class="icon-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path
-                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33 1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                            </path>
-                        </svg>
-                    </div>
+            </div>
+            <div class="header-right">
+                <div class="icon-btn theme-toggle" id="theme-toggle">
+                    <!-- Sun/Moon icon will be swapped by JS -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" class="sun-icon">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </div>
+                <div class="icon-btn notification-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="notification-badge"></span>
+                </div>
+                <div class="user-avatar-small">
+                    MS
                 </div>
             </div>
         </header>
@@ -449,6 +459,171 @@
                 </div>
             </div>
         </div>
+        <div id="tracking-view" style="display: none;">
+            <div class="tracking-body">
+                <!-- MAP AREA -->
+                <div class="map-area">
+                    <div id="live-tracking-map"></div>
+
+                    <!-- Floating Live Badge on Map -->
+                    <div class="map-live-badge">
+                        <span class="live-dot"></span> LIVE
+                    </div>
+
+                    <!-- Ambulance Marker (animated, overlaid on map) -->
+                    <div class="ambulance-float" id="ambulanceFloat">
+                        <div class="amb-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="1" y="10" width="18" height="8" rx="2" />
+                                <path d="M19 18h2a1 1 0 0 0 1-1v-4l-3-3h-3" />
+                                <circle cx="5" cy="18" r="2" />
+                                <circle cx="15" cy="18" r="2" />
+                                <path d="M13 10V6a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v4" />
+                                <path d="M7 14h4M9 12v4" />
+                            </svg>
+                        </div>
+                        <span class="amb-live-tag">Live</span>
+                    </div>
+
+                    <!-- ETA Glassmorphism Card -->
+                    <div class="eta-card">
+                        <div class="eta-minutes">12 <span>min</span></div>
+                        <div class="eta-label">ESTIMATED ARRIVAL</div>
+                        <div class="eta-progress-track">
+                            <div class="eta-progress-fill" id="etaFill"></div>
+                        </div>
+                        <div class="eta-sub">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                <circle cx="12" cy="10" r="3" />
+                            </svg>
+                            Ambulance on N.S. Road
+                        </div>
+                    </div>
+
+                    <!-- Map Controls -->
+                    <div class="map-controls">
+                        <button class="map-ctrl-btn" title="Zoom In">+</button>
+                        <button class="map-ctrl-btn" title="Zoom Out">−</button>
+                        <button class="map-ctrl-btn" title="My Location">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RIGHT DETAIL PANEL -->
+                <aside class="detail-panel">
+                    <!-- Driver Card -->
+                    <div class="driver-profile-card">
+                        <div class="driver-top">
+                            <div class="driver-avatar-main">
+                                <img src="driver_profile.png" alt="Matt Smith"
+                                    onerror="this.style.display='none';this.parentElement.classList.add('avatar-fallback')">
+                                <span class="avatar-initials">MS</span>
+                            </div>
+                            <div class="driver-info-main">
+                                <h2 class="driver-name">Matt Smith</h2>
+                                <div class="verified-badge">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="3">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                        <polyline points="22 4 12 14.01 9 11.01" />
+                                    </svg>
+                                    Verified Driver
+                                </div>
+                            </div>
+                        </div>
+                        <div class="driver-actions">
+                            <button class="action-btn-call" onclick="handleCall()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 5.49 5.49l.94-.94a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 15.5z" />
+                                </svg>
+                                Call Driver
+                            </button>
+                            <button class="action-btn-msg" onclick="handleMessage()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                </svg>
+                                Message
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Card -->
+                    <div class="info-card vehicle-card">
+                        <div class="info-row">
+                            <div class="info-icon vehicle-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="1" y="10" width="18" height="8" rx="2" />
+                                    <path d="M19 18h2a1 1 0 0 0 1-1v-4l-3-3h-3" />
+                                    <circle cx="5" cy="18" r="2" />
+                                    <circle cx="15" cy="18" r="2" />
+                                    <path d="M13 10V6a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v4" />
+                                    <path d="M7 14h4M9 12v4" />
+                                </svg>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">VEHICLE</span>
+                                <span class="info-value">ALS Ambulance</span>
+                            </div>
+                            <span class="info-badge">WB-04A</span>
+                        </div>
+                    </div>
+
+                    <!-- Emergency Details Card -->
+                    <div class="info-card emergency-details-card">
+                        <div class="card-title-row">
+                            <h3 class="card-title">Emergency Details</h3>
+                        </div>
+                        <div class="detail-row-tracking">
+                            <div class="detail-icon-tracking symptom-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2v8m0 0v8m0-8h8m-8 0H4" />
+                                </svg>
+                            </div>
+                            <div class="detail-content-tracking">
+                                <span class="detail-label-tracking">MAIN SYMPTOMS</span>
+                                <span class="detail-val-tracking">Chest Pain, Shortness of Breath</span>
+                            </div>
+                        </div>
+                        <div class="detail-row-tracking">
+                            <div class="detail-icon-tracking dest-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                    <circle cx="12" cy="10" r="3" />
+                                </svg>
+                            </div>
+                            <div class="detail-content-tracking">
+                                <span class="detail-label-tracking">DESTINATION</span>
+                                <span class="detail-val-tracking">Apollo Gleneagles, Kolkata</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Safety Alert -->
+                    <div class="safety-alert">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <span>Stay calm. Our driver is equipped with basic medical oxygen.</span>
+                    </div>
+                </aside>
+            </div>
     <!-- Location Selection Modal -->
     <div class="modal-overlay" id="locationModal">
         <div class="modal-content">
