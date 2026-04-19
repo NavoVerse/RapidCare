@@ -102,6 +102,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Check for view routing in URL (e.g. ?view=tracking)
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewQuery = urlParams.get('view');
+    if (viewQuery) {
+        navItems.forEach(item => {
+            const label = item.querySelector('span');
+            if (label && label.textContent.trim().toLowerCase() === viewQuery.toLowerCase()) {
+                item.click();
+            }
+        });
+    }
+
     // Search bar focus effect
     const searchBarInput = document.querySelector('.search-bar input');
     const searchBarEl = document.querySelector('.search-bar');
