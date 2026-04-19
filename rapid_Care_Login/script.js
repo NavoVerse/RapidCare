@@ -1,3 +1,24 @@
+const API_BASE = 'http://localhost:5000/api/auth';
+
+// --- Toast Notification System ---
+function showToast(message, type = 'info') {
+    // Remove existing toasts
+    document.querySelectorAll('.toast').forEach(t => t.remove());
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    // Trigger animation
+    requestAnimationFrame(() => toast.classList.add('show'));
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+    }, 3500);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Theme Toggle Logic
     const themeToggles = document.querySelectorAll('.theme-toggle');
@@ -64,14 +85,99 @@ document.addEventListener('DOMContentLoaded', () => {
         signupView.style.display = 'block';
     });
 
-    // Redirection logic for Login/Signup buttons
-    const loginForms = document.querySelectorAll('.login-form');
-    loginForms.forEach(form => {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            // Redirect to patient interface
-            window.location.href = '../patient_Dashboard/index.html';
-        });
+    // --- SIGNUP FORM ---
+    const signupForm = signupView.querySelector('.login-form');
+    signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value;
+
+        if (!firstName || !email || !password) {
+            showToast('Please fill all required fields', 'error');
+            return;
+        }
+
+        const btn = signupForm.querySelector('.create-btn');
+        btn.textContent = 'Creating...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_BASE}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: `${firstName} ${lastName}`.trim(),
+                    email: email,
+                    password: password,
+                    role: 'patient',
+                    phone: ''
+                })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                showToast(`Account created! Welcome, ${firstName}`, 'success');
+                // Switch to login view after a short delay
+                setTimeout(() => {
+                    signupView.style.display = 'none';
+                    loginView.style.display = 'block';
+                    document.getElementById('login-email').value = email;
+                }, 1500);
+            } else {
+                showToast(data.error || 'Registration failed', 'error');
+            }
+        } catch (err) {
+            showToast('Server unreachable. Is the backend running?', 'error');
+        } finally {
+            btn.textContent = 'Create account';
+            btn.disabled = false;
+        }
+    });
+
+    // --- LOGIN FORM ---
+    const loginForm = loginView.querySelector('.login-form');
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+
+        if (!email || !password) {
+            showToast('Please enter email and password', 'error');
+            return;
+        }
+
+        const btn = loginForm.querySelector('.create-btn');
+        btn.textContent = 'Logging in...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_BASE}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                // Store token and user info
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                showToast(`Welcome back, ${data.user.name}!`, 'success');
+                // Redirect to patient dashboard
+                setTimeout(() => {
+                    window.location.href = '../patient_Dashboard/index.html';
+                }, 1500);
+            } else {
+                showToast(data.error || 'Login failed', 'error');
+            }
+        } catch (err) {
+            showToast('Server unreachable. Is the backend running?', 'error');
+        } finally {
+            btn.textContent = 'Log in';
+            btn.disabled = false;
+        }
     });
 
     // Password Visibility Toggle
@@ -97,4 +203,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
