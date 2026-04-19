@@ -32,6 +32,49 @@ body.dark-mode {
     gap: 20px;
 }
 
+/* Branding Header */
+.branding-header {
+    text-align: center;
+    margin-bottom: 10px;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.brand-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #f8fafc;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.page-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+.service-quote {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--primary-yellow); /* Yellow color as requested */
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Stepper styling */
 .stepper {
     display: flex;
