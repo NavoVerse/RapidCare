@@ -5,6 +5,7 @@
     --primary-yellow: #facc15;
     --acc-yellow: #eab308;
     --white: #ffffff;
+    --pure-white: #ffffff;
     --bg-light: #f0fdf4;
     --text-dark: #14532d;
     --text-muted: #4d7c0f;
@@ -19,6 +20,7 @@ body.dark-mode {
     --primary-yellow: #ca8a04;
     --acc-yellow: #eab308;
     --white: #1e293b;
+    --pure-white: #ffffff;
     --bg-light: #0f172a;
     --text-dark: #f8fafc;
     --text-muted: #cbd5e1; /* Even lighter for better visibility */
@@ -126,11 +128,11 @@ body.dark-mode {
     font-family: 'Blending', cursive;
     font-size: 32px;
     font-weight: 400;
-    color: var(--white);
+    color: #ffffff;
 }
 
 .back-link {
-    color: var(--white);
+    color: #ffffff;
     text-decoration: none;
     font-size: 13px;
     background: rgba(255, 255, 255, 0.2);
@@ -150,7 +152,7 @@ body.dark-mode {
     z-index: 3;
     text-align: center;
     padding-bottom: 20px;
-    color: var(--white);
+    color: #ffffff;
 }
 
 .bottom-content h1 {
@@ -332,7 +334,7 @@ input::placeholder {
     width: 100%;
     padding: 18px;
     background-color: var(--primary-green);
-    color: var(--white);
+    color: #ffffff;
     border: none;
     border-radius: 10px;
     font-size: 16px;
