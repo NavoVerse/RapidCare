@@ -1648,7 +1648,7 @@ body.dark-mode .driver-profile-card, body.dark-mode .info-card { background: #1e
     }
 }
 
-<<<<<<< HEAD
+
 /* Sub-tab System */
 .sub-tab {
     cursor: pointer;
@@ -1699,26 +1699,6 @@ body.dark-mode .driver-profile-card, body.dark-mode .info-card { background: #1e
     box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
 }
 
-/* Edit Modal Layout */
-#editModal .modal-content {
-    max-width: 500px;
-}
-
-.form-group label {
-    margin-bottom: 8px;
-    color: var(--text-main);
-}
-
-.form-group input {
-    transition: border-color 0.2s;
-    background: var(--white);
-    color: var(--text-main);
-}
-
-.form-group input:focus {
-    border-color: var(--primary-green);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
 }
 
 body.dark-mode .form-group input {

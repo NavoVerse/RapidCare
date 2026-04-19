@@ -690,7 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-<<<<<<< HEAD
+
     // =============================================
     // DETAILS VIEW SUB-TABS & EDIT LOGIC
     // =============================================
