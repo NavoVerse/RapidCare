@@ -11,8 +11,7 @@
 <body>
 
     <div class="payment-container">
-        <div class="theme-toggle" id="theme-toggle"
-            style="position: absolute; top: 30px; right: 30px; cursor: pointer; color: var(--text-dark); z-index: 1000;">
+        <div class="theme-toggle" id="theme-toggle">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="5"></circle>
                 <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -25,7 +24,10 @@
                 <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
         </div>
-        <h1>RapidCare Always On Your Service</h1>
+        
+        <div class="payment-content-wrapper">
+            <div class="payment-content-inner">
+                <h1>RapidCare Always On Your Service</h1>
 
         <div class="location-indicator">
             <div class="marker-icon ambulance">
@@ -256,6 +258,9 @@
             </div>
 
             <button class="pay-now-btn">Pay <span id="payBtnAmount">500</span> RS</button>
+        </div>
+        
+            </div>
         </div>
 
     </div>
