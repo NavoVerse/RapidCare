@@ -544,21 +544,25 @@ body {
     color: var(--text-muted);
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
     padding: 10px 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 14px;
     background: var(--bg-main);
     color: var(--text-main);
+    appearance: auto;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
     border-color: var(--primary-green);
 }
 
-body.dark-mode .form-group input {
+body.dark-mode .form-group input,
+body.dark-mode .form-group select {
     background: #0f172a;
 }
 
