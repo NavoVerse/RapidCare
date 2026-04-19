@@ -172,8 +172,20 @@ function selectRecord(id) {
 
     noSelection.style.display = 'none';
     detailContent.style.display = 'block';
+    
+    // Mobile handling
+    if (window.innerWidth <= 768) {
+        detailPane.classList.add('mobile-active');
+    }
 
     detailContent.innerHTML = `
+        <div class="mobile-back-btn" onclick="closeMobileDetail()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Back to Records</span>
+        </div>
         <div class="detail-header">
             <div class="detail-title">
                 <h2>${record.title}</h2>
@@ -305,5 +317,16 @@ function setupEventListeners() {
         `;
     });
 }
+
+function closeMobileDetail() {
+    detailPane.classList.remove('mobile-active');
+    document.querySelectorAll('.history-item').forEach(item => item.classList.remove('selected'));
+}
+
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        detailPane.classList.remove('mobile-active');
+    }
+});
 
 init();
