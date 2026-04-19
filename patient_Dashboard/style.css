@@ -940,7 +940,7 @@ body.dark-mode .map-overlay {
 
 .profile-grid {
     display: grid;
-    grid-template-columns: 350px 1fr;
+    grid-template-columns: 1fr 1.2fr;
     gap: 24px;
 }
 
