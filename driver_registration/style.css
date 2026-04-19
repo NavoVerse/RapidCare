@@ -54,13 +54,27 @@ body.dark-mode {
 }
 
 .page-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 400;
-    color: #94a3b8;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #ffffff;
     text-transform: uppercase;
-    margin-bottom: 15px;
-    letter-spacing: 3px;
+    margin-bottom: 25px;
+    letter-spacing: 4px;
+    position: relative;
+    display: inline-block;
+}
+
+.page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 20%;
+    width: 60%;
+    height: 3px;
+    background: var(--primary-green);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
 }
 
 .service-quote {
@@ -338,8 +352,14 @@ select option {
     }
 
     .page-title {
-        font-size: 0.8rem;
+        font-size: 1rem;
         letter-spacing: 2px;
+        margin-bottom: 20px;
+    }
+
+    .page-title::after {
+        height: 2px;
+        bottom: -5px;
     }
 
     .service-quote {
