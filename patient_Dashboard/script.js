@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const navItems = document.querySelectorAll('.nav-item');
     const dashboardView = document.getElementById('dashboard-view');
     const detailsView = document.getElementById('details-view');
+    const trackingView = document.getElementById('tracking-view');
 
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -75,21 +76,28 @@ document.addEventListener('DOMContentLoaded', () => {
             item.classList.add('active');
 
             // View Switching Logic
+            dashboardView.style.display = 'none';
+            detailsView.style.display = 'none';
+            trackingView.style.display = 'none';
+
             if (label === 'Details') {
-                if (dashboardView) dashboardView.style.display = 'none';
-                if (detailsView) detailsView.style.display = 'block';
+                detailsView.style.display = 'block';
             } else if (label === 'Overview') {
-                if (dashboardView) dashboardView.style.display = 'block';
-                if (detailsView) detailsView.style.display = 'none';
+                dashboardView.style.display = 'block';
                 // Trigger map resize since it was hidden
-                if (typeof map !== 'undefined' && map.invalidateSize) {
-                    setTimeout(() => map.invalidateSize(), 100);
+                if (typeof overviewMap !== 'undefined' && overviewMap.invalidateSize) {
+                    setTimeout(() => overviewMap.invalidateSize(), 150);
+                }
+            } else if (label === 'Tracking') {
+                trackingView.style.display = 'block';
+                // Trigger tracking map resize or init
+                if (typeof trackingMap === 'undefined' || !trackingMap) {
+                    initLiveTrackingMap();
+                } else {
+                    setTimeout(() => trackingMap.invalidateSize(), 150);
                 }
             } else {
-                // For other items, we can either keep showing the current view or clear it
-                // For now, let's keep the dashboard view as the default for other tabs
-                if (dashboardView) dashboardView.style.display = 'block';
-                if (detailsView) detailsView.style.display = 'none';
+                dashboardView.style.display = 'block';
             }
         });
     });
@@ -110,11 +118,101 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     // MAP & HOSPITAL INTEGRATION (Leaflet)
     // =============================================
-    const map = L.map('map').setView([22.5726, 88.3639], 12);
+    const overviewMap = L.map('map').setView([22.5726, 88.3639], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    }).addTo(overviewMap);
+
+    // =============================================
+    // LIVE TRACKING MAP (Integrated from Tracking Interface)
+    // =============================================
+    let trackingMap = null;
+    let ambulanceMarker = null;
+
+    async function initLiveTrackingMap() {
+        const mapEl = document.getElementById('live-tracking-map');
+        if (!mapEl || !window.L) return;
+
+        trackingMap = L.map('live-tracking-map', {
+            center: [22.5430, 88.3690],
+            zoom: 13,
+            zoomControl: false, 
+            attributionControl: true
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(trackingMap);
+
+        const patientCoords = [22.5726, 88.3639];
+        const hospitalCoords = [22.5165, 88.3958];
+
+        const userPin = L.divIcon({
+            className: 'leaflet-user-pin',
+            html: '📍',
+            iconSize: [38, 38],
+            iconAnchor: [19, 19]
+        });
+
+        const hospitalPin = L.divIcon({
+            className: 'leaflet-hospital-pin',
+            html: '🏥',
+            iconSize: [38, 38],
+            iconAnchor: [19, 19]
+        });
+
+        const ambIcon = L.divIcon({
+            className: '',
+            html: `<div style="width:52px;height:52px;border-radius:50%;background:#fff;border:3px solid #22c55e;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,0.22);font-size:26px;">🚑</div>`,
+            iconSize: [52, 52],
+            iconAnchor: [26, 26]
+        });
+
+        L.marker(patientCoords, { icon: userPin }).addTo(trackingMap).bindPopup('<b>Your Location</b>');
+        L.marker(hospitalCoords, { icon: hospitalPin }).addTo(trackingMap).bindPopup('<b>Apollo Gleneagles</b>');
+        ambulanceMarker = L.marker(patientCoords, { icon: ambIcon }).addTo(trackingMap).bindPopup('<b>Matt Smith</b><br>ALS Ambulance');
+
+        try {
+            const resp = await fetch(`https://router.project-osrm.org/route/v1/driving/${patientCoords[1]},${patientCoords[0]};${hospitalCoords[1]},${hospitalCoords[0]}?overview=full&geometries=geojson`);
+            const data = await resp.json();
+            if (data.routes && data.routes.length > 0) {
+                const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                L.polyline(coords, { color: '#14532d', weight: 8, opacity: 0.8 }).addTo(trackingMap);
+                const actualRoute = L.polyline(coords, { color: '#22c55e', weight: 4 }).addTo(trackingMap);
+                trackingMap.fitBounds(actualRoute.getBounds(), { padding: [60, 60] });
+                animateAmbulance(coords);
+            }
+        } catch (err) {
+            console.error("Tracking Routing failed", err);
+        }
+    }
+
+    function animateAmbulance(routePoints) {
+        if (!ambulanceMarker || !routePoints || routePoints.length === 0) return;
+        let idx = 0;
+        const totalPoints = routePoints.length;
+        const stepTime = Math.max(50, 15000 / totalPoints); 
+        const step = () => {
+            if (idx >= totalPoints) idx = 0;
+            ambulanceMarker.setLatLng(routePoints[idx]);
+            idx++;
+            setTimeout(step, stepTime);
+        };
+        step();
+    }
+
+    // Map controls for tracking
+    const ctrlBtns = document.querySelectorAll('.map-ctrl-btn');
+    ctrlBtns.forEach((btn, i) => {
+        btn.addEventListener('click', () => {
+            if (!trackingMap) return;
+            if (i === 0) trackingMap.zoomIn();
+            else if (i === 1) trackingMap.zoomOut();
+            else trackingMap.setView([22.5430, 88.3690], 13);
+        });
+    });
 
     let hospitals = [];
     let userMarker = null;
@@ -161,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button onclick="window.bookAmbulance('${h.name.replace(/'/g, "\\'")}')" style="width: 100%; padding: 8px; background: #15803d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">🚑 Book RapidCare</button>
                 </div>`;
             L.marker([h.lat, h.lng], { icon: hospitalIcon })
-                .addTo(map)
+                .addTo(overviewMap)
                 .bindPopup(popupContent);
         });
     }
@@ -193,8 +291,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!userMarker) return;
         const userLatLng = userMarker.getLatLng();
         
-        if (distancePolyline) map.removeLayer(distancePolyline);
-        if (distanceBackgroundLine) map.removeLayer(distanceBackgroundLine);
+        if (distancePolyline) overviewMap.removeLayer(distancePolyline);
+        if (distanceBackgroundLine) overviewMap.removeLayer(distanceBackgroundLine);
         
         try {
             // Fetch real road route using OSRM public API
@@ -208,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 coords = [userLatLng, [lat, lng]];
             }
-
+ 
             // Draw outer thick border
             distanceBackgroundLine = L.polyline(coords, {
                 color: '#14532d',
@@ -216,8 +314,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 opacity: 0.8,
                 lineJoin: 'round',
                 lineCap: 'round'
-            }).addTo(map);
-
+            }).addTo(overviewMap);
+ 
             // Draw inner smooth path
             distancePolyline = L.polyline(coords, {
                 color: '#22c55e',
@@ -225,17 +323,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 opacity: 1,
                 lineJoin: 'round',
                 lineCap: 'round'
-            }).addTo(map);
-
-            map.fitBounds(distanceBackgroundLine.getBounds(), { padding: [50, 50] });
-
+            }).addTo(overviewMap);
+ 
+            overviewMap.fitBounds(distanceBackgroundLine.getBounds(), { padding: [50, 50] });
+ 
         } catch (e) {
             console.error("Routing error:", e);
             // Fallback to straight dashed line if offline
             distancePolyline = L.polyline([userLatLng, [lat, lng]], {
                 color: '#15803d', weight: 4, opacity: 0.7, dashArray: '10, 10', lineJoin: 'round'
-            }).addTo(map);
-            map.fitBounds(distancePolyline.getBounds(), { padding: [50, 50] });
+            }).addTo(overviewMap);
+            overviewMap.fitBounds(distancePolyline.getBounds(), { padding: [50, 50] });
         }
     };
 
@@ -299,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
             backToMapBtn.style.display = 'none';
             document.getElementById('tracking-title').textContent = "Real-time Tracking";
             document.getElementById('tracking-badges').style.display = 'flex';
-            if (map.invalidateSize) map.invalidateSize();
+            if (overviewMap.invalidateSize) overviewMap.invalidateSize();
         });
     }
 
@@ -350,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
             item.addEventListener('click', () => {
                 document.querySelectorAll('.hospital-item').forEach(el => el.classList.remove('active-hospital'));
                 item.classList.add('active-hospital');
-                map.setView([h.lat, h.lng], 15);
+                overviewMap.setView([h.lat, h.lng], 15);
             });
             container.appendChild(item);
         });
@@ -360,13 +458,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // USER LOCATION MANAGEMENT
     // =============================================
     function updateUserLocation(lat, lng) {
-        if (userMarker) map.removeLayer(userMarker);
+        if (userMarker) overviewMap.removeLayer(userMarker);
         
-        userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map)
+        userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(overviewMap)
             .bindPopup('<b>Your Location</b>')
             .openPopup();
             
-        map.setView([lat, lng], 13);
+        overviewMap.setView([lat, lng], 13);
         renderHospitalsList(lat, lng);
     }
 
@@ -514,3 +612,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('RapidCare Dashboard Initialized');
 });
+
+function handleCall() {
+     const toast = document.createElement('div');
+     toast.style.cssText = "position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#15803d;color:white;padding:16px 24px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.2);z-index:9999;font-weight:600;display:flex;align-items:center;gap:12px;animation:slideUp 0.4s ease;";
+     toast.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 5.49 5.49l.94-.94a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 15.5z"/></svg> Initializing Secure Call...`;
+     document.body.appendChild(toast);
+     setTimeout(() => toast.remove(), 3000);
+}
+
+function handleMessage() {
+     const msg = prompt("Enter message for Matt Smith:");
+     if (msg) {
+        alert("Message sent to driver: " + msg);
+     }
+}
