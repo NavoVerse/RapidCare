@@ -10,27 +10,32 @@
 }
 
 body {
-    /* Based on image, the background is a very dark gray/almost black */
-    background: #1e1e1e;
+    background: linear-gradient(135deg, #fef9c3 0%, var(--primary-yellow) 100%);
     color: var(--text-dark);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 20px;
+    padding: 40px 20px;
+    transition: background 0.3s ease;
 }
 
-/* Ensure theme variables adapt to dark mode properly if needed */
 body.dark-mode {
-    color: #f8fafc;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: var(--text-dark);
 }
 
 .registration-container {
     width: 100%;
-    max-width: 95%;
+    max-width: 1100px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 30px;
+    background: var(--white);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(21, 128, 61, 0.1);
 }
 
 /* Branding Header */
@@ -42,22 +47,20 @@ body.dark-mode {
 
 .brand-logo {
     font-family: 'Montserrat', sans-serif;
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     font-weight: 800;
-    background: linear-gradient(90deg, #ffffff 0%, #facc15 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--primary-green);
     letter-spacing: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     text-transform: uppercase;
-    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.2));
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .page-title {
     font-family: 'Montserrat', sans-serif;
     font-size: 1.4rem;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--text-dark);
     text-transform: uppercase;
     margin-bottom: 25px;
     letter-spacing: 4px;
@@ -104,21 +107,21 @@ body.dark-mode {
 /* Stepper styling */
 .stepper {
     display: flex;
-    background: #2a2a2a;
-    border-radius: 8px;
+    background: var(--input-bg);
+    border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #444;
+    border: 1px solid var(--input-border);
 }
 
 .step {
     flex: 1;
     text-align: center;
-    padding: 12px 10px;
-    font-size: 0.85rem;
+    padding: 16px 10px;
+    font-size: 0.9rem;
     font-weight: 600;
-    color: #fff;
-    background: #2a2a2a;
-    border-right: 1px solid #444;
+    color: var(--text-muted);
+    background: transparent;
+    border-right: 1px solid var(--input-border);
     transition: all 0.3s ease;
     cursor: pointer;
 }
@@ -132,18 +135,26 @@ body.dark-mode {
 }
 
 .step.active {
-    background: #f0fdf4; /* Light green/yellowish background based on image */
+    background: var(--bg-light);
     color: var(--primary-green);
+    position: relative;
+}
+
+.step.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary-green);
 }
 
 /* Form section styling */
 .form-section {
     display: none;
-    background: #333333; /* Dark gray background matching image */
-    border-radius: 12px;
-    padding: 25px 30px;
-    border: 1px solid #444;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    background: transparent;
+    padding: 10px 0;
 }
 
 .form-section.active {
@@ -157,13 +168,13 @@ body.dark-mode {
 }
 
 .section-header h2 {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #e2e8f0;
-    letter-spacing: 1px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-green);
+    letter-spacing: 0.5px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .step-badge {
@@ -244,14 +255,14 @@ input[type="date"],
 input[type="tel"],
 select {
     width: 100%;
-    padding: 12px 15px;
-    background: #2a2a2a;
-    border: 1px solid #555;
-    border-radius: 6px;
-    color: #f8fafc;
-    font-size: 0.95rem;
+    padding: 14px 18px;
+    background: var(--input-bg);
+    border: 1.5px solid var(--input-border);
+    border-radius: 10px;
+    color: var(--text-dark);
+    font-size: 1rem;
     outline: none;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 input::placeholder {
@@ -260,7 +271,7 @@ input::placeholder {
 
 /* Chrome, Safari, Edge, Opera hide spin buttons for date/number */
 input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+    filter: var(--calendar-filter, invert(0));
     cursor: pointer;
 }
 
@@ -294,8 +305,8 @@ select {
 }
 
 select option {
-    background: #2a2a2a;
-    color: #fff;
+    background: var(--white);
+    color: var(--text-dark);
 }
 
 .form-actions {
@@ -435,12 +446,12 @@ select option {
 
 /* Document Cards */
 .document-card {
-    background: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: var(--bg-light);
+    border: 1px solid var(--input-border);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
 }
 
 .document-card:hover {
@@ -497,8 +508,8 @@ select option {
 }
 
 .btn-verify:hover {
-    background: #333;
-    border-color: #888;
+    background: var(--input-bg);
+    border-color: var(--primary-green);
     transform: translateY(-1px);
 }
 
@@ -556,7 +567,7 @@ select option {
 
 .upload-box:hover {
     border-color: var(--primary-green);
-    background: #2c332c; /* slight green tint */
+    background: var(--bg-light);
     transform: scale(1.02);
 }
 
@@ -571,9 +582,8 @@ select option {
 
 .upload-icon {
     font-size: 1.5rem;
-    color: #94a3b8;
-    margin-bottom: 8px;
-    background: #333;
+    color: var(--text-muted);
+    background: var(--input-bg);
     width: 32px;
     height: 32px;
     display: flex;
@@ -596,10 +606,10 @@ select option {
 /* Info Footer */
 .info-footer {
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: var(--text-muted);
     padding: 12px 15px;
-    background: #2a2a2a;
-    border-left: 3px solid #3b82f6; /* Blue border as in image */
+    background: var(--input-bg);
+    border-left: 3px solid var(--primary-green);
     border-radius: 4px;
     margin-top: 30px;
     margin-bottom: 30px;
@@ -608,10 +618,10 @@ select option {
 
 /* Declaration Box */
 .declaration-box {
-    border: 1px solid #444;
-    border-radius: 10px;
+    border: 1px solid var(--primary-green);
+    border-radius: 15px;
     padding: 25px 30px;
-    background: #222;
+    background: var(--bg-light);
     margin-top: 30px;
 }
 
@@ -641,9 +651,9 @@ select option {
     left: 0;
     height: 20px;
     width: 20px;
-    background-color: #2a2a2a;
-    border: 1px solid #555;
-    border-radius: 4px;
+    background-color: var(--input-bg);
+    border: 1.5px solid var(--input-border);
+    border-radius: 6px;
     transition: all 0.2s ease;
 }
 
