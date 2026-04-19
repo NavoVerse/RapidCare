@@ -59,17 +59,33 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        const globalAddBtn = document.getElementById('global-add-btn');
+        if (globalAddBtn) {
+            globalAddBtn.addEventListener('click', () => {
+                openModal('Global', null, null, null);
+            });
+        }
+
         function openModal(type, listContainer, pillElement, accordionItem) {
-            typeInput.value = type;
-            // Update Modal Header dynamically
             const headerText = modal.querySelector('.modal-header h3');
-            if(headerText) {
-                headerText.textContent = `Add ${type} Insurance Scheme`;
+            const typeGroup = document.getElementById('scheme-type-group');
+            
+            if (type === 'Global') {
+                typeInput.value = 'Global';
+                if(headerText) headerText.textContent = `Add New Insurance`;
+                if(typeGroup) typeGroup.style.display = 'flex';
+                currentContainer = null;
+                currentPill = null;
+                currentAccordion = null;
+            } else {
+                typeInput.value = type;
+                if(headerText) headerText.textContent = `Add ${type} Insurance Scheme`;
+                if(typeGroup) typeGroup.style.display = 'none';
+                currentContainer = listContainer;
+                currentPill = pillElement;
+                currentAccordion = accordionItem;
             }
             
-            currentContainer = listContainer;
-            currentPill = pillElement;
-            currentAccordion = accordionItem;
             modal.classList.add('active');
         }
 
@@ -90,6 +106,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
+            
+            let targetType = typeInput.value;
+            let targetContainer = currentContainer;
+            let targetPill = currentPill;
+            let targetAccordion = currentAccordion;
+
+            if (targetType === 'Global') {
+                const selected = document.getElementById('scheme-category-select').value;
+                const accordionsObj = {
+                    'State': document.querySelector('.icon-state').closest('.accordion-item'),
+                    'Central': document.querySelector('.icon-central').closest('.accordion-item'),
+                    'Mediclaim': document.querySelector('.icon-mediclaim').closest('.accordion-item'),
+                    'Private': document.querySelector('.icon-private').closest('.accordion-item')
+                };
+                targetAccordion = accordionsObj[selected];
+                targetContainer = targetAccordion.querySelector('.scheme-list');
+                targetPill = targetAccordion.querySelector('.count-pill');
+            }
+
             const name = document.getElementById('scheme-name').value;
             const desc = document.getElementById('scheme-desc').value;
             const link = document.getElementById('scheme-link').value;
@@ -114,29 +149,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            // Insert before the divider of available schemes if it exists, else just append
-            const divider = currentContainer.querySelector('.section-divider');
+            const divider = targetContainer.querySelector('.section-divider');
             if (divider) {
-                currentContainer.insertBefore(newCard, divider);
+                targetContainer.insertBefore(newCard, divider);
             } else {
-                currentContainer.appendChild(newCard);
+                targetContainer.appendChild(newCard);
             }
 
-            // Animate it nicely
             requestAnimationFrame(() => {
                 newCard.style.opacity = '1';
                 newCard.style.transform = 'none';
             });
 
-            // Update Pill Count
-            let currentCount = parseInt(currentPill.textContent);
+            let currentCount = parseInt(targetPill.textContent);
             if (!isNaN(currentCount)) {
-                currentPill.textContent = (currentCount + 1) + " Linked";
+                targetPill.textContent = (currentCount + 1) + " Linked";
             }
 
-            // Recalculate max-height so we don't clip bounds
-            if (currentAccordion.classList.contains('active')) {
-                const content = currentAccordion.querySelector('.accordion-content');
+            if (targetAccordion.classList.contains('active')) {
+                const content = targetAccordion.querySelector('.accordion-content');
                 setTimeout(() => {
                     content.style.maxHeight = content.scrollHeight + "px";
                 }, 50);
