@@ -116,8 +116,8 @@
             <div class="header-right">
                 <div class="icon-btn theme-toggle" id="theme-toggle">
                     <!-- Sun/Moon icon will be swapped by JS -->
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" class="sun-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        class="sun-icon">
                         <circle cx="12" cy="12" r="5"></circle>
                         <line x1="12" y1="1" x2="12" y2="3"></line>
                         <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -130,8 +130,7 @@
                     </svg>
                 </div>
                 <div class="icon-btn notification-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                     </svg>
@@ -148,11 +147,23 @@
                 <!-- Stats -->
                 <div class="stats-grid">
                     <div class="stat-card clickable-stat" id="locationCard">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
                             <label>Your Location</label>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary-green);">
-                                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                            </svg>
+                            <div style="display: flex; gap: 8px;">
+                                <button id="refreshLocationBtn" title="Refresh Location"
+                                    style="background:none; border:none; color:var(--primary-green); cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.5">
+                                        <path d="M23 4v6h-6"></path>
+                                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                                    </svg>
+                                </button>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" style="color: var(--primary-green);">
+                                    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                </svg>
+                            </div>
                         </div>
                         <div class="value" id="userLocationText">Detecting...</div>
                         <div class="trend positive" id="locationStatus">
@@ -186,11 +197,16 @@
                     <div class="card">
                         <div class="card-header">
                             <h3>Hospitals Available</h3>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <button id="refreshHospitalsBtn" title="Refresh Hospitals"
+                                    style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:0; display:flex; align-items:center;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.5">
+                                        <path d="M23 4v6h-6"></path>
+                                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <div class="hospital-list" id="hospitalListContainer">
                             <div style="padding: 20px; text-align: center; color: var(--text-muted);">
@@ -207,22 +223,28 @@
                                 <span
                                     style="padding: 4px 12px; background: #ecfdf5; color: #059669; border-radius: 20px; font-size: 12px; font-weight: 600;">Live</span>
                             </div>
-                            <button id="backToMapBtn" style="display: none; padding: 6px 12px; background: var(--bg-main); border: 1.5px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 700; color: var(--primary-green); cursor: pointer;">← Back to Map</button>
+                            <button id="backToMapBtn"
+                                style="display: none; padding: 6px 12px; background: var(--bg-main); border: 1.5px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 700; color: var(--primary-green); cursor: pointer;">←
+                                Back to Map</button>
                         </div>
                         <div class="map-wrapper" style="position: relative; flex-grow: 1;">
                             <div class="map-container" id="map" style="height: 100%; min-height: 500px;"></div>
-                            <div id="hospitalStatusPanel" style="display: none; height: 100%; min-height: 500px; padding: 30px; background: var(--white); overflow-y: auto;">
+                            <div id="hospitalStatusPanel"
+                                style="display: none; height: 100%; min-height: 500px; padding: 30px; background: var(--white); overflow-y: auto;">
                                 <!-- Content generated by JS -->
                             </div>
                             <div class="map-overlay">
                                 <div class="duration-info">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <polyline points="12 6 12 12 16 14"></polyline>
                                     </svg>
                                     <span>Duration: 3 hours 45 min</span>
                                 </div>
-                                <button style="padding: 8px 16px; background: var(--primary-green); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">View Full Route</button>
+                                <button
+                                    style="padding: 8px 16px; background: var(--primary-green); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">View
+                                    Full Route</button>
                             </div>
                         </div>
                     </div>
@@ -258,7 +280,7 @@
                             </div>
                             <div class="profile-details-section">
                                 <div class="name-header">
-                                    <h2>Ahmed Ali Hussain</h2>
+                                    <h2>Samim Uddin Molla</h2>
                                     <div class="action-icons">
                                         <button class="call-btn">📞</button>
                                         <button class="mail-btn">✉️</button>
@@ -608,49 +630,57 @@
                     </div>
                 </aside>
             </div>
-    <!-- Location Selection Modal -->
-    <div class="modal-overlay" id="locationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Set Your Location</h2>
-                <span class="close-modal" id="closeLocationModal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="search-box-container" style="margin-bottom: 20px;">
-                    <input type="text" id="locationSearchInput" placeholder="Search city or hospital area..." 
-                        style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; outline: none;">
-                    <div id="searchResults" class="search-results"></div>
+        </div>
+        <!-- Location Selection Modal -->
+        <div class="modal-overlay" id="locationModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Set Your Location</h2>
+                    <span class="close-modal" id="closeLocationModal">&times;</span>
                 </div>
-                
-                <div class="dropdown-section">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Quick Selection</label>
-                    <select id="quickLocationSelect" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); color: var(--text-main);">
-                        <option value="" disabled selected>Choose a major area...</option>
-                        <option value="22.5726,88.3639">Central Kolkata</option>
-                        <option value="22.5165,88.4042">Bypass / Anandapur</option>
-                        <option value="22.5850,88.3470">Howrah Station</option>
-                        <option value="22.6547,88.4467">Kolkata Airport (CCU)</option>
-                        <option value="22.5135,88.3629">Dhakuria / Jadavpur</option>
-                        <option value="22.4939,88.3980">Southend / Mukundapur</option>
-                    </select>
-                </div>
+                <div class="modal-body">
+                    <div class="search-box-container" style="margin-bottom: 20px;">
+                        <input type="text" id="locationSearchInput" placeholder="Search city or hospital area..."
+                            style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; outline: none;">
+                        <div id="searchResults" class="search-results"></div>
+                    </div>
 
-                <button id="useCurrentGPS" style="width: 100%; margin-top: 20px; padding: 12px; background: var(--primary-green); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    Use My Live GPS
-                </button>
+                    <div class="dropdown-section">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Quick
+                            Selection</label>
+                        <select id="quickLocationSelect"
+                            style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); color: var(--text-main);">
+                            <option value="" disabled selected>Choose a major area...</option>
+                            <option value="22.5726,88.3639">Central Kolkata</option>
+                            <option value="22.5165,88.4042">Bypass / Anandapur</option>
+                            <option value="22.5850,88.3470">Howrah Station</option>
+                            <option value="22.6547,88.4467">Kolkata Airport (CCU)</option>
+                            <option value="22.5135,88.3629">Dhakuria / Jadavpur</option>
+                            <option value="22.4939,88.3980">Southend / Mukundapur</option>
+                        </select>
+                    </div>
+
+                    <button id="useCurrentGPS"
+                        style="width: 100%; margin-top: 20px; padding: 12px; background: var(--primary-green); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        Use My Live GPS
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 
 
 
-    <!-- Leaflet Map (Free, no API key required) -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="../Backend/user_Location_Auto_Detection/location_service.js?v=2"></script>
-    <script src="../Backend/map_Integration/map_api.js?v=2"></script>
-    <script src="../Backend/user_Database/db_manager.js?v=2"></script>
-    <script src="script.js?v=2"></script>
+        <!-- Leaflet Map (Free, no API key required) -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="../Backend/user_Location_Auto_Detection/location_service.js?v=2"></script>
+        <script src="../Backend/map_Integration/map_api.js?v=2"></script>
+        <script src="../Backend/user_Database/db_manager.js?v=2"></script>
+        <script src="script.js?v=2"></script>
 </body>
 
 </html>
