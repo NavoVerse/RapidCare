@@ -107,13 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // Inline fallback
             hospitals = [
-                { name: "AMRI Hospital, Dhakuria", lat: 22.5135, lng: 88.3629, status: "Available" },
-                { name: "Apollo Gleneagles Hospitals", lat: 22.5710, lng: 88.4055, status: "Limited" },
-                { name: "Fortis Hospital, Anandapur", lat: 22.5165, lng: 88.4042, status: "Available" },
-                { name: "Medica Superspecialty Hospital", lat: 22.4939, lng: 88.3980, status: "Busy" },
-                { name: "NRS Medical College and Hospital", lat: 22.5645, lng: 88.3685, status: "Available" },
-                { name: "Peerless Hospital", lat: 22.4770, lng: 88.3900, status: "Available" },
-                { name: "SSKM Hospital", lat: 22.5392, lng: 88.3444, status: "Busy" }
+                { name: "AMRI Hospital, Dhakuria", lat: 22.5135, lng: 88.3629, status: "Available", beds: 12, facilities: ["ICU", "Emergency", "Cardiology"] },
+                { name: "Apollo Gleneagles Hospitals", lat: 22.5710, lng: 88.4055, status: "Limited", beds: 3, facilities: ["Neurology", "Trauma Care", "Oxygen Support"] },
+                { name: "Fortis Hospital, Anandapur", lat: 22.5165, lng: 88.4042, status: "Available", beds: 21, facilities: ["General Surgery", "Pediatrics", "Diagnostic Lab"] },
+                { name: "Medica Superspecialty Hospital", lat: 22.4939, lng: 88.3980, status: "Busy", beds: 0, facilities: ["Organ Transplant", "Advanced Imaging", "Reentry Care"] },
+                { name: "NRS Medical College and Hospital", lat: 22.5645, lng: 88.3685, status: "Available", beds: 45, facilities: ["Government Funded", "Free Pharmacy", "Maternity"] },
+                { name: "Peerless Hospital", lat: 22.4770, lng: 88.3900, status: "Available", beds: 18, facilities: ["Orthopedic", "Oncology", "Dialysis"] },
+                { name: "SSKM Hospital", lat: 22.5392, lng: 88.3444, status: "Busy", beds: 1, facilities: ["Cardiac Surgery", "Burn Ward", "Medical Research"] }
             ];
         }
 
@@ -149,6 +149,92 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // =============================================
+    // HLIGHIGHT DISTANCE & STATUS PANEL LOGIC
+    // =============================================
+    let distancePolyline = null;
+
+    window.highlightDistance = function(lat, lng) {
+        if (!userMarker) return;
+        const userLatLng = userMarker.getLatLng();
+        
+        if (distancePolyline) map.removeLayer(distancePolyline);
+        
+        distancePolyline = L.polyline([userLatLng, [lat, lng]], {
+            color: '#15803d',
+            weight: 4,
+            opacity: 0.7,
+            dashArray: '10, 10',
+            lineJoin: 'round'
+        }).addTo(map);
+        
+        map.fitBounds(distancePolyline.getBounds(), { padding: [50, 50] });
+    };
+
+    window.showHospitalStatus = function(hospitalName) {
+        const h = hospitals.find(item => item.name === hospitalName);
+        if (!h) return;
+
+        const mapContainer = document.getElementById('map');
+        const statusPanel = document.getElementById('hospitalStatusPanel');
+        const backBtn = document.getElementById('backToMapBtn');
+        const title = document.getElementById('tracking-title');
+        const badges = document.getElementById('tracking-badges');
+        const overlay = document.querySelector('.map-overlay');
+
+        if (mapContainer && statusPanel) {
+            mapContainer.style.display = 'none';
+            if (overlay) overlay.style.display = 'none';
+            statusPanel.style.display = 'block';
+            backBtn.style.display = 'block';
+            title.textContent = "Hospital Status - " + h.name.split(',')[0];
+            badges.style.display = 'none';
+
+            statusPanel.innerHTML = `
+                <div class="status-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="font-size: 1.5rem; color: var(--text-main); font-family: 'Outfit', sans-serif;">${h.name}</h2>
+                        <span class="h-status" style="background: ${h.status === 'Available' ? '#f0fdf4' : (h.status === 'Busy' ? '#fef2f2' : '#fefce8')}; color: ${h.status === 'Available' ? '#15803d' : (h.status === 'Busy' ? '#dc2626' : '#eab308')};">${h.status}</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                        <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border);">
+                            <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Available Beds</label>
+                            <div style="font-size: 2rem; font-weight: 800; color: var(--primary-green); margin-top: 5px;">${h.beds}</div>
+                        </div>
+                        <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border);">
+                            <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Response Class</label>
+                            <div style="font-size: 1.5rem; font-weight: 800; color: var(--acc-yellow); margin-top: 5px;">Level ${h.beds > 10 ? 'A' : 'B'}</div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-bottom: 12px; font-weight: 700;">Key Facilities</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px;">
+                        ${h.facilities.map(f => `<span style="padding: 6px 14px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-weight: 500;">${f}</span>`).join('')}
+                    </div>
+
+                    <button onclick="window.bookAmbulance('${h.name.replace(/'/g, "\\'")}')" style="width: 100%; padding: 16px; background: var(--primary-green); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem;">
+                        🚑 Book RapidCare for this Hospital
+                    </button>
+                    <p style="margin-top: 15px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Note: Bed counts are updated every 15 minutes by hospital staff.</p>
+                </div>
+            `;
+        }
+    };
+
+    const backToMapBtn = document.getElementById('backToMapBtn');
+    if (backToMapBtn) {
+        backToMapBtn.addEventListener('click', () => {
+            document.getElementById('map').style.display = 'block';
+            document.querySelector('.map-overlay').style.display = 'flex';
+            document.getElementById('hospitalStatusPanel').style.display = 'none';
+            backToMapBtn.style.display = 'none';
+            document.getElementById('tracking-title').textContent = "Real-time Tracking";
+            document.getElementById('tracking-badges').style.display = 'flex';
+            if (map.invalidateSize) map.invalidateSize();
+        });
+    }
+
+    // =============================================
     // HOSPITAL LIST & DISTANCE CALCULATIONS
     // =============================================
     function renderHospitalsList(userLat, userLng) {
@@ -179,14 +265,22 @@ document.addEventListener('DOMContentLoaded', () => {
             item.className = 'hospital-item';
             const statusColor = h.status === 'Available' ? '#15803d' : (h.status === 'Busy' ? '#dc2626' : '#eab308');
             item.innerHTML = `
-                <div class="hospital-info">
-                    <span class="h-name">${h.name}</span>
-                    <span class="h-distance">${h.distance} km away</span>
+                <div class="hospital-info" style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px;">
+                        <span class="h-name">${h.name}</span>
+                        <span class="h-distance" style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem;">${h.distance} km</span>
+                    </div>
+                    <div class="h-actions-row" style="display: flex; gap: 10px;">
+                        <button class="book-btn uni-btn" onclick="event.stopPropagation(); window.bookAmbulance('${h.name.replace(/'/g, "\\'")}')">🚑 Book Now</button>
+                        <button class="action-btn distance-btn uni-btn" onclick="event.stopPropagation(); window.highlightDistance(${h.lat}, ${h.lng})">📍 Distance</button>
+                        <button class="action-btn status-btn uni-btn" onclick="event.stopPropagation(); window.showHospitalStatus('${h.name.replace(/'/g, "\\'")}')" style="color: ${statusColor}; border-color: ${statusColor}">🛡️ ${h.status}</button>
+                    </div>
                 </div>
-                <span class="h-status" style="color: ${statusColor}; font-weight: 600;">${h.status}</span>
             `;
             item.style.cursor = 'pointer';
             item.addEventListener('click', () => {
+                document.querySelectorAll('.hospital-item').forEach(el => el.classList.remove('active-hospital'));
+                item.classList.add('active-hospital');
                 map.setView([h.lat, h.lng], 15);
             });
             container.appendChild(item);
