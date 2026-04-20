@@ -172,29 +172,58 @@ header {
     gap: 16px;
 }
 
-.search-bar {
+/* Header & Patient Name */
+.patient-title-area {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: var(--bg-main);
-    border: 1px solid var(--border);
-    padding: 8px 18px;
-    border-radius: 50px;
-    width: 320px;
-    transition: all 0.3s;
+    flex-direction: column;
+    gap: 2px;
 }
 
-.search-bar:focus-within {
-    border-color: var(--primary-green);
-    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
-}
-
-.search-bar input {
-    background: none;
-    border: none;
-    outline: none;
-    width: 100%;
+.patient-name {
+    font-size: 24px;
+    font-weight: 800;
     color: var(--text-main);
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.view-subtitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary-green);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Contrast & Typography Improvements */
+.pane-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.history-item .item-title {
+    font-weight: 700;
+    color: var(--text-main);
+    font-size: 15px;
+}
+
+.history-item .item-doctor {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.vital-card label {
+    font-weight: 700;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vital-card .value {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--primary-green);
 }
 
 .icon-btn {
