@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const detailsView = document.getElementById('details-view');
     const trackingView = document.getElementById('tracking-view');
     const insuranceView = document.getElementById('insurance-view');
-
+    const paymentsView = document.getElementById('payments-view');
 
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
             detailsView.style.display = 'none';
             trackingView.style.display = 'none';
             insuranceView.style.display = 'none';
-
+            paymentsView.style.display = 'none';
 
             if (label === 'Details') {
                 detailsView.style.display = 'block';
@@ -102,7 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else if (label === 'Insurance') {
                 insuranceView.style.display = 'block';
-
+            } else if (label === 'Payments') {
+                paymentsView.style.display = 'block';
             } else {
                 dashboardView.style.display = 'block';
             }
@@ -1005,62 +1006,55 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =============================================
-    // ORIGINAL PAYMENT LOGIC (RECONNECTED)
+    // INTEGRATED PAYMENT LOGIC
     // =============================================
-    let baseFare = 350; 
-    let equipmentCharge = 100;
-    let platformCharge = 40; 
-    let donationAmount = 10;
+    let baseFarePayment = 350; 
+    let equipmentChargePayment = 100;
+    let platformChargePayment = 40; 
+    let donationAmountPayment = 10;
     
-    let isPlatformFree = false;
-    let isHighValueApplied = false;
-    let selectedBankOffer = 'none';
+    let isPlatformFreePayment = false;
+    let isHighValueAppliedPayment = false;
+    let selectedBankOfferPayment = 'none';
 
-    let cashRideCount = parseInt(localStorage.getItem('rapidcare_cash_rides') || '0');
-    let isCashRewardActive = (cashRideCount >= 5);
+    let cashRideCountPayment = parseInt(localStorage.getItem('rapidcare_cash_rides') || '0');
+    let isCashRewardActivePayment = (cashRideCountPayment >= 5);
 
-    const detailsBtnPay = document.getElementById('detailsBtn');
-    const detailsPanelPay = document.getElementById('detailsPanel');
-    const donateBtnsPay = document.querySelectorAll('.donate-btn');
-    const customDonationInput = document.getElementById('customDonation');
+    const detailsBtnPay = document.getElementById('detailsBtnPayment');
+    const detailsPanelPay = document.getElementById('detailsPanelIntegrated');
+    const donateBtnsPay = document.querySelectorAll('.donate-btn-integrated');
+    const customDonationPay = document.getElementById('customDonation');
     
-    const payableAmountDisplay = document.getElementById('payableAmountDisplay');
-    const donationDisplay = document.getElementById('donationDisplay');
-    const totalDisplay = document.getElementById('totalDisplay');
-    const payBtnAmount = document.getElementById('payBtnAmount');
+    const payableDisplayPay = document.getElementById('payableAmountDisplay');
+    const donationDisplayPay = document.getElementById('donationDisplay');
+    const totalDisplayPay = document.getElementById('totalDisplay');
+    const payBtnAmtPay = document.getElementById('payBtnAmount');
 
-    const rideDiscountRow = document.getElementById('rideDiscountRow');
-    const bankDiscountRow = document.getElementById('bankDiscountRow');
-    const bankDiscountName = document.getElementById('bankDiscountName');
-    const bankDiscountAmount = document.getElementById('bankDiscountAmount');
+    const rideDiscRowPay = document.getElementById('rideDiscountRow');
+    const bankDiscRowPay = document.getElementById('bankDiscountRow');
+    const bankDiscNamePay = document.getElementById('bankDiscountName');
+    const bankDiscAmtPay = document.getElementById('bankDiscountAmount');
 
-    const addDiscountBtn = document.getElementById('addDiscountBtn');
-    const firstRideLabel = document.getElementById('firstRideLabel');
-    const platformChargeDisplay = document.getElementById('platformChargeDisplay');
+    const addDiscBtnPay = document.getElementById('addDiscountBtn');
+    const firstRideLblPay = document.getElementById('firstRideLabel');
+    const platChargeDispPay = document.getElementById('platformChargeDisplay');
 
-    const discountModal = document.getElementById('discountModal');
-    const closeModal = document.getElementById('closeModal');
-    const applyDiscountsBtn = document.getElementById('applyDiscountsBtn');
-    const cbPlatformFree = document.getElementById('cbPlatformFree');
-    const cbHighValue = document.getElementById('cbHighValue');
-    const bankRadios = document.getElementsByName('bankOffer');
+    const discModalPay = document.getElementById('discountModal');
+    const closeDiscModalPay = document.getElementById('closeDiscountModal');
+    const applyDiscBtnPay = document.getElementById('applyDiscountsBtn');
+    const cbPlatFreePay = document.getElementById('cbPlatformFree');
+    const cbHighValPay = document.getElementById('cbHighValue');
+    const bankRadsPay = document.getElementsByName('bankOffer');
 
-    const cardRadio = document.getElementById('cardRadio');
-    const upiRadio = document.getElementById('upiRadio');
-    const cashRadio = document.getElementById('cashRadio');
-    const paymentRadios = document.querySelectorAll('input[name="payment"]');
-    const cardDetailsForm = document.getElementById('cardDetailsForm');
-    const upiDetailsForm = document.getElementById('upiDetailsForm');
-    const cashDetailsForm = document.getElementById('cashDetailsForm');
-    const upiApps = document.querySelectorAll('.upi-app');
+    const payMethodsPay = document.querySelectorAll('input[name="payment-method"]');
+    const cardFormPay = document.getElementById('cardDetailsForm');
+    const upiFormPay = document.getElementById('upiDetailsForm');
+    const cashFormPay = document.getElementById('cashDetailsForm');
+    const upiAppsPay = document.querySelectorAll('.upi-app-integrated');
 
-    const cashProgressFill = document.getElementById('cashProgressFill');
-    const cashRidesDots = document.getElementById('cashRidesDots');
-    const cashRidesRemaining = document.getElementById('cashRidesRemaining');
-    const cashStatusText = document.getElementById('cashStatusText');
-    const cashRewardUnlocked = document.getElementById('cashRewardUnlocked');
-    const cashStatus = document.getElementById('cashStatus');
-    const cashRewardRow = document.getElementById('cashRewardRow');
+    const cashFillPay = document.getElementById('cashProgressFill');
+    const cashStatusTxtPay = document.getElementById('cashStatusText');
+    const cashRowPay = document.getElementById('cashRewardRow');
 
     if (detailsBtnPay) {
         detailsBtnPay.addEventListener('click', () => {
@@ -1068,39 +1062,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (addDiscountBtn) {
-        addDiscountBtn.addEventListener('click', () => {
-            if (discountModal) discountModal.style.display = 'flex';
+    if (addDiscBtnPay) {
+        addDiscBtnPay.addEventListener('click', () => {
+            discModalPay.style.display = 'flex';
         });
     }
 
-    if (closeModal) {
-        closeModal.addEventListener('click', () => {
-            if (discountModal) discountModal.style.display = 'none';
+    if (closeDiscModalPay) {
+        closeDiscModalPay.addEventListener('click', () => {
+            discModalPay.style.display = 'none';
         });
     }
 
-    if (applyDiscountsBtn) {
-        applyDiscountsBtn.addEventListener('click', () => {
-            isPlatformFree = cbPlatformFree && cbPlatformFree.checked;
-            isHighValueApplied = cbHighValue && cbHighValue.checked;
+    if (applyDiscBtnPay) {
+        applyDiscBtnPay.addEventListener('click', () => {
+            isPlatformFreePayment = cbPlatFreePay && cbPlatFreePay.checked;
+            isHighValueAppliedPayment = cbHighValPay && cbHighValPay.checked;
             
-            if (bankRadios) {
-                for (let radio of bankRadios) {
-                    if (radio.checked) {
-                        selectedBankOffer = radio.value;
-                        break;
-                    }
+            for (let radio of bankRadsPay) {
+                if (radio.checked) {
+                    selectedBankOfferPayment = radio.value;
+                    break;
                 }
             }
 
-            platformCharge = isPlatformFree ? 0 : 40;
-            addDiscountBtn.textContent = 'DISCOUNTS APPLIED';
-            addDiscountBtn.style.background = 'var(--primary-green)';
-            addDiscountBtn.style.color = 'white';
+            platformChargePayment = isPlatformFreePayment ? 0 : 40;
+            addDiscBtnPay.textContent = 'Discounts Applied';
+            addDiscBtnPay.style.background = 'var(--primary-green)';
+            addDiscBtnPay.style.color = 'white';
             
-            updateTotal();
-            if (discountModal) discountModal.style.display = 'none';
+            updateTotalPayment();
+            discModalPay.style.display = 'none';
         });
     }
 
@@ -1108,164 +1100,147 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', (e) => {
             donateBtnsPay.forEach(b => b.classList.remove('selected'));
             e.target.classList.add('selected');
-            if (customDonationInput) customDonationInput.value = '';
-            donationAmount = parseInt(e.target.getAttribute('data-amount'));
-            updateTotal();
+            if (customDonationPay) customDonationPay.value = '';
+            donationAmountPayment = parseInt(e.target.getAttribute('data-amount'));
+            updateTotalPayment();
         });
     });
 
-    if (customDonationInput) {
-        customDonationInput.addEventListener('input', (e) => {
+    if (customDonationPay) {
+        customDonationPay.addEventListener('input', (e) => {
             donateBtnsPay.forEach(b => b.classList.remove('selected'));
-            donationAmount = parseInt(e.target.value) || 0;
-            updateTotal();
+            donationAmountPayment = parseInt(e.target.value) || 0;
+            updateTotalPayment();
         });
     }
 
-    const payNowBtn = document.querySelector('.pay-now-btn');
-    if (payNowBtn) {
-        payNowBtn.addEventListener('click', () => {
-            if (cashRadio && cashRadio.checked) {
-                if (isCashRewardActive) {
-                    cashRideCount = 0;
-                    isCashRewardActive = false;
+    const confirmPayBtn = document.querySelector('.pay-now-btn-integrated');
+    if (confirmPayBtn) {
+        confirmPayBtn.addEventListener('click', () => {
+            const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            if (selectedMethod === 'cash') {
+                if (isCashRewardActivePayment) {
+                    cashRideCountPayment = 0;
+                    isCashRewardActivePayment = false;
                 } else {
-                    cashRideCount++;
+                    cashRideCountPayment++;
                 }
-                localStorage.setItem('rapidcare_cash_rides', cashRideCount.toString());
+                localStorage.setItem('rapidcare_cash_rides', cashRideCountPayment.toString());
             }
 
-            alert('PAYMENT SUCCESSFUL!\n\nTransaction ID: RC' + Math.floor(Math.random() * 1000000) + '\nThank you for choosing RapidCare.');
-            updateCashRewardUI();
-            updateTotal();
-            // Return to overview
-            const overviewNav = document.querySelector('.nav-item[data-view="overview"]');
-            if (overviewNav) overviewNav.click();
+            alert('PAYMENT SUCCESSFUL!\n\nThank you for choosing RapidCare.\nYour bill is settled.');
+            updateCashRewardUIPayment();
+            updateTotalPayment();
+            // Return to dashboard overview
+            document.querySelector('.nav-item[data-view="overview"]')?.click();
         });
     }
 
-    paymentRadios.forEach(radio => {
+    payMethodsPay.forEach(radio => {
         radio.addEventListener('change', () => {
-            cardDetailsForm.style.display = 'none';
-            upiDetailsForm.style.display = 'none';
-            cashDetailsForm.style.display = 'none';
+            cardFormPay.style.display = 'none';
+            upiFormPay.style.display = 'none';
+            cashFormPay.style.display = 'none';
 
-            if (cardRadio.checked) cardDetailsForm.style.display = 'flex';
-            else if (upiRadio.checked) upiDetailsForm.style.display = 'flex';
-            else if (cashRadio.checked) cashDetailsForm.style.display = 'flex';
+            if (radio.value === 'card') cardFormPay.style.display = 'block';
+            else if (radio.value === 'upi') upiFormPay.style.display = 'block';
+            else if (radio.value === 'cash') cashFormPay.style.display = 'block';
             
-            updateTotal();
+            updateTotalPayment();
         });
     });
 
-    upiApps.forEach(app => {
+    upiAppsPay.forEach(app => {
         app.addEventListener('click', () => {
-            upiApps.forEach(a => a.classList.remove('selected'));
+            upiAppsPay.forEach(a => a.classList.remove('selected'));
             app.classList.add('selected');
         });
     });
 
-    function updateCashRewardUI() {
-        const ridesCompleted = Math.min(cashRideCount, 5);
-        isCashRewardActive = (cashRideCount >= 5);
+    function updateCashRewardUIPayment() {
+        const ridesCompleted = Math.min(cashRideCountPayment, 5);
+        isCashRewardActivePayment = (cashRideCountPayment >= 5);
 
-        if (cashProgressFill) {
-            const progress = isCashRewardActive ? 100 : (ridesCompleted / 5) * 100;
-            cashProgressFill.style.width = progress + '%';
+        if (cashFillPay) {
+            const progress = isCashRewardActivePayment ? 100 : (ridesCompleted / 5) * 100;
+            cashFillPay.style.width = progress + '%';
         }
 
-        if (cashRidesDots) {
-            const dots = cashRidesDots.querySelectorAll('.ride-dot');
-            dots.forEach(dot => {
-                const rideNum = parseInt(dot.getAttribute('data-ride'));
-                if (rideNum <= ridesCompleted) {
-                    dot.classList.add('completed');
-                } else if (rideNum === 6 && isCashRewardActive) {
-                    dot.classList.add('completed');
-                } else {
-                    dot.classList.remove('completed');
-                }
-            });
-        }
-
-        if (isCashRewardActive) {
-            if (cashStatus) cashStatus.style.display = 'none';
-            if (cashRewardUnlocked) cashRewardUnlocked.style.display = 'block';
-        } else {
-            if (cashStatus) cashStatus.style.display = 'block';
-            if (cashRewardUnlocked) cashRewardUnlocked.style.display = 'none';
-            const remaining = 5 - ridesCompleted;
-            if (cashRidesRemaining) cashRidesRemaining.textContent = remaining;
-            if (cashStatusText) {
-                cashStatusText.innerHTML = `Complete <strong id="cashRidesRemaining">${remaining}</strong> more cash ride${remaining !== 1 ? 's' : ''} to unlock free platform fee (₹40 saved!)`;
+        if (cashStatusTxtPay) {
+            if (isCashRewardActivePayment) {
+                cashStatusTxtPay.innerHTML = '<strong style="color: var(--primary-green);">Reward Unlocked!</strong> This ride\'s platform fee is waived.';
+            } else {
+                const remaining = 5 - ridesCompleted;
+                cashStatusTxtPay.textContent = `${remaining} more cash ride${remaining !== 1 ? 's' : ''} to unlock free platform fee!`;
             }
         }
     }
 
-    function updateTotal() {
+    function updateTotalPayment() {
+        const selectedMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
         let cashRewardDiscount = 0;
-        if (cashRadio && cashRadio.checked && isCashRewardActive) {
+        if (selectedMethod === 'cash' && isCashRewardActivePayment) {
             cashRewardDiscount = 40;
         }
 
-        let effectivePlatformCharge = platformCharge;
+        let effectivePlatformCharge = platformChargePayment;
         if (cashRewardDiscount > 0) effectivePlatformCharge = 0;
 
-        let subtotal = baseFare + equipmentCharge + effectivePlatformCharge;
+        let subtotal = baseFarePayment + equipmentChargePayment + effectivePlatformCharge;
         
         let rideDiscount = 0;
-        if (isHighValueApplied && (baseFare + equipmentCharge + platformCharge) > 600) {
+        if (isHighValueAppliedPayment && (baseFarePayment + equipmentChargePayment + platformChargePayment) > 600) {
             rideDiscount = 10;
-            if (rideDiscountRow) rideDiscountRow.style.display = 'flex';
+            if (rideDiscRowPay) rideDiscRowPay.style.display = 'flex';
         } else {
-            if (rideDiscountRow) rideDiscountRow.style.display = 'none';
+            if (rideDiscRowPay) rideDiscRowPay.style.display = 'none';
         }
 
         let bankDiscount = 0;
         let bankName = "";
         
-        if (cardRadio && cardRadio.checked && selectedBankOffer !== 'none') {
-            if (selectedBankOffer === 'hdfc') {
+        if (selectedMethod === 'card' && selectedBankOfferPayment !== 'none') {
+            if (selectedBankOfferPayment === 'hdfc') {
                 bankDiscount = Math.round((subtotal - rideDiscount) * 0.05);
                 bankName = "HDFC Bank (5% Off)";
-            } else if (selectedBankOffer === 'sbi') {
+            } else if (selectedBankOfferPayment === 'sbi') {
                 bankDiscount = Math.round((subtotal - rideDiscount) * 0.06);
                 bankName = "SBI Bank (6% Off)";
             }
         }
 
         if (bankDiscount > 0) {
-            if (bankDiscountName) bankDiscountName.textContent = bankName;
-            if (bankDiscountAmount) bankDiscountAmount.textContent = `-${bankDiscount} RS`;
-            if (bankDiscountRow) bankDiscountRow.style.display = 'flex';
+            if (bankDiscNamePay) bankDiscNamePay.textContent = bankName;
+            if (bankDiscAmtPay) bankDiscAmtPay.textContent = `-₹${bankDiscount}`;
+            if (bankDiscRowPay) bankDiscRowPay.style.display = 'flex';
         } else {
-            if (bankDiscountRow) bankDiscountRow.style.display = 'none';
+            if (bankDiscRowPay) bankDiscRowPay.style.display = 'none';
         }
 
-        if (cashRewardRow) {
-            cashRewardRow.style.display = (cashRewardDiscount > 0) ? 'flex' : 'none';
+        if (cashRowPay) {
+            cashRowPay.style.display = (cashRewardDiscount > 0) ? 'flex' : 'none';
         }
 
-        if (platformChargeDisplay) {
-            if (isPlatformFree || cashRewardDiscount > 0) {
-                platformChargeDisplay.innerHTML = '<del>40 RS</del> 0 RS';
-                if (firstRideLabel && isPlatformFree) firstRideLabel.style.display = 'inline';
+        if (platChargeDispPay) {
+            if (isPlatformFreePayment || cashRewardDiscount > 0) {
+                platChargeDispPay.innerHTML = '<del>₹40</del> ₹0';
+                if (firstRideLblPay && isPlatformFreePayment) firstRideLblPay.style.display = 'inline';
             } else {
-                platformChargeDisplay.textContent = '40 RS';
-                if (firstRideLabel) firstRideLabel.style.display = 'none';
+                platChargeDispPay.textContent = '₹40';
+                if (firstRideLblPay) firstRideLblPay.style.display = 'none';
             }
         }
 
-        const total = subtotal - rideDiscount - bankDiscount + donationAmount;
+        const total = subtotal - rideDiscount - bankDiscount + donationAmountPayment;
         
-        if (donationDisplay) donationDisplay.textContent = `${donationAmount} RS`;
-        if (totalDisplay) totalDisplay.textContent = `${total} RS`;
-        if (payableAmountDisplay) payableAmountDisplay.textContent = `payable amount-${total} RS`;
-        if (payBtnAmount) payBtnAmount.textContent = total;
+        if (donationDisplayPay) donationDisplayPay.textContent = `₹${donationAmountPayment}`;
+        if (totalDisplayPay) totalDisplayPay.textContent = `₹${total}`;
+        if (payableDisplayPay) payableDisplayPay.textContent = `Payable Amount: ₹${total}`;
+        if (payBtnAmtPay) payBtnAmtPay.textContent = total;
     }
 
-    updateCashRewardUI();
-    updateTotal();
+    updateCashRewardUIPayment();
+    updateTotalPayment();
 
     console.log('RapidCare Dashboard Initialized');
 });
