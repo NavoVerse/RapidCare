@@ -15,14 +15,14 @@
         </div>
 
         <nav class="nav-menu">
-            <a href="../patient_Dashboard/index.html?view=overview" class="nav-item">
+            <a href="../patient_Dashboard/index.html" class="nav-item">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
                 <span>Overview</span>
             </a>
-            <a href="../patient_Dashboard/index.html?view=details" class="nav-item">
+            <a href="#" class="nav-item">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -30,18 +30,12 @@
                 </svg>
                 <span>Details</span>
             </a>
-            <a href="../patient_Dashboard/index.html?view=tracking" class="nav-item">
+            <a href="#" class="nav-item">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                 </svg>
                 <span>Tracking</span>
-            </a>
-            <a href="../patient_Dashboard/index.html?view=insurance" class="nav-item">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                </svg>
-                <span>Insurance</span>
             </a>
             <a href="#" class="nav-item active">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -50,15 +44,7 @@
                 </svg>
                 <span>History</span>
             </a>
-            <a href="../analytics_interface/index.html" class="nav-item">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="20" x2="18" y2="10"></line>
-                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="14"></line>
-                </svg>
-                <span>Analytics</span>
-            </a>
-            <a href="../patient_Dashboard/index.html?view=payments" class="nav-item">
+            <a href="#" class="nav-item">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="2" y="5" width="20" height="14" rx="2" />
                     <line x1="2" y1="10" x2="22" y2="10" />
@@ -146,54 +132,6 @@
             </section>
         </div>
     </main>
-
-    <!-- Booking Modal -->
-    <div id="booking-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Schedule New Appointment</h3>
-                <span class="close-modal" id="close-booking-modal" onclick="closeBookingModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="booking-form" onsubmit="handleBookingSubmit(event)">
-                    <div class="form-group">
-                        <label>Doctor Name</label>
-                        <input type="text" id="book-doctor" placeholder="e.g. Dr. Sarah Mitchell" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Specialty</label>
-                        <input type="text" id="book-specialty" placeholder="e.g. Cardiology" required>
-                    </div>
-                    <div class="form-group-row">
-                        <div class="form-group">
-                            <label>Date</label>
-                            <input type="date" id="book-date" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Time</label>
-                            <input type="time" id="book-time" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Hospital/Clinic</label>
-                        <input type="text" id="book-hospital" placeholder="e.g. City General Hospital" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Appointment Type</label>
-                        <select id="book-type">
-                            <option value="Checkup">Regular Checkup</option>
-                            <option value="Consultation">Consultation</option>
-                            <option value="Follow-up">Follow-up Visit</option>
-                            <option value="Diagnostics">Diagnostics/Lab</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="primary-btn" style="width: 100%; margin-top: 20px; justify-content: center;">
-                        Confirm Booking
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <script src="script.js"></script>
 </body>

@@ -92,7 +92,6 @@ const themeToggle = document.getElementById('theme-toggle');
 
 let currentFilter = 'all';
 let searchQuery = '';
-let selectedRecordId = null; // Track current record for re-rendering
 
 // Initialize
 function init() {
@@ -150,7 +149,6 @@ function getTrend(currentValue, previousValue, type) {
 
 // Select Record and Update Detail Pane
 function selectRecord(id) {
-    selectedRecordId = id;
     const recordIndex = medicalRecords.findIndex(r => r.id === id);
     const record = medicalRecords[recordIndex];
     const prevRecord = medicalRecords[recordIndex + 1]; // Previous in time is next in array since it's sorted desc
@@ -267,7 +265,7 @@ function selectRecord(id) {
                             </div>
                         </div>
                     `).join('')}
-                    <div class="booking-card" onclick="openBookingModal()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; border-style: dashed; cursor: pointer; background: transparent;">
+                    <div class="booking-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; border-style: dashed; cursor: pointer; background: transparent;">
                         <span style="font-size: 24px; color: var(--primary-green);">+</span>
                         <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">New Booking</span>
                     </div>
@@ -323,42 +321,6 @@ function setupEventListeners() {
 function closeMobileDetail() {
     detailPane.classList.remove('mobile-active');
     document.querySelectorAll('.history-item').forEach(item => item.classList.remove('selected'));
-    selectedRecordId = null;
-}
-
-// Modal Functions
-function openBookingModal() {
-    document.getElementById('booking-modal').classList.add('active');
-}
-
-function closeBookingModal() {
-    document.getElementById('booking-modal').classList.remove('active');
-    document.getElementById('booking-form').reset();
-}
-
-function handleBookingSubmit(event) {
-    event.preventDefault();
-    
-    const newBooking = {
-        id: Date.now(),
-        doctor: document.getElementById('book-doctor').value,
-        specialty: document.getElementById('book-specialty').value,
-        date: document.getElementById('book-date').value,
-        time: document.getElementById('book-time').value,
-        hospital: document.getElementById('book-hospital').value,
-        type: document.getElementById('book-type').value
-    };
-
-    doctorBookings.unshift(newBooking); // Add to beginning of list
-    closeBookingModal();
-    
-    // Re-render the detail pane if a record is still selected
-    if (selectedRecordId) {
-        selectRecord(selectedRecordId);
-    }
-    
-    // Optional: Show success feedback
-    console.log('Booking confirmed:', newBooking);
 }
 
 window.addEventListener('resize', () => {
