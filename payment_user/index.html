@@ -6,11 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RapidCare Payment</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body>
 
     <div class="payment-container">
+        <div class="back-btn" id="backToDashboard" style="position: absolute; top: 30px; left: 30px; cursor: pointer; color: var(--text-muted); z-index: 1000; display: flex; align-items: center; gap: 8px; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--primary-green)'" onmouseout="this.style.color='var(--text-muted)'" onclick="window.location.href='../patient_Dashboard/index.html'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Back</span>
+        </div>
+
         <div class="theme-toggle" id="theme-toggle">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="5"></circle>
@@ -305,6 +314,54 @@
                 </div>
             </div>
             <button class="apply-modal-btn" id="applyDiscountsBtn">Apply Discounts</button>
+        </div>
+    </div>
+
+    <!-- Hidden Receipt for PDF Generation -->
+    <div id="receipt-template">
+        <div class="receipt-body">
+            <div class="receipt-header">
+                <div class="receipt-logo">RapidCare</div>
+                <div class="receipt-title">Official Assurance & Payment Receipt</div>
+            </div>
+            
+            <div class="receipt-details">
+                <div>
+                    <h3 style="margin-bottom: 10px; color: #15803d;">Patient Details</h3>
+                    <p><strong>Name:</strong> Samim Uddin Molla</p>
+                    <p><strong>User ID:</strong> RC-PAT-99210</p>
+                    <p><strong>Date:</strong> <span id="receiptDate"></span></p>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 10px; color: #15803d;">Trip Details</h3>
+                    <p><strong>Service:</strong> Emergency Ambulance</p>
+                    <p><strong>Distance:</strong> 5 km</p>
+                    <p><strong>Status:</strong> Payment Successful</p>
+                </div>
+            </div>
+
+            <table class="receipt-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th style="text-align: right;">Amount (RS)</th>
+                    </tr>
+                </thead>
+                <tbody id="receiptItems">
+                    <!-- Items populated by JS -->
+                </tbody>
+                <tfoot>
+                    <tr class="receipt-total-row">
+                        <td>Total Amount Paid</td>
+                        <td style="text-align: right;" id="receiptTotal">0 RS</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="assurance-seal">
+                ✅ RAPIDCARE ASSURED SERVICE
+                <p style="font-size: 12px; font-weight: normal; margin-top: 5px;">This is a digitally generated assurance certificate. RapidCare guarantees immediate medical assistance for this booking.</p>
+            </div>
         </div>
     </div>
 
