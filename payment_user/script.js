@@ -155,36 +155,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle Pay Now Button
     const payNowBtn = document.querySelector('.pay-now-btn');
-    payNowBtn.addEventListener('click', async () => {
-        // Validation check
-        const selectedMethod = document.querySelector('input[name="payment"]:checked').value;
-        if (selectedMethod === 'card') {
-            const inputs = cardDetailsForm.querySelectorAll('input');
-            let valid = true;
-            inputs.forEach(input => {
-                if (!input.value && input.type !== 'hidden') valid = false;
-            });
-            if (!valid) {
-                alert('Please fill in all card details.');
-                return;
-            }
-        }
-
-        // Processing state
-        payNowBtn.disabled = true;
-        payNowBtn.innerHTML = `
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin">
-                <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-            </svg>
-            Processing Payment...
-        `;
-
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
+    payNowBtn.addEventListener('click', () => {
         // If paying with cash, increment the ride counter
         if (cashRadio && cashRadio.checked) {
             if (isCashRewardActive) {
+                // Reward was used on this ride — reset counter
                 cashRideCount = 0;
                 isCashRewardActive = false;
             } else {
@@ -193,111 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('rapidcare_cash_rides', cashRideCount.toString());
         }
 
-        // Show Success Animation
-        showSuccessAnimation();
-
-        // Populate and Generate PDF
-        populateReceipt();
-        await generatePDF();
-
-        // Redirect after delay
-        setTimeout(() => {
-            window.location.href = '../patient_Dashboard/index.html';
-        }, 4000);
+        alert('PAYMENT SUCCESSFUL!\n\nTransaction ID: RC' + Math.floor(Math.random() * 1000000) + '\nThank you for choosing RapidCare.');
+        window.location.href = '../patient_Dashboard/index.html';
     });
-
-    function showSuccessAnimation() {
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.98);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.5s ease;
-        `;
-        overlay.innerHTML = `
-            <div style="width: 120px; height: 120px; border-radius: 50%; background: #15803d; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; animation: scaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-            </div>
-            <h2 style="color: #15803d; font-size: 2.5rem; margin-bottom: 10px;">Payment Successful!</h2>
-            <p style="color: #666; font-size: 1.2rem;">Generating your assurance receipt...</p>
-            <style>
-                @keyframes scaleUp { from { transform: scale(0); } to { transform: scale(1); } }
-                .animate-spin { animation: spin 1s linear infinite; }
-                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-            </style>
-        `;
-        document.body.appendChild(overlay);
-    }
-
-    function populateReceipt() {
-        const dateEl = document.getElementById('receiptDate');
-        const itemsEl = document.getElementById('receiptItems');
-        const totalEl = document.getElementById('receiptTotal');
-        
-        if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN', {
-            day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-        });
-
-        let html = '';
-        html += `<tr><td>Distance Charge (5 km)</td><td style="text-align: right;">350 RS</td></tr>`;
-        html += `<tr><td>Emergency Equipment</td><td style="text-align: right;">100 RS</td></tr>`;
-        
-        let effPlatform = isPlatformFree || (cashRadio && cashRadio.checked && isCashRewardActive) ? 0 : 40;
-        html += `<tr><td>Platform Charge</td><td style="text-align: right;">${effPlatform} RS</td></tr>`;
-
-        if (isHighValueApplied && (baseFare + equipmentCharge + platformCharge) > 600) {
-            html += `<tr style="color: #15803d;"><td>High Value Ride Discount</td><td style="text-align: right;">-10 RS</td></tr>`;
-        }
-
-        if (cardRadio.checked && selectedBankOffer !== 'none') {
-            let subtotal = baseFare + equipmentCharge + (isPlatformFree ? 0 : 40);
-            let rideDisc = isHighValueApplied ? 10 : 0;
-            let bankDisc = 0;
-            if (selectedBankOffer === 'hdfc') bankDisc = Math.round((subtotal - rideDisc) * 0.05);
-            else if (selectedBankOffer === 'sbi') bankDisc = Math.round((subtotal - rideDisc) * 0.06);
-            
-            if (bankDisc > 0) {
-                html += `<tr style="color: #15803d;"><td>Bank Offer (${selectedBankOffer.toUpperCase()})</td><td style="text-align: right;">-${bankDisc} RS</td></tr>`;
-            }
-        }
-
-        if (donationAmount > 0) {
-            html += `<tr><td>Donation to RapidCare Foundation</td><td style="text-align: right;">${donationAmount} RS</td></tr>`;
-        }
-
-        if (itemsEl) itemsEl.innerHTML = html;
-        if (totalEl) totalEl.textContent = totalDisplay.textContent;
-    }
-
-    async function generatePDF() {
-        const element = document.querySelector('.receipt-body');
-        const opt = {
-            margin: 0,
-            filename: 'RapidCare_Assurance_Receipt.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        
-        // Temporarily show the template for the library to capture it
-        const template = document.getElementById('receipt-template');
-        template.style.display = 'block';
-        
-        try {
-            await html2pdf().set(opt).from(element).save();
-        } catch (error) {
-            console.error('PDF generation failed:', error);
-        } finally {
-            template.style.display = 'none';
-        }
-    }
 
     // Handle Payment Method Toggle
     paymentRadios.forEach(radio => {
