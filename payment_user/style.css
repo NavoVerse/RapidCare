@@ -14,11 +14,10 @@ body {
     color: var(--text-main);
     display: flex;
     justify-content: center;
-    align-items: stretch;
-    height: 100vh;
+    align-items: center;
     min-height: 100vh;
-    overflow: hidden;
-    padding: 16px 24px;
+    overflow-x: hidden;
+    padding: 20px;
 }
 
 body.dark-mode {
@@ -36,17 +35,18 @@ body.dark-mode {
 
 .payment-container {
     background: var(--card-bg);
-    width: 100%;
-    max-width: 100%;
-    border-radius: 20px;
-    box-shadow: var(--shadow);
+    width: 90%;
+    max-width: 1400px;
+    min-height: 85vh;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
     text-align: center;
-    margin: 0 auto;
+    margin: 40px auto;
     display: flex;
     flex-direction: column;
     position: relative;
     overflow: hidden;
-    flex: 1;
+    animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .payment-content-wrapper {
@@ -60,9 +60,100 @@ body.dark-mode {
 
 .payment-content-inner {
     width: 100%;
-    max-width: 800px;
+    max-width: 1000px;
     display: flex;
     flex-direction: column;
+    margin: 0 auto;
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.4); }
+    70% { box-shadow: 0 0 0 20px rgba(21, 128, 61, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(21, 128, 61, 0); }
+}
+
+/* Receipt Styles for PDF */
+#receipt-template {
+    display: none;
+    position: fixed;
+    left: -9999px;
+    top: -9999px;
+}
+
+.receipt-body {
+    width: 800px;
+    padding: 60px;
+    background: white;
+    color: #1a1a1a;
+}
+
+.receipt-header {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 30px;
+}
+
+.receipt-logo {
+    font-size: 32px;
+    font-weight: 800;
+    color: #15803d;
+    margin-bottom: 10px;
+}
+
+.receipt-title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #666;
+}
+
+.receipt-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.receipt-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+}
+
+.receipt-table th {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 2px solid #f0f0f0;
+    color: #666;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.receipt-table td {
+    padding: 16px 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.receipt-total-row {
+    font-size: 20px;
+    font-weight: 700;
+    background: #f8fafc;
+}
+
+.assurance-seal {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    border: 2px solid #15803d;
+    border-radius: 12px;
+    color: #15803d;
+    font-weight: 700;
 }
 
 h1 {
