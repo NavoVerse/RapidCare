@@ -1,0 +1,53 @@
+:root {
+    /* Light Theme */
+    --bg-color: #ECEFF1;
+    --surface-color: #F5F7F8;
+    --primary-color: #191970;
+    --primary-text: #0D1117;
+    --secondary-text: #546E7A;
+    --accent-color: #D32F2F; /* Emergency Red */
+    --border-color: #CFD8DC;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --primary-hover: #121250;
+    --btn-text: #FFFFFF;
+    
+    /* SOS Button - Light Mode */
+    --sos-bg: #D32F2F;
+    --sos-text: #FFFFFF;
+    --sos-glow: rgba(211, 47, 47, 0.4);
+    
+    --transition-speed: 0.3s;
+}
+
+[data-theme="dark"] {
+    /* Dark Theme */
+    --bg-color: #121212;
+    --surface-color: #1E1E1E;
+    --primary-color: #191970;
+    --primary-text: #ECEFF1;
+    --secondary-text: #9E9E9E;
+    --accent-color: #00B0FF; /* Active Blue */
+    --border-color: #333333;
+    --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    --primary-hover: #2a2a8e;
+    --btn-text: #ECEFF1;
+    
+    /* Subtle border for primary buttons in dark mode */
+    --btn-border: 1px solid rgba(236, 239, 241, 0.2);
+    
+    /* SOS Button - Dark Mode */
+    --sos-bg: #FF5252; /* Brighter red for dark mode visibility */
+    --sos-text: #FFFFFF;
+    --sos-glow: rgba(255, 82, 82, 0.6);
+}
+
+/* Base Styles to ensure theme application */
+body {
+    background-color: var(--bg-color);
+    color: var(--primary-text);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.theme-transition {
+    transition: all var(--transition-speed) ease !important;
+}

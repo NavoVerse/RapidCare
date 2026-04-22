@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RapidCare | Driver Dashboard</title>
+    <link rel="stylesheet" href="../shared_assets/css/theme.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="../shared_assets/js/theme-manager.js"></script>
 </head>
-<body class="dark-theme">
+<body>
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -59,6 +61,7 @@
                     <h1>Dashboard</h1>
                 </div>
                 <div class="header-right">
+                    <div class="theme-toggle" id="theme-toggle"></div>
                     <div class="live-badge">
                         <span class="pulse-dot"></span>
                         LIVE

@@ -1,34 +1,20 @@
 :root {
-    --primary-green: #15803d;
-    --acc-green: #22c55e;
-    --bg-main: #f0fdf4;
-    --bg-card: #ffffff;
-    --text-main: #14532d;
-    --text-muted: #4d7c0f;
-    --border: #d1d5db;
-    
-    /* Semantic Colors */
+    /* Semantic Colors - Keep these as they are specific to Insurance flow */
     --semantic-green: #10b981;
-    --semantic-green-bg: #d1fae5;
+    --semantic-green-bg: var(--success-bg, #d1fae5);
     --semantic-amber: #f59e0b;
-    --semantic-amber-bg: #fef3c7;
+    --semantic-amber-bg: var(--warning-bg, #fef3c7);
     --semantic-red: #ef4444;
-    --semantic-red-bg: #fee2e2;
+    --semantic-red-bg: var(--error-bg, #fee2e2);
     --semantic-grey: #6b7280;
-    --semantic-grey-bg: #f3f4f6;
+    --semantic-grey-bg: rgba(107, 114, 128, 0.1);
 
     /* Card Design */
-    --card-border: 0.5px solid var(--border);
+    --card-border: 1px solid var(--border-color);
     --border-radius: 12px;
 }
 
-body.dark-mode {
-    --bg-main: #0f172a;
-    --bg-card: #1e293b;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --border: #334155;
-    
+[data-theme="dark"] :root {
     --semantic-green-bg: rgba(16, 185, 129, 0.15);
     --semantic-amber-bg: rgba(245, 158, 11, 0.15);
     --semantic-red-bg: rgba(239, 68, 68, 0.15);
@@ -43,8 +29,8 @@ body.dark-mode {
 }
 
 body {
-    background-color: var(--bg-main);
-    color: var(--text-main);
+    background-color: var(--bg-color);
+    color: var(--primary-text);
     min-height: 100vh;
 }
 
@@ -92,7 +78,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--bg-card);
+    background: var(--surface-color);
     padding: 24px;
     border-radius: var(--border-radius);
     border: var(--card-border);
@@ -112,10 +98,10 @@ body {
 
 .hospital-id {
     font-size: 14px;
-    color: var(--text-muted);
+    color: var(--secondary-text);
     font-weight: 500;
     padding-left: 16px;
-    border-left: 1px solid var(--border);
+    border-left: 1px solid var(--border-color);
 }
 
 .badge {
@@ -176,27 +162,27 @@ body {
 }
 
 .btn-primary {
-    background: var(--primary-green);
+    background: var(--primary-color);
     color: white;
     box-shadow: 0 1px 3px rgba(21, 128, 61, 0.2);
 }
 
 .btn-primary:hover {
-    background: var(--acc-green);
+    background: var(--accent-color);
     box-shadow: 0 4px 6px rgba(21, 128, 61, 0.3);
     transform: translateY(-1px);
 }
 
 .btn-outline {
     background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    color: var(--primary-text);
 }
 
 .btn-outline:hover {
-    border-color: var(--primary-green);
-    color: var(--primary-green);
-    background: var(--bg-main);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: var(--bg-color);
 }
 
 .btn-sm {
@@ -213,7 +199,7 @@ body {
 }
 
 .metric-card {
-    background: var(--bg-card);
+    background: var(--surface-color);
     padding: 20px;
     border-radius: var(--border-radius);
     border: var(--card-border);
@@ -224,7 +210,7 @@ body {
 
 .metric-card .label {
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--secondary-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-weight: 600;
@@ -233,7 +219,7 @@ body {
 .metric-card .value {
     font-size: 28px;
     font-weight: 700;
-    color: var(--text-main);
+    color: var(--primary-text);
 }
 
 /* Accordions */
@@ -244,7 +230,7 @@ body {
 }
 
 .accordion-item {
-    background: var(--bg-card);
+    background: var(--surface-color);
     border: var(--card-border);
     border-radius: var(--border-radius);
     overflow: hidden;
@@ -257,12 +243,12 @@ body {
     align-items: center;
     cursor: pointer;
     user-select: none;
-    background: var(--bg-card);
+    background: var(--surface-color);
     transition: background 0.2s ease;
 }
 
 .accordion-header:hover {
-    background: var(--bg-main);
+    background: var(--bg-color);
 }
 
 .accordion-title-area {
@@ -294,7 +280,7 @@ body {
 
 .accordion-title-text p {
     font-size: 13px;
-    color: var(--text-muted);
+    color: var(--secondary-text);
     margin-top: 4px;
 }
 
@@ -325,7 +311,7 @@ body {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-out;
-    background: var(--bg-card);
+    background: var(--surface-color);
 }
 
 .accordion-body {
@@ -361,7 +347,7 @@ body {
 
 .scheme-title p {
     font-size: 13px;
-    color: var(--text-muted);
+    color: var(--secondary-text);
     margin-top: 4px;
 }
 
@@ -379,7 +365,7 @@ body {
 
 .detail-label {
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--secondary-text);
     text-transform: uppercase;
 }
 
@@ -397,7 +383,7 @@ body {
     display: flex;
     justify-content: space-between;
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--secondary-text);
     margin-bottom: 6px;
 }
 
@@ -411,7 +397,7 @@ body {
 
 .progress-fill {
     height: 100%;
-    background: var(--primary-green);
+    background: var(--primary-color);
     border-radius: 3px;
 }
 
@@ -424,7 +410,7 @@ body {
 .section-divider {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--secondary-text);
     margin: 16px 0 12px;
     display: flex;
     align-items: center;
@@ -434,7 +420,7 @@ body {
     content: '';
     flex: 1;
     height: 1px;
-    background: var(--border);
+    background: var(--border-color);
     margin-left: 16px;
 }
 
@@ -442,9 +428,9 @@ body {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
-    border: 1px dashed var(--border);
+    border: 1px dashed var(--border-color);
     background: transparent;
-    color: var(--primary-green);
+    color: var(--primary-color);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -453,13 +439,13 @@ body {
 }
 
 .add-scheme-btn:hover {
-    border-color: var(--primary-green);
-    background: var(--bg-main);
+    border-color: var(--primary-color);
+    background: var(--bg-color);
 }
 
 /* Claim History Table */
 .claim-history {
-    background: var(--bg-card);
+    background: var(--surface-color);
     border-radius: var(--border-radius);
     border: var(--card-border);
     padding: 24px;
@@ -497,7 +483,7 @@ body {
 }
 
 .modal-content {
-    background: var(--bg-card);
+    background: var(--surface-color);
     width: 90%;
     max-width: 400px;
     border-radius: 12px;
@@ -528,7 +514,7 @@ body {
     border: none;
     font-size: 24px;
     cursor: pointer;
-    color: var(--text-muted);
+    color: var(--secondary-text);
 }
 
 .form-group {
@@ -541,33 +527,33 @@ body {
 .form-group label {
     font-size: 13px;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--secondary-text);
 }
 
 .form-group input,
 .form-group select {
     padding: 10px 12px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 14px;
-    background: var(--bg-main);
-    color: var(--text-main);
+    background: var(--bg-color);
+    color: var(--primary-text);
     appearance: auto;
 }
 
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: var(--primary-green);
+    border-color: var(--primary-color);
 }
 
-body.dark-mode .form-group input,
-body.dark-mode .form-group select {
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select {
     background: #0f172a;
 }
 
 .view-all {
-    color: var(--primary-green);
+    color: var(--primary-color);
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
@@ -586,10 +572,10 @@ th {
     text-align: left;
     padding: 12px;
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--secondary-text);
     text-transform: uppercase;
     font-weight: 600;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-color);
 }
 
 td {

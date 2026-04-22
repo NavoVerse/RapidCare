@@ -1,15 +1,16 @@
 :root {
-    --bg-dark: #121212;
-    --sidebar-bg: #1e1e1e;
-    --card-bg: #252525;
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
-    --accent-red: #ff4d4d;
+    --bg-dark: var(--bg-color);
+    --sidebar-bg: var(--surface-color);
+    --card-bg: var(--surface-color);
+    --inner-box-bg: var(--bg-color);
+    --text-primary: var(--primary-text);
+    --text-secondary: var(--secondary-text);
+    --accent-red: var(--primary-color);
     --accent-orange: #ff9f43;
     --accent-green: #2ecc71;
     --accent-blue: #3498db;
-    --border-color: #333333;
-    --hover-bg: #303030;
+    --border-color: var(--border-color);
+    --hover-bg: var(--bg-color);
     --sidebar-width: 260px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -248,6 +249,33 @@ body {
     font-weight: 700;
 }
 
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.theme-toggle {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--primary-text);
+    transition: var(--transition);
+}
+
+.theme-toggle:hover {
+    background: var(--hover-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+
 .live-badge {
     display: flex;
     align-items: center;
@@ -411,7 +439,8 @@ body {
 .patient-avatar {
     width: 50px;
     height: 50px;
-    background-color: #333;
+    background-color: var(--inner-box-bg);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -485,11 +514,11 @@ body {
 }
 
 .vital-item {
-    background-color: #1a1a1a;
+    background-color: var(--inner-box-bg);
     padding: 15px;
     border-radius: 12px;
     text-align: center;
-    border: 1px solid #333;
+    border: 1px solid var(--border-color);
 }
 
 .vital-value {
@@ -524,8 +553,8 @@ body {
 .btn-red { background-color: var(--accent-red); color: white; }
 .btn-red:hover { background-color: #ff3333; }
 
-.btn-dark { background-color: #333; color: white; }
-.btn-dark:hover { background-color: #444; }
+.btn-dark { background-color: var(--text-secondary); color: white; }
+.btn-dark:hover { filter: brightness(0.9); }
 
 .btn-green-outline {
     background-color: transparent;
@@ -538,7 +567,7 @@ body {
 
 /* Conditions Card */
 .conditions-card {
-    background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--inner-box-bg) 100%);
 }
 
 .conditions-header {
@@ -634,21 +663,21 @@ body {
 /* Live Navigation Card */
 .map-placeholder {
     height: 200px;
-    background-color: #1a1a1a;
+    background-color: var(--inner-box-bg);
     border-radius: 12px;
     position: relative;
     overflow: hidden;
     margin-bottom: 20px;
-    border: 1px solid #333;
+    border: 1px solid var(--border-color);
 }
 
 .map-grid {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-image: linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px);
+    background-image: linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
     background-size: 40px 40px;
-    opacity: 0.2;
+    opacity: 0.1;
 }
 
 .route-line {
@@ -774,10 +803,10 @@ body {
 }
 
 .queue-item {
-    background-color: #1a1a1a;
+    background-color: var(--inner-box-bg);
     padding: 15px;
     border-radius: 12px;
-    border: 1px solid #333;
+    border: 1px solid var(--border-color);
 }
 
 .item-header {
@@ -820,22 +849,29 @@ body {
 .emergency-sos-btn {
     width: 100%;
     padding: 18px;
-    background-color: transparent;
-    border: 2px solid var(--border-color);
+    background: var(--sos-bg);
+    border: none;
     border-radius: 16px;
-    color: white;
+    color: var(--sos-text);
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
     text-transform: uppercase;
     letter-spacing: 1px;
     transition: var(--transition);
+    box-shadow: 0 10px 20px var(--sos-glow);
+    animation: sos-pulse-driver 2s infinite;
 }
 
 .emergency-sos-btn:hover {
-    background-color: var(--accent-red);
-    border-color: var(--accent-red);
-    box-shadow: 0 0 20px rgba(255, 77, 77, 0.4);
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+@keyframes sos-pulse-driver {
+    0% { box-shadow: 0 0 0 0 var(--sos-glow); }
+    70% { box-shadow: 0 0 20px 10px var(--sos-glow); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
 }
 
 /* Animations */

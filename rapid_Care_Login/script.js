@@ -20,30 +20,26 @@ function showToast(message, type = 'info') {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Theme Toggle Logic
-    const themeToggles = document.querySelectorAll('.theme-toggle');
-    const body = document.body;
-    
-    // Check for saved theme
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        body.classList.add('dark-mode');
-        updateToggleIcons(true);
-    }
+    // Theme Toggle is now handled by shared_assets/js/theme-manager.js
 
-    themeToggles.forEach(toggle => {
-        toggle.addEventListener('click', () => {
-            const isDark = body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            updateToggleIcons(isDark);
+
+    // Toggle between Signup and Login
+    const signupView = document.getElementById('signup-view');
+    const loginView = document.getElementById('login-view');
+    const showLoginLink = document.getElementById('show-login');
+    const showSignupLink = document.getElementById('show-signup');
+
+    if (showLoginLink && showSignupLink && signupView && loginView) {
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupView.style.display = 'none';
+            loginView.style.display = 'block';
         });
-    });
 
-    function updateToggleIcons(isDark) {
-        themeToggles.forEach(toggle => {
-            toggle.innerHTML = isDark 
-                ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`
-                : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+        showSignupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginView.style.display = 'none';
+            signupView.style.display = 'block';
         });
     }
 
@@ -52,40 +48,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSlide = 0;
     const slideCount = slides.length;
 
-    if (slideCount === 0) return;
+    if (slideCount > 0) {
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
 
-    function nextSlide() {
-        slides[currentSlide].classList.remove('active');
-        dots[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slideCount;
 
-        currentSlide = (currentSlide + 1) % slideCount;
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
 
-        slides[currentSlide].classList.add('active');
-        dots[currentSlide].classList.add('active');
+        // Auto scroll every 5 seconds
+        setInterval(nextSlide, 5000);
     }
 
-    // Auto scroll every 5 seconds
-    setInterval(nextSlide, 5000);
+    // theme-manager.js handles the toggle logic automatically for .theme-toggle elements.
 
-    // Toggle between Signup and Login
-    const signupView = document.getElementById('signup-view');
-    const loginView = document.getElementById('login-view');
-    const showLoginLink = document.getElementById('show-login');
-    const showSignupLink = document.getElementById('show-signup');
-
-    showLoginLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        signupView.style.display = 'none';
-        loginView.style.display = 'block';
-    });
-
-    showSignupLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        loginView.style.display = 'none';
-        signupView.style.display = 'block';
-    });
-
-    // --- SIGNUP FORM ---
     const signupForm = signupView.querySelector('.login-form');
     signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
