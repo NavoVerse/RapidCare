@@ -19,7 +19,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
 }
 
 body {
@@ -27,6 +26,7 @@ body {
     color: var(--text-primary);
     height: 100vh;
     overflow: hidden;
+    font-family: var(--font-body);
 }
 
 .app-container {
@@ -47,9 +47,10 @@ body {
 }
 
 .logo-text {
+    font-family: 'Outfit', sans-serif;
     font-size: 24px;
     font-weight: 800;
-    color: var(--accent-red);
+    color: var(--primary-color);
     letter-spacing: -1px;
     margin-bottom: 30px;
     display: block;
