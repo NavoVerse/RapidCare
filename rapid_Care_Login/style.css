@@ -24,7 +24,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
 }
 
 body {
@@ -34,6 +33,7 @@ body {
     align-items: center;
     min-height: 100vh;
     color: var(--text-dark);
+    font-family: var(--font-body);
 }
 
 [data-theme="dark"] body {
