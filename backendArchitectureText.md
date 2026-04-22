@@ -921,7 +921,7 @@ RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxx
 DONE | Merge Auth Server + Dev Dashboard into single `Backend/server.js` | 🔴 High | 2 hours |
 DONE | Set up Knex.js with SQLite adapter | 🔴 High | 2 hours |
 DONE | Convert `schema.sql` into Knex migration files | 🔴 High | 3 hours |
-| Add Joi/Zod validation on existing auth routes | 🟡 Medium | 2 hours |
+DONE | Add Joi/Zod validation on existing auth routes | 🟡 Medium | 2 hours |
 | Add RBAC middleware (`authorize('patient')`, etc.) | 🟡 Medium | 2 hours |
 | Add `express-rate-limit` to auth endpoints | 🟡 Medium | 1 hour |
 | Move `.env` to `.gitignore`, rotate JWT secret | 🔴 High | 30 minutes |
