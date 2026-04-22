@@ -121,15 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check for view routing in URL (e.g. ?view=tracking)
     const urlParams = new URLSearchParams(window.location.search);
     const viewQuery = urlParams.get('view');
-    if (viewQuery) {
-        navItems.forEach(item => {
-            const label = item.querySelector('span');
-            if (label && label.textContent.trim().toLowerCase() === viewQuery.toLowerCase()) {
-                item.click();
-            }
-        });
-    }
-
     // Search bar focus effect
     const searchBarInput = document.querySelector('.search-bar input');
     const searchBarEl = document.querySelector('.search-bar');
@@ -1827,4 +1818,39 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     resizer.addEventListener('mousedown', mouseDownHandler);
+
+    // Redirect to Patient Profile in Details view when clicking user icons
+    const userIcons = document.querySelectorAll('.user-profile, .user-avatar-small');
+    userIcons.forEach(icon => {
+        icon.style.cursor = 'pointer';
+        icon.addEventListener('click', () => {
+            // 1. Manually trigger View Switching (Sync with sidebar)
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(nav => nav.classList.remove('active'));
+            const detailsBtn = document.querySelector('.nav-item[data-view="details"]');
+            if (detailsBtn) detailsBtn.classList.add('active');
+
+            const views = ['dashboard-view', 'details-view', 'tracking-view', 'insurance-view', 'analytics-view', 'history-view', 'payments-view'];
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            const detailsView = document.getElementById('details-view');
+            if (detailsView) detailsView.style.display = 'block';
+
+            // 2. Manually trigger Sub-Tab Switching inside Details
+            const subTabs = document.querySelectorAll('.sub-tab');
+            subTabs.forEach(t => t.classList.remove('active'));
+            const profileTab = document.querySelector('.sub-tab[data-tab="patient-profile"]');
+            if (profileTab) profileTab.classList.add('active');
+
+            const subTabContents = document.querySelectorAll('.sub-tab-content');
+            subTabContents.forEach(c => c.style.display = 'none');
+            const profileView = document.getElementById('patient-profile-view');
+            if (profileView) profileView.style.display = 'block';
+
+            // 3. Visual feedback & scroll
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
 });
