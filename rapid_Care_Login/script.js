@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000/api/auth';
+const API_BASE = 'http://localhost:5000/api/v1/auth';
 
 // --- Toast Notification System ---
 function showToast(message, type = 'info') {

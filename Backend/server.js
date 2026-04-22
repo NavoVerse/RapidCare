@@ -42,12 +42,11 @@ const authenticateToken = (req, res, next) => {
 };
 
 // =============================================================================
-// AUTH ROUTES  (/api/auth/*)
-// Legacy-compatible — keeps existing rapid_Care_Login/script.js working.
+// AUTH ROUTES  (/api/v1/auth/*)
 // =============================================================================
 
 // 1. Register New User
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/v1/auth/register', async (req, res) => {
     const { name, email, password, role, phone } = req.body;
     const db = getDb();
 
@@ -83,7 +82,7 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // 2. Login with Password
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/v1/auth/login', async (req, res) => {
     const { email, password } = req.body;
     const db = getDb();
 
@@ -114,7 +113,7 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // 3. Request OTP
-app.post('/api/auth/request-otp', async (req, res) => {
+app.post('/api/v1/auth/request-otp', async (req, res) => {
     const { email } = req.body;
     const db = getDb();
 
@@ -141,7 +140,7 @@ app.post('/api/auth/request-otp', async (req, res) => {
 });
 
 // 4. Verify OTP
-app.post('/api/auth/verify-otp', async (req, res) => {
+app.post('/api/v1/auth/verify-otp', async (req, res) => {
     const { email, otp } = req.body;
     const db = getDb();
 
@@ -177,7 +176,7 @@ app.post('/api/auth/verify-otp', async (req, res) => {
 });
 
 // 5. Get Profile (protected)
-app.get('/api/auth/profile', authenticateToken, async (req, res) => {
+app.get('/api/v1/auth/profile', authenticateToken, async (req, res) => {
     const db = getDb();
     try {
         const user = await db.get(
@@ -251,7 +250,7 @@ async function startServer() {
             console.log('╔══════════════════════════════════════════════╗');
             console.log(`║   RapidCare Unified Backend — Port ${PORT}      ║`);
             console.log('╠══════════════════════════════════════════════╣');
-            console.log(`║  Auth API :  http://localhost:${PORT}/api/auth  ║`);
+            console.log(`║  Auth API :  http://localhost:${PORT}/api/v1/auth  ║`);
             console.log(`║  Admin API:  http://localhost:${PORT}/api/data  ║`);
             console.log(`║  Dev Dash :  http://localhost:${PORT}/dev       ║`);
             console.log(`║  Health   :  http://localhost:${PORT}/health    ║`);
