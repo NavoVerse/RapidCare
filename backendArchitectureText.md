@@ -923,7 +923,7 @@ DONE | Set up Knex.js with SQLite adapter | 🔴 High | 2 hours |
 DONE | Convert `schema.sql` into Knex migration files | 🔴 High | 3 hours |
 DONE | Add Joi/Zod validation on existing auth routes | 🟡 Medium | 2 hours |
 DONE | Add RBAC middleware (`authorize('patient')`, etc.) | 🟡 Medium | 2 hours |
-| Add `express-rate-limit` to auth endpoints | 🟡 Medium | 1 hour |
+DONE | Add `express-rate-limit` to auth endpoints | 🟡 Medium | 1 hour |
 | Move `.env` to `.gitignore`, rotate JWT secret | 🔴 High | 30 minutes |
 DONE | Update `start_rapidcare.bat` to start single server | 🟡 Medium | 30 minutes |
 DONE | Update `rapid_Care_Login/script.js` to use `/api/v1/auth` | 🟡 Medium | 30 minutes |
