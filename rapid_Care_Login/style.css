@@ -1,32 +1,23 @@
 @import url('https://fonts.cdnfonts.com/css/blending');
 :root {
-    --primary-green: #15803d;
-    --acc-green: #22c55e;
+    --primary-green: var(--primary-color);
+    --acc-green: var(--accent-color);
     --primary-yellow: #facc15;
     --acc-yellow: #eab308;
-    --white: #ffffff;
+    --white: var(--surface-color);
     --pure-white: #ffffff;
-    --bg-light: #f0fdf4;
-    --text-dark: #14532d;
-    --text-muted: #4d7c0f;
-    --input-bg: #f9fafb;
-    --input-border: #d1d5db;
-    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --bg-light: var(--bg-color);
+    --text-dark: var(--primary-text);
+    --text-muted: var(--secondary-text);
+    --input-bg: var(--bg-color);
+    --input-border: var(--border-color);
+    --shadow: var(--card-shadow);
 }
 
-body.dark-mode {
-    --primary-green: #22c55e;
-    --acc-green: #4ade80;
+[data-theme="dark"] :root {
     --primary-yellow: #ca8a04;
     --acc-yellow: #eab308;
-    --white: #1e293b;
     --pure-white: #ffffff;
-    --bg-light: #0f172a;
-    --text-dark: #f8fafc;
-    --text-muted: #cbd5e1; /* Even lighter for better visibility */
-    --input-bg: #334155;
-    --input-border: #475569;
-    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -37,7 +28,7 @@ body.dark-mode {
 }
 
 body {
-    background: linear-gradient(135deg, #fef9c3 0%, var(--primary-yellow) 100%);
+    background: var(--bg-color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -45,8 +36,8 @@ body {
     color: var(--text-dark);
 }
 
-body.dark-mode {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+[data-theme="dark"] body {
+    background: var(--bg-color);
 }
 
 .container {
@@ -409,15 +400,15 @@ input::placeholder {
     width: 100%;
     margin-top: 30px;
     padding: 22px;
-    background: linear-gradient(135deg, #ef4444 0%, #ed0d0d 100%);
-    color: #ffffff;
+    background: var(--sos-bg);
+    color: var(--sos-text);
     border: none;
     border-radius: 15px;
     font-family: 'Inter', sans-serif;
     font-size: 22px;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 10px 30px var(--sos-glow);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     justify-content: center;
@@ -428,8 +419,8 @@ input::placeholder {
 }
 
 .sos-button:hover {
-    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
     filter: brightness(1.1);
+    transform: translateY(-2px);
 }
 
 .sos-button:active {
@@ -465,12 +456,12 @@ input::placeholder {
 
 @keyframes sos-pulse {
     0% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        box-shadow: 0 0 0 0 var(--sos-glow);
         transform: scale(1);
     }
 
     50% {
-        box-shadow: 0 0 25px 10px rgba(239, 68, 68, 0.5);
+        box-shadow: 0 0 25px 15px var(--sos-glow);
         transform: scale(1.03);
     }
 
