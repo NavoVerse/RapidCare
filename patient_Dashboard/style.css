@@ -40,7 +40,8 @@ body {
     background-color: var(--bg-main);
     color: var(--text-main);
     display: flex;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
 }
 
 /* Sidebar */
@@ -201,7 +202,8 @@ button#sidebar-toggle:hover {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow: hidden;
+    height: 100vh;
 }
 
 header {
@@ -215,6 +217,7 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
+    flex-shrink: 0;
 }
 
 .header-left {
@@ -2401,9 +2404,7 @@ body.dark-mode {
 /* ===========================
    INTEGRATED PAYMENT VIEW
    =========================== */
-#payments-view {
-    background: var(--bg-main);
-}
+
 
 .payment-container-integrated {
     background: var(--bg-card);
@@ -3609,23 +3610,113 @@ body.dark-mode .card-glass {
     }
 }
 
+#analytics-view, #history-view, 
+
+
+
+
+
+
+
+/* View Scrolling and Layout Rules */
+#dashboard-view,
+#details-view,
+#tracking-view,
+#insurance-view,
+#analytics-view,
+#payments-view {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+}
+
+#history-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
 #analytics-view, #history-view, #payments-view {
     background-color: var(--bg-main);
 }
 
-#history-view {
-    height: calc(100vh - 90px);
-    display: flex;
-    flex-direction: column;
-}
-
-#analytics-view {
-    /* Main content handles scrolling, just add padding if container lacks it, 
-       but .analytics-container handles it. */
-    width: 100%;
-}
-
 #payments-view {
-    padding: 32px; /* Match dashboard-container */
-    width: 100%;
+    padding: 32px;
+}
+
+
+
+/* Resizable Dashboard Cards */
+#dashboard-view .main-grid {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0; /* Let resizer provide the gap */
+}
+
+#dashboard-view .main-grid > .card:first-child {
+    flex: 0 0 auto;
+    width: 40%;
+    min-width: 300px;
+    max-width: 70%;
+}
+
+.resizer {
+    width: 24px;
+    cursor: col-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.resizer::after {
+    content: "";
+    width: 6px;
+    height: 48px;
+    background-color: var(--border);
+    border-radius: 10px;
+    transition: background-color 0.2s, height 0.2s;
+}
+
+.resizer:hover::after, .resizer.resizing::after {
+    background-color: var(--primary-green);
+    height: 60px;
+}
+
+#dashboard-view .main-grid > .card.tracking-card {
+    flex: 1;
+    min-width: 350px;
+    overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+    #dashboard-view .main-grid {
+        flex-direction: column;
+        gap: 24px;
+    }
+    #dashboard-view .main-grid > .card:first-child {
+        width: 100% !important;
+        max-width: 100%;
+    }
+    .resizer {
+        display: none;
+    }
+}
+
+
+/* Universal Tab Switching Animation */
+#dashboard-view,
+#details-view,
+#tracking-view,
+#insurance-view,
+#analytics-view,
+#history-view,
+#payments-view {
+    animation: fadeIn 0.4s ease forwards;
 }
