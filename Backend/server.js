@@ -41,6 +41,8 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+const { authorize } = require('./middleware/rbac');
+
 // ── Validation Middleware ─────────────────────────────────────────────────────
 const { validate } = require('./middleware/validate');
 const { 
@@ -181,7 +183,7 @@ app.post('/api/v1/auth/verify-otp', validate(verifyOtpSchema), async (req, res) 
 });
 
 // 5. Get Profile (protected)
-app.get('/api/v1/auth/profile', authenticateToken, async (req, res) => {
+app.get('/api/v1/auth/profile', authenticateToken, authorize('patient', 'driver', 'hospital', 'admin'), async (req, res) => {
     const db = getDb();
     try {
         const user = await db.get(
@@ -234,8 +236,8 @@ async function fetchDashboardData(res) {
 // Legacy endpoint (used by DeveloperDashboard/index.html when served at /dev)
 app.get('/api/data', (req, res) => fetchDashboardData(res));
 
-// Future-ready versioned endpoint
-app.get('/api/admin/data', authenticateToken, (req, res) => fetchDashboardData(res));
+// Future-ready versioned endpoint (Admin only)
+app.get('/api/admin/data', authenticateToken, authorize('admin'), (req, res) => fetchDashboardData(res));
 
 // =============================================================================
 // HEALTH CHECK
