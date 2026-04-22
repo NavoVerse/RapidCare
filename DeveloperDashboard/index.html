@@ -83,7 +83,8 @@
     <script>
         async function fetchData() {
             try {
-                const response = await fetch('/api/data');
+                // Uses the unified backend (port 5000) regardless of how this page is opened
+                const response = await fetch('http://localhost:5000/api/data');
                 const data = await response.json();
 
                 updateTable('patients-list', data.patients, (p) => `
