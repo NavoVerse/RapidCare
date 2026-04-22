@@ -21,7 +21,6 @@
 11. [Third-Party Integrations](#11-third-party-integrations)
 12. [Deployment Architecture](#12-deployment-architecture)
 13. [Phased Implementation Plan](#13-phased-implementation-plan)
-e
 ---
 
 ## 1. Executive Summary
