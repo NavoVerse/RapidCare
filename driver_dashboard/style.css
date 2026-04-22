@@ -467,9 +467,15 @@ body {
 }
 
 .priority-badge.critical {
-    background-color: rgba(255, 77, 77, 0.15);
-    color: var(--accent-red);
-    border: 1px solid rgba(255, 77, 77, 0.3);
+    background-color: rgba(255, 77, 77, 0.2);
+    color: #ff4d4d;
+    border: 1px solid rgba(255, 77, 77, 0.4);
+}
+
+[data-theme="dark"] .priority-badge.critical {
+    background-color: rgba(255, 82, 82, 0.25);
+    color: #ff8a80; /* Lighter red for dark background */
+    border-color: rgba(255, 82, 82, 0.5);
 }
 
 .activity-timeline {
@@ -552,10 +558,10 @@ body {
 }
 
 .btn-red { background-color: var(--accent-red); color: white; }
-.btn-red:hover { background-color: #ff3333; }
+.btn-red:hover { filter: brightness(1.2); }
 
-.btn-dark { background-color: var(--text-secondary); color: white; }
-.btn-dark:hover { filter: brightness(0.9); }
+.btn-dark { background-color: var(--accent-red); color: white; }
+.btn-dark:hover { filter: brightness(1.2); }
 
 .btn-green-outline {
     background-color: transparent;
