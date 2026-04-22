@@ -41,18 +41,23 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+// ── Validation Middleware ─────────────────────────────────────────────────────
+const { validate } = require('./middleware/validate');
+const { 
+    registerSchema, 
+    loginSchema, 
+    requestOtpSchema, 
+    verifyOtpSchema 
+} = require('./validators/auth.validator');
+
 // =============================================================================
 // AUTH ROUTES  (/api/v1/auth/*)
 // =============================================================================
 
 // 1. Register New User
-app.post('/api/v1/auth/register', async (req, res) => {
+app.post('/api/v1/auth/register', validate(registerSchema), async (req, res) => {
     const { name, email, password, role, phone } = req.body;
     const db = getDb();
-
-    if (!name || !email || !password || !role) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -82,7 +87,7 @@ app.post('/api/v1/auth/register', async (req, res) => {
 });
 
 // 2. Login with Password
-app.post('/api/v1/auth/login', async (req, res) => {
+app.post('/api/v1/auth/login', validate(loginSchema), async (req, res) => {
     const { email, password } = req.body;
     const db = getDb();
 
@@ -113,7 +118,7 @@ app.post('/api/v1/auth/login', async (req, res) => {
 });
 
 // 3. Request OTP
-app.post('/api/v1/auth/request-otp', async (req, res) => {
+app.post('/api/v1/auth/request-otp', validate(requestOtpSchema), async (req, res) => {
     const { email } = req.body;
     const db = getDb();
 
@@ -140,7 +145,7 @@ app.post('/api/v1/auth/request-otp', async (req, res) => {
 });
 
 // 4. Verify OTP
-app.post('/api/v1/auth/verify-otp', async (req, res) => {
+app.post('/api/v1/auth/verify-otp', validate(verifyOtpSchema), async (req, res) => {
     const { email, otp } = req.body;
     const db = getDb();
 
