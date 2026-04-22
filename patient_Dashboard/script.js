@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(analyticsView) analyticsView.style.display = 'block';
             } else if (label === 'History') {
                 if(historyView) historyView.style.display = 'flex';
-            } else if (label === 'Payments') {
+            } else if (label === 'Payment History') {
                 paymentsView.style.display = 'block';
             } else {
                 dashboardView.style.display = 'block';
@@ -1770,3 +1770,61 @@ window.addEventListener('resize', () => {
 });
 
 init();
+
+// Resizer Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const resizer = document.getElementById('dragMe');
+    if (!resizer) return;
+    
+    const leftSide = resizer.previousElementSibling;
+    const rightSide = resizer.nextElementSibling;
+
+    let x = 0;
+    let leftWidth = 0;
+
+    const mouseDownHandler = function (e) {
+        x = e.clientX;
+        leftWidth = leftSide.getBoundingClientRect().width;
+        
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+        
+        resizer.classList.add('resizing');
+        document.body.style.cursor = 'col-resize';
+        
+        leftSide.style.pointerEvents = 'none';
+        rightSide.style.pointerEvents = 'none';
+        leftSide.style.userSelect = 'none';
+        rightSide.style.userSelect = 'none';
+    };
+
+    const mouseMoveHandler = function (e) {
+        const dx = e.clientX - x;
+        const parentWidth = resizer.parentNode.getBoundingClientRect().width;
+        // Calculate new width in percentage to keep it responsive
+        const newLeftWidth = ((leftWidth + dx) * 100) / parentWidth;
+        
+        // Limits
+        if (newLeftWidth > 20 && newLeftWidth < 75) {
+            leftSide.style.width = newLeftWidth + '%';
+        }
+    };
+
+    const mouseUpHandler = function () {
+        resizer.classList.remove('resizing');
+        document.body.style.cursor = '';
+        
+        leftSide.style.pointerEvents = '';
+        rightSide.style.pointerEvents = '';
+        leftSide.style.userSelect = '';
+        rightSide.style.userSelect = '';
+
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+        
+        // Trigger resize event for map rendering if needed
+        window.dispatchEvent(new Event('resize'));
+    };
+
+    resizer.addEventListener('mousedown', mouseDownHandler);
+});
