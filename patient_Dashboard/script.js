@@ -1868,3 +1868,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resizer.addEventListener('mousedown', mouseDownHandler);
 });
+
+// Profile Dropdown Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const userProfileCard = document.getElementById('userProfileCard');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const profileChevron = document.getElementById('profileChevron');
+
+    if (userProfileCard && profileDropdown) {
+        userProfileCard.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isActive = profileDropdown.classList.contains('active');
+            
+            // Toggle dropdown
+            profileDropdown.classList.toggle('active');
+            
+            // Rotate chevron
+            if (profileChevron) {
+                profileChevron.style.transform = isActive ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            if (profileDropdown.classList.contains('active')) {
+                profileDropdown.classList.remove('active');
+                if (profileChevron) {
+                    profileChevron.style.transform = 'rotate(0deg)';
+                }
+            }
+        });
+
+        // Prevent closing when clicking inside the dropdown
+        profileDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Handle "View Profile" click within dropdown
+        const viewProfileItem = profileDropdown.querySelector('[data-view="details"]');
+        if (viewProfileItem) {
+            viewProfileItem.addEventListener('click', () => {
+                // Switch to Details view
+                const detailsLink = document.querySelector('.nav-link[data-view="details"]');
+                if (detailsLink) detailsLink.click();
+                
+                // Activate Profile sub-tab
+                const profileTab = document.querySelector('.sub-tab[data-tab="profile"]');
+                if (profileTab) profileTab.click();
+                
+                profileDropdown.classList.remove('active');
+                if (profileChevron) profileChevron.style.transform = 'rotate(0deg)';
+            });
+        }
+    }
+});
