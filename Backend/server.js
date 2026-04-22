@@ -52,6 +52,12 @@ const {
     verifyOtpSchema 
 } = require('./validators/auth.validator');
 
+// ── Rate Limiting Middleware ──────────────────────────────────────────────────
+const { generalLimiter, loginLimiter, otpLimiter } = require('./middleware/rateLimiter');
+
+// Apply general limiter to all auth routes
+app.use('/api/v1/auth', generalLimiter);
+
 // =============================================================================
 // AUTH ROUTES  (/api/v1/auth/*)
 // =============================================================================
@@ -89,7 +95,7 @@ app.post('/api/v1/auth/register', validate(registerSchema), async (req, res) => 
 });
 
 // 2. Login with Password
-app.post('/api/v1/auth/login', validate(loginSchema), async (req, res) => {
+app.post('/api/v1/auth/login', loginLimiter, validate(loginSchema), async (req, res) => {
     const { email, password } = req.body;
     const db = getDb();
 
@@ -120,7 +126,7 @@ app.post('/api/v1/auth/login', validate(loginSchema), async (req, res) => {
 });
 
 // 3. Request OTP
-app.post('/api/v1/auth/request-otp', validate(requestOtpSchema), async (req, res) => {
+app.post('/api/v1/auth/request-otp', otpLimiter, validate(requestOtpSchema), async (req, res) => {
     const { email } = req.body;
     const db = getDb();
 
