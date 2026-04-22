@@ -54,7 +54,7 @@
                 </svg>
                 <span>Insurance</span>
             </a>
-            <a href="../analytics_interface/index.html" class="nav-item">
+            <a href="#" class="nav-item" data-view="analytics">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -63,7 +63,7 @@
                 </svg>
                 <span>Analytics</span>
             </a>
-            <a href="../history_patient/index.html" class="nav-item">
+            <a href="#" class="nav-item" data-view="history">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -110,7 +110,7 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" placeholder="Search for hospitals, routes...">
+                    <input type="text" id="history-search" placeholder="Search for hospitals, routes, records...">
                 </div>
             </div>
             <div class="header-right">
@@ -1272,8 +1272,363 @@
             </div>
         </div>
 
+        
+        <div id="analytics-view" style="display: none;">
+            <div class="analytics-container">
+            <!-- Top Metrics Row -->
+            <div class="metrics-grid">
+                <div class="metric-card card-glass">
+                    <div class="metric-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <span class="label">Average response time</span>
+                        <div class="value-row">
+                            <span class="value" id="val-response">11.4</span>
+                            <span class="unit">min</span>
+                            <span class="trend up">↓ 8% faster</span>
+                        </div>
+                        <div class="mini-chart">
+                            <svg viewBox="0 0 100 30" class="sparkline" preserveAspectRatio="none" style="width: 100%; height: 100%;">
+                                <path d="M 0,20 C 15,20 15,8 30,8 C 45,8 45,22 60,22 C 75,22 75,12 100,12" fill="none" stroke="var(--primary-green)" stroke-width="2"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card card-glass">
+                    <div class="metric-icon blue">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <span class="label">Health safety score</span>
+                        <div class="value-row">
+                            <span class="value" id="val-safety">88</span>
+                            <span class="unit">/100</span>
+                            <span class="points">+3 pts</span>
+                        </div>
+                        <div class="mini-chart">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 88%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card card-glass">
+                    <div class="metric-icon red">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <span class="label">Total emergency distance</span>
+                        <div class="value-row">
+                            <span class="value" id="val-distance">142</span>
+                            <span class="unit">km</span>
+                        </div>
+                        <div class="mini-chart">
+                            <svg viewBox="0 0 100 30" class="sparkline" preserveAspectRatio="none" style="width: 100%; height: 100%;">
+                                <path d="M0,20 L20,18 L40,22 L60,15 L80,25 L100,10" fill="none" stroke="#ef4444" stroke-width="2"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Charts Section -->
+            <div class="main-grid">
+                <div class="chart-container card-heavy">
+                    <div class="container-header">
+                        <h2>Vitals history</h2>
+                        <div class="patient-context">
+                            <span>Last 30 days - Patient: Samim Uddin Molla</span>
+                        </div>
+                    </div>
+                    
+                    <div class="vitals-dashboard">
+                        <div class="vital-row">
+                            <div class="vital-header">
+                                <span class="dot heart"></span>
+                                <span class="vital-name">Heart rate</span>
+                                <div class="vital-stat">
+                                    <span class="v-val" id="val-hr">82</span>
+                                    <span class="v-unit">bpm</span>
+                                    <span class="v-ref">Normal: 60-100</span>
+                                </div>
+                            </div>
+                            <div class="v-bar-container">
+                                <div class="v-bar heart" id="bar-hr" style="width: 75%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="vital-row">
+                            <div class="vital-header">
+                                <span class="dot bp"></span>
+                                <span class="vital-name">Blood pressure</span>
+                                <div class="vital-stat">
+                                    <span class="v-val" id="val-bp">118/76</span>
+                                    <span class="v-unit">mmHg</span>
+                                    <span class="v-ref">Optimal</span>
+                                </div>
+                            </div>
+                            <div class="v-bar-container">
+                                <div class="v-bar bp" id="bar-bp" style="width: 65%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="vital-row">
+                            <div class="vital-header">
+                                <span class="dot oxygen"></span>
+                                <span class="vital-name">Oxygen saturation</span>
+                                <div class="vital-stat">
+                                    <span class="v-val" id="val-o2">98</span>
+                                    <span class="v-unit">%</span>
+                                    <span class="v-ref">Excellent: 95-100</span>
+                                </div>
+                            </div>
+                            <div class="v-bar-container">
+                                <div class="v-bar oxygen" id="bar-o2" style="width: 95%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="main-line-chart">
+                            <svg viewBox="0 0 800 200" class="primary-chart" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="chartGrade" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="var(--primary-green)" stop-opacity="0.1"></stop>
+                                        <stop offset="100%" stop-color="var(--primary-green)" stop-opacity="0"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M 0,150 C 50,150 50,140 100,140 C 150,140 150,160 200,160 C 250,160 250,145 300,145 C 350,145 350,155 400,155 C 450,155 450,130 500,130 C 550,130 550,140 600,140 C 650,140 650,150 700,150 C 750,150 750,135 800,135" fill="none" stroke="var(--primary-green)" stroke-width="3"></path>
+                                <path d="M 0,150 C 50,150 50,140 100,140 C 150,140 150,160 200,160 C 250,160 250,145 300,145 C 350,145 350,155 400,155 C 450,155 450,130 500,130 C 550,130 550,140 600,140 C 650,140 650,150 700,150 C 750,150 750,135 800,135 L 800,200 L 0,200 Z" fill="url(#chartGrade)"></path>
+                            </svg>
+                            <div class="chart-labels">
+                                <span>W1</span>
+                                <span>W2</span>
+                                <span>W3</span>
+                                <span>W4</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="side-panel">
+                    <div class="status-card card-heavy">
+                        <h3>Service quality</h3>
+                        <div class="circular-progress">
+                            <svg viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="45" class="bg"></circle>
+                                <circle cx="50" cy="50" r="45" class="fg" style="stroke-dasharray: 282.7; stroke-dashoffset: 28;"></circle>
+                            </svg>
+                            <div class="progress-val">
+                                <span>94%</span>
+                                <small>Fast accepted</small>
+                            </div>
+                        </div>
+                        <div class="stat-footer">
+                            <strong>47 of 50</strong>
+                            <p>Responses within target</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Utilization Section -->
+            <div class="utilization-section card-heavy">
+                <div class="container-header">
+                    <div class="title-group">
+                        <h2>Financial utilization - last 7 incidents</h2>
+                        <div class="chart-legend">
+                            <span class="l-item"><span class="l-dot insurance"></span> Insurance coverage</span>
+                            <span class="l-item"><span class="l-dot out-of-pocket"></span> Out-of-pocket spending</span>
+                        </div>
+                    </div>
+                    <a href="../patient_Dashboard/index.html?view=insurance" class="view-link">Claim History →</a>
+                </div>
+                <div class="utilization-bars">
+                    <div class="chart-grid-lines">
+                        <span></span><span></span><span></span><span></span>
+                    </div>
+                    <div class="u-bar-group">
+                        <div class="u-tooltip">₹2.4k Cov | ₹0.6k Out</div>
+                        <div class="u-bars-wrapper">
+                            <div class="u-bar insurance" style="height: 60%;"></div>
+                            <div class="u-bar out-of-pocket" style="height: 15%;"></div>
+                        </div>
+                        <span>Inc 1</span>
+                    </div>
+                    <div class="u-bar-group">
+                        <div class="u-tooltip">₹1.8k Cov | ₹0.9k Out</div>
+                        <div class="u-bars-wrapper">
+                            <div class="u-bar insurance" style="height: 45%;"></div>
+                            <div class="u-bar out-of-pocket" style="height: 25%;"></div>
+                        </div>
+                        <span>Inc 2</span>
+                    </div>
+                    <div class="u-bar-group">
+                        <div class="u-tooltip">₹5.2k Cov | ₹0.4k Out</div>
+                        <div class="u-bars-wrapper">
+                            <div class="u-bar insurance" style="height: 85%;"></div>
+                            <div class="u-bar out-of-pocket" style="height: 10%;"></div>
+                        </div>
+                        <span>Inc 3</span>
+                    </div>
+                    <div class="u-bar-group">
+                        <div class="u-tooltip">₹2.1k Cov | ₹2.0k Out</div>
+                        <div class="u-bars-wrapper">
+                            <div class="u-bar insurance" style="height: 35%;"></div>
+                            <div class="u-bar out-of-pocket" style="height: 32%;"></div>
+                        </div>
+                        <span>Inc 4</span>
+                    </div>
+                    <div class="u-bar-group">
+                        <div class="u-tooltip">₹4.5k Cov | ₹0.5k Out</div>
+                        <div class="u-bars-wrapper">
+                            <div class="u-bar insurance" style="height: 75%;"></div>
+                            <div class="u-bar out-of-pocket" style="height: 12%;"></div>
+                        </div>
+                        <span>Inc 5</span>
+                    </div>
+                    <div class="u-bar-group">
+                        <div class="u-tooltip">₹3.8k Cov | ₹1.2k Out</div>
+                        <div class="u-bars-wrapper">
+                            <div class="u-bar insurance" style="height: 55%;"></div>
+                            <div class="u-bar out-of-pocket" style="height: 20%;"></div>
+                        </div>
+                        <span>Inc 6</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        </div>
+        <!-- Simulation Modal -->
+    <div class="modal-overlay" id="simModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Simulate Data Edit</h2>
+                <button class="close-btn" onclick="closeSimModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Edit vitals to see how the intelligence dashboard reacts in real-time.</p>
+                <div class="form-group">
+                    <label>Heart Rate (bpm)</label>
+                    <input type="number" id="input-hr" value="82">
+                </div>
+                <div class="form-group">
+                    <label>Blood Pressure (Systolic)</label>
+                    <input type="number" id="input-bp" value="118">
+                </div>
+                <div class="form-group">
+                    <label>Safety Score (0-100)</label>
+                    <input type="range" id="input-safety" min="0" max="100" value="88">
+                </div>
+                <button class="primary-btn" onclick="applySimulation()" style="width: 100%; margin-top: 20px;">
+                    Apply & Update Analytics
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+        
+        <div id="history-view" style="display: none;">
+            <div class="history-container">
+            <!-- Timeline Pane -->
+            <section class="timeline-pane">
+                <div class="pane-header">
+                    <h3>Medical Records</h3>
+                    <span id="record-count" style="font-size: 12px; color: var(--text-muted);">8 Records</span>
+                </div>
+                <div class="filters-row">
+                    <span class="filter-chip active" data-filter="all">All Visits</span>
+                    <span class="filter-chip" data-filter="cardiology">Cardiology</span>
+                    <span class="filter-chip" data-filter="general">General</span>
+                    <span class="filter-chip" data-filter="lab">Lab Results</span>
+                </div>
+                <div class="history-list" id="history-list">
+                    <!-- History Items will be injected here -->
+                </div>
+            </section>
+
+            <!-- Detail Pane -->
+            <section class="detail-pane" id="detail-pane">
+                <div id="no-selection" style="text-align: center; margin-top: 100px; color: var(--text-muted);">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom: 20px;">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <p>Select a medical record to view details</p>
+                </div>
+                <div id="detail-content" style="display: none;">
+                    <!-- Detail content will be injected here -->
+                </div>
+            </section>
+        </div>
+    
+        </div>
+        <!-- Booking Modal -->
+    <div id="booking-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Schedule New Appointment</h3>
+                <span class="close-modal" id="close-booking-modal" onclick="closeBookingModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="booking-form" onsubmit="handleBookingSubmit(event)">
+                    <div class="form-group">
+                        <label>Doctor Name</label>
+                        <input type="text" id="book-doctor" placeholder="e.g. Dr. Sarah Mitchell" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Specialty</label>
+                        <input type="text" id="book-specialty" placeholder="e.g. Cardiology" required>
+                    </div>
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="book-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Time</label>
+                            <input type="time" id="book-time" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Hospital/Clinic</label>
+                        <input type="text" id="book-hospital" placeholder="e.g. City General Hospital" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Appointment Type</label>
+                        <select id="book-type">
+                            <option value="Checkup">Regular Checkup</option>
+                            <option value="Consultation">Consultation</option>
+                            <option value="Follow-up">Follow-up Visit</option>
+                            <option value="Diagnostics">Diagnostics/Lab</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="primary-btn" style="width: 100%; margin-top: 20px; justify-content: center;">
+                        Confirm Booking
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+
         <!-- Payment View -->
-        <div id="payments-view" style="display: none; padding: 24px; flex-grow: 1; overflow-y: auto;">
+        <div id="payments-view" style="display: none;">
             <div class="payment-container-integrated">
                 <div class="payment-content-inner">
                     <h1 class="payment-title">RapidCare Payment Service</h1>
