@@ -9,27 +9,24 @@ echo         RAPIDCARE SYSTEM INITIALIZER
 echo ==================================================
 echo.
 
-:: Start Auth Backend
-echo [1/3] Starting Auth Backend (Port 5000)...
-cd "Backend\user_Registration_Login_System"
-start "RapidCare Auth Backend" cmd /c "node server.js"
-cd /d "%ROOT_DIR%"
-
-:: Start Developer Dashboard
-echo [2/3] Starting Developer Dashboard (Port 3000)...
-cd "DeveloperDashboard"
-start "RapidCare Dev Dashboard" cmd /c "node server.js"
+:: Start Unified Backend (Auth + Dev Dashboard on Port 5000)
+echo [1/2] Starting Unified Backend (Port 5000)...
+cd "Backend"
+start "RapidCare Backend" cmd /c "node server.js"
 cd /d "%ROOT_DIR%"
 
 :: Open Frontend
-echo [3/3] Launching App Entry Point...
+echo [2/2] Launching App Entry Point...
 timeout /t 2 >nul
 start "" "choose_User\index.html"
 
 echo.
 echo ==================================================
-echo   System running. Close the terminal windows
-echo   to stop the servers.
+echo   Unified backend running on http://localhost:5000
+echo   Dev Dashboard: http://localhost:5000/dev
+echo   Auth API:      http://localhost:5000/api/auth
+echo.
+echo   Close the backend terminal window to stop.
 echo ==================================================
 echo.
 pause
