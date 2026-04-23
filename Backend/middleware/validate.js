@@ -11,14 +11,19 @@ const validate = (schema) => {
             req.body = schema.parse(req.body);
             next();
         } catch (error) {
-            if (error instanceof z.ZodError) {
+            // Check for Zod error structure safely
+            if (error && error.errors) {
                 // Return 400 Bad Request with formatted error messages
                 const errors = error.errors.map(err => ({
-                    field: err.path.join('.'),
+                    field: err.path ? err.path.join('.') : 'unknown',
                     message: err.message
                 }));
+                
+                // Concatenate messages so the frontend can display them directly
+                const errorMsg = errors.map(e => e.message).join(', ');
+                
                 return res.status(400).json({ 
-                    error: 'Validation failed', 
+                    error: errorMsg, 
                     details: errors 
                 });
             }
