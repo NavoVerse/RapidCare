@@ -1,23 +1,45 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Outfit:wght@300;400;500;600;700&display=swap');
-@import 'theme.css';
-
 :root {
-    --accent-blue: #3b82f6;
-    --accent-emerald: #10b981;
-    --glass-bg: rgba(15, 23, 42, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.05);
+    --accent-blue: var(--primary-color);
+    --accent-emerald: var(--accent-color);
+    --glass-bg: var(--surface-color);
+    --glass-border: var(--border-color);
 }
+
+.theme-toggle {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: rotate(15deg) scale(1.1);
+    box-shadow: var(--shadow-md);
+    background: var(--bg-color);
+}
+
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: var(--font-family);
 }
 
 body {
-    background: var(--body-bg);
-    color: var(--text-dark);
+    background: var(--bg-color);
+    color: var(--primary-text);
     min-height: 100vh;
     padding: 20px 0;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -31,7 +53,7 @@ body {
 }
 
 .brand-title {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 3rem;
     font-weight: 800;
     color: var(--accent-emerald);
@@ -42,16 +64,17 @@ body {
 .brand-divider {
     width: 60px;
     height: 4px;
-    background: var(--primary-yellow);
+    background: var(--accent-color);
     margin: 10px auto;
     border-radius: 2px;
 }
 
 .brand-quote {
-    font-size: 1.1rem;
-    color: var(--text-muted);
+    font-family: var(--font-caption);
+    font-size: 0.9rem;
+    color: var(--secondary-text);
     font-style: italic;
-    font-weight: 300;
+    font-weight: 400;
     letter-spacing: 1px;
 }
 
@@ -83,7 +106,7 @@ body {
 .step-label {
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--secondary-text);
     text-transform: uppercase;
     letter-spacing: 1.5px;
     transition: all 0.3s ease;
@@ -110,17 +133,17 @@ body {
 }
 
 .step-item:hover .step-label {
-    color: var(--text-dark);
+    color: var(--primary-text);
     transform: translateY(-2px);
 }
 
 /* Premium Container */
 .premium-container {
-    background: var(--white);
+    background: var(--surface-color);
     border-radius: 30px;
     padding: 50px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--glass-border);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
     backdrop-filter: blur(10px);
     animation: scaleIn 0.6s ease-out;
 }
@@ -136,14 +159,14 @@ body {
 
 .section-header {
     margin-bottom: 40px;
-    border-bottom: 1px solid var(--input-border);
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 20px;
 }
 
 .section-header h2 {
     font-size: 1.3rem;
     font-weight: 700;
-    color: var(--text-dark);
+    color: var(--primary-text);
     display: flex;
     align-items: center;
     gap: 15px;
@@ -180,7 +203,7 @@ body {
 label {
     display: block;
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--secondary-text);
     margin-bottom: 10px;
     font-weight: 500;
     transition: all 0.3s ease;
@@ -189,7 +212,7 @@ label {
 input, select, textarea {
     width: 100%;
     padding: 16px 20px;
-    background: rgba(30, 41, 59, 0.5);
+    background: var(--surface-color);
     border: 1px solid #334155;
     border-radius: 12px;
     color: #f8fafc;
@@ -217,7 +240,7 @@ input:focus + label, select:focus + label {
 }
 
 .infra-item {
-    background: rgba(30, 41, 59, 0.3);
+    background: var(--surface-color);
     padding: 20px;
     border-radius: 15px;
     border: 1px solid var(--glass-border);
@@ -228,7 +251,7 @@ input:focus + label, select:focus + label {
 }
 
 .infra-item:hover {
-    background: rgba(30, 41, 59, 0.6);
+    background: var(--bg-color);
     border-color: var(--accent-emerald);
     transform: scale(1.02);
 }
@@ -323,14 +346,14 @@ input:focus + label, select:focus + label {
     padding: 16px 40px;
     background: transparent;
     border: 1px solid #334155;
-    color: var(--text-muted);
+    color: var(--secondary-text);
     border-radius: 12px;
     cursor: pointer;
 }
 
 .btn-prev:hover {
-    border-color: var(--text-dark);
-    color: var(--text-dark);
+    border-color: var(--primary-text);
+    color: var(--primary-text);
 }
 
 .submit-full-btn {
@@ -355,7 +378,7 @@ input:focus + label, select:focus + label {
 .mt-40 { margin-top: 40px; }
 .divider-line {
     height: 1px;
-    background: var(--input-border);
+    background: var(--border-color);
     margin: 40px 0;
 }
 

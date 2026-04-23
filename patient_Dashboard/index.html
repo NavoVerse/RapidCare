@@ -6,11 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RapidCare Dashboard</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="../shared_assets/css/theme.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap"
         rel="stylesheet">
+    <script src="../shared_assets/js/theme-manager.js"></script>
 </head>
 
 <body>
@@ -81,16 +82,33 @@
             </a>
         </nav>
 
-        <div class="user-profile">
+        <div class="user-profile" id="userProfileCard">
             <img src="samim_profile.jpg" alt="Samim Uddin" class="user-avatar" style="object-fit: cover;">
             <div class="user-info">
                 <h4>Samim Uddin Molla</h4>
                 <p>Patient (Premium)</p>
             </div>
-            <svg style="margin-left: auto; color: var(--text-muted);" width="16" height="16" viewBox="0 0 24 24"
+            <svg id="profileChevron" style="margin-left: auto; color: var(--text-muted); transition: transform 0.3s ease;" width="16" height="16" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M6 9l6 6 6-6"></path>
             </svg>
+            
+            <!-- Profile Dropdown Menu -->
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-item" data-view="details" data-tab="profile">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span>View Profile</span>
+                </div>
+                <div class="dropdown-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    <span>Settings</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item logout" onclick="window.location.href='../choose_User/index.html'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <span>Logout</span>
+                </div>
+            </div>
         </div>
     </aside>
 
@@ -116,18 +134,6 @@
             <div class="header-right">
                 <div class="icon-btn theme-toggle" id="theme-toggle">
                     <!-- Sun/Moon icon will be swapped by JS -->
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        class="sun-icon">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                    </svg>
                 </div>
                 <div class="icon-btn notification-btn">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -382,36 +388,35 @@
                                         <div class="icon">❤️</div>
                                         <div class="text">
                                             <label>chronic disease</label>
-                                            <p>IHD, Obesity, Chronic thyroid disorder</p>
+                                            <p id="hist-chronic">IHD, Obesity, Chronic thyroid disorder</p>
                                         </div>
                                     </div>
                                     <div class="history-item">
                                         <div class="icon">💧</div>
                                         <div class="text">
                                             <label>Diabetes Emergencies</label>
-                                            <p>Diabetic Ketoacidosis</p>
+                                            <p id="hist-emergencies">Diabetic Ketoacidosis</p>
                                         </div>
                                     </div>
                                     <div class="history-item">
                                         <div class="icon">⚙️</div>
                                         <div class="text">
                                             <label>Surgery</label>
-                                            <p>Liposuction</p>
+                                            <p id="hist-surgery">Liposuction</p>
                                         </div>
                                     </div>
                                     <div class="history-item">
                                         <div class="icon">👥</div>
                                         <div class="text">
                                             <label>Family disease</label>
-                                            <p>Obesity (Father)</p>
+                                            <p id="hist-family">Obesity (Father)</p>
                                         </div>
                                     </div>
                                     <div class="history-full-width">
                                         <div class="icon">🩸</div>
                                         <div class="text">
                                             <label>Diabetes related complication</label>
-                                            <p>Nephropathy, Neuropathy, Retinopathy, Diabetic foot, Sexual dysfunction
-                                            </p>
+                                            <p id="hist-complication">Nephropathy, Neuropathy, Retinopathy, Diabetic foot, Sexual dysfunction</p>
                                         </div>
                                     </div>
                                 </div>
@@ -421,22 +426,27 @@
                             <div class="profile-panel diet-panel">
                                 <div class="panel-header">
                                     <h3>🍳 Diet</h3>
-                                    <button class="notes-btn" id="editDietNotes">+ Notes</button>
+                                    <div style="display: flex; gap: 10px;">
+                                        <button class="link-btn" id="editDiet">Edit</button>
+                                        <button class="notes-btn" id="toggleDietNotes">+ Notes</button>
+                                    </div>
                                 </div>
                                 <div class="diet-list">
                                     <div class="diet-card">
-                                        <span>🥃 8 Cups - <small>per day</small></span>
+                                        <span id="diet-water">🥃 8 Cups - <small>per day</small></span>
                                     </div>
                                     <div class="diet-card">
-                                        <span>☕ 3 Cups - <small>per day</small></span>
+                                        <span id="diet-coffee">☕ 3 Cups - <small>per day</small></span>
                                     </div>
                                     <div class="diet-card full">
-                                        <span>⏰ Intermittent fasting, Intermittent fasting,</span>
+                                        <span id="diet-fasting">⏰ Intermittent fasting, Intermittent fasting,</span>
                                     </div>
                                     <div class="diet-card full">
-                                        <span>🍭 Table sugar, Daily Avg 3 / 6</span>
+                                        <span id="diet-sugar">🍭 Table sugar, Daily Avg 3 / 6</span>
                                     </div>
                                 </div>
+                                <textarea id="dietNotesBox" class="notes-textarea" placeholder="Write your diet notes here..." style="display: none;"></textarea>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -1796,7 +1806,17 @@
                 </button>
             </div>
         </div>
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- SOS Floating Button -->
+    <div class="sos-floating" id="sos-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <span>SOS EMERGENCY</span>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
         <script src="../Backend/user_Location_Auto_Detection/location_service.js?v=2"></script>
         <script src="../Backend/map_Integration/map_api.js?v=2"></script>
         <script src="../Backend/user_Database/db_manager.js?v=2"></script>
