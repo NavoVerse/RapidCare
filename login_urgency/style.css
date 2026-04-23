@@ -3,17 +3,17 @@
 
 /* ===== DESIGN TOKENS ===== */
 :root {
-    --primary-green: #15803d;
-    --acc-green: #22c55e;
+    --primary-green: var(--primary-color);
+    --acc-green: var(--accent-color);
     --primary-yellow: #facc15;
     --acc-yellow: #eab308;
-    --white: #ffffff;
-    --bg-light: #f0fdf4;
-    --text-dark: #14532d;
-    --text-muted: #4d7c0f;
-    --input-bg: #f9fafb;
-    --input-border: #d1d5db;
-    --shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+    --white: var(--surface-color);
+    --bg-light: var(--bg-color);
+    --text-dark: var(--primary-text);
+    --text-muted: var(--secondary-text);
+    --input-bg: var(--bg-color);
+    --input-border: var(--border-color);
+    --shadow: var(--card-shadow);
 
     --emergency-red: #E11D48;
     --emergency-red-light: #ffe4e9;
@@ -25,18 +25,9 @@
     --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-body.dark-mode {
-    --primary-green: #22c55e;
-    --acc-green: #4ade80;
+[data-theme="dark"] :root {
     --primary-yellow: #ca8a04;
     --acc-yellow: #eab308;
-    --white: #1e293b;
-    --bg-light: #0f172a;
-    --text-dark: #f8fafc;
-    --text-muted: #cbd5e1;
-    --input-bg: #334155;
-    --input-border: #475569;
-    --shadow: 0 20px 25px -5px rgba(0,0,0,0.4);
     --emergency-red-light: rgba(225,29,72,0.15);
 }
 
@@ -46,7 +37,7 @@ html { font-size: 16px; -webkit-font-smoothing: antialiased; }
 
 body {
     font-family: var(--font);
-    background: linear-gradient(135deg, #fef9c3 0%, var(--primary-yellow) 100%);
+    background: var(--bg-color);
     color: var(--text-dark);
     min-height: 100vh;
     height: 100vh;
@@ -56,7 +47,10 @@ body {
     overflow: hidden;
     transition: background 0.4s ease;
 }
-body.dark-mode { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+
+[data-theme="dark"] body { 
+    background: var(--bg-color);
+}
 
 /* ===== THEME TOGGLE ===== */
 .theme-toggle {
@@ -74,7 +68,7 @@ body.dark-mode { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
     background: rgba(255, 255, 255, 0.25);
     transform: scale(1.08) rotate(15deg); 
 }
-body.dark-mode .theme-toggle { background: rgba(255, 255, 255, 0.1); }
+[data-theme="dark"] .theme-toggle { background: rgba(255, 255, 255, 0.1); }
 
 /* ===== PAGE WRAPPER ===== */
 .page-wrapper {

@@ -1,19 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Theme Toggle Logic
-    const themeToggle = document.getElementById('theme-toggle');
-    const body = document.body;
-    
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        body.classList.add('dark-mode');
-        updateToggleIcon(true);
-    }
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const isDark = body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            updateToggleIcon(isDark);
+    // SOS Button Logic
+    const sosBtn = document.getElementById('sos-btn');
+    if (sosBtn) {
+        sosBtn.addEventListener('click', () => {
+            window.location.href = '../login_urgency/index.html';
         });
     }
 
@@ -50,12 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateToggleIcon(isDark) {
-        if (!themeToggle) return;
-        themeToggle.innerHTML = isDark 
-            ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`
-            : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
-    }
+
 
     // Nav menu interaction
     const navItems = document.querySelectorAll('.nav-item');
@@ -117,6 +102,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Profile Icon Redirection
+    const sidebarProfile = document.querySelector('.user-profile');
+    const headerProfile = document.querySelector('.user-avatar-small');
+    const detailsNavItem = Array.from(navItems).find(item => item.querySelector('span')?.textContent.trim() === 'Details');
+
+    function switchToPatientProfile() {
+        if (detailsNavItem) {
+            detailsNavItem.click();
+            // Wait for view switch before clicking sub-tab if needed, 
+            // but the script handles sub-tab state globally so we can just find and click it.
+            const patientProfileTab = document.querySelector('.sub-tab[data-tab="patient-profile"]');
+            if (patientProfileTab) patientProfileTab.click();
+        }
+    }
+
+    if (sidebarProfile) {
+        sidebarProfile.style.cursor = 'pointer';
+        sidebarProfile.addEventListener('click', switchToPatientProfile);
+    }
+    if (headerProfile) {
+        headerProfile.style.cursor = 'pointer';
+        headerProfile.addEventListener('click', switchToPatientProfile);
+    }
 
     // Check for view routing in URL (e.g. ?view=tracking)
     const urlParams = new URLSearchParams(window.location.search);
@@ -755,11 +764,42 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'A1c Level', id: 't-a', target: null }
           ] 
         },
-        { id: 'editMedicalHistory', title: 'Edit Medical History', fields: [] },
+        { 
+          id: 'editMedicalHistory', 
+          title: 'Edit Medical History', 
+          fields: [
+            { label: 'Chronic Disease', id: 'm-c', target: 'hist-chronic', prefix: '' },
+            { label: 'Emergencies', id: 'm-e', target: 'hist-emergencies', prefix: '' },
+            { label: 'Surgery', id: 'm-s', target: 'hist-surgery', prefix: '' },
+            { label: 'Family Disease', id: 'm-f', target: 'hist-family', prefix: '' },
+            { label: 'Complications', id: 'm-x', target: 'hist-complication', prefix: '' }
+          ] 
+        },
         { id: 'editMedicationsList', title: 'Edit Medications', fields: [] },
         { id: 'editMedicationsListTab', title: 'Edit Medications', fields: [] },
-        { id: 'editDietNotes', title: 'Edit Diet & Notes', fields: [] }
+        { 
+          id: 'editDiet', 
+          title: 'Edit Diet Plan', 
+          fields: [
+            { label: 'Water Intake', id: 'd-w', target: 'diet-water', prefix: '🥃 ' },
+            { label: 'Coffee/Tea', id: 'd-c', target: 'diet-coffee', prefix: '☕ ' },
+            { label: 'Fasting Plan', id: 'd-f', target: 'diet-fasting', prefix: '⏰ ' },
+            { label: 'Sugar/Diet', id: 'd-s', target: 'diet-sugar', prefix: '🍭 ' }
+          ] 
+        }
     ];
+
+    // Toggle Diet Notes Box
+    const toggleDietNotesBtn = document.getElementById('toggleDietNotes');
+    const dietNotesBox = document.getElementById('dietNotesBox');
+    if (toggleDietNotesBtn && dietNotesBox) {
+        toggleDietNotesBtn.addEventListener('click', () => {
+            const isHidden = dietNotesBox.style.display === 'none';
+            dietNotesBox.style.display = isHidden ? 'block' : 'none';
+            toggleDietNotesBtn.textContent = isHidden ? 'Close Notes' : '+ Notes';
+        });
+    }
+
 
     let activeEditConfig = null;
 
@@ -1827,4 +1867,58 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     resizer.addEventListener('mousedown', mouseDownHandler);
+});
+
+// Profile Dropdown Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const userProfileCard = document.getElementById('userProfileCard');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const profileChevron = document.getElementById('profileChevron');
+
+    if (userProfileCard && profileDropdown) {
+        userProfileCard.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isActive = profileDropdown.classList.contains('active');
+            
+            // Toggle dropdown
+            profileDropdown.classList.toggle('active');
+            
+            // Rotate chevron
+            if (profileChevron) {
+                profileChevron.style.transform = isActive ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            if (profileDropdown.classList.contains('active')) {
+                profileDropdown.classList.remove('active');
+                if (profileChevron) {
+                    profileChevron.style.transform = 'rotate(0deg)';
+                }
+            }
+        });
+
+        // Prevent closing when clicking inside the dropdown
+        profileDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Handle "View Profile" click within dropdown
+        const viewProfileItem = profileDropdown.querySelector('[data-view="details"]');
+        if (viewProfileItem) {
+            viewProfileItem.addEventListener('click', () => {
+                // Switch to Details view
+                const detailsLink = document.querySelector('.nav-link[data-view="details"]');
+                if (detailsLink) detailsLink.click();
+                
+                // Activate Profile sub-tab
+                const profileTab = document.querySelector('.sub-tab[data-tab="profile"]');
+                if (profileTab) profileTab.click();
+                
+                profileDropdown.classList.remove('active');
+                if (profileChevron) profileChevron.style.transform = 'rotate(0deg)';
+            });
+        }
+    }
 });
