@@ -750,9 +750,15 @@ document.addEventListener('DOMContentLoaded', () => {
           title: 'Edit Patient Profile', 
           fields: [
             { label: 'Full Name', id: 'edit-name', target: 'displayProfileName', prefix: '' },
-            { label: 'Location', id: 'edit-loc', target: 'displayProfileLocation', prefix: '📍 ' },
-            { label: 'Job Title', id: 'edit-job', target: 'displayProfileJob', prefix: '💼 ' },
-            { label: 'Birth Date', id: 'edit-birth', target: 'displayProfileBirth', prefix: '🎂 ' }
+            { label: 'Gender (Male/Female)', id: 'edit-gender', target: 'displayProfileGender', prefix: '👤 ' },
+            { label: 'Date of Birth', id: 'edit-birth', target: 'displayProfileBirth', prefix: '🎂 ' },
+            { label: 'Height (Cm)', id: 'edit-height', target: 'displayProfileHeight', prefix: '' },
+            { label: 'Weight (kg)', id: 'edit-weight', target: 'displayProfileWeight', prefix: '' },
+            { label: 'Blood Type', id: 'edit-blood', target: 'displayProfileBlood', prefix: '🩸 ' },
+            { label: 'Home Location', id: 'edit-loc', target: 'displayProfileLocation', prefix: '📍 ' },
+            { label: 'Blood Pressure', id: 'edit-bp', target: 'displayProfileBP', prefix: '' },
+            { label: 'Allergies', id: 'edit-allergies', target: 'displayProfileAllergies', prefix: '' },
+            { label: 'Chronic Conditions', id: 'edit-chronic', target: 'displayProfileChronic', prefix: '' }
           ] 
         },
         { 
@@ -818,9 +824,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                     return `
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label style="display:block; margin-bottom:5px; font-weight:600; font-size:0.9rem;">${f.label}</label>
-                            <input type="text" id="${f.id}" value="${currentVal}" placeholder="Enter ${f.label}..." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="display:block; margin-bottom:4px; font-weight:700; font-size:0.75rem; color: var(--secondary-text); text-transform: uppercase; letter-spacing: 0.5px;">${f.label}</label>
+                            <input type="text" id="${f.id}" value="${currentVal}" placeholder="Add ${f.label}" style="width:100%; padding:8px 0; border:none; border-bottom:1px solid var(--border-color); background:transparent; color:var(--primary-text); font-size:1rem; font-weight:500; outline:none; transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--primary-color)'" onblur="this.style.borderColor='var(--border-color)'">
                         </div>
                     `;
                 }).join('');
