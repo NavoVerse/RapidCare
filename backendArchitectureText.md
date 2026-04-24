@@ -939,8 +939,8 @@ DONE | Update `DeveloperDashboard` to call unified server | 🟡 Medium | 30 min
 
 | Task | Priority | Effort |
 |---|---|---|
-| Build `POST /api/v1/drivers/register` — save all 5 steps of driver form | 🔴 High | 3 hours |
-| Build `POST /api/v1/hospitals/register` — save all 5 steps of hospital form | 🔴 High | 3 hours |
+DONE | Build `POST /api/v1/drivers/register` — save all 5 steps of driver form | 🔴 High | 3 hours |
+DONE | Build `POST /api/v1/hospitals/register` — save all 5 steps of hospital form | 🔴 High | 3 hours |
 | Connect `driver_registration/script.js` submit to backend API | 🔴 High | 2 hours |
 | Connect `hospital_registration/script.js` submit to backend API | 🔴 High | 2 hours |
 | Build `GET/PUT /api/v1/patients/me` — patient profile CRUD | 🟡 Medium | 2 hours |

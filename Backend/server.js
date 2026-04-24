@@ -94,6 +94,97 @@ app.post('/api/v1/auth/register', validate(registerSchema), async (req, res) => 
     }
 });
 
+// 1b. Register Driver (5-step form)
+app.post('/api/v1/drivers/register', async (req, res) => {
+    const { 
+        name, email, password, phone, 
+        dob, alt_phone, address, city, state, pincode, 
+        aadhaar_number, pan_number, license_number, vehicle_number 
+    } = req.body;
+    const db = getDb();
+
+    try {
+        await db.run('BEGIN TRANSACTION');
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const result = await db.run(
+            'INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)',
+            [name, email, hashedPassword, 'driver', phone]
+        );
+        const userId = result.lastID;
+
+        await db.run(`
+            INSERT INTO drivers (
+                user_id, status, license_number, vehicle_number, dob, alt_phone, 
+                address, city, state, pincode, aadhaar_number, pan_number
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            userId, 'available', license_number, vehicle_number, dob, alt_phone,
+            address, city, state, pincode, aadhaar_number, pan_number
+        ]);
+
+        await db.run('COMMIT');
+        res.status(201).json({ message: 'Driver registered successfully', userId });
+    } catch (err) {
+        await db.run('ROLLBACK');
+        if (err.message.includes('UNIQUE constraint failed')) {
+            return res.status(400).json({ error: 'Email, license, or vehicle number already exists' });
+        }
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 1c. Register Hospital (5-step form)
+app.post('/api/v1/hospitals/register', async (req, res) => {
+    const data = req.body;
+    const db = getDb();
+
+    try {
+        await db.run('BEGIN TRANSACTION');
+        
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const result = await db.run(
+            'INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)',
+            [data.hospital_name, data.email, hashedPassword, 'hospital', data.reception_number]
+        );
+        const userId = result.lastID;
+
+        await db.run(`
+            INSERT INTO hospitals (
+                user_id, address, city, total_beds, available_beds,
+                hospital_type, year_established, district, state, pincode,
+                state_health_license, license_expiry, nabh_accreditation, nabl_accreditation,
+                pharmacy_license, fire_noc, pan_tan, gst,
+                reception_number, emergency_casualty_number, ambulance_dispatch_number,
+                icu_helpline, admin_billing_number, website,
+                icu_beds, nicu_beds, picu_beds, ccu_beds, ventilators, dialysis, ot, ambulances,
+                departments, ayushman_bharat, state_insurance, admin_name, designation
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
+        `, [
+            userId, data.address, data.district, data.total_beds, data.total_beds,
+            data.hospital_type, data.year_established, data.district, data.state, data.pincode,
+            data.state_health_license, data.license_expiry, data.nabh_accreditation, data.nabl_accreditation,
+            data.pharmacy_license, data.fire_noc, data.pan_tan, data.gst,
+            data.reception_number, data.emergency_casualty_number, data.ambulance_dispatch_number,
+            data.icu_helpline, data.admin_billing_number, data.website,
+            data.icu_beds || 0, data.nicu_beds || 0, data.picu_beds || 0, data.ccu_beds || 0, 
+            data.ventilators || 0, data.dialysis || 0, data.ot || 0, data.ambulances || 0,
+            JSON.stringify(data.departments || []), data.ayushman_bharat, data.state_insurance, 
+            data.admin_name, data.designation
+        ]);
+
+        await db.run('COMMIT');
+        res.status(201).json({ message: 'Hospital registered successfully', userId });
+    } catch (err) {
+        await db.run('ROLLBACK');
+        if (err.message.includes('UNIQUE constraint failed')) {
+            return res.status(400).json({ error: 'Email or Contact already exists' });
+        }
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // 2. Login with Password
 app.post('/api/v1/auth/login', loginLimiter, validate(loginSchema), async (req, res) => {
     const { email, password } = req.body;
