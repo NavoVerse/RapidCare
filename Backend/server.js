@@ -202,6 +202,54 @@ app.get('/api/v1/auth/profile', authenticateToken, authorize('patient', 'driver'
     }
 });
 
+// 6. Get Patient Profile
+app.get('/api/v1/patients/me', authenticateToken, authorize('patient'), async (req, res) => {
+    const db = getDb();
+    try {
+        const patient = await db.get(`
+            SELECT u.name, u.email, u.phone, 
+                   p.gender, p.date_of_birth, p.height, p.weight, 
+                   p.blood_group as blood_type, p.home_location, p.blood_pressure, 
+                   p.allergies, p.chronic_conditions
+            FROM users u
+            JOIN patients p ON u.id = p.user_id
+            WHERE u.id = ?
+        `, [req.user.id]);
+        
+        if (!patient) return res.status(404).json({ error: 'Patient profile not found' });
+        res.json(patient);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 7. Update Patient Profile
+app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (req, res) => {
+    const { name, gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, allergies, chronic_conditions } = req.body;
+    const db = getDb();
+    
+    try {
+        await db.run('BEGIN TRANSACTION');
+        if (name !== undefined) {
+            await db.run('UPDATE users SET name = ? WHERE id = ?', [name, req.user.id]);
+        }
+        await db.run(`
+            UPDATE patients SET 
+                gender = ?, date_of_birth = ?, height = ?, weight = ?, 
+                blood_group = ?, home_location = ?, blood_pressure = ?, 
+                allergies = ?, chronic_conditions = ?
+            WHERE user_id = ?
+        `, [gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, allergies, chronic_conditions, req.user.id]);
+        await db.run('COMMIT');
+        
+        res.json({ message: 'Profile updated successfully' });
+    } catch (err) {
+        await db.run('ROLLBACK');
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
 // =============================================================================
 // DEV DASHBOARD API  (/api/data)
 // Legacy-compatible — fetched by DeveloperDashboard/index.html via /api/data.
