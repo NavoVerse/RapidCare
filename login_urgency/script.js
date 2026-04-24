@@ -89,22 +89,45 @@ document.addEventListener('DOMContentLoaded', () => {
         sendCodeBtn.disabled = !valid;
     }
 
-    sendCodeBtn.addEventListener('click', () => {
+    sendCodeBtn.addEventListener('click', async () => {
         if (sendCodeBtn.disabled) return;
 
-        // Update the "Sent to" display on slide 2
-        const sentToDisplay = document.getElementById('sentToDisplay');
         if (contactMode === 'mobile') {
-            const phone = phoneInput.value;
-            sentToDisplay.textContent = `+91 ${phone.substring(0, 2)}••••${phone.substring(phone.length - 2)}`;
-        } else {
-            const email = emailInput.value;
-            const atIndex = email.indexOf('@');
-            sentToDisplay.textContent = `${email.substring(0, 2)}••••@${email.substring(atIndex + 1)}`;
+            alert('SMS OTP delivery is not yet implemented. Please select "Email ID" for OTP delivery via Nodemailer.');
+            return;
         }
 
-        goToSlide(1);
-        startResendTimer();
+        const origText = sendCodeBtn.innerText;
+        sendCodeBtn.innerText = 'Sending...';
+        sendCodeBtn.disabled = true;
+
+        try {
+            const response = await fetch('http://localhost:5000/api/v1/auth/request-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailInput.value })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                // Update the "Sent to" display on slide 2
+                const sentToDisplay = document.getElementById('sentToDisplay');
+                const email = emailInput.value;
+                const atIndex = email.indexOf('@');
+                sentToDisplay.textContent = `${email.substring(0, 2)}••••@${email.substring(atIndex + 1)}`;
+
+                goToSlide(1);
+                startResendTimer();
+            } else {
+                alert(data.error || 'Failed to send OTP. Are you registered?');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Server error while sending OTP.');
+        } finally {
+            sendCodeBtn.innerText = origText;
+            sendCodeBtn.disabled = false;
+        }
     });
 
     // ========== SLIDE 2: OTP VERIFICATION ==========
@@ -178,13 +201,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    resendBtn.addEventListener('click', () => {
+    resendBtn.addEventListener('click', async () => {
         if (resendBtn.disabled) return;
-        // Clear OTP boxes
-        otpBoxes.forEach(b => { b.value = ''; b.classList.remove('filled', 'error'); });
-        verifyBtn.disabled = true;
-        otpBoxes[0].focus();
-        startResendTimer();
+        
+        const origText = resendBtn.innerText;
+        resendBtn.innerText = 'Sending...';
+        resendBtn.disabled = true;
+
+        try {
+            const response = await fetch('http://localhost:5000/api/v1/auth/request-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailInput.value })
+            });
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Clear OTP boxes
+                otpBoxes.forEach(b => { b.value = ''; b.classList.remove('filled', 'error'); });
+                verifyBtn.disabled = true;
+                otpBoxes[0].focus();
+                startResendTimer();
+            } else {
+                alert(data.error || 'Failed to resend OTP.');
+                resendBtn.disabled = false;
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Server error while resending OTP.');
+            resendBtn.disabled = false;
+        } finally {
+            resendBtn.innerText = origText;
+        }
     });
 
     backToSlide1.addEventListener('click', () => {
@@ -195,10 +243,41 @@ document.addEventListener('DOMContentLoaded', () => {
         goToSlide(0);
     });
 
-    verifyBtn.addEventListener('click', () => {
+    verifyBtn.addEventListener('click', async () => {
         if (verifyBtn.disabled) return;
-        // Simulate verification (accept any 6-digit code)
-        goToSlide(2);
+        
+        let otpCode = '';
+        otpBoxes.forEach(b => otpCode += b.value);
+
+        const origText = verifyBtn.innerText;
+        verifyBtn.innerText = 'Verifying...';
+        verifyBtn.disabled = true;
+
+        try {
+            const response = await fetch('http://localhost:5000/api/v1/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailInput.value, otp: otpCode })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('rapidcare_token', data.token);
+                localStorage.setItem('rapidcare_user', JSON.stringify(data.user));
+                goToSlide(2);
+            } else {
+                alert(data.error || 'Invalid OTP');
+                otpBoxes.forEach(b => { b.value = ''; b.classList.remove('filled'); });
+                checkOTPComplete();
+                otpBoxes[0].focus();
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Server error during verification.');
+        } finally {
+            verifyBtn.innerText = origText;
+            verifyBtn.disabled = false;
+        }
     });
 
     // ========== SLIDE 3: EMERGENCY CATEGORIZATION ==========

@@ -14,12 +14,38 @@ const cors    = require('cors');
 const bcrypt  = require('bcrypt');
 const jwt     = require('jsonwebtoken');
 const path    = require('path');
+const nodemailer = require('nodemailer');
 const { getDb, initializeDB } = require('./db');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const app  = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_rapidcare_key_2026';
+
+// ── Mailer Setup ──────────────────────────────────────────────────────────────
+let transporter;
+if (process.env.SMTP_HOST && process.env.SMTP_USER) {
+    transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT || 587,
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        }
+    });
+} else {
+    nodemailer.createTestAccount((err, account) => {
+        if (!err) {
+            transporter = nodemailer.createTransport({
+                host: account.smtp.host,
+                port: account.smtp.port,
+                secure: account.smtp.secure,
+                auth: { user: account.user, pass: account.pass }
+            });
+            console.log('Nodemailer: Created Ethereal test account for email delivery.');
+        }
+    });
+}
 
 // ── Global Middleware ──────────────────────────────────────────────────────────
 app.use(cors());
@@ -94,6 +120,97 @@ app.post('/api/v1/auth/register', validate(registerSchema), async (req, res) => 
     }
 });
 
+// 1b. Register Driver (5-step form)
+app.post('/api/v1/drivers/register', async (req, res) => {
+    const { 
+        name, email, password, phone, 
+        dob, alt_phone, address, city, state, pincode, 
+        aadhaar_number, pan_number, license_number, vehicle_number 
+    } = req.body;
+    const db = getDb();
+
+    try {
+        await db.run('BEGIN TRANSACTION');
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const result = await db.run(
+            'INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)',
+            [name, email, hashedPassword, 'driver', phone]
+        );
+        const userId = result.lastID;
+
+        await db.run(`
+            INSERT INTO drivers (
+                user_id, status, license_number, vehicle_number, dob, alt_phone, 
+                address, city, state, pincode, aadhaar_number, pan_number
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            userId, 'available', license_number, vehicle_number, dob, alt_phone,
+            address, city, state, pincode, aadhaar_number, pan_number
+        ]);
+
+        await db.run('COMMIT');
+        res.status(201).json({ message: 'Driver registered successfully', userId });
+    } catch (err) {
+        await db.run('ROLLBACK');
+        if (err.message.includes('UNIQUE constraint failed')) {
+            return res.status(400).json({ error: 'Email, license, or vehicle number already exists' });
+        }
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 1c. Register Hospital (5-step form)
+app.post('/api/v1/hospitals/register', async (req, res) => {
+    const data = req.body;
+    const db = getDb();
+
+    try {
+        await db.run('BEGIN TRANSACTION');
+        
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const result = await db.run(
+            'INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)',
+            [data.hospital_name, data.email, hashedPassword, 'hospital', data.reception_number]
+        );
+        const userId = result.lastID;
+
+        await db.run(`
+            INSERT INTO hospitals (
+                user_id, address, city, total_beds, available_beds,
+                hospital_type, year_established, district, state, pincode,
+                state_health_license, license_expiry, nabh_accreditation, nabl_accreditation,
+                pharmacy_license, fire_noc, pan_tan, gst,
+                reception_number, emergency_casualty_number, ambulance_dispatch_number,
+                icu_helpline, admin_billing_number, website,
+                icu_beds, nicu_beds, picu_beds, ccu_beds, ventilators, dialysis, ot, ambulances,
+                departments, ayushman_bharat, state_insurance, admin_name, designation
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
+        `, [
+            userId, data.address, data.district, data.total_beds, data.total_beds,
+            data.hospital_type, data.year_established, data.district, data.state, data.pincode,
+            data.state_health_license, data.license_expiry, data.nabh_accreditation, data.nabl_accreditation,
+            data.pharmacy_license, data.fire_noc, data.pan_tan, data.gst,
+            data.reception_number, data.emergency_casualty_number, data.ambulance_dispatch_number,
+            data.icu_helpline, data.admin_billing_number, data.website,
+            data.icu_beds || 0, data.nicu_beds || 0, data.picu_beds || 0, data.ccu_beds || 0, 
+            data.ventilators || 0, data.dialysis || 0, data.ot || 0, data.ambulances || 0,
+            JSON.stringify(data.departments || []), data.ayushman_bharat, data.state_insurance, 
+            data.admin_name, data.designation
+        ]);
+
+        await db.run('COMMIT');
+        res.status(201).json({ message: 'Hospital registered successfully', userId });
+    } catch (err) {
+        await db.run('ROLLBACK');
+        if (err.message.includes('UNIQUE constraint failed')) {
+            return res.status(400).json({ error: 'Email or Contact already exists' });
+        }
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // 2. Login with Password
 app.post('/api/v1/auth/login', loginLimiter, validate(loginSchema), async (req, res) => {
     const { email, password } = req.body;
@@ -145,10 +262,26 @@ app.post('/api/v1/auth/request-otp', otpLimiter, validate(requestOtpSchema), asy
             [email, otp, expiresAt.toISOString()]
         );
 
-        console.log(`[OTP DEBUG] OTP for ${email}: ${otp}`);
-        res.json({ message: 'OTP sent successfully (Check server console for debug OTP)' });
+        if (transporter) {
+            const info = await transporter.sendMail({
+                from: '"RapidCare Admin" <no-reply@rapidcare.com>',
+                to: email,
+                subject: "Your RapidCare OTP",
+                text: `Your one-time password is: ${otp}`,
+                html: `<h3>RapidCare Verification</h3><p>Your one-time password is: <strong>${otp}</strong></p><p>It will expire in 10 minutes.</p>`
+            });
+            console.log(`[OTP DEBUG] OTP for ${email}: ${otp}`);
+            if (!process.env.SMTP_HOST) {
+                console.log(`[Nodemailer] Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+            }
+        } else {
+            console.log(`[OTP DEBUG] Transporter not ready. OTP for ${email}: ${otp}`);
+        }
+
+        res.json({ message: 'OTP sent successfully (Check server console for preview URL)' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Error sending OTP:', err);
+        res.status(500).json({ error: 'Failed to send OTP' });
     }
 });
 
