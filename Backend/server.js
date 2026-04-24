@@ -393,7 +393,9 @@ async function fetchDashboardData(res) {
     const db = getDb();
     try {
         const patients = await db.all(`
-            SELECT u.*, p.blood_group, p.medical_history, p.emergency_contact
+            SELECT u.*, p.blood_group, p.medical_history, p.emergency_contact,
+                   p.gender, p.date_of_birth, p.height, p.weight,
+                   p.blood_pressure, p.home_location, p.allergies, p.chronic_conditions
             FROM users u
             JOIN patients p ON u.id = p.user_id
             WHERE u.role = 'patient'
@@ -436,7 +438,7 @@ app.put('/api/admin/data', express.json(), async (req, res) => {
     if (!allowedRoles.includes(role)) return res.status(400).json({ error: 'Invalid role' });
     
     const userFields = ['name', 'email', 'phone'];
-    const patientFields = ['blood_group', 'medical_history', 'emergency_contact'];
+    const patientFields = ['blood_group', 'medical_history', 'emergency_contact', 'gender', 'date_of_birth', 'height', 'weight', 'blood_pressure', 'home_location', 'allergies', 'chronic_conditions'];
     const driverFields = ['license_number', 'vehicle_number', 'status'];
     const hospitalFields = ['address', 'total_beds', 'specialty'];
 
