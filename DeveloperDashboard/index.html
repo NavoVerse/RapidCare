@@ -81,6 +81,36 @@
     </div>
 
     <script>
+        async function updateField(role, id, field, element) {
+            const value = element.innerText.trim();
+            const originalValue = element.getAttribute('data-original') || '';
+            if (value === originalValue) return;
+
+            element.style.opacity = '0.5';
+            try {
+                const response = await fetch('http://localhost:5000/api/admin/data', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role, id, field, value })
+                });
+                if (response.ok) {
+                    element.setAttribute('data-original', value);
+                    element.style.background = 'rgba(0, 255, 0, 0.1)';
+                    setTimeout(() => { element.style.background = ''; }, 1000);
+                } else {
+                    throw new Error('Update failed');
+                }
+            } catch (error) {
+                console.error(error);
+                element.innerText = originalValue; // Revert
+                element.style.background = 'rgba(255, 0, 0, 0.1)';
+                setTimeout(() => { element.style.background = ''; }, 1000);
+                alert('Failed to update field.');
+            } finally {
+                element.style.opacity = '1';
+            }
+        }
+
         async function fetchData() {
             try {
                 // Uses the unified backend (port 5000) regardless of how this page is opened
@@ -89,37 +119,37 @@
 
                 updateTable('patients-list', data.patients, (p) => `
                     <td>${p.id}</td>
-                    <td><strong>${p.name}</strong></td>
-                    <td>${p.email}</td>
+                    <td><strong contenteditable="true" data-original="${p.name}" onblur="updateField('patient', ${p.id}, 'name', this)">${p.name}</strong></td>
+                    <td><span contenteditable="true" data-original="${p.email}" onblur="updateField('patient', ${p.id}, 'email', this)">${p.email}</span></td>
                     <td><code>${p.password.substring(0, 15)}...</code></td>
                     <td>
-                        <small>Blood: ${p.blood_group || 'N/A'}</small><br>
-                        <small>History: ${p.medical_history || 'None'}</small>
+                        <small>Blood: <span contenteditable="true" data-original="${p.blood_group || ''}" onblur="updateField('patient', ${p.id}, 'blood_group', this)">${p.blood_group || ''}</span></small><br>
+                        <small>History: <span contenteditable="true" data-original="${p.medical_history || ''}" onblur="updateField('patient', ${p.id}, 'medical_history', this)">${p.medical_history || ''}</span></small>
                     </td>
                 `);
 
                 updateTable('drivers-list', data.drivers, (d) => `
                     <td>${d.id}</td>
-                    <td><strong>${d.name}</strong></td>
-                    <td>${d.email}</td>
+                    <td><strong contenteditable="true" data-original="${d.name}" onblur="updateField('driver', ${d.id}, 'name', this)">${d.name}</strong></td>
+                    <td><span contenteditable="true" data-original="${d.email}" onblur="updateField('driver', ${d.id}, 'email', this)">${d.email}</span></td>
                     <td><code>${d.password.substring(0, 15)}...</code></td>
                     <td>
-                        <small>License: ${d.license_number || 'N/A'}</small><br>
-                        <small>Vehicle: ${d.vehicle_number || 'N/A'}</small>
+                        <small>License: <span contenteditable="true" data-original="${d.license_number || ''}" onblur="updateField('driver', ${d.id}, 'license_number', this)">${d.license_number || ''}</span></small><br>
+                        <small>Vehicle: <span contenteditable="true" data-original="${d.vehicle_number || ''}" onblur="updateField('driver', ${d.id}, 'vehicle_number', this)">${d.vehicle_number || ''}</span></small>
                     </td>
-                    <td><span class="badge" style="background: rgba(0,0,0,0.2)">${d.status}</span></td>
+                    <td><span class="badge" style="background: rgba(0,0,0,0.2)" contenteditable="true" data-original="${d.status}" onblur="updateField('driver', ${d.id}, 'status', this)">${d.status}</span></td>
                 `);
 
                 updateTable('hospitals-list', data.hospitals, (h) => `
                     <td>${h.id}</td>
-                    <td><strong>${h.name}</strong></td>
-                    <td>${h.email}</td>
+                    <td><strong contenteditable="true" data-original="${h.name}" onblur="updateField('hospital', ${h.id}, 'name', this)">${h.name}</strong></td>
+                    <td><span contenteditable="true" data-original="${h.email}" onblur="updateField('hospital', ${h.id}, 'email', this)">${h.email}</span></td>
                     <td><code>${h.password.substring(0, 15)}...</code></td>
                     <td>
-                        <small>Address: ${h.address || 'N/A'}</small><br>
-                        <small>Spec: ${h.specialty || 'General'}</small>
+                        <small>Address: <span contenteditable="true" data-original="${h.address || ''}" onblur="updateField('hospital', ${h.id}, 'address', this)">${h.address || ''}</span></small><br>
+                        <small>Spec: <span contenteditable="true" data-original="${h.specialty || ''}" onblur="updateField('hospital', ${h.id}, 'specialty', this)">${h.specialty || 'General'}</span></small>
                     </td>
-                    <td>${h.total_beds || 0}</td>
+                    <td><span contenteditable="true" data-original="${h.total_beds || 0}" onblur="updateField('hospital', ${h.id}, 'total_beds', this)">${h.total_beds || 0}</span></td>
                 `);
 
             } catch (error) {
@@ -137,8 +167,12 @@
         }
 
         fetchData();
-        // Refresh every 30 seconds
-        setInterval(fetchData, 30000);
+        // Refresh every 30 seconds only if nothing is currently being edited
+        setInterval(() => {
+            if (!document.activeElement || !document.activeElement.isContentEditable) {
+                fetchData();
+            }
+        }, 30000);
     </script>
 </body>
 </html>
