@@ -843,12 +843,12 @@ header {
 }
 
 [data-theme="dark"] .modal-content {
-    background: #1e293b;
-    border: 1px solid #334155;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
 }
 
 [data-theme="dark"] .search-item:hover {
-    background: #334155;
+    background: var(--border-color);
 }
 
 /* Dark Mode Map Filter */
@@ -1302,9 +1302,9 @@ header {
 }
 
 [data-theme="dark"] .notes-textarea {
-    background-color: #1e293b;
-    border-color: #334155;
-    color: #f8fafc;
+    background-color: var(--surface-color);
+    border-color: var(--border-color);
+    color: var(--primary-text);
 }
 
 /* ====================================================
@@ -1929,8 +1929,8 @@ header {
 
 [data-theme="dark"] .driver-profile-card,
 [data-theme="dark"] .info-card {
-    background: #1e293b;
-    border-color: #334155;
+    background: var(--surface-color);
+    border-color: var(--border-color);
 }
 
 /* Responsive Tracking View */
@@ -2075,9 +2075,9 @@ header {
 
 
 [data-theme="dark"] .form-group input {
-    background: #1e293b;
-    border-color: #334155;
-    color: #f8fafc;
+    background: var(--surface-color);
+    border-color: var(--border-color);
+    color: var(--primary-text);
 }
 
 /* ===========================

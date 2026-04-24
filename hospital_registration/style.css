@@ -181,8 +181,8 @@ body {
     letter-spacing: 0.5px;
 }
 
-.badge-required { background: #ef4444; color: white; }
-.badge-select { background: #10b981; color: white; }
+.badge-required { background: var(--error-color); color: white; }
+.badge-select { background: var(--success-color); color: white; }
 
 /* Form Fields */
 .form-row {
@@ -213,9 +213,9 @@ input, select, textarea {
     width: 100%;
     padding: 16px 20px;
     background: var(--surface-color);
-    border: 1px solid #334155;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
-    color: #f8fafc;
+    color: var(--primary-text);
     font-size: 1rem;
     outline: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -262,7 +262,7 @@ input:focus + label, select:focus + label {
     text-align: center;
     background: transparent;
     border: none;
-    border-bottom: 2px solid #334155;
+    border-bottom: 2px solid var(--border-color);
     border-radius: 0;
 }
 
@@ -283,7 +283,7 @@ input:focus + label, select:focus + label {
     align-items: center;
     gap: 12px;
     font-size: 0.9rem;
-    color: #cbd5e1;
+    color: var(--secondary-text);
     cursor: pointer;
     padding: 10px;
     border-radius: 8px;
@@ -327,9 +327,9 @@ input:focus + label, select:focus + label {
 
 .btn-next {
     padding: 16px 40px;
-    background: var(--accent-emerald);
+    background: var(--primary-color);
     color: white;
-    border: none;
+    border: var(--btn-border);
     border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -345,7 +345,7 @@ input:focus + label, select:focus + label {
 .btn-prev {
     padding: 16px 40px;
     background: transparent;
-    border: 1px solid #334155;
+    border: 1px solid var(--border-color);
     color: var(--secondary-text);
     border-radius: 12px;
     cursor: pointer;
@@ -359,9 +359,9 @@ input:focus + label, select:focus + label {
 .submit-full-btn {
     width: 100%;
     padding: 20px;
-    background: transparent;
-    border: 2px solid var(--accent-emerald);
-    color: var(--accent-emerald);
+    background: var(--primary-color);
+    border: var(--btn-border);
+    color: white;
     font-size: 1.2rem;
     font-weight: 700;
     border-radius: 15px;
