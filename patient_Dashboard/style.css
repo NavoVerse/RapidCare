@@ -571,12 +571,16 @@ header {
     padding: 8px 12px;
     background: var(--primary-color);
     color: white;
-    border: none;
+    border: 1px solid transparent;
     border-radius: 6px;
     font-size: 11px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
+}
+
+[data-theme="dark"] .book-btn {
+    border: var(--btn-border);
 }
 
 .uni-btn {
@@ -2438,15 +2442,19 @@ header {
 }
 
 .btn-primary {
-    background: var(--semantic-green);
+    background: var(--primary-color);
     color: white;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    border: 1px solid transparent;
+    box-shadow: 0 4px 12px rgba(25, 25, 112, 0.2);
+}
+
+[data-theme="dark"] .btn-primary {
+    border: var(--btn-border);
 }
 
 .btn-primary:hover {
-    background: #059669;
-    /* Slightly darker green for hover */
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+    background: var(--accent-color);
+    box-shadow: 0 6px 16px rgba(25, 25, 112, 0.3);
     transform: translateY(-1px);
 }
 
