@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const popularBanks = [
-        { name: "SBI", icon: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/state-bank-of-india-sbi-icon.png" },
-        { name: "HDFC", icon: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/hdfc-bank-icon.png" },
-        { name: "ICICI", icon: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/icici-bank-icon.png" },
-        { name: "Axis", icon: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/axis-bank-icon.png" }
+        { name: "SBI", icon: "assets/logos/sbi_logo.png" },
+        { name: "HDFC", icon: "assets/logos/hdfc_logo.png" },
+        { name: "ICICI", icon: "assets/logos/icici_logo.png" },
+        { name: "Axis", icon: "assets/logos/axis_logo.png" }
     ];
 
     const pricingConfig = {
