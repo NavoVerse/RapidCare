@@ -26,9 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
-    const bankSearch = document.getElementById('bank-search');
-    const bankList = document.getElementById('bank-list');
-    const allBanksSelect = document.getElementById('all-banks-select');
+    const cardBankSearch = document.getElementById('card-bank-search');
+    const cardBankList = document.getElementById('card-bank-list');
+    const netBankSearch = document.getElementById('net-bank-search');
+    const netBankList = document.getElementById('net-bank-list');
     const popularBanksGrid = document.getElementById('popular-banks');
     const applyCouponBtn = document.getElementById('apply-coupon');
     const couponInput = document.getElementById('coupon-code');
@@ -109,56 +110,110 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Bank Logic ---
     function populateBankLists() {
-        // All banks dropdown
         indianBanks.sort().forEach(bank => {
-            const option = document.createElement('option');
-            option.value = bank;
-            option.textContent = bank;
-            allBanksSelect.appendChild(option);
+            // Populate Cards search list
+            const cardItem = createBankItem(bank, cardBankSearch, cardBankList);
+            cardBankList.appendChild(cardItem);
             
-            const bankItem = document.createElement('div');
-            bankItem.className = 'bank-item';
-            bankItem.textContent = bank;
-            bankItem.onclick = () => selectBank(bank);
-            bankList.appendChild(bankItem);
+            // Populate Net Banking search list
+            const netItem = createBankItem(bank, netBankSearch, netBankList);
+            netBankList.appendChild(netItem);
         });
 
         // Popular banks grid
         popularBanks.forEach(bank => {
             const card = document.createElement('div');
-            card.className = 'upi-card'; // Reusing style
+            card.className = 'upi-card'; 
             card.innerHTML = `<img src="${bank.icon}" alt="${bank.name}" style="filter: none;"><span>${bank.name}</span>`;
-            card.onclick = () => selectBank(bank.name);
+            card.onclick = () => {
+                const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+                if (activeTab === 'card') {
+                    selectBank(bank.name, cardBankSearch, cardBankList);
+                } else if (activeTab === 'netbanking') {
+                    selectBank(bank.name, netBankSearch, netBankList);
+                }
+            };
             popularBanksGrid.appendChild(card);
         });
     }
 
-    function selectBank(bankName) {
-        bankSearch.value = bankName;
-        bankList.style.display = 'none';
+    function createBankItem(bankName, input, list) {
+        const item = document.createElement('div');
+        item.className = 'bank-item';
+        item.textContent = bankName;
+        item.onclick = () => selectBank(bankName, input, list);
+        return item;
     }
 
-    bankSearch.addEventListener('focus', () => {
-        bankList.style.display = 'block';
-    });
+    function selectBank(bankName, input, list) {
+        input.value = bankName;
+        list.style.display = 'none';
+    }
 
-    bankSearch.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const items = bankList.querySelectorAll('.bank-item');
-        items.forEach(item => {
-            if (item.textContent.toLowerCase().includes(term)) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
+    const bankAcronyms = {
+        "SBI": "State Bank of India",
+        "HDFC": "HDFC Bank",
+        "ICICI": "ICICI Bank",
+        "PNB": "Punjab National Bank",
+        "BOB": "Bank of Baroda",
+        "KOTAK": "Kotak Mahindra Bank",
+        "IDFC": "IDFC FIRST Bank",
+    };
+
+    function setupSearch(input, list) {
+        if (!input || !list) return;
+        
+        input.addEventListener('focus', () => {
+            list.style.display = 'block';
+        });
+
+        input.addEventListener('input', (e) => {
+            const term = e.target.value.trim().toLowerCase();
+            const items = list.querySelectorAll('.bank-item:not(.no-results)');
+            let hasResults = false;
+            
+            items.forEach(item => {
+                const bankName = item.textContent;
+                const acronymMatch = Object.entries(bankAcronyms).some(([acr, full]) => 
+                    acr.toLowerCase().includes(term) && full === bankName
+                );
+
+                if (bankName.toLowerCase().includes(term) || acronymMatch) {
+                    item.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show "Not Available" if no results
+            const existingNoRes = list.querySelector('.no-results');
+            if (!hasResults && term.length > 0) {
+                list.style.display = 'block'; // Ensure list is visible
+                if (!existingNoRes) {
+                    const noRes = document.createElement('div');
+                    noRes.className = 'bank-item no-results';
+                    noRes.style.color = 'var(--accent-color)';
+                    noRes.style.fontWeight = '600';
+                    noRes.style.textAlign = 'center';
+                    noRes.innerHTML = '<i data-lucide="alert-circle" style="width:16px; vertical-align:middle; margin-right:5px;"></i> Bank not available';
+                    list.appendChild(noRes);
+                    lucide.createIcons();
+                }
+            } else if (existingNoRes) {
+                existingNoRes.remove();
             }
         });
-    });
 
-    document.addEventListener('click', (e) => {
-        if (!bankSearch.contains(e.target) && !bankList.contains(e.target)) {
-            bankList.style.display = 'none';
-        }
-    });
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !list.contains(e.target)) {
+                list.style.display = 'none';
+            }
+        });
+    }
+
+    setupSearch(cardBankSearch, cardBankList);
+    setupSearch(netBankSearch, netBankList);
 
     // --- Coupon Logic ---
     applyCouponBtn.addEventListener('click', () => {
