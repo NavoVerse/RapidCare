@@ -550,6 +550,11 @@ input:focus {
 .primary-btn {
     background: var(--primary-color);
     color: white;
+    border: 1px solid transparent;
+}
+
+[data-theme="dark"] .primary-btn {
+    border: var(--btn-border);
 }
 
 .secondary-btn {
@@ -568,6 +573,11 @@ input:focus {
     align-items: center;
     justify-content: center;
     gap: 12px;
+    border: 1px solid transparent;
+}
+
+[data-theme="dark"] .pay-btn {
+    border: var(--btn-border);
 }
 
 .pay-btn:hover {

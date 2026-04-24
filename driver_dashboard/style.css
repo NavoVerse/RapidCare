@@ -557,11 +557,16 @@ body {
     transition: var(--transition);
 }
 
-.btn-red { background-color: var(--accent-red); color: white; }
+.btn-red { background-color: var(--accent-red); color: white; border: 1px solid transparent; }
 .btn-red:hover { filter: brightness(1.2); }
 
-.btn-dark { background-color: var(--accent-red); color: white; }
+.btn-dark { background-color: var(--accent-red); color: white; border: 1px solid transparent; }
 .btn-dark:hover { filter: brightness(1.2); }
+
+[data-theme="dark"] .btn-red,
+[data-theme="dark"] .btn-dark {
+    border: var(--btn-border);
+}
 
 .btn-green-outline {
     background-color: transparent;
