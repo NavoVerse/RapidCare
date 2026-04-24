@@ -184,26 +184,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ─── ROLE SELECT ─── */
-let selectedTarget = null;
 function chooseRole(card, target) {
-    // If already chosen, navigate on second click
-    if (card.classList.contains('chosen')) {
-        navigateWithTransition(target);
-        return;
-    }
-
-    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('chosen'));
-    card.classList.add('chosen');
-    selectedTarget = target;
-    
-    const continueBtn = document.getElementById('continueBtn');
-    if (continueBtn) {
-        continueBtn.disabled = false;
-        continueBtn.style.opacity = '1';
-        continueBtn.style.cursor = 'pointer';
-        continueBtn.textContent = 'Continue →';
-        continueBtn.onclick = () => navigateWithTransition(selectedTarget);
-    }
+    // Navigate immediately on first click with transition
+    navigateWithTransition(target);
 }
 
 function navigateWithTransition(target) {
