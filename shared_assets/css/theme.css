@@ -83,7 +83,10 @@ textarea {
     --sos-text: #FFFFFF;
     --sos-glow: rgba(239, 68, 68, 0.6);
 
-    /* UI Enhancement Tokens */
+    /* Semantic Colors */
+    --success-color: #10b981;
+    --error-color: #ef4444;
+    --warning-color: #f59e0b;
     --btn-border: 1px solid #ECEFF1;
 }
 

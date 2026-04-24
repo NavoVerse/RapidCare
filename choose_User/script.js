@@ -186,6 +186,12 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ─── ROLE SELECT ─── */
 let selectedTarget = null;
 function chooseRole(card, target) {
+    // If already chosen, navigate on second click
+    if (card.classList.contains('chosen')) {
+        navigateWithTransition(target);
+        return;
+    }
+
     document.querySelectorAll('.role-card').forEach(c => c.classList.remove('chosen'));
     card.classList.add('chosen');
     selectedTarget = target;
@@ -196,6 +202,19 @@ function chooseRole(card, target) {
         continueBtn.style.opacity = '1';
         continueBtn.style.cursor = 'pointer';
         continueBtn.textContent = 'Continue →';
-        continueBtn.onclick = () => window.location.href = selectedTarget;
+        continueBtn.onclick = () => navigateWithTransition(selectedTarget);
+    }
+}
+
+function navigateWithTransition(target) {
+    if (!target) return;
+    const trans = document.getElementById('pgTrans');
+    if (trans) {
+        trans.classList.add('active');
+        setTimeout(() => {
+            window.location.href = target;
+        }, 600);
+    } else {
+        window.location.href = target;
     }
 }

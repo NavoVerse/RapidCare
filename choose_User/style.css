@@ -599,6 +599,22 @@ canvas#globe { border-radius: 50%; display: block; }
 .reveal { opacity: 0; transform: translateY(32px); transition: opacity .8s ease, transform .8s ease; }
 .reveal.vis { opacity: 1; transform: translateY(0); }
 
+/* ─── PAGE TRANSITION ─── */
+.page-transition {
+    position: fixed;
+    inset: 0;
+    background: var(--navy);
+    z-index: 10000; /* Above everything including cursor */
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-transition.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
 /* Mobile Optimizations */
 @media (max-width: 768px) {
     .bento { grid-template-columns: 1fr; }
