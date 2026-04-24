@@ -57,10 +57,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (trainingForm) {
-        trainingForm.addEventListener('submit', (e) => {
+        trainingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            alert('Registration Submitted successfully!');
-            // Final submission logic
+            
+            const submitBtn = document.querySelector('.submit-btn');
+            const origText = submitBtn.innerText;
+            submitBtn.innerText = 'Submitting...';
+            submitBtn.disabled = true;
+
+            const payload = {
+                name: document.getElementById('fullName')?.value,
+                dob: document.getElementById('dob')?.value,
+                email: document.getElementById('email')?.value,
+                password: document.getElementById('password')?.value,
+                phone: document.getElementById('mobileNum')?.value,
+                alt_phone: document.getElementById('altNum')?.value,
+                address: document.getElementById('address')?.value,
+                city: document.getElementById('city')?.value,
+                state: document.getElementById('state')?.value,
+                pincode: document.getElementById('pinCode')?.value,
+                aadhaar_number: document.getElementById('aadhaarNum')?.value,
+                pan_number: document.getElementById('panNum')?.value,
+                license_number: document.getElementById('dlNum')?.value,
+                vehicle_number: document.getElementById('rcNum')?.value
+            };
+
+            try {
+                const response = await fetch('http://localhost:5000/api/v1/drivers/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Driver Registration Submitted successfully!');
+                    window.location.href = '../rapid_Care_Login/index.html';
+                } else {
+                    alert('Registration failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Server error, please try again later.');
+            } finally {
+                submitBtn.innerText = origText;
+                submitBtn.disabled = false;
+            }
         });
     }
 });
