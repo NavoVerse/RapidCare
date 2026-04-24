@@ -941,12 +941,13 @@ DONE | Update `DeveloperDashboard` to call unified server | 🟡 Medium | 30 min
 |---|---|---|
 DONE | Build `POST /api/v1/drivers/register` — save all 5 steps of driver form | 🔴 High | 3 hours |
 DONE | Build `POST /api/v1/hospitals/register` — save all 5 steps of hospital form | 🔴 High | 3 hours |
-| Connect `driver_registration/script.js` submit to backend API | 🔴 High | 2 hours |
-| Connect `hospital_registration/script.js` submit to backend API | 🔴 High | 2 hours |
-| Build `GET/PUT /api/v1/patients/me` — patient profile CRUD | 🟡 Medium | 2 hours |
-| Connect `patient_Dashboard` Details view edit forms to API | 🟡 Medium | 3 hours |
-| Implement real OTP delivery via Nodemailer | 🟡 Medium | 2 hours |
-| Connect `login_urgency` OTP flow to `/api/v1/auth/request-otp` and `/verify-otp` | 🟡 Medium | 2 hours |
+DONE | Connect `driver_registration/script.js` submit to backend API | 🔴 High | 2 hours |
+DONE | Connect `hospital_registration/script.js` submit to backend API | 🔴 High | 2 hours |
+DONE | Build `GET/PUT /api/v1/patients/me` — patient profile CRUD | 🟡 Medium | 2 hours |
+DONE | Connect `patient_Dashboard` Details view edit forms to API | 🟡 Medium | 3 hours |
+DONE | Implement real OTP delivery via Nodemailer | 🟡 Medium | 2 hours |
+DONE | Connect `login_urgency` OTP flow to `/api/v1/auth/request-otp` and `/verify-otp` | 🟡 Medium | 2 hours |
+Twilio SMS not Done
 
 **Deliverable**: All registration forms persist data; OTPs delivered via email.
 
