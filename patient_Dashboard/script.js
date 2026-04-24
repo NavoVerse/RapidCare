@@ -1,4 +1,74 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // =============================================
+    // PROFILE DATA FETCHING
+    // =============================================
+    async function loadUserProfile() {
+        const token = localStorage.getItem('rapidcare_token');
+        if (!token) {
+            // Check if user is in localStorage just in case
+            const userStr = localStorage.getItem('rapidcare_user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    const sidebarName = document.querySelector('.user-info h3');
+                    if (sidebarName) sidebarName.textContent = user.name;
+                } catch(e) {}
+            }
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:5000/api/v1/patients/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error('Failed to fetch profile');
+            const data = await response.json();
+
+            // Update details view
+            const setVal = (id, val, prefix = '', defaultVal = '--') => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val ? prefix + val : prefix + defaultVal;
+            };
+
+            setVal('displayProfileName', data.name, '', 'Unknown User');
+            setVal('displayProfileGender', data.gender, '👤 ');
+            setVal('displayProfileBirth', data.date_of_birth, '🎂 ');
+            setVal('displayProfileHeight', data.height);
+            setVal('displayProfileWeight', data.weight);
+            if (data.height && data.weight) {
+                const hM = data.height / 100;
+                setVal('displayProfileBMI', (data.weight / (hM * hM)).toFixed(1));
+            } else {
+                setVal('displayProfileBMI', '--');
+            }
+            setVal('displayProfileBlood', data.blood_type, '🩸 ');
+            setVal('displayProfileLocation', data.home_location, '📍 ');
+            setVal('displayProfileBP', data.blood_pressure);
+            setVal('displayProfileAllergies', data.allergies);
+            setVal('displayProfileChronic', data.chronic_conditions);
+
+            // Update sidebar and header
+            const sidebarName = document.getElementById('sidebarName');
+            if (sidebarName && data.name) sidebarName.textContent = data.name;
+            
+            // Set dynamic avatars
+            if (data.name) {
+                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=2563eb&color=fff&size=128`;
+                const sidebarAvatar = document.getElementById('sidebarAvatar');
+                if (sidebarAvatar) sidebarAvatar.src = avatarUrl;
+                const headerAvatar = document.getElementById('headerAvatar');
+                if (headerAvatar) headerAvatar.src = avatarUrl;
+                const mainProfileAvatar = document.getElementById('mainProfileAvatar');
+                if (mainProfileAvatar) mainProfileAvatar.src = avatarUrl;
+            }
+
+        } catch (error) {
+            console.error('Error loading profile:', error);
+        }
+    }
+
+    loadUserProfile();
+
     // SOS Button Logic
     const sosBtn = document.getElementById('sos-btn');
     if (sosBtn) {
@@ -884,10 +954,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (input && f.target) {
                         const targetEl = document.getElementById(f.target);
                         if (targetEl) {
-                            targetEl.textContent = f.prefix + input.value;
+                            targetEl.textContent = input.value ? f.prefix + input.value : f.prefix + '--';
                         }
                     }
                 });
+            }
+
+            if (activeEditConfig && activeEditConfig.id === 'editGeneralProfile') {
+                const heightVal = parseFloat(document.getElementById('edit-height')?.value);
+                const weightVal = parseFloat(document.getElementById('edit-weight')?.value);
+                const bmiEl = document.getElementById('displayProfileBMI');
+                if (bmiEl) {
+                    if (heightVal && weightVal) {
+                        const hM = heightVal / 100;
+                        bmiEl.textContent = (weightVal / (hM * hM)).toFixed(1);
+                    } else {
+                        bmiEl.textContent = '--';
+                    }
+                }
             }
 
             // Show success toast

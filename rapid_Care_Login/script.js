@@ -141,8 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (res.ok) {
                 // Store token and user info
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('rapidcare_token', data.token);
+                localStorage.setItem('rapidcare_user', JSON.stringify(data.user));
                 showToast(`Welcome back, ${data.user.name}!`, 'success');
                 // Redirect to patient dashboard
                 setTimeout(() => {

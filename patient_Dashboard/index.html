@@ -83,9 +83,9 @@
         </nav>
 
         <div class="user-profile" id="userProfileCard">
-            <img src="samim_profile.jpg" alt="Samim Uddin" class="user-avatar" style="object-fit: cover;">
+            <img src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff" alt="User" class="user-avatar" id="sidebarAvatar" style="object-fit: cover;">
             <div class="user-info">
-                <h4>Samim Uddin Molla</h4>
+                <h4 id="sidebarName">Loading...</h4>
                 <p>Patient (Premium)</p>
             </div>
             <svg id="profileChevron" style="margin-left: auto; color: var(--text-muted); transition: transform 0.3s ease;" width="16" height="16" viewBox="0 0 24 24"
@@ -143,7 +143,7 @@
                     <span class="notification-badge"></span>
                 </div>
                 <div class="user-avatar-small">
-                    <img src="samim_profile.jpg" alt="SU" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                    <img src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff" id="headerAvatar" alt="U" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
                 </div>
             </div>
         </header>
@@ -281,16 +281,14 @@
                             <div class="profile-info-grid">
                                 <div class="profile-image-section">
                                     <div class="profile-avatar-wrapper">
-                                        <img src="samim_profile.jpg" alt="Patient Avatar">
+                                        <img src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff" id="mainProfileAvatar" alt="Patient Avatar">
                                         <div class="avatar-badges">
-                                            <span class="badge alcohol">🍷</span>
-                                            <span class="badge smoker">🚬</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="profile-details-section">
                                     <div class="name-header">
-                                        <h2 id="displayProfileName">Samim Uddin Molla</h2>
+                                        <h2 id="displayProfileName">Loading...</h2>
                                         <div class="action-icons">
                                             <button class="call-btn">📞</button>
                                             <button class="mail-btn">✉️</button>
@@ -298,30 +296,34 @@
                                         <button class="edit-profile-btn" id="editGeneralProfile">✏️ Edit</button>
                                     </div>
                                     <div class="demographics">
-                                        <span id="displayProfileGender">👤 Male</span>
-                                        <span id="displayProfileBirth">🎂 12 Dec 1992</span>
-                                        <span id="displayProfileBlood">🩸 O+</span>
-                                        <span id="displayProfileLocation">📍 Elshiekh zayed, Giza</span>
+                                        <span id="displayProfileGender">👤 --</span>
+                                        <span id="displayProfileBirth">🎂 --</span>
+                                        <span id="displayProfileBlood">🩸 --</span>
+                                        <span id="displayProfileLocation">📍 --</span>
                                     </div>
                                     <div class="vitals-row" style="flex-wrap: wrap;">
                                         <div class="vital-item" style="min-width: 80px;">
-                                            <div class="vital-val"><span id="displayProfileHeight">175</span> <small>Cm</small></div>
+                                            <div class="vital-val"><span id="displayProfileHeight">--</span> <small>Cm</small></div>
                                             <div class="vital-label">Height</div>
                                         </div>
                                         <div class="vital-item" style="min-width: 80px;">
-                                            <div class="vital-val"><span id="displayProfileWeight">92</span> <small>kg</small></div>
+                                            <div class="vital-val"><span id="displayProfileWeight">--</span> <small>kg</small></div>
                                             <div class="vital-label">Weight</div>
                                         </div>
                                         <div class="vital-item" style="min-width: 80px;">
-                                            <div class="vital-val"><span id="displayProfileBP">124/80</span> <small>mmHg</small></div>
+                                            <div class="vital-val"><span id="displayProfileBMI" style="color: var(--accent);">--</span></div>
+                                            <div class="vital-label">BMI</div>
+                                        </div>
+                                        <div class="vital-item" style="min-width: 80px;">
+                                            <div class="vital-val"><span id="displayProfileBP">--/--</span> <small>mmHg</small></div>
                                             <div class="vital-label">Blood pressure</div>
                                         </div>
                                         <div class="vital-item" style="min-width: 120px; flex: 1;">
-                                            <div class="vital-val" id="displayProfileAllergies" style="font-size: 1rem; white-space: normal;">None</div>
+                                            <div class="vital-val" id="displayProfileAllergies" style="font-size: 1rem; white-space: normal;">--</div>
                                             <div class="vital-label">Allergies</div>
                                         </div>
                                         <div class="vital-item" style="min-width: 120px; flex: 1;">
-                                            <div class="vital-val" id="displayProfileChronic" style="font-size: 1rem; white-space: normal;">Hypertension</div>
+                                            <div class="vital-val" id="displayProfileChronic" style="font-size: 1rem; white-space: normal;">--</div>
                                             <div class="vital-label">Chronic Conditions</div>
                                         </div>
                                     </div>
@@ -329,16 +331,14 @@
                                 <div class="diagnosis-section">
                                     <div class="diag-group">
                                         <label>Own diagnosis</label>
-                                        <div class="tags">
-                                            <span class="tag obesity">Obesity</span>
-                                            <span class="tag uncontrolled">Uncontrolled Type 2</span>
+                                        <div class="tags" id="ownDiagnosisTags">
+                                            <span class="tag" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: transparent;">None added</span>
                                         </div>
                                     </div>
                                     <div class="diag-group">
                                         <label>Health barriers</label>
-                                        <div class="tags">
-                                            <span class="tag fear">Fear of medication</span>
-                                            <span class="tag fear">Fear of insulin</span>
+                                        <div class="tags" id="healthBarriersTags">
+                                            <span class="tag" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: transparent;">None added</span>
                                         </div>
                                     </div>
                                 </div>

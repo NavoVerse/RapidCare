@@ -5,82 +5,192 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RapidCare | Dev Dashboard</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>RapidCare <span>Developer</span> Dashboard</h1>
-        <p style="color: var(--text-dim);">Live Database Inspection System</p>
-    </header>
 
-    <div class="dashboard-grid">
-        <!-- Patients Section -->
-        <section id="patients-section">
-            <h2><span class="badge badge-patient">Patients</span> Database</h2>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Password (Hashed)</th>
-                            <th>Medical Details / Contact</th>
-                        </tr>
-                    </thead>
-                    <tbody id="patients-list">
-                        <tr><td colspan="5" class="loading">Loading records...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+    <aside class="sidebar">
+        <div class="logo-container">
+            <h1>RapidCare <span>Dev</span></h1>
+            <p>Live Database Inspector</p>
+        </div>
+        <nav id="sidebar-nav">
+            <a href="#" data-target="overview" class="active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Overview
+            </a>
+            <a href="#" data-target="patients">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                Patients
+            </a>
+            <a href="#" data-target="drivers">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M16 12l-4-4-4 4M12 8v8"></path></svg>
+                Drivers
+            </a>
+            <a href="#" data-target="hospitals">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Hospitals
+            </a>
+        </nav>
+    </aside>
 
-        <!-- Drivers Section -->
-        <section id="drivers-section">
-            <h2><span class="badge badge-driver">Drivers</span> Database</h2>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Password (Hashed)</th>
-                            <th>Vehicle & License</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="drivers-list">
-                        <tr><td colspan="6" class="loading">Loading records...</td></tr>
-                    </tbody>
-                </table>
+    <main class="main-content">
+        <header>
+            <h2 id="page-title">Dashboard Overview</h2>
+            <div class="search-bar">
+                <input type="text" id="global-search" placeholder="Search records...">
             </div>
-        </section>
+        </header>
 
-        <!-- Hospitals Section -->
-        <section id="hospitals-section">
-            <h2><span class="badge badge-hospital">Hospitals</span> Database</h2>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Password (Hashed)</th>
-                            <th>Location / Specialty</th>
-                            <th>Total Beds</th>
-                        </tr>
-                    </thead>
-                    <tbody id="hospitals-list">
-                        <tr><td colspan="6" class="loading">Loading records...</td></tr>
-                    </tbody>
-                </table>
+        <!-- Toast Notification -->
+        <div id="toast" class="toast">Update successful!</div>
+
+        <!-- Metrics Section -->
+        <div class="metrics-grid" id="metrics-grid">
+            <div class="metric-card">
+                <h3>Total Patients</h3>
+                <div class="value" id="count-patients" style="color: var(--patient)">0</div>
             </div>
-        </section>
-    </div>
+            <div class="metric-card">
+                <h3>Active Drivers</h3>
+                <div class="value" id="count-drivers" style="color: var(--driver)">0</div>
+            </div>
+            <div class="metric-card">
+                <h3>Hospitals</h3>
+                <div class="value" id="count-hospitals" style="color: var(--hospital)">0</div>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Patients Section -->
+            <section id="patients-section" class="data-section">
+                <div class="table-panel">
+                    <div class="table-header">
+                        <h3><span class="badge badge-patient">Patients</span> Database</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Password (Hash)</th>
+                                    <th>Medical Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patients-list">
+                                <tr><td colspan="5" class="loading">Loading records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Drivers Section -->
+            <section id="drivers-section" class="data-section">
+                <div class="table-panel">
+                    <div class="table-header">
+                        <h3><span class="badge badge-driver">Drivers</span> Database</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>License / Vehicle</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="drivers-list">
+                                <tr><td colspan="5" class="loading">Loading records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hospitals Section -->
+            <section id="hospitals-section" class="data-section">
+                <div class="table-panel">
+                    <div class="table-header">
+                        <h3><span class="badge badge-hospital">Hospitals</span> Database</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Location / Spec</th>
+                                    <th>Beds</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hospitals-list">
+                                <tr><td colspan="5" class="loading">Loading records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
 
     <script>
+        let dashboardData = { patients: [], drivers: [], hospitals: [] };
+
+        // Toast functionality
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            if (isError) toast.classList.add('error');
+            else toast.classList.remove('error');
+            
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Navigation functionality
+        const navLinks = document.querySelectorAll('#sidebar-nav a');
+        const sections = document.querySelectorAll('.data-section');
+        const metricsGrid = document.getElementById('metrics-grid');
+        const pageTitle = document.getElementById('page-title');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                const target = link.getAttribute('data-target');
+                
+                if (target === 'overview') {
+                    pageTitle.textContent = 'Dashboard Overview';
+                    metricsGrid.style.display = 'grid';
+                    sections.forEach(s => s.classList.add('active'));
+                } else {
+                    pageTitle.textContent = target.charAt(0).toUpperCase() + target.slice(1) + ' Database';
+                    metricsGrid.style.display = 'none';
+                    sections.forEach(s => s.classList.remove('active'));
+                    document.getElementById(target + '-section').classList.add('active');
+                }
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('global-search');
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('tbody tr').forEach(row => {
+                if (row.querySelector('.loading')) return;
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
+        });
+
+        // Inline Update functionality
         async function updateField(role, id, field, element) {
             const value = element.innerText.trim();
             const originalValue = element.getAttribute('data-original') || '';
@@ -93,86 +203,117 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ role, id, field, value })
                 });
+                
                 if (response.ok) {
                     element.setAttribute('data-original', value);
-                    element.style.background = 'rgba(0, 255, 0, 0.1)';
+                    element.style.background = 'rgba(16, 185, 129, 0.2)';
                     setTimeout(() => { element.style.background = ''; }, 1000);
+                    showToast(`${field} updated successfully!`);
                 } else {
                     throw new Error('Update failed');
                 }
             } catch (error) {
                 console.error(error);
                 element.innerText = originalValue; // Revert
-                element.style.background = 'rgba(255, 0, 0, 0.1)';
+                element.style.background = 'rgba(239, 68, 68, 0.2)';
                 setTimeout(() => { element.style.background = ''; }, 1000);
-                alert('Failed to update field.');
+                showToast(`Failed to update ${field}`, true);
             } finally {
                 element.style.opacity = '1';
             }
         }
 
+        // Data Fetching
         async function fetchData() {
             try {
-                // Uses the unified backend (port 5000) regardless of how this page is opened
                 const response = await fetch('http://localhost:5000/api/data');
-                const data = await response.json();
+                dashboardData = await response.json();
 
-                updateTable('patients-list', data.patients, (p) => `
-                    <td>${p.id}</td>
-                    <td><strong contenteditable="true" data-original="${p.name}" onblur="updateField('patient', ${p.id}, 'name', this)">${p.name}</strong></td>
-                    <td><span contenteditable="true" data-original="${p.email}" onblur="updateField('patient', ${p.id}, 'email', this)">${p.email}</span></td>
-                    <td><code>${p.password.substring(0, 15)}...</code></td>
-                    <td>
-                        <small>Blood: <span contenteditable="true" data-original="${p.blood_group || ''}" onblur="updateField('patient', ${p.id}, 'blood_group', this)">${p.blood_group || ''}</span></small><br>
-                        <small>History: <span contenteditable="true" data-original="${p.medical_history || ''}" onblur="updateField('patient', ${p.id}, 'medical_history', this)">${p.medical_history || ''}</span></small>
-                    </td>
-                `);
+                // Update Metrics
+                document.getElementById('count-patients').textContent = dashboardData.patients.length;
+                document.getElementById('count-drivers').textContent = dashboardData.drivers.length;
+                document.getElementById('count-hospitals').textContent = dashboardData.hospitals.length;
 
-                updateTable('drivers-list', data.drivers, (d) => `
-                    <td>${d.id}</td>
-                    <td><strong contenteditable="true" data-original="${d.name}" onblur="updateField('driver', ${d.id}, 'name', this)">${d.name}</strong></td>
-                    <td><span contenteditable="true" data-original="${d.email}" onblur="updateField('driver', ${d.id}, 'email', this)">${d.email}</span></td>
-                    <td><code>${d.password.substring(0, 15)}...</code></td>
-                    <td>
-                        <small>License: <span contenteditable="true" data-original="${d.license_number || ''}" onblur="updateField('driver', ${d.id}, 'license_number', this)">${d.license_number || ''}</span></small><br>
-                        <small>Vehicle: <span contenteditable="true" data-original="${d.vehicle_number || ''}" onblur="updateField('driver', ${d.id}, 'vehicle_number', this)">${d.vehicle_number || ''}</span></small>
-                    </td>
-                    <td><span class="badge" style="background: rgba(0,0,0,0.2)" contenteditable="true" data-original="${d.status}" onblur="updateField('driver', ${d.id}, 'status', this)">${d.status}</span></td>
-                `);
+                // Render Tables
+                renderTables();
 
-                updateTable('hospitals-list', data.hospitals, (h) => `
-                    <td>${h.id}</td>
-                    <td><strong contenteditable="true" data-original="${h.name}" onblur="updateField('hospital', ${h.id}, 'name', this)">${h.name}</strong></td>
-                    <td><span contenteditable="true" data-original="${h.email}" onblur="updateField('hospital', ${h.id}, 'email', this)">${h.email}</span></td>
-                    <td><code>${h.password.substring(0, 15)}...</code></td>
-                    <td>
-                        <small>Address: <span contenteditable="true" data-original="${h.address || ''}" onblur="updateField('hospital', ${h.id}, 'address', this)">${h.address || ''}</span></small><br>
-                        <small>Spec: <span contenteditable="true" data-original="${h.specialty || ''}" onblur="updateField('hospital', ${h.id}, 'specialty', this)">${h.specialty || 'General'}</span></small>
-                    </td>
-                    <td><span contenteditable="true" data-original="${h.total_beds || 0}" onblur="updateField('hospital', ${h.id}, 'total_beds', this)">${h.total_beds || 0}</span></td>
-                `);
+                // Re-apply search filter if any
+                const event = new Event('input');
+                searchInput.dispatchEvent(event);
 
             } catch (error) {
                 console.error('Fetch error:', error);
+                showToast('Failed to sync with server', true);
             }
+        }
+
+        function renderTables() {
+            updateTable('patients-list', dashboardData.patients, (p) => `
+                <td><strong>${p.id}</strong></td>
+                <td><strong contenteditable="true" data-original="${p.name}" onblur="updateField('patient', ${p.id}, 'name', this)">${p.name}</strong></td>
+                <td><span contenteditable="true" data-original="${p.email}" onblur="updateField('patient', ${p.id}, 'email', this)">${p.email}</span></td>
+                <td><code>${p.password ? p.password.substring(0, 10) : ''}...</code></td>
+                <td>
+                    <details class="dev-details-collapsible">
+                        <summary>View Profile Details</summary>
+                        <div class="collapsible-content">
+                            <div class="detail-row"><span class="detail-label">Gender:</span> <span contenteditable="true" data-original="${p.gender || ''}" onblur="updateField('patient', ${p.id}, 'gender', this)">${p.gender || '-'}</span></div>
+                            <div class="detail-row"><span class="detail-label">DOB:</span> <span contenteditable="true" data-original="${p.date_of_birth || ''}" onblur="updateField('patient', ${p.id}, 'date_of_birth', this)">${p.date_of_birth || '-'}</span></div>
+                            <div class="detail-row"><span class="detail-label">Height:</span> <span contenteditable="true" data-original="${p.height || ''}" onblur="updateField('patient', ${p.id}, 'height', this)">${p.height || '-'}</span></div>
+                            <div class="detail-row"><span class="detail-label">Weight:</span> <span contenteditable="true" data-original="${p.weight || ''}" onblur="updateField('patient', ${p.id}, 'weight', this)">${p.weight || '-'}</span></div>
+                            <div class="detail-row"><span class="detail-label">Blood:</span> <span contenteditable="true" data-original="${p.blood_group || ''}" onblur="updateField('patient', ${p.id}, 'blood_group', this)">${p.blood_group || '-'}</span></div>
+                            <div class="detail-row"><span class="detail-label">BP:</span> <span contenteditable="true" data-original="${p.blood_pressure || ''}" onblur="updateField('patient', ${p.id}, 'blood_pressure', this)">${p.blood_pressure || '-'}</span></div>
+                            <div class="detail-row"><span class="detail-label">Location:</span> <span contenteditable="true" data-original="${p.home_location || ''}" onblur="updateField('patient', ${p.id}, 'home_location', this)">${p.home_location || '-'}</span></div>
+                            <div class="detail-row"><span class="detail-label">Allergies:</span> <span contenteditable="true" data-original="${p.allergies || ''}" onblur="updateField('patient', ${p.id}, 'allergies', this)">${p.allergies || '-'}</span></div>
+                            <div class="detail-row"><span class="detail-label">Conditions:</span> <span contenteditable="true" data-original="${p.chronic_conditions || ''}" onblur="updateField('patient', ${p.id}, 'chronic_conditions', this)">${p.chronic_conditions || '-'}</span></div>
+                            <div class="detail-row"><span class="detail-label">History:</span> <span contenteditable="true" data-original="${p.medical_history || ''}" onblur="updateField('patient', ${p.id}, 'medical_history', this)">${p.medical_history || '-'}</span></div>
+                        </div>
+                    </details>
+                </td>
+            `);
+
+            updateTable('drivers-list', dashboardData.drivers, (d) => `
+                <td><strong>${d.id}</strong></td>
+                <td><strong contenteditable="true" data-original="${d.name}" onblur="updateField('driver', ${d.id}, 'name', this)">${d.name}</strong></td>
+                <td><span contenteditable="true" data-original="${d.email}" onblur="updateField('driver', ${d.id}, 'email', this)">${d.email}</span></td>
+                <td>
+                    <small>Lic: <span contenteditable="true" data-original="${d.license_number || ''}" onblur="updateField('driver', ${d.id}, 'license_number', this)">${d.license_number || '-'}</span></small><br>
+                    <small>Veh: <span contenteditable="true" data-original="${d.vehicle_number || ''}" onblur="updateField('driver', ${d.id}, 'vehicle_number', this)">${d.vehicle_number || '-'}</span></small>
+                </td>
+                <td><span class="badge" contenteditable="true" data-original="${d.status}" onblur="updateField('driver', ${d.id}, 'status', this)">${d.status}</span></td>
+            `);
+
+            updateTable('hospitals-list', dashboardData.hospitals, (h) => `
+                <td><strong>${h.id}</strong></td>
+                <td><strong contenteditable="true" data-original="${h.name}" onblur="updateField('hospital', ${h.id}, 'name', this)">${h.name}</strong></td>
+                <td><span contenteditable="true" data-original="${h.email}" onblur="updateField('hospital', ${h.id}, 'email', this)">${h.email}</span></td>
+                <td>
+                    <small>Add: <span contenteditable="true" data-original="${h.address || ''}" onblur="updateField('hospital', ${h.id}, 'address', this)">${h.address || '-'}</span></small><br>
+                    <small>Spec: <span contenteditable="true" data-original="${h.specialty || ''}" onblur="updateField('hospital', ${h.id}, 'specialty', this)">${h.specialty || '-'}</span></small>
+                </td>
+                <td><strong contenteditable="true" data-original="${h.total_beds || 0}" onblur="updateField('hospital', ${h.id}, 'total_beds', this)">${h.total_beds || 0}</strong></td>
+            `);
         }
 
         function updateTable(id, records, template) {
             const tbody = document.getElementById(id);
             if (!records || records.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">No records found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">No records found in database</td></tr>';
                 return;
             }
             tbody.innerHTML = records.map(r => `<tr>${template(r)}</tr>`).join('');
         }
 
+        // Init
+        document.querySelector('[data-target="overview"]').click(); // Setup overview mode
         fetchData();
-        // Refresh every 30 seconds only if nothing is currently being edited
+        
+        // Auto-refresh safely
         setInterval(() => {
             if (!document.activeElement || !document.activeElement.isContentEditable) {
                 fetchData();
             }
-        }, 30000);
+        }, 15000);
     </script>
 </body>
 </html>
