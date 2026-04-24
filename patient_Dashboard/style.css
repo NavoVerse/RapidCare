@@ -764,6 +764,33 @@ header {
     animation: fadeIn 0.3s ease;
 }
 
+#editModal .modal-content {
+    max-width: 700px;
+}
+
+#editModal .modal-body {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 15px;
+}
+
+#editModal .modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+#editModal .modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+#editModal .modal-body::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 10px;
+}
+
+#editFields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 30px;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;

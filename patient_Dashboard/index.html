@@ -299,26 +299,30 @@
                                     </div>
                                     <div class="demographics">
                                         <span id="displayProfileGender">👤 Male</span>
+                                        <span id="displayProfileBirth">🎂 12 Dec 1992</span>
+                                        <span id="displayProfileBlood">🩸 O+</span>
                                         <span id="displayProfileLocation">📍 Elshiekh zayed, Giza</span>
-                                        <span id="displayProfileJob">💼 Accountant</span>
-                                        <span id="displayProfileBirth">🎂 12 Dec 1992 (38 years)</span>
                                     </div>
-                                    <div class="vitals-row">
-                                        <div class="vital-item">
-                                            <div class="vital-val">22.4 <small>BMI</small></div>
-                                            <div class="vital-trend pos">▼ 10</div>
-                                        </div>
-                                        <div class="vital-item">
-                                            <div class="vital-val">92 <small>kg</small></div>
-                                            <div class="vital-trend pos">▼ 10 kg</div>
-                                        </div>
-                                        <div class="vital-item">
-                                            <div class="vital-val">175 <small>Cm</small></div>
+                                    <div class="vitals-row" style="flex-wrap: wrap;">
+                                        <div class="vital-item" style="min-width: 80px;">
+                                            <div class="vital-val"><span id="displayProfileHeight">175</span> <small>Cm</small></div>
                                             <div class="vital-label">Height</div>
                                         </div>
-                                        <div class="vital-item">
-                                            <div class="vital-val">124/80 <small>Blood pressure</small></div>
-                                            <div class="vital-trend neg">▲ 10</div>
+                                        <div class="vital-item" style="min-width: 80px;">
+                                            <div class="vital-val"><span id="displayProfileWeight">92</span> <small>kg</small></div>
+                                            <div class="vital-label">Weight</div>
+                                        </div>
+                                        <div class="vital-item" style="min-width: 80px;">
+                                            <div class="vital-val"><span id="displayProfileBP">124/80</span> <small>mmHg</small></div>
+                                            <div class="vital-label">Blood pressure</div>
+                                        </div>
+                                        <div class="vital-item" style="min-width: 120px; flex: 1;">
+                                            <div class="vital-val" id="displayProfileAllergies" style="font-size: 1rem; white-space: normal;">None</div>
+                                            <div class="vital-label">Allergies</div>
+                                        </div>
+                                        <div class="vital-item" style="min-width: 120px; flex: 1;">
+                                            <div class="vital-val" id="displayProfileChronic" style="font-size: 1rem; white-space: normal;">Hypertension</div>
+                                            <div class="vital-label">Chronic Conditions</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1715,7 +1719,7 @@
                 <div class="modal-body">
                     <form id="editForm">
                         <div id="editFields"></div>
-                        <button type="submit" style="width: 100%; margin-top: 20px; padding: 12px; background: var(--primary-green); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        <button type="submit" style="width: 100%; margin-top: 10px; padding: 12px; background: transparent; color: var(--primary-text); border: none; font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">
                             Save Changes
                         </button>
                     </form>
