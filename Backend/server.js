@@ -245,6 +245,39 @@ app.get('/api/data', (req, res) => fetchDashboardData(res));
 // Future-ready versioned endpoint (Admin only)
 app.get('/api/admin/data', authenticateToken, authorize('admin'), (req, res) => fetchDashboardData(res));
 
+// Update endpoint for Developer Dashboard
+app.put('/api/admin/data', express.json(), async (req, res) => {
+    const { role, id, field, value } = req.body;
+    const db = getDb();
+    
+    // Validate inputs
+    const allowedRoles = ['patient', 'driver', 'hospital'];
+    if (!allowedRoles.includes(role)) return res.status(400).json({ error: 'Invalid role' });
+    
+    const userFields = ['name', 'email', 'phone'];
+    const patientFields = ['blood_group', 'medical_history', 'emergency_contact'];
+    const driverFields = ['license_number', 'vehicle_number', 'status'];
+    const hospitalFields = ['address', 'total_beds', 'specialty'];
+
+    try {
+        if (userFields.includes(field)) {
+            await db.run(`UPDATE users SET ${field} = ? WHERE id = ?`, [value, id]);
+        } else if (role === 'patient' && patientFields.includes(field)) {
+            await db.run(`UPDATE patients SET ${field} = ? WHERE user_id = ?`, [value, id]);
+        } else if (role === 'driver' && driverFields.includes(field)) {
+            await db.run(`UPDATE drivers SET ${field} = ? WHERE user_id = ?`, [value, id]);
+        } else if (role === 'hospital' && hospitalFields.includes(field)) {
+            await db.run(`UPDATE hospitals SET ${field} = ? WHERE user_id = ?`, [value, id]);
+        } else {
+            return res.status(400).json({ error: 'Invalid field' });
+        }
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Update error:', error);
+        res.status(500).json({ error: 'Failed to update data' });
+    }
+});
+
 // =============================================================================
 // HEALTH CHECK
 // =============================================================================
