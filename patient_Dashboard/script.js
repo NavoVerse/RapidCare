@@ -842,8 +842,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (editForm) {
-        editForm.addEventListener('submit', (e) => {
+        editForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            if (activeEditConfig && activeEditConfig.id === 'editGeneralProfile') {
+                const payload = {
+                    name: document.getElementById('edit-name')?.value,
+                    gender: document.getElementById('edit-gender')?.value,
+                    date_of_birth: document.getElementById('edit-birth')?.value,
+                    height: parseFloat(document.getElementById('edit-height')?.value) || null,
+                    weight: parseFloat(document.getElementById('edit-weight')?.value) || null,
+                    blood_type: document.getElementById('edit-blood')?.value,
+                    home_location: document.getElementById('edit-loc')?.value,
+                    blood_pressure: document.getElementById('edit-bp')?.value,
+                    allergies: document.getElementById('edit-allergies')?.value,
+                    chronic_conditions: document.getElementById('edit-chronic')?.value
+                };
+
+                try {
+                    const token = localStorage.getItem('rapidcare_token');
+                    if (token) {
+                        const response = await fetch('http://localhost:5000/api/v1/patients/me', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) throw new Error('Failed to update profile');
+                    }
+                } catch (error) {
+                    console.error('Update error:', error);
+                    alert('Error updating profile in database.');
+                }
+            }
             
             if (activeEditConfig && activeEditConfig.fields) {
                 activeEditConfig.fields.forEach(f => {
@@ -1295,6 +1328,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateCashRewardUIPayment();
     updateTotalPayment();
+
+    async function loadPatientProfile() {
+        try {
+            const token = localStorage.getItem('rapidcare_token');
+            if (!token) return;
+            const res = await fetch('http://localhost:5000/api/v1/patients/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.name) document.getElementById('displayProfileName').textContent = data.name;
+                if (data.gender) document.getElementById('displayProfileGender').textContent = `👤 ${data.gender}`;
+                if (data.date_of_birth) document.getElementById('displayProfileBirth').textContent = `🎂 ${data.date_of_birth}`;
+                if (data.blood_type) document.getElementById('displayProfileBlood').textContent = `🩸 ${data.blood_type}`;
+                if (data.home_location) document.getElementById('displayProfileLocation').textContent = `📍 ${data.home_location}`;
+                if (data.height != null) document.getElementById('displayProfileHeight').textContent = data.height;
+                if (data.weight != null) document.getElementById('displayProfileWeight').textContent = data.weight;
+                if (data.blood_pressure) document.getElementById('displayProfileBP').textContent = data.blood_pressure;
+                if (data.allergies) document.getElementById('displayProfileAllergies').textContent = data.allergies;
+                if (data.chronic_conditions) document.getElementById('displayProfileChronic').textContent = data.chronic_conditions;
+            }
+        } catch (e) {
+            console.error('Failed to load profile', e);
+        }
+    }
+    loadPatientProfile();
 
     console.log('RapidCare Dashboard Initialized');
 });
