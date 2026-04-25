@@ -1004,8 +1004,8 @@ DONE | Replace hardcoded data in `history_patient/script.js` with API calls | �
 | Connect `Insurance_Interface` to backend | 🟡 Medium | 3 hours |
 | Build analytics APIs with real trip data aggregation | 🟡 Medium | 4 hours |
 | Connect `analytics_interface` to real data instead of simulation | 🟡 Medium | 3 hours |
-| Build admin export API to replace `excel_dashboard/mockData.js` | 🟡 Medium | 2 hours |
-| Connect `excel_dashboard` to live data from `/api/v1/admin/export` | 🟡 Medium | 2 hours |
+DONE | Build admin export API to replace `excel_dashboard/mockData.js` | 🟡 Medium | 2 hours |
+DONE | Connect `excel_dashboard` to live data from `/api/v1/admin/export` | 🟡 Medium | 2 hours |
 | Build hospital-facing dashboard APIs (bed management, incoming patients) | 🟡 Medium | 4 hours |
 
 **Deliverable**: All 13 frontend modules connected to real backend APIs.

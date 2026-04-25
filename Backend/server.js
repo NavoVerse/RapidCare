@@ -814,6 +814,62 @@ app.put('/api/v1/trips/:id/status', authenticateToken, authorize('driver'), asyn
 
 
 // =============================================================================
+// ADMIN EXPORT API (/api/v1/admin/export)
+// Used by excel_dashboard to download live data.
+// =============================================================================
+app.get('/api/v1/admin/export', authenticateToken, authorize('admin'), async (req, res) => {
+    try {
+        const hospitals = await knex('hospitals')
+            .join('users', 'hospitals.user_id', 'users.id')
+            .select(
+                'users.created_at as Timestamp',
+                'users.name as Hospital Name',
+                'hospitals.hospital_type as Type',
+                'hospitals.total_beds as Beds',
+                'hospitals.district as District',
+                'hospitals.state as State',
+                'hospitals.reception_number as Emergency No',
+                'hospitals.icu_beds as ICU Beds',
+                'hospitals.ambulances as Ambulances',
+                'users.email as Email'
+            );
+
+        const drivers = await knex('drivers')
+            .join('users', 'drivers.user_id', 'users.id')
+            .select(
+                'users.created_at as Timestamp',
+                'users.name as Driver Name',
+                'users.phone as Mobile',
+                'drivers.city as City',
+                'drivers.state as State',
+                'drivers.license_number as DL Number',
+                'drivers.vehicle_type as Vehicle Type',
+                'drivers.vehicle_number as RC Number',
+                'drivers.status as Status'
+            );
+
+        const patients = await knex('patients')
+            .join('users', 'patients.user_id', 'users.id')
+            .select(
+                'users.created_at as Timestamp',
+                'users.name as Patient Name',
+                'patients.gender as Gender',
+                'patients.date_of_birth as DOB',
+                'patients.home_location as Location',
+                'patients.chronic_conditions as Diagnosis',
+                'patients.weight as Weight',
+                'patients.height as Height',
+                'patients.blood_pressure as Blood Pressure'
+            );
+
+        res.json({ hospitals, drivers, patients });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// =============================================================================
 // DEV DASHBOARD API  (/api/data)
 // Legacy-compatible — fetched by DeveloperDashboard/index.html via /api/data.
 // Also accessible as /api/admin/data for the new API versioning plan.
