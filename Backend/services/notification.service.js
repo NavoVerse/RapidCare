@@ -5,28 +5,26 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 /**
  * Notification Service
  * Handles sending emails and (future) SMS notifications.
+ * 
+ * CONFIGURATION FOR GMAIL:
+ * 1. Enable 2-Step Verification in your Google Account.
+ * 2. Generate an "App Password" (Security > 2-Step Verification > App Passwords).
+ * 3. Use 'smtp.gmail.com' as SMTP_HOST and 587 as SMTP_PORT.
  */
 
 let transporter;
 
 // Initialize transporter with SMTP settings from .env
 const initTransporter = () => {
-    if (process.env.SMTP_HOST && process.env.SMTP_USER) {
-        transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT || 587,
-            secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS
-            }
-        });
-        console.log('Nodemailer: Initialized with SMTP settings.');
-    } else {
-        // Fallback to Ethereal for development if no real credentials provided
+    const { SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_PORT } = process.env;
+
+    // Graceful check for missing variables
+    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+        console.warn('⚠️ SMTP credentials missing in .env. Falling back to Ethereal for testing.');
+        
         nodemailer.createTestAccount((err, account) => {
             if (err) {
-                console.error('Failed to create a testing account. ' + err.message);
+                console.error('❌ Failed to create a testing account: ' + err.message);
                 return;
             }
             transporter = nodemailer.createTransport({
@@ -35,8 +33,24 @@ const initTransporter = () => {
                 secure: account.smtp.secure,
                 auth: { user: account.user, pass: account.pass }
             });
-            console.log('Nodemailer: Created Ethereal test account for development.');
+            console.log('✅ Nodemailer: Created Ethereal test account for development.');
         });
+        return;
+    }
+
+    try {
+        transporter = nodemailer.createTransport({
+            host: SMTP_HOST,
+            port: parseInt(SMTP_PORT) || 587,
+            secure: SMTP_PORT == 465, 
+            auth: {
+                user: SMTP_USER,
+                pass: SMTP_PASS
+            }
+        });
+        console.log('✅ Nodemailer: Initialized with production SMTP settings.');
+    } catch (error) {
+        console.error('❌ Failed to initialize SMTP transporter:', error.message);
     }
 };
 
@@ -49,13 +63,11 @@ initTransporter();
  */
 const sendOTPEmail = async (email, otp) => {
     if (!transporter) {
-        // Retry initialization once if it hasn't happened
-        initTransporter();
-        if (!transporter) throw new Error('Email transporter not initialized');
+        throw new Error('Email service is not available. Please check your SMTP configuration.');
     }
 
     const mailOptions = {
-        from: `"RapidCare Support" <${process.env.SMTP_USER || 'no-reply@rapidcare.com'}>`,
+        from: process.env.EMAIL_FROM || `"RapidCare Support" <${process.env.SMTP_USER}>`,
         to: email,
         subject: 'Your RapidCare Verification Code',
         text: `Your RapidCare verification code is: ${otp}. This code expires in 10 minutes.`,
@@ -91,8 +103,8 @@ const sendOTPEmail = async (email, otp) => {
         }
         return info;
     } catch (error) {
-        console.error('Error sending OTP email:', error);
-        throw error;
+        console.error('❌ Error sending OTP email:', error.message);
+        throw new Error('Failed to send verification email. Please try again later.');
     }
 };
 

@@ -947,7 +947,7 @@ DONE | Build `GET/PUT /api/v1/patients/me` — patient profile CRUD | 🟡 Mediu
 DONE | Connect `patient_Dashboard` Details view edit forms to API | 🟡 Medium | 3 hours |
 DONE | Implement real OTP delivery via Nodemailer | 🟡 Medium | 2 hours |
 DONE | Connect `login_urgency` OTP flow to `/api/v1/auth/request-otp` and `/verify-otp` | 🟡 Medium | 2 hours |
-Twilio SMS not Done
+DONE | Implement Custom Email OTP System (Nodemailer) | 🟡 Medium | 2 hours |
 
 **Deliverable**: All registration forms persist data; OTPs delivered via email.
 
