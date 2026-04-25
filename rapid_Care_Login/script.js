@@ -29,17 +29,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const showLoginLink = document.getElementById('show-login');
     const showSignupLink = document.getElementById('show-signup');
 
-    if (showLoginLink && showSignupLink && signupView && loginView) {
+    const forgotPasswordView = document.getElementById('forgot-password-view');
+    const showForgotPasswordLink = document.getElementById('show-forgot-password');
+    const backToLoginLink = document.getElementById('back-to-login');
+
+    if (showLoginLink && showSignupLink && signupView && loginView && forgotPasswordView) {
         showLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
             signupView.style.display = 'none';
+            forgotPasswordView.style.display = 'none';
             loginView.style.display = 'block';
         });
 
         showSignupLink.addEventListener('click', (e) => {
             e.preventDefault();
             loginView.style.display = 'none';
+            forgotPasswordView.style.display = 'none';
             signupView.style.display = 'block';
+        });
+
+        showForgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginView.style.display = 'none';
+            signupView.style.display = 'none';
+            forgotPasswordView.style.display = 'block';
+        });
+
+        backToLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            forgotPasswordView.style.display = 'none';
+            signupView.style.display = 'none';
+            loginView.style.display = 'block';
         });
     }
 
@@ -108,7 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(data.error || 'Registration failed', 'error');
             }
         } catch (err) {
-            showToast('Server unreachable. Is the backend running?', 'error');
+            showToast('Error: ' + err.message, 'error');
+            console.error('Signup error:', err);
         } finally {
             btn.textContent = 'Create account';
             btn.disabled = false;
@@ -152,7 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(data.error || 'Login failed', 'error');
             }
         } catch (err) {
-            showToast('Server unreachable. Is the backend running?', 'error');
+            showToast('Error: ' + err.message, 'error');
+            console.error('Login error:', err);
         } finally {
             btn.textContent = 'Log in';
             btn.disabled = false;
@@ -173,6 +195,88 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // --- FORGOT PASSWORD LOGIC ---
+    const forgotStep1 = document.getElementById('forgot-step-1');
+    const forgotStep2 = document.getElementById('forgot-step-2');
+    let resetEmailOrPhone = '';
+
+    if (forgotStep1 && forgotStep2) {
+        // Step 1: Request OTP
+        forgotStep1.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const emailInput = document.getElementById('forgot-email').value.trim();
+            if (!emailInput) return showToast('Please enter your email or phone', 'error');
+
+            const btn = forgotStep1.querySelector('.create-btn');
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/request-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailInput })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    showToast('OTP sent successfully', 'success');
+                    resetEmailOrPhone = emailInput;
+                    forgotStep1.style.display = 'none';
+                    forgotStep2.style.display = 'block';
+                } else {
+                    showToast(data.error || 'Failed to send OTP', 'error');
+                }
+            } catch (err) {
+                showToast('Error: ' + err.message, 'error');
+                console.error('OTP Request error:', err);
+            } finally {
+                btn.textContent = 'Send OTP';
+                btn.disabled = false;
+            }
+        });
+
+        // Step 2: Verify OTP & Reset Password
+        forgotStep2.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const otp = document.getElementById('forgot-otp').value.trim();
+            const newPassword = document.getElementById('forgot-new-password').value;
+
+            if (!otp || !newPassword) return showToast('Please fill all fields', 'error');
+
+            const btn = forgotStep2.querySelector('.create-btn');
+            btn.textContent = 'Resetting...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/reset-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: resetEmailOrPhone, otp, newPassword })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    showToast('Password reset successfully!', 'success');
+                    // Reset forms and go back to login
+                    forgotStep2.reset();
+                    forgotStep1.reset();
+                    forgotStep2.style.display = 'none';
+                    forgotStep1.style.display = 'block';
+                    document.getElementById('back-to-login').click();
+                } else {
+                    showToast(data.error || 'Failed to reset password', 'error');
+                }
+            } catch (err) {
+                showToast('Error: ' + err.message, 'error');
+                console.error('Password Reset error:', err);
+            } finally {
+                btn.textContent = 'Reset Password';
+                btn.disabled = false;
+            }
+        });
+    }
 
     // SOS Button Redirection
     const sosButton = document.querySelector('.sos-button');

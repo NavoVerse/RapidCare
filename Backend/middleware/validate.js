@@ -12,19 +12,20 @@ const validate = (schema) => {
             next();
         } catch (error) {
             // Check for Zod error structure safely
-            if (error && error.errors) {
+            if (error instanceof z.ZodError) {
                 // Return 400 Bad Request with formatted error messages
-                const errors = error.errors.map(err => ({
+                const issues = error.issues || error.errors || [];
+                const formattedErrors = issues.map(err => ({
                     field: err.path ? err.path.join('.') : 'unknown',
                     message: err.message
                 }));
                 
                 // Concatenate messages so the frontend can display them directly
-                const errorMsg = errors.map(e => e.message).join(', ');
+                const errorMsg = formattedErrors.map(e => e.message).join(', ');
                 
                 return res.status(400).json({ 
                     error: errorMsg, 
-                    details: errors 
+                    details: formattedErrors 
                 });
             }
             next(error);

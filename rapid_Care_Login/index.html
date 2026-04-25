@@ -141,6 +141,10 @@
                                 </svg>
                             </span>
                         </div>
+                        
+                        <div style="text-align: right; margin-bottom: 24px; margin-top: -8px;">
+                            <a href="#" id="show-forgot-password" style="font-size: 14px; color: var(--primary);">Forgot password?</a>
+                        </div>
 
                         <button type="submit" class="create-btn">Log in</button>
 
@@ -165,6 +169,43 @@
                                 Apple
                             </button>
                         </div>
+                    </form>
+                </div>
+
+                <!-- Forgot Password View -->
+                <div id="forgot-password-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h2>Reset Password</h2>
+                        <div class="theme-toggle" id="theme-toggle-forgot">
+                        </div>
+                    </div>
+                    <p class="subtitle">Remembered? <a href="#" id="back-to-login">Back to login</a></p>
+
+                    <!-- Step 1: Request OTP -->
+                    <form action="#" class="forgot-request-form" id="forgot-step-1">
+                        <div class="input-group">
+                            <input type="text" id="forgot-email" placeholder="Email / Phone" required>
+                        </div>
+                        <button type="submit" class="create-btn">Send OTP</button>
+                    </form>
+
+                    <!-- Step 2: Verify OTP and Reset -->
+                    <form action="#" class="forgot-reset-form" id="forgot-step-2" style="display: none;">
+                        <p class="subtitle" style="margin-bottom: 15px;">Enter the OTP sent to your email/phone</p>
+                        <div class="input-group">
+                            <input type="text" id="forgot-otp" placeholder="6-digit OTP" required maxlength="6">
+                        </div>
+                        <div class="input-group password-group">
+                            <input type="password" id="forgot-new-password" placeholder="New Password" required minlength="6">
+                            <span class="eye-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </span>
+                        </div>
+                        <button type="submit" class="create-btn">Reset Password</button>
                     </form>
                 </div>
             </div>
