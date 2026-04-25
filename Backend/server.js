@@ -83,30 +83,8 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_rapidcare_key_2026';
 
-// ── Mailer Setup ──────────────────────────────────────────────────────────────
-let transporter;
-if (process.env.SMTP_HOST && process.env.SMTP_USER) {
-    transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT || 587,
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
-        }
-    });
-} else {
-    nodemailer.createTestAccount((err, account) => {
-        if (!err) {
-            transporter = nodemailer.createTransport({
-                host: account.smtp.host,
-                port: account.smtp.port,
-                secure: account.smtp.secure,
-                auth: { user: account.user, pass: account.pass }
-            });
-            console.log('Nodemailer: Created Ethereal test account for email delivery.');
-        }
-    });
-}
+// ── Services ────────────────────────────────────────────────────────────────
+const notificationService = require('./services/notification.service');
 
 // ── Global Middleware ──────────────────────────────────────────────────────────
 app.use(cors());
@@ -343,24 +321,15 @@ app.post('/api/v1/auth/request-otp', otpLimiter, validate(requestOtpSchema), asy
             [mappedEmail, otp, expiresAt.toISOString()]
         );
 
-        if (transporter && email.includes('@')) {
-            const info = await transporter.sendMail({
-                from: '"RapidCare Admin" <no-reply@rapidcare.com>',
-                to: email,
-                subject: "Your RapidCare OTP",
-                text: `Your one-time password is: ${otp}`,
-                html: `<h3>RapidCare Verification</h3><p>Your one-time password is: <strong>${otp}</strong></p><p>It will expire in 10 minutes.</p>`
-            });
+        if (email.includes('@')) {
+            await notificationService.sendOTPEmail(email, otp);
             console.log(`[OTP DEBUG] OTP for ${email} (mapped: ${mappedEmail}): ${otp}`);
-            if (!process.env.SMTP_HOST) {
-                console.log(`[Nodemailer] Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
-            }
         } else {
-            // Simulate SMS if it's a phone number or if transporter isn't ready
+            // Simulate SMS if it's a phone number
             console.log(`[OTP DEBUG] SMS Simulation. OTP for ${email} (mapped: ${mappedEmail}): ${otp}`);
         }
 
-        res.json({ message: 'OTP sent successfully (Check server console for preview URL)' });
+        res.json({ message: 'OTP sent successfully. Please check your email.' });
     } catch (err) {
         console.error('Error sending OTP:', err);
         res.status(500).json({ error: 'Failed to send OTP' });
