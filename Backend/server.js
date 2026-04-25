@@ -10,15 +10,33 @@
  */
 
 const express = require('express');
-const cors    = require('cors');
-const bcrypt  = require('bcrypt');
-const jwt     = require('jsonwebtoken');
-const path    = require('path');
+const cors = require('cors');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const path = require('path');
 const nodemailer = require('nodemailer');
+const http = require('http');
+const { Server } = require('socket.io');
 const { getDb, initializeDB } = require('./db');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
-const app  = express();
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: { origin: '*' }
+});
+
+// Expose io instance to routes if needed
+app.set('io', io);
+
+// Socket.IO event handling
+io.on('connection', (socket) => {
+    console.log(`[Socket.IO] New client connected: ${socket.id}`);
+
+    socket.on('disconnect', () => {
+        console.log(`[Socket.IO] Client disconnected: ${socket.id}`);
+    });
+});
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_rapidcare_key_2026';
 
@@ -71,11 +89,11 @@ const { authorize } = require('./middleware/rbac');
 
 // ── Validation Middleware ─────────────────────────────────────────────────────
 const { validate } = require('./middleware/validate');
-const { 
-    registerSchema, 
-    loginSchema, 
-    requestOtpSchema, 
-    verifyOtpSchema 
+const {
+    registerSchema,
+    loginSchema,
+    requestOtpSchema,
+    verifyOtpSchema
 } = require('./validators/auth.validator');
 
 // ── Rate Limiting Middleware ──────────────────────────────────────────────────
@@ -122,10 +140,10 @@ app.post('/api/v1/auth/register', validate(registerSchema), async (req, res) => 
 
 // 1b. Register Driver (5-step form)
 app.post('/api/v1/drivers/register', async (req, res) => {
-    const { 
-        name, email, password, phone, 
-        dob, alt_phone, address, city, state, pincode, 
-        aadhaar_number, pan_number, license_number, vehicle_number 
+    const {
+        name, email, password, phone,
+        dob, alt_phone, address, city, state, pincode,
+        aadhaar_number, pan_number, license_number, vehicle_number
     } = req.body;
     const db = getDb();
 
@@ -166,7 +184,7 @@ app.post('/api/v1/hospitals/register', async (req, res) => {
 
     try {
         await db.run('BEGIN TRANSACTION');
-        
+
         const hashedPassword = await bcrypt.hash(data.password, 10);
         const result = await db.run(
             'INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)',
@@ -194,9 +212,9 @@ app.post('/api/v1/hospitals/register', async (req, res) => {
             data.pharmacy_license, data.fire_noc, data.pan_tan, data.gst,
             data.reception_number, data.emergency_casualty_number, data.ambulance_dispatch_number,
             data.icu_helpline, data.admin_billing_number, data.website,
-            data.icu_beds || 0, data.nicu_beds || 0, data.picu_beds || 0, data.ccu_beds || 0, 
+            data.icu_beds || 0, data.nicu_beds || 0, data.picu_beds || 0, data.ccu_beds || 0,
             data.ventilators || 0, data.dialysis || 0, data.ot || 0, data.ambulances || 0,
-            JSON.stringify(data.departments || []), data.ayushman_bharat, data.state_insurance, 
+            JSON.stringify(data.departments || []), data.ayushman_bharat, data.state_insurance,
             data.admin_name, data.designation
         ]);
 
@@ -348,7 +366,7 @@ app.get('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
             JOIN patients p ON u.id = p.user_id
             WHERE u.id = ?
         `, [req.user.id]);
-        
+
         if (!patient) return res.status(404).json({ error: 'Patient profile not found' });
         res.json(patient);
     } catch (err) {
@@ -360,7 +378,7 @@ app.get('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
 app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (req, res) => {
     const { name, gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, allergies, chronic_conditions } = req.body;
     const db = getDb();
-    
+
     try {
         await db.run('BEGIN TRANSACTION');
         if (name !== undefined) {
@@ -374,7 +392,7 @@ app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
             WHERE user_id = ?
         `, [gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, allergies, chronic_conditions, req.user.id]);
         await db.run('COMMIT');
-        
+
         res.json({ message: 'Profile updated successfully' });
     } catch (err) {
         await db.run('ROLLBACK');
@@ -432,11 +450,11 @@ app.get('/api/admin/data', authenticateToken, authorize('admin'), (req, res) => 
 app.put('/api/admin/data', express.json(), async (req, res) => {
     const { role, id, field, value } = req.body;
     const db = getDb();
-    
+
     // Validate inputs
     const allowedRoles = ['patient', 'driver', 'hospital'];
     if (!allowedRoles.includes(role)) return res.status(400).json({ error: 'Invalid role' });
-    
+
     const userFields = ['name', 'email', 'phone'];
     const patientFields = ['blood_group', 'medical_history', 'emergency_contact', 'gender', 'date_of_birth', 'height', 'weight', 'blood_pressure', 'home_location', 'allergies', 'chronic_conditions'];
     const driverFields = ['license_number', 'vehicle_number', 'status'];
@@ -474,16 +492,16 @@ app.get('/health', (req, res) => {
 async function startServer() {
     try {
         await initializeDB();
-        app.listen(PORT, () => {
+        server.listen(PORT, () => {
             console.log('');
-            console.log('╔══════════════════════════════════════════════╗');
-            console.log(`║   RapidCare Unified Backend — Port ${PORT}      ║`);
-            console.log('╠══════════════════════════════════════════════╣');
-            console.log(`║  Auth API :  http://localhost:${PORT}/api/v1/auth  ║`);
-            console.log(`║  Admin API:  http://localhost:${PORT}/api/data  ║`);
-            console.log(`║  Dev Dash :  http://localhost:${PORT}/dev       ║`);
-            console.log(`║  Health   :  http://localhost:${PORT}/health    ║`);
-            console.log('╚══════════════════════════════════════════════╝');
+            console.log('╔════════════════════════════════════════════════╗');
+            console.log(`║   RapidCare Unified Backend — Port ${PORT}        ║`);
+            console.log('╠════════════════════════════════════════════════╣');
+            console.log(`║  Auth API :  http://localhost:${PORT}/api/v1/auth ║`);
+            console.log(`║  Admin API:  http://localhost:${PORT}/api/data    ║`);
+            console.log(`║  Dev Dash :  http://localhost:${PORT}/dev         ║`);
+            console.log(`║  Health   :  http://localhost:${PORT}/health      ║`);
+            console.log('╚════════════════════════════════════════════════╝');
             console.log('');
         });
     } catch (err) {

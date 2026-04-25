@@ -959,7 +959,7 @@ Twilio SMS not Done
 
 | Task | Priority | Effort |
 |---|---|---|
-| Add Socket.IO to unified server | 🔴 High | 2 hours |
+DONE | Add Socket.IO to unified server | 🔴 High | 2 hours |
 | Build `POST /api/v1/trips/request` — create trip + find nearest driver | 🔴 High | 4 hours |
 | Implement driver matching algorithm with proximity search | 🔴 High | 4 hours |
 | Build trip acceptance / rejection flow with 60s timeout | 🔴 High | 4 hours |
