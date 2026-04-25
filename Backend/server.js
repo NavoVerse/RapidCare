@@ -33,6 +33,49 @@ app.set('io', io);
 io.on('connection', (socket) => {
     console.log(`[Socket.IO] New client connected: ${socket.id}`);
 
+    // Join room based on user role and id (e.g., patient_1, driver_5)
+    socket.on('join', (data) => {
+        const { userId, role } = data;
+        if (userId && role) {
+            socket.join(`${role}_${userId}`);
+            console.log(`[Socket.IO] User ${userId} (${role}) joined their room: ${role}_${userId}`);
+        }
+    });
+
+    // Handle real-time driver location updates
+    socket.on('driver:location_update', async (data) => {
+        const { userId, lat, lng } = data;
+        if (!userId || lat === undefined || lng === undefined) return;
+
+        try {
+            // 1. Update the driver's current position in the database
+            await knex('drivers').where({ user_id: userId }).update({
+                current_lat: lat,
+                current_lng: lng
+            });
+
+            // 2. Find all active trips involving this driver
+            const activeTrips = await knex('trips')
+                .where({ driver_id: userId })
+                .whereIn('status', ['accepted', 'heading_to_patient', 'heading_to_hospital']);
+
+            // 3. Broadcast the new location to each patient in an active trip
+            activeTrips.forEach(trip => {
+                io.to(`patient_${trip.patient_id}`).emit('trip:driver_location', {
+                    trip_id: trip.id,
+                    lat,
+                    lng
+                });
+            });
+
+            // Optional: Broadcast to a global "admin" room or similar for monitoring
+            // io.to('admin_room').emit('global:driver_moved', { userId, lat, lng });
+
+        } catch (err) {
+            console.error('[Socket.IO] Error in driver:location_update:', err);
+        }
+    });
+
     socket.on('disconnect', () => {
         console.log(`[Socket.IO] Client disconnected: ${socket.id}`);
     });
@@ -618,6 +661,16 @@ app.post('/api/v1/trips/:id/accept', authenticateToken, authorize('driver'), asy
                 trip_id: trip.id,
                 driver_id: req.user.id
             });
+
+            // Notify the targeted hospital about the incoming ambulance
+            io.to(`hospital_${trip.hospital_id}`).emit('hospital:incoming_alert', {
+                trip_id: trip.id,
+                patient_id: trip.patient_id,
+                driver_id: req.user.id,
+                status: 'accepted',
+                message: 'An ambulance has accepted a request and is heading to your facility.'
+            });
+            console.log(`[Socket.IO] Hospital ${trip.hospital_id} alerted about incoming trip ${trip.id}`);
         }
 
         res.json({ message: 'Trip accepted successfully' });
@@ -652,6 +705,53 @@ app.post('/api/v1/trips/:id/reject', authenticateToken, authorize('driver'), asy
         }
 
         res.json({ message: 'Trip rejected successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Update trip status (Driver)
+app.put('/api/v1/trips/:id/status', authenticateToken, authorize('driver'), async (req, res) => {
+    const { status } = req.body;
+    const allowedStatuses = ['heading_to_patient', 'arrived', 'heading_to_hospital', 'at_hospital', 'completed', 'cancelled'];
+    
+    if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    try {
+        const trip = await knex('trips').where({ id: req.params.id }).first();
+        if (!trip || trip.driver_id !== req.user.id) {
+            return res.status(404).json({ error: 'Trip not found or unauthorized' });
+        }
+
+        const updateData = { status };
+        if (status === 'completed') {
+            updateData.end_time = knex.fn.now();
+        }
+
+        await knex('trips').where({ id: req.params.id }).update(updateData);
+
+        // If trip is completed or cancelled, make driver available again
+        if (status === 'completed' || status === 'cancelled') {
+            await knex('drivers').where({ user_id: req.user.id }).update({ status: 'available' });
+        }
+
+        const io = req.app.get('io');
+        if (io) {
+            // Notify patient
+            io.to(`patient_${trip.patient_id}`).emit('trip:status_update', {
+                trip_id: trip.id,
+                status
+            });
+            // Notify hospital
+            io.to(`hospital_${trip.hospital_id}`).emit('hospital:trip_update', {
+                trip_id: trip.id,
+                status
+            });
+        }
+
+        res.json({ message: `Trip status updated to ${status}` });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
