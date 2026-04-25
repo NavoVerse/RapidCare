@@ -962,7 +962,7 @@ Twilio SMS not Done
 DONE | Add Socket.IO to unified server | 🔴 High | 2 hours |
 DONE | Build `POST /api/v1/trips/request` — create trip + find nearest driver | 🔴 High | 4 hours |
 DONE | Implement driver matching algorithm with proximity search | 🔴 High | 4 hours |
-| Build trip acceptance / rejection flow with 60s timeout | 🔴 High | 4 hours |
+DONE | Build trip acceptance / rejection flow with 60s timeout | 🔴 High | 4 hours |
 | Implement `driver:location` WebSocket events for live tracking | 🔴 High | 3 hours |
 | Connect `patient_Dashboard` booking buttons to real trip API | 🔴 High | 3 hours |
 | Replace `patient_Dashboard` simulated ambulance tracking with live WebSocket data | 🔴 High | 4 hours |

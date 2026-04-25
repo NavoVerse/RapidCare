@@ -495,6 +495,8 @@ app.delete('/api/v1/medical_records/:id', authenticateToken, authorize('patient'
 // TRIPS & REAL-TIME DISPATCH API (/api/v1/trips)
 // =============================================================================
 
+const tripTimeouts = new Map();
+
 // Request a new trip (Patient)
 app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async (req, res) => {
     const { pickup_lat, pickup_lng, hospital_id } = req.body;
@@ -547,7 +549,6 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
         
         const tripId = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
 
-        // We can emit a socket event here later when building the real-time flow
         const io = req.app.get('io');
         if (io) {
             io.to(`driver_${nearestDriver.user_id}`).emit('trip:new_request', {
@@ -559,12 +560,98 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
             });
         }
 
+        // 60-second timeout to auto-cancel or reassign if not accepted
+        const timeoutId = setTimeout(async () => {
+            try {
+                const trip = await knex('trips').where({ id: tripId }).first();
+                if (trip && trip.status === 'requested') {
+                    await knex('trips').where({ id: tripId }).update({ status: 'cancelled' });
+                    if (io) {
+                        io.to(`patient_${req.user.id}`).emit('trip:timeout', {
+                            trip_id: tripId,
+                            message: 'No driver accepted the request in time.'
+                        });
+                        io.to(`driver_${nearestDriver.user_id}`).emit('trip:cancelled', {
+                            trip_id: tripId,
+                            message: 'Trip request timed out.'
+                        });
+                    }
+                }
+                tripTimeouts.delete(tripId);
+            } catch (err) {
+                console.error('Timeout error:', err);
+            }
+        }, 60000);
+        
+        tripTimeouts.set(tripId, timeoutId);
+
         res.status(201).json({
             message: 'Trip requested successfully',
             trip_id: tripId,
             driver_id: nearestDriver.user_id
         });
 
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Accept a trip (Driver)
+app.post('/api/v1/trips/:id/accept', authenticateToken, authorize('driver'), async (req, res) => {
+    try {
+        const trip = await knex('trips').where({ id: req.params.id }).first();
+        if (!trip || trip.driver_id !== req.user.id || trip.status !== 'requested') {
+            return res.status(400).json({ error: 'Invalid trip or already processed' });
+        }
+
+        await knex('trips').where({ id: req.params.id }).update({ status: 'accepted' });
+        await knex('drivers').where({ user_id: req.user.id }).update({ status: 'busy' });
+
+        if (tripTimeouts.has(trip.id)) {
+            clearTimeout(tripTimeouts.get(trip.id));
+            tripTimeouts.delete(trip.id);
+        }
+
+        const io = req.app.get('io');
+        if (io) {
+            io.to(`patient_${trip.patient_id}`).emit('trip:accepted', {
+                trip_id: trip.id,
+                driver_id: req.user.id
+            });
+        }
+
+        res.json({ message: 'Trip accepted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Reject a trip (Driver)
+app.post('/api/v1/trips/:id/reject', authenticateToken, authorize('driver'), async (req, res) => {
+    try {
+        const trip = await knex('trips').where({ id: req.params.id }).first();
+        if (!trip || trip.driver_id !== req.user.id || trip.status !== 'requested') {
+            return res.status(400).json({ error: 'Invalid trip or already processed' });
+        }
+
+        // Ideally, here we would re-run the driver matching for the next nearest driver.
+        // For now, we'll mark it as cancelled.
+        await knex('trips').where({ id: req.params.id }).update({ status: 'cancelled' });
+
+        if (tripTimeouts.has(trip.id)) {
+            clearTimeout(tripTimeouts.get(trip.id));
+            tripTimeouts.delete(trip.id);
+        }
+
+        const io = req.app.get('io');
+        if (io) {
+            io.to(`patient_${trip.patient_id}`).emit('trip:rejected', {
+                trip_id: trip.id,
+                message: 'Driver was unavailable, trip cancelled.'
+            });
+        }
+
+        res.json({ message: 'Trip rejected successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
