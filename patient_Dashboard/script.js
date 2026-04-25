@@ -1589,65 +1589,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // --- HISTORY SCRIPT --- 
-const medicalRecords = [
-    {
-        id: 1,
-        date: "2024-03-15",
-        type: "cardiology",
-        title: "Heart Rhythm Consultation",
-        doctor: "Dr. Sarah Mitchell",
-        hospital: "City General Hospital",
-        status: "completed",
-        vitals: { bp: "120/80", hr: "72 bpm", temp: "98.6 F", weight: "75 kg" },
-        diagnosis: "Normal Sinus Rhythm, mild tachycardia during exercise.",
-        prescriptions: [
-            { name: "Metoprolol", dosage: "25mg", frequency: "Once daily", purpose: "Heart rate control" },
-            { name: "Aspirin", dosage: "81mg", frequency: "Once daily", purpose: "Blood thinner" }
-        ],
-        notes: "Patient reported occasional palpitations. EKG showed no significant abnormalities. Recommended maintaining current exercise routine but monitoring heart rate."
-    },
-    {
-        id: 2,
-        date: "2024-02-10",
-        type: "general",
-        title: "Annual Physical Examination",
-        doctor: "Dr. Robert Wilson",
-        hospital: "RapidCare Clinic",
-        status: "completed",
-        vitals: { bp: "118/75", hr: "68 bpm", temp: "98.4 F", weight: "76 kg" },
-        diagnosis: "Healthy adult, all vitals within normal range.",
-        prescriptions: [
-            { name: "Vitamin D3", dosage: "2000 IU", frequency: "Once daily", purpose: "Supplements" }
-        ],
-        notes: "Overall health is excellent. Blood work looks good. Slight deficiency in Vitamin D, hence the supplement."
-    },
-    {
-        id: 3,
-        date: "2024-01-22",
-        type: "lab",
-        title: "Comprehensive Metabolic Panel",
-        doctor: "Lab Services",
-        hospital: "Diagnostic Labs Inc.",
-        status: "completed",
-        vitals: null,
-        diagnosis: "Lab results within reference ranges.",
-        prescriptions: [],
-        notes: "Glucose levels: 92 mg/dL. Cholesterol: 185 mg/dL. Kidney function tests (BUN/Creatinine) are normal."
-    },
-    {
-        id: 4,
-        date: "2023-12-05",
-        type: "cardiology",
-        title: "Follow-up Echo-cardiogram",
-        doctor: "Dr. Sarah Mitchell",
-        hospital: "City General Hospital",
-        status: "completed",
-        vitals: { bp: "122/82", hr: "75 bpm", temp: "98.2 F", weight: "77 kg" },
-        diagnosis: "Normal cardiac structure and function.",
-        prescriptions: [],
-        notes: "Echo shows no signs of valve disease or cardiomyopathy. Next follow-up in 12 months."
-    }
-];
+let medicalRecords = [];
 
 const doctorBookings = [
     {
@@ -1687,8 +1629,43 @@ let selectedRecordId = null; // Track current record for re-rendering
 
 // Initialize
 function init() {
-    renderHistory();
+    fetchMedicalRecords();
     setupEventListeners();
+}
+
+async function fetchMedicalRecords() {
+    const token = localStorage.getItem('rapidcare_token');
+    if (!token) return;
+
+    try {
+        const response = await fetch('http://localhost:5000/api/v1/medical_records', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            medicalRecords = data.map(record => ({
+                id: record.id,
+                date: record.created_at,
+                type: 'general', 
+                title: record.diagnosis || 'Medical Visit',
+                doctor: record.doctor_name || 'Assigned Doctor',
+                hospital: record.hospital_name || 'RapidCare Facility',
+                status: record.status || 'completed',
+                vitals: null,
+                diagnosis: record.diagnosis,
+                prescriptions: (record.prescriptions || []).map(p => ({
+                    name: p.medication_name,
+                    dosage: p.sig,
+                    frequency: 'As directed',
+                    purpose: p.indication || ''
+                })),
+                notes: record.clinical_notes || record.treatment_plan
+            }));
+            renderHistory();
+        }
+    } catch (error) {
+        console.error('Error fetching medical records:', error);
+    }
 }
 
 // Render History List
