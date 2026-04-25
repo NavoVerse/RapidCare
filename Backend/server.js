@@ -428,7 +428,7 @@ app.get('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
             SELECT u.name, u.email, u.phone, 
                    p.gender, p.date_of_birth, p.height, p.weight, 
                    p.blood_group as blood_type, p.home_location, p.blood_pressure, 
-                   p.allergies, p.chronic_conditions
+                   p.allergies, p.chronic_conditions, p.own_diagnosis, p.health_barriers, p.habits
             FROM users u
             JOIN patients p ON u.id = p.user_id
             WHERE u.id = ?
@@ -443,7 +443,7 @@ app.get('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
 
 // 7. Update Patient Profile
 app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (req, res) => {
-    const { name, gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, allergies, chronic_conditions } = req.body;
+    const { name, gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, allergies, chronic_conditions, own_diagnosis, health_barriers, habits } = req.body;
     const db = getDb();
 
     try {
@@ -455,9 +455,9 @@ app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
             UPDATE patients SET 
                 gender = ?, date_of_birth = ?, height = ?, weight = ?, 
                 blood_group = ?, home_location = ?, blood_pressure = ?, 
-                allergies = ?, chronic_conditions = ?
+                allergies = ?, chronic_conditions = ?, own_diagnosis = ?, health_barriers = ?, habits = ?
             WHERE user_id = ?
-        `, [gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, allergies, chronic_conditions, req.user.id]);
+        `, [gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, allergies, chronic_conditions, own_diagnosis, health_barriers, habits, req.user.id]);
         await db.run('COMMIT');
 
         res.json({ message: 'Profile updated successfully' });
@@ -850,7 +850,7 @@ async function fetchDashboardData(res) {
         const patients = await db.all(`
             SELECT u.*, p.blood_group, p.medical_history, p.emergency_contact,
                    p.gender, p.date_of_birth, p.height, p.weight,
-                   p.blood_pressure, p.home_location, p.allergies, p.chronic_conditions
+                   p.blood_pressure, p.home_location, p.allergies, p.chronic_conditions, p.own_diagnosis, p.health_barriers, p.habits
             FROM users u
             JOIN patients p ON u.id = p.user_id
             WHERE u.role = 'patient'
@@ -893,7 +893,7 @@ app.put('/api/admin/data', express.json(), async (req, res) => {
     if (!allowedRoles.includes(role)) return res.status(400).json({ error: 'Invalid role' });
 
     const userFields = ['name', 'email', 'phone'];
-    const patientFields = ['blood_group', 'medical_history', 'emergency_contact', 'gender', 'date_of_birth', 'height', 'weight', 'blood_pressure', 'home_location', 'allergies', 'chronic_conditions'];
+    const patientFields = ['blood_group', 'medical_history', 'emergency_contact', 'gender', 'date_of_birth', 'height', 'weight', 'blood_pressure', 'home_location', 'allergies', 'chronic_conditions', 'own_diagnosis', 'health_barriers', 'habits'];
     const driverFields = ['license_number', 'vehicle_number', 'status'];
     const hospitalFields = ['address', 'total_beds', 'specialty'];
 
@@ -913,6 +913,21 @@ app.put('/api/admin/data', express.json(), async (req, res) => {
     } catch (error) {
         console.error('Update error:', error);
         res.status(500).json({ error: 'Failed to update data' });
+    }
+});
+
+// Delete endpoint for Developer Dashboard
+app.delete('/api/admin/data', express.json(), async (req, res) => {
+    const { id } = req.body;
+    const db = getDb();
+    if (!id) return res.status(400).json({ error: 'ID is required' });
+
+    try {
+        await db.run('DELETE FROM users WHERE id = ?', [id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Delete error:', error);
+        res.status(500).json({ error: 'Failed to delete user' });
     }
 });
 
