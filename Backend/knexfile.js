@@ -10,9 +10,17 @@
  */
 
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const isProduction = process.env.DB_TYPE === 'postgresql';
+
+if (!isProduction) {
+    const dbDir = path.resolve(__dirname, './user_Database');
+    if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
+    }
+}
 
 module.exports = {
     development: {
