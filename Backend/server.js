@@ -110,6 +110,10 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER) {
 
 // ── Global Middleware ──────────────────────────────────────────────────────────
 app.use(cors());
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Private-Network', 'true');
+    next();
+});
 app.use(express.json());
 
 // ── Static: Dev Dashboard (served at /dev) ────────────────────────────────────
@@ -149,16 +153,30 @@ app.use('/api/v1/auth', generalLimiter);
 // AUTH ROUTES  (/api/v1/auth/*)
 // =============================================================================
 
+// Helper to map phone numbers to a pseudo-email for DB constraints
+const mapEmailOrPhone = (input) => {
+    if (!input) return { mappedEmail: input, mappedPhone: null };
+    const isPhone = /^\d{10}$/.test(input);
+    if (isPhone) {
+        return { mappedEmail: `${input}@phone.rapidcare.local`, mappedPhone: input };
+    }
+    return { mappedEmail: input, mappedPhone: null };
+};
+
 // 1. Register New User
 app.post('/api/v1/auth/register', validate(registerSchema), async (req, res) => {
     const { name, email, password, role, phone } = req.body;
     const db = getDb();
+    
+    // Map email/phone input
+    const { mappedEmail, mappedPhone } = mapEmailOrPhone(email);
+    const finalPhone = mappedPhone || phone; // Prefer the one extracted from 'email' field if it was a phone number
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const result = await db.run(
             'INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)',
-            [name, email, hashedPassword, role, phone]
+            [name, mappedEmail, hashedPassword, role, finalPhone]
         );
 
         const userId = result.lastID;
@@ -276,9 +294,10 @@ app.post('/api/v1/hospitals/register', async (req, res) => {
 app.post('/api/v1/auth/login', loginLimiter, validate(loginSchema), async (req, res) => {
     const { email, password } = req.body;
     const db = getDb();
+    const { mappedEmail } = mapEmailOrPhone(email);
 
     try {
-        const user = await db.get('SELECT * FROM users WHERE email = ?', [email]);
+        const user = await db.get('SELECT * FROM users WHERE email = ?', [mappedEmail]);
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
@@ -307,9 +326,10 @@ app.post('/api/v1/auth/login', loginLimiter, validate(loginSchema), async (req, 
 app.post('/api/v1/auth/request-otp', otpLimiter, validate(requestOtpSchema), async (req, res) => {
     const { email } = req.body;
     const db = getDb();
+    const { mappedEmail } = mapEmailOrPhone(email);
 
     try {
-        const user = await db.get('SELECT * FROM users WHERE email = ?', [email]);
+        const user = await db.get('SELECT * FROM users WHERE email = ?', [mappedEmail]);
         if (!user) {
             return res.status(404).json({ error: 'User not found. Please register first.' });
         }
@@ -317,13 +337,13 @@ app.post('/api/v1/auth/request-otp', otpLimiter, validate(requestOtpSchema), asy
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expiresAt = new Date(Date.now() + 10 * 60000); // 10 minutes
 
-        await db.run('DELETE FROM otps WHERE email = ?', [email]);
+        await db.run('DELETE FROM otps WHERE email = ?', [mappedEmail]);
         await db.run(
             'INSERT INTO otps (email, otp, expires_at) VALUES (?, ?, ?)',
-            [email, otp, expiresAt.toISOString()]
+            [mappedEmail, otp, expiresAt.toISOString()]
         );
 
-        if (transporter) {
+        if (transporter && email.includes('@')) {
             const info = await transporter.sendMail({
                 from: '"RapidCare Admin" <no-reply@rapidcare.com>',
                 to: email,
@@ -331,12 +351,13 @@ app.post('/api/v1/auth/request-otp', otpLimiter, validate(requestOtpSchema), asy
                 text: `Your one-time password is: ${otp}`,
                 html: `<h3>RapidCare Verification</h3><p>Your one-time password is: <strong>${otp}</strong></p><p>It will expire in 10 minutes.</p>`
             });
-            console.log(`[OTP DEBUG] OTP for ${email}: ${otp}`);
+            console.log(`[OTP DEBUG] OTP for ${email} (mapped: ${mappedEmail}): ${otp}`);
             if (!process.env.SMTP_HOST) {
                 console.log(`[Nodemailer] Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
             }
         } else {
-            console.log(`[OTP DEBUG] Transporter not ready. OTP for ${email}: ${otp}`);
+            // Simulate SMS if it's a phone number or if transporter isn't ready
+            console.log(`[OTP DEBUG] SMS Simulation. OTP for ${email} (mapped: ${mappedEmail}): ${otp}`);
         }
 
         res.json({ message: 'OTP sent successfully (Check server console for preview URL)' });
@@ -350,11 +371,12 @@ app.post('/api/v1/auth/request-otp', otpLimiter, validate(requestOtpSchema), asy
 app.post('/api/v1/auth/verify-otp', validate(verifyOtpSchema), async (req, res) => {
     const { email, otp } = req.body;
     const db = getDb();
+    const { mappedEmail } = mapEmailOrPhone(email);
 
     try {
         const otpRecord = await db.get(
             'SELECT * FROM otps WHERE email = ? AND otp = ?',
-            [email, otp]
+            [mappedEmail, otp]
         );
 
         if (!otpRecord) {
@@ -364,8 +386,8 @@ app.post('/api/v1/auth/verify-otp', validate(verifyOtpSchema), async (req, res) 
             return res.status(401).json({ error: 'OTP expired' });
         }
 
-        const user = await db.get('SELECT * FROM users WHERE email = ?', [email]);
-        await db.run('DELETE FROM otps WHERE email = ?', [email]);
+        const user = await db.get('SELECT * FROM users WHERE email = ?', [mappedEmail]);
+        await db.run('DELETE FROM otps WHERE email = ?', [mappedEmail]);
 
         const token = jwt.sign(
             { id: user.id, email: user.email, role: user.role },
@@ -377,6 +399,39 @@ app.post('/api/v1/auth/verify-otp', validate(verifyOtpSchema), async (req, res) 
             token,
             user: { id: user.id, name: user.name, email: user.email, role: user.role }
         });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 4b. Reset Password
+app.post('/api/v1/auth/reset-password', async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+    const db = getDb();
+    const { mappedEmail } = mapEmailOrPhone(email);
+
+    if (!email || !otp || !newPassword || newPassword.length < 6) {
+        return res.status(400).json({ error: 'Invalid input. Password must be at least 6 characters.' });
+    }
+
+    try {
+        const otpRecord = await db.get(
+            'SELECT * FROM otps WHERE email = ? AND otp = ?',
+            [mappedEmail, otp]
+        );
+
+        if (!otpRecord) {
+            return res.status(401).json({ error: 'Invalid OTP' });
+        }
+        if (new Date(otpRecord.expires_at) < new Date()) {
+            return res.status(401).json({ error: 'OTP expired' });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await db.run('UPDATE users SET password = ? WHERE email = ?', [hashedPassword, mappedEmail]);
+        await db.run('DELETE FROM otps WHERE email = ?', [mappedEmail]);
+
+        res.json({ message: 'Password reset successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
