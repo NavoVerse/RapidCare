@@ -960,8 +960,8 @@ Twilio SMS not Done
 | Task | Priority | Effort |
 |---|---|---|
 DONE | Add Socket.IO to unified server | 🔴 High | 2 hours |
-| Build `POST /api/v1/trips/request` — create trip + find nearest driver | 🔴 High | 4 hours |
-| Implement driver matching algorithm with proximity search | 🔴 High | 4 hours |
+DONE | Build `POST /api/v1/trips/request` — create trip + find nearest driver | 🔴 High | 4 hours |
+DONE | Implement driver matching algorithm with proximity search | 🔴 High | 4 hours |
 | Build trip acceptance / rejection flow with 60s timeout | 🔴 High | 4 hours |
 | Implement `driver:location` WebSocket events for live tracking | 🔴 High | 3 hours |
 | Connect `patient_Dashboard` booking buttons to real trip API | 🔴 High | 3 hours |
@@ -979,9 +979,9 @@ DONE | Add Socket.IO to unified server | 🔴 High | 2 hours |
 
 | Task | Priority | Effort |
 |---|---|---|
-| Create `medical_records` + `prescriptions` tables via migration | 🔴 High | 1 hour |
-| Build CRUD APIs for medical records | 🔴 High | 3 hours |
-| Replace hardcoded data in `history_patient/script.js` with API calls | 🔴 High | 3 hours |
+DONE | Create `medical_records` + `prescriptions` tables via migration | 🔴 High | 1 hour |
+DONE | Build CRUD APIs for medical records | 🔴 High | 3 hours |
+DONE | Replace hardcoded data in `history_patient/script.js` with API calls | 🔴 High | 3 hours |
 | Create `payments` table via migration | 🔴 High | 1 hour |
 | Build fare calculation API (`/api/v1/payments/calculate`) | 🔴 High | 2 hours |
 | Build payment recording API | 🟡 Medium | 2 hours |

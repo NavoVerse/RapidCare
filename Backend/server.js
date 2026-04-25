@@ -17,7 +17,7 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const http = require('http');
 const { Server } = require('socket.io');
-const { getDb, initializeDB } = require('./db');
+const { getDb, initializeDB, knex } = require('./db');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
@@ -396,6 +396,176 @@ app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
         res.json({ message: 'Profile updated successfully' });
     } catch (err) {
         await db.run('ROLLBACK');
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// =============================================================================
+// MEDICAL RECORDS & PRESCRIPTIONS API (/api/v1/medical_records)
+// =============================================================================
+
+// Get all medical records for logged-in patient
+app.get('/api/v1/medical_records', authenticateToken, authorize('patient'), async (req, res) => {
+    try {
+        const records = await knex('medical_records')
+            .where({ patient_id: req.user.id })
+            .orderBy('created_at', 'desc');
+            
+        // Fetch prescriptions for each record
+        for (let record of records) {
+            record.prescriptions = await knex('prescriptions')
+                .where({ medical_record_id: record.id });
+        }
+        res.json(records);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Create a new medical record
+app.post('/api/v1/medical_records', authenticateToken, authorize('patient', 'hospital', 'admin'), async (req, res) => {
+    const { patient_id, diagnosis, treatment_plan, clinical_notes, prescriptions } = req.body;
+    
+    // If patient is creating it, force patient_id to be themselves
+    const targetPatientId = req.user.role === 'patient' ? req.user.id : patient_id;
+    
+    if (!targetPatientId) {
+        return res.status(400).json({ error: 'patient_id is required' });
+    }
+    
+    try {
+        await knex.transaction(async trx => {
+            const inserted = await trx('medical_records').insert({
+                patient_id: targetPatientId,
+                hospital_id: req.user.role === 'hospital' ? req.user.id : null,
+                diagnosis,
+                treatment_plan,
+                clinical_notes
+            }).returning('id');
+            
+            const recordId = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
+
+            if (prescriptions && prescriptions.length > 0) {
+                const prescriptionsToInsert = prescriptions.map(p => ({
+                    medical_record_id: recordId,
+                    patient_id: targetPatientId,
+                    medication_name: p.medication_name,
+                    indication: p.indication,
+                    sig: p.sig,
+                    status: p.status || 'active',
+                    start_date: p.start_date,
+                    assigned_by: p.assigned_by || req.user.name
+                }));
+                await trx('prescriptions').insert(prescriptionsToInsert);
+            }
+        });
+        
+        res.status(201).json({ message: 'Medical record created successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Update a medical record
+app.put('/api/v1/medical_records/:id', authenticateToken, authorize('patient', 'hospital', 'admin'), async (req, res) => {
+    const { diagnosis, treatment_plan, clinical_notes, status } = req.body;
+    try {
+        await knex('medical_records')
+            .where({ id: req.params.id })
+            .update({ diagnosis, treatment_plan, clinical_notes, status, updated_at: knex.fn.now() });
+        res.json({ message: 'Medical record updated' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Delete a medical record
+app.delete('/api/v1/medical_records/:id', authenticateToken, authorize('patient', 'hospital', 'admin'), async (req, res) => {
+    try {
+        await knex('medical_records').where({ id: req.params.id }).del();
+        res.json({ message: 'Medical record deleted' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// =============================================================================
+// TRIPS & REAL-TIME DISPATCH API (/api/v1/trips)
+// =============================================================================
+
+// Request a new trip (Patient)
+app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async (req, res) => {
+    const { pickup_lat, pickup_lng, hospital_id } = req.body;
+    
+    if (!pickup_lat || !pickup_lng || !hospital_id) {
+        return res.status(400).json({ error: 'pickup_lat, pickup_lng, and hospital_id are required' });
+    }
+
+    try {
+        // Find nearest available driver
+        const availableDrivers = await knex('drivers').where({ status: 'available' });
+
+        if (availableDrivers.length === 0) {
+            return res.status(404).json({ error: 'No available drivers found nearby' });
+        }
+
+        // Simple Euclidean distance for simulation (or Haversine if preferred)
+        let nearestDriver = null;
+        let minDistance = Infinity;
+
+        availableDrivers.forEach(driver => {
+            if (driver.current_lat && driver.current_lng) {
+                // Approximate distance calculation
+                const dist = Math.sqrt(
+                    Math.pow(driver.current_lat - pickup_lat, 2) + 
+                    Math.pow(driver.current_lng - pickup_lng, 2)
+                );
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    nearestDriver = driver;
+                }
+            }
+        });
+
+        if (!nearestDriver) {
+            // Fallback to the first available if no coords
+            nearestDriver = availableDrivers[0];
+        }
+
+        // Create the trip
+        const inserted = await knex('trips').insert({
+            patient_id: req.user.id,
+            driver_id: nearestDriver.user_id, // nearestDriver.user_id references users.id
+            hospital_id,
+            pickup_lat,
+            pickup_lng,
+            status: 'requested',
+            start_time: knex.fn.now()
+        }).returning('id');
+        
+        const tripId = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
+
+        // We can emit a socket event here later when building the real-time flow
+        const io = req.app.get('io');
+        if (io) {
+            io.to(`driver_${nearestDriver.user_id}`).emit('trip:new_request', {
+                trip_id: tripId,
+                pickup_lat,
+                pickup_lng,
+                hospital_id,
+                patient_id: req.user.id
+            });
+        }
+
+        res.status(201).json({
+            message: 'Trip requested successfully',
+            trip_id: tripId,
+            driver_id: nearestDriver.user_id
+        });
+
+    } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
