@@ -11,6 +11,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="../shared_assets/js/theme-manager.js"></script>
 </head>
 
@@ -280,34 +281,49 @@
                         <div class="profile-main-card">
                             <div class="profile-info-grid">
                                 <div class="profile-image-section">
-                                    <div class="profile-avatar-wrapper">
-                                        <img src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff" id="mainProfileAvatar" alt="Patient Avatar">
-                                        <div class="avatar-badges">
-                                        </div>
+                                  <div class="profile-avatar-container">
+                                    <img src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff&size=128" alt="Avatar" id="mainProfileAvatar">
+                                    <div class="habit-emojis-container" id="habitEmojisDisplay">
+                                        <!-- Habit emojis will be rendered here -->
+                                    </div>
+                                    <div class="habit-emoji-picker" id="habitEmojiPicker" style="display: none;">
+                                        <div class="picker-option" data-emoji="🚬" title="Smoking">🚬</div>
+                                        <div class="picker-option" data-emoji="🍺" title="Alcohol">🍺</div>
+                                        <div class="picker-option" data-emoji="💊" title="Meds/Drugs">💊</div>
+                                        <div class="picker-option" data-emoji="🥗" title="Healthy Diet">🥗</div>
+                                        <div class="picker-option" data-emoji="🏃" title="Exercise">🏃</div>
+                                        <div class="picker-option" data-emoji="😴" title="Good Sleep">😴</div>
+                                        <div class="picker-option" data-emoji="💧" title="Hydrated">💧</div>
+                                        <div class="picker-option" data-emoji="🚭" title="No Smoking">🚭</div>
+                                    </div>
                                     </div>
                                 </div>
                                 <div class="profile-details-section">
                                     <div class="name-header">
-                                        <h2 id="displayProfileName">Loading...</h2>
+                                        <h2 id="displayProfileName" class="editable-field" data-field="name">Loading...</h2>
                                         <div class="action-icons">
-                                            <button class="call-btn">📞</button>
-                                            <button class="mail-btn">✉️</button>
+                                            <button class="call-btn" onclick="handleCall()">📞</button>
+                                            <button class="mail-btn" onclick="handleMessage()">✉️</button>
                                         </div>
-                                        <button class="edit-profile-btn" id="editGeneralProfile">✏️ Edit</button>
+                                        <div class="profile-edit-actions">
+                                            <button class="edit-profile-btn" id="editGeneralProfile">✏️ Edit</button>
+                                            <button class="save-profile-btn" id="saveGeneralProfile" style="display: none;">💾 Save</button>
+                                            <button class="cancel-profile-btn" id="cancelGeneralProfile" style="display: none;">❌ Cancel</button>
+                                        </div>
                                     </div>
                                     <div class="demographics">
-                                        <span id="displayProfileGender">👤 --</span>
-                                        <span id="displayProfileBirth">🎂 --</span>
-                                        <span id="displayProfileBlood">🩸 --</span>
-                                        <span id="displayProfileLocation">📍 --</span>
+                                        <span>👤 <span id="displayProfileGender" class="editable-field" data-field="gender">--</span></span>
+                                        <span>🎂 <span id="displayProfileBirth" class="editable-field" data-field="date_of_birth">--</span></span>
+                                        <span>🩸 <span id="displayProfileBlood" class="editable-field" data-field="blood_type">--</span></span>
+                                        <span>📍 <span id="displayProfileLocation" class="editable-field" data-field="home_location">--</span></span>
                                     </div>
                                     <div class="vitals-row" style="flex-wrap: wrap;">
                                         <div class="vital-item" style="min-width: 80px;">
-                                            <div class="vital-val"><span id="displayProfileHeight">--</span> <small>Cm</small></div>
+                                            <div class="vital-val"><span id="displayProfileHeight" class="editable-field" data-field="height">--</span> <small>Cm</small></div>
                                             <div class="vital-label">Height</div>
                                         </div>
                                         <div class="vital-item" style="min-width: 80px;">
-                                            <div class="vital-val"><span id="displayProfileWeight">--</span> <small>kg</small></div>
+                                            <div class="vital-val"><span id="displayProfileWeight" class="editable-field" data-field="weight">--</span> <small>kg</small></div>
                                             <div class="vital-label">Weight</div>
                                         </div>
                                         <div class="vital-item" style="min-width: 80px;">
@@ -315,15 +331,21 @@
                                             <div class="vital-label">BMI</div>
                                         </div>
                                         <div class="vital-item" style="min-width: 80px;">
-                                            <div class="vital-val"><span id="displayProfileBP">--/--</span> <small>mmHg</small></div>
+                                            <div class="vital-val"><span id="displayProfileBP" class="editable-field" data-field="blood_pressure">--/--</span> <small>mmHg</small></div>
                                             <div class="vital-label">Blood pressure</div>
                                         </div>
                                         <div class="vital-item" style="min-width: 120px; flex: 1;">
-                                            <div class="vital-val" id="displayProfileAllergies" style="font-size: 1rem; white-space: normal;">--</div>
+                                            <div class="suggestions-container">
+                                                <div id="displayProfileAllergies" class="editable-field" data-field="allergies" style="font-size: 1rem; white-space: normal;">--</div>
+                                                <div id="allergies-suggestions" class="suggestions-dropdown"></div>
+                                            </div>
                                             <div class="vital-label">Allergies</div>
                                         </div>
                                         <div class="vital-item" style="min-width: 120px; flex: 1;">
-                                            <div class="vital-val" id="displayProfileChronic" style="font-size: 1rem; white-space: normal;">--</div>
+                                            <div class="suggestions-container">
+                                                <div id="displayProfileChronic" class="editable-field" data-field="chronic_conditions" style="font-size: 1rem; white-space: normal;">--</div>
+                                                <div id="chronic-suggestions" class="suggestions-dropdown"></div>
+                                            </div>
                                             <div class="vital-label">Chronic Conditions</div>
                                         </div>
                                     </div>
@@ -331,14 +353,16 @@
                                 <div class="diagnosis-section">
                                     <div class="diag-group">
                                         <label>Own diagnosis</label>
-                                        <div class="tags" id="ownDiagnosisTags">
-                                            <span class="tag" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: transparent;">None added</span>
+                                        <div class="suggestions-container tags">
+                                            <div id="ownDiagnosisTags" class="editable-field" data-field="own_diagnosis" style="font-size: 0.9rem; min-height: 24px;">None added</div>
+                                            <div id="own-diagnosis-suggestions" class="suggestions-dropdown"></div>
                                         </div>
                                     </div>
                                     <div class="diag-group">
                                         <label>Health barriers</label>
-                                        <div class="tags" id="healthBarriersTags">
-                                            <span class="tag" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: transparent;">None added</span>
+                                        <div class="suggestions-container tags">
+                                            <div id="healthBarriersTags" class="editable-field" data-field="health_barriers" style="font-size: 0.9rem; min-height: 24px;">None added</div>
+                                            <div id="health-barriers-suggestions" class="suggestions-dropdown"></div>
                                         </div>
                                     </div>
                                 </div>

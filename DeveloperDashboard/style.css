@@ -383,3 +383,28 @@ code {
     font-weight: 500;
     margin-right: 8px;
 }
+
+/* Delete Action */
+.btn-delete {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--hospital);
+    transform: scale(1.1);
+}
+
+.action-cell {
+    width: 60px;
+    text-align: center;
+}

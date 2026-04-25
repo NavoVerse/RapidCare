@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    let selectedHabits = [];
     // =============================================
     // REAL-TIME DISPATCH (Socket.IO)
     // =============================================
@@ -64,12 +65,21 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update details view
             const setVal = (id, val, prefix = '', defaultVal = '--') => {
                 const el = document.getElementById(id);
-                if (el) el.textContent = val ? prefix + val : prefix + defaultVal;
+                if (el) {
+                    if ((id === 'ownDiagnosisTags' || id === 'healthBarriersTags') && val && val !== 'None added') {
+                        const tags = val.split(',').map(t => t.trim()).filter(t => t);
+                        if (tags.length > 0) {
+                            el.innerHTML = tags.map(tag => `<span class="tag" style="background: rgba(255,255,255,0.05); color: var(--secondary-text); border: 1px solid var(--border-color);">${tag}</span>`).join('');
+                            return;
+                        }
+                    }
+                    el.textContent = val ? val : defaultVal;
+                }
             };
 
             setVal('displayProfileName', data.name, '', 'Unknown User');
-            setVal('displayProfileGender', data.gender, '👤 ');
-            setVal('displayProfileBirth', data.date_of_birth, '🎂 ');
+            setVal('displayProfileGender', data.gender);
+            setVal('displayProfileBirth', data.date_of_birth);
             setVal('displayProfileHeight', data.height);
             setVal('displayProfileWeight', data.weight);
             if (data.height && data.weight) {
@@ -78,11 +88,18 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 setVal('displayProfileBMI', '--');
             }
-            setVal('displayProfileBlood', data.blood_type, '🩸 ');
-            setVal('displayProfileLocation', data.home_location, '📍 ');
+            setVal('displayProfileBlood', data.blood_type);
+            setVal('displayProfileLocation', data.home_location);
             setVal('displayProfileBP', data.blood_pressure);
             setVal('displayProfileAllergies', data.allergies);
             setVal('displayProfileChronic', data.chronic_conditions);
+            setVal('ownDiagnosisTags', data.own_diagnosis, '', 'None added');
+            setVal('healthBarriersTags', data.health_barriers, '', 'None added');
+
+            // Render habit emojis
+            selectedHabits = data.habits ? data.habits.split(',').filter(h => h) : [];
+            renderHabitEmojis(selectedHabits);
+            updateEmojiPickerSelection();
 
             // Update sidebar and header
             const sidebarName = document.getElementById('sidebarName');
@@ -105,6 +122,45 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error loading profile:', error);
         }
+    }
+
+    // Habit Emoji Logic
+    function renderHabitEmojis(habits) {
+        const container = document.getElementById('habitEmojisDisplay');
+        if (!container) return;
+        container.innerHTML = habits.map(emoji => `<span class="habit-emoji">${emoji}</span>`).join('');
+    }
+
+    function updateEmojiPickerSelection() {
+        const options = document.querySelectorAll('.picker-option');
+        options.forEach(opt => {
+            const emoji = opt.dataset.emoji;
+            if (selectedHabits.includes(emoji)) {
+                opt.classList.add('selected');
+            } else {
+                opt.classList.remove('selected');
+            }
+        });
+    }
+
+    const picker = document.getElementById('habitEmojiPicker');
+    if (picker) {
+        picker.addEventListener('click', (e) => {
+            const opt = e.target.closest('.picker-option');
+            if (!opt) return;
+            const emoji = opt.dataset.emoji;
+            if (selectedHabits.includes(emoji)) {
+                selectedHabits = selectedHabits.filter(h => h !== emoji);
+            } else {
+                if (selectedHabits.length >= 3) {
+                    alert('You can select a maximum of 3 habit emojis.');
+                    return;
+                }
+                selectedHabits.push(emoji);
+            }
+            renderHabitEmojis(selectedHabits);
+            updateEmojiPickerSelection();
+        });
     }
 
     loadUserProfile();
@@ -947,6 +1003,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById(btnConfig.id);
         if (btn) {
             btn.addEventListener('click', () => {
+                if (btnConfig.id === 'editGeneralProfile') {
+                    enterInlineEditMode();
+                    return;
+                }
                 activeEditConfig = btnConfig;
                 editModalTitle.textContent = btnConfig.title;
                 
@@ -974,6 +1034,243 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
+    // =============================================
+    // INLINE EDITING LOGIC (General Profile)
+    // =============================================
+    const editableFields = document.querySelectorAll('.editable-field');
+    const saveBtn = document.getElementById('saveGeneralProfile');
+    const cancelBtn = document.getElementById('cancelGeneralProfile');
+    const editBtn = document.getElementById('editGeneralProfile');
+    let originalValues = {};
+
+    function enterInlineEditMode() {
+        if (!editBtn || !saveBtn || !cancelBtn) return;
+        editBtn.style.display = 'none';
+        saveBtn.style.display = 'flex';
+        cancelBtn.style.display = 'flex';
+
+        // Show emoji picker
+        const picker = document.getElementById('habitEmojiPicker');
+        if (picker) picker.style.display = 'grid';
+
+        editableFields.forEach(field => {
+            if (field.id === 'ownDiagnosisTags' || field.id === 'healthBarriersTags') {
+                // If it contains tags, convert them to comma-separated text for editing
+                const tags = Array.from(field.querySelectorAll('.tag')).map(t => t.textContent.trim());
+                if (tags.length > 0) {
+                    field.textContent = tags.join(', ') + ', ';
+                }
+            }
+            originalValues[field.id] = field.textContent;
+            field.contentEditable = "true";
+        });
+        
+        // Focus the name field
+        const nameField = document.getElementById('displayProfileName');
+        if (nameField) nameField.focus();
+    }
+
+    function exitInlineEditMode(save = false) {
+        if (!editBtn || !saveBtn || !cancelBtn) return;
+        editBtn.style.display = 'flex';
+        saveBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+
+        editableFields.forEach(field => {
+            field.contentEditable = "false";
+            if (!save) {
+                field.textContent = originalValues[field.id];
+            }
+        });
+        
+        // Hide emoji picker
+        const picker = document.getElementById('habitEmojiPicker');
+        if (picker) picker.style.display = 'none';
+
+        if (save) {
+            // Recalculate BMI if needed
+            const height = parseFloat(document.getElementById('displayProfileHeight')?.textContent);
+            const weight = parseFloat(document.getElementById('displayProfileWeight')?.textContent);
+            const bmiEl = document.getElementById('displayProfileBMI');
+            if (bmiEl) {
+                if (height && weight) {
+                    const hM = height / 100;
+                    bmiEl.textContent = (weight / (hM * hM)).toFixed(1);
+                } else {
+                    bmiEl.textContent = '--';
+                }
+            }
+            // Re-render everything from the fresh database state
+            loadUserProfile();
+        }
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const payload = {};
+            editableFields.forEach(field => {
+                const key = field.dataset.field;
+                if (!key) return;
+                let val = field.textContent.trim();
+                if (val === '--' || val === 'Unknown User' || val === 'Loading...' || val === 'None added') val = '';
+                
+                // Convert to number if needed
+                if (key === 'height' || key === 'weight') {
+                    payload[key] = parseFloat(val) || null;
+                } else {
+                    payload[key] = val;
+                }
+            });
+            
+            // Add habits to payload
+            payload.habits = selectedHabits.join(',');
+
+            try {
+                const token = localStorage.getItem('rapidcare_token');
+                if (token) {
+                    const response = await fetch('http://localhost:5000/api/v1/patients/me', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error('Failed to update profile');
+                    
+                    // Update sidebar and header name if changed
+                    const sidebarName = document.getElementById('sidebarName');
+                    if (sidebarName && payload.name) sidebarName.textContent = payload.name;
+                    
+                    // Show success toast
+                    const toast = document.createElement('div');
+                    toast.style.cssText = "position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--primary-green);color:white;padding:12px 24px;border-radius:10px;z-index:10000;box-shadow:0 10px 30px rgba(0,0,0,0.1);animation:slideUp 0.3s ease-out;";
+                    toast.textContent = "Profile updated successfully!";
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 2500);
+
+                    exitInlineEditMode(true);
+                }
+            } catch (error) {
+                console.error('Update error:', error);
+                alert('Error updating profile in database.');
+            }
+        });
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            exitInlineEditMode(false);
+        });
+    }
+
+    // =============================================
+    // SUGGESTIONS LOGIC
+    // =============================================
+    const commonAllergies = [
+        "Penicillin", "Peanuts", "Shellfish", "Latex", "Pollen", 
+        "Dust Mites", "Mold", "Aspirin", "Ibuprofen", "Dairy",
+        "Eggs", "Soy", "Wheat"
+    ];
+
+    const commonChronic = [
+        "Asthma", "Diabetes (Type 1)", "Diabetes (Type 2)", 
+        "Hypertension", "Arthritis", "Heart Disease", 
+        "Thyroid Disorder", "COPD", "Epilepsy", "Migraine",
+        "Anxiety", "Depression", "GERD"
+    ];
+
+    const commonDiagnosis = [
+        "Obesity", "High Cholesterol", "Insomnia", "Stress",
+        "Chronic Pain", "Fatigue", "Vitamin D Deficiency",
+        "Anemia", "PCOS", "Sleep Apnea"
+    ];
+
+    const commonBarriers = [
+        "Lack of Exercise", "Poor Diet", "Smoking", 
+        "Alcohol Consumption", "Sedentary Lifestyle", 
+        "Irregular Sleep", "High Caffeine Intake",
+        "Work Stress", "Financial Constraints"
+    ];
+
+    function setupSuggestions(fieldId, suggestionsId, list) {
+        const field = document.getElementById(fieldId);
+        const dropdown = document.getElementById(suggestionsId);
+        if (!field || !dropdown) return;
+
+        function renderSuggestions(filter = "") {
+            const filtered = list.filter(item => 
+                item.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                dropdown.classList.remove('active');
+                return;
+            }
+
+            dropdown.innerHTML = filtered.map(item => `
+                <div class="suggestion-item" data-value="${item}">
+                    <i class="fas fa-plus"></i> ${item}
+                </div>
+            `).join('');
+            dropdown.classList.add('active');
+        }
+
+        field.addEventListener('focus', () => {
+            if (field.contentEditable === "true") {
+                renderSuggestions();
+            }
+        });
+
+        field.addEventListener('input', () => {
+            if (field.contentEditable === "true") {
+                // Get the text after the last comma
+                const parts = field.textContent.split(',');
+                const lastPart = parts[parts.length - 1].trim();
+                renderSuggestions(lastPart);
+            }
+        });
+
+        dropdown.addEventListener('mousedown', (e) => {
+            const item = e.target.closest('.suggestion-item');
+            if (item) {
+                const value = item.dataset.value;
+                const parts = field.textContent.split(',').map(p => p.trim());
+                // Replace the last part (what the user was typing) with the selected value
+                parts[parts.length - 1] = value;
+                
+                // Filter out empty or placeholder strings
+                const filteredParts = parts.filter(p => p && p !== '--' && p !== 'None');
+                
+                field.textContent = filteredParts.join(', ') + ', ';
+                
+                // Keep focus and place cursor at end
+                setTimeout(() => {
+                    field.focus();
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(field);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }, 0);
+            }
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (!field.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    }
+
+    setupSuggestions('displayProfileAllergies', 'allergies-suggestions', commonAllergies);
+    setupSuggestions('displayProfileChronic', 'chronic-suggestions', commonChronic);
+    setupSuggestions('ownDiagnosisTags', 'own-diagnosis-suggestions', commonDiagnosis);
+    setupSuggestions('healthBarriersTags', 'health-barriers-suggestions', commonBarriers);
 
     if (editForm) {
         editForm.addEventListener('submit', async (e) => {
@@ -1477,31 +1774,57 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCashRewardUIPayment();
     updateTotalPayment();
 
-    async function loadPatientProfile() {
-        try {
-            const token = localStorage.getItem('rapidcare_token');
-            if (!token) return;
-            const res = await fetch('http://localhost:5000/api/v1/patients/me', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.name) document.getElementById('displayProfileName').textContent = data.name;
-                if (data.gender) document.getElementById('displayProfileGender').textContent = `👤 ${data.gender}`;
-                if (data.date_of_birth) document.getElementById('displayProfileBirth').textContent = `🎂 ${data.date_of_birth}`;
-                if (data.blood_type) document.getElementById('displayProfileBlood').textContent = `🩸 ${data.blood_type}`;
-                if (data.home_location) document.getElementById('displayProfileLocation').textContent = `📍 ${data.home_location}`;
-                if (data.height != null) document.getElementById('displayProfileHeight').textContent = data.height;
-                if (data.weight != null) document.getElementById('displayProfileWeight').textContent = data.weight;
-                if (data.blood_pressure) document.getElementById('displayProfileBP').textContent = data.blood_pressure;
-                if (data.allergies) document.getElementById('displayProfileAllergies').textContent = data.allergies;
-                if (data.chronic_conditions) document.getElementById('displayProfileChronic').textContent = data.chronic_conditions;
+    // Profile Dropdown Logic
+    const userProfileCard = document.getElementById('userProfileCard');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const profileChevron = document.getElementById('profileChevron');
+
+    if (userProfileCard && profileDropdown) {
+        userProfileCard.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isActive = profileDropdown.classList.contains('active');
+            
+            // Toggle dropdown
+            profileDropdown.classList.toggle('active');
+            
+            // Rotate chevron
+            if (profileChevron) {
+                profileChevron.style.transform = isActive ? 'rotate(0deg)' : 'rotate(180deg)';
             }
-        } catch (e) {
-            console.error('Failed to load profile', e);
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            if (profileDropdown.classList.contains('active')) {
+                profileDropdown.classList.remove('active');
+                if (profileChevron) {
+                    profileChevron.style.transform = 'rotate(0deg)';
+                }
+            }
+        });
+
+        // Prevent closing when clicking inside the dropdown
+        profileDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Handle "View Profile" click within dropdown
+        const viewProfileItem = profileDropdown.querySelector('[data-view="details"]');
+        if (viewProfileItem) {
+            viewProfileItem.addEventListener('click', () => {
+                // Switch to Details view
+                const detailsLink = document.querySelector('.nav-link[data-view="details"]');
+                if (detailsLink) detailsLink.click();
+                
+                // Activate Profile sub-tab
+                const profileTab = document.querySelector('.sub-tab[data-tab="profile"]');
+                if (profileTab) profileTab.click();
+                
+                profileDropdown.classList.remove('active');
+                if (profileChevron) profileChevron.style.transform = 'rotate(0deg)';
+            });
         }
     }
-    loadPatientProfile();
 
     console.log('RapidCare Dashboard Initialized');
 });
@@ -2057,58 +2380,4 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     resizer.addEventListener('mousedown', mouseDownHandler);
-});
-
-// Profile Dropdown Logic
-document.addEventListener('DOMContentLoaded', () => {
-    const userProfileCard = document.getElementById('userProfileCard');
-    const profileDropdown = document.getElementById('profileDropdown');
-    const profileChevron = document.getElementById('profileChevron');
-
-    if (userProfileCard && profileDropdown) {
-        userProfileCard.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isActive = profileDropdown.classList.contains('active');
-            
-            // Toggle dropdown
-            profileDropdown.classList.toggle('active');
-            
-            // Rotate chevron
-            if (profileChevron) {
-                profileChevron.style.transform = isActive ? 'rotate(0deg)' : 'rotate(180deg)';
-            }
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', () => {
-            if (profileDropdown.classList.contains('active')) {
-                profileDropdown.classList.remove('active');
-                if (profileChevron) {
-                    profileChevron.style.transform = 'rotate(0deg)';
-                }
-            }
-        });
-
-        // Prevent closing when clicking inside the dropdown
-        profileDropdown.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
-        // Handle "View Profile" click within dropdown
-        const viewProfileItem = profileDropdown.querySelector('[data-view="details"]');
-        if (viewProfileItem) {
-            viewProfileItem.addEventListener('click', () => {
-                // Switch to Details view
-                const detailsLink = document.querySelector('.nav-link[data-view="details"]');
-                if (detailsLink) detailsLink.click();
-                
-                // Activate Profile sub-tab
-                const profileTab = document.querySelector('.sub-tab[data-tab="profile"]');
-                if (profileTab) profileTab.click();
-                
-                profileDropdown.classList.remove('active');
-                if (profileChevron) profileChevron.style.transform = 'rotate(0deg)';
-            });
-        }
-    }
 });
