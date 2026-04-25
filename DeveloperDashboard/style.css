@@ -18,7 +18,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
 }
 
 body {
@@ -80,7 +79,7 @@ nav a {
 }
 
 nav a:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(128, 128, 128, 0.15);
     color: var(--text-main);
 }
 
@@ -104,8 +103,7 @@ header {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border);
-    background: rgba(18, 18, 18, 0.8);
-    backdrop-filter: blur(10px);
+    background: var(--surface-color);
     position: sticky;
     top: 0;
     z-index: 10;
@@ -135,6 +133,21 @@ header h2 {
 .search-bar input:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 2px rgba(0, 176, 255, 0.2);
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    margin-left: 20px;
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-main);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.theme-toggle:hover {
+    background: var(--bg-dark);
+    transform: scale(1.08) rotate(15deg);
 }
 
 /* Metrics Grid */
@@ -229,7 +242,7 @@ th {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    background: rgba(0,0,0,0.1);
+    background: rgba(128,128,128,0.1);
     border-bottom: 1px solid var(--border);
 }
 
@@ -245,7 +258,7 @@ tr:last-child td {
 }
 
 tr:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(128, 128, 128, 0.1);
 }
 
 /* Badges */
@@ -261,7 +274,7 @@ tr:hover {
 
 code {
     font-family: 'JetBrains Mono', monospace;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(128, 128, 128, 0.15);
     padding: 4px 8px;
     border-radius: 6px;
     color: var(--text-muted);
@@ -278,7 +291,7 @@ code {
 }
 
 [contenteditable="true"]:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(128, 128, 128, 0.1);
     border-bottom-color: var(--accent);
     cursor: text;
 }
@@ -286,7 +299,7 @@ code {
 [contenteditable="true"]:focus {
     background: rgba(0, 176, 255, 0.1);
     border-bottom: 1px solid var(--accent);
-    color: #fff;
+    color: var(--text-main);
 }
 
 /* Toast */
@@ -317,7 +330,7 @@ code {
 
 /* Collapsible Details */
 .dev-details-collapsible {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(128, 128, 128, 0.1);
     border-radius: 8px;
     border: 1px solid var(--border);
     padding: 8px 12px;
@@ -361,7 +374,7 @@ code {
     display: flex;
     justify-content: space-between;
     font-size: 0.85rem;
-    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    border-bottom: 1px dashed rgba(128, 128, 128, 0.3);
     padding-bottom: 4px;
 }
 
