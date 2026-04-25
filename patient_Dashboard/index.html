@@ -13,6 +13,8 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="../shared_assets/js/theme-manager.js"></script>
+    <!-- Lucide Icons (via CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
@@ -72,6 +74,13 @@
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
                 <span>History</span>
+            </a>
+            <a href="#" class="nav-item" data-view="payment">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                <span>Payment</span>
             </a>
             <a href="#" class="nav-item" data-view="payments">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1733,6 +1742,253 @@
             </div>
         </div>
 
+        <div id="payment-view" style="display: none;">
+<main class="payment-main">
+            <!-- Left Side: Payment Methods -->
+            <section class="payment-methods">
+                <section class="ambulance-selection">
+                    <h2 class="headline">Select Ambulance Type</h2>
+                    <div class="ambulance-grid">
+                        <label class="ambulance-option">
+                            <input type="radio" name="ambulance-type" value="normal" checked>
+                            <div class="ambulance-card">
+                                <i data-lucide="truck"></i>
+                                <h3>Normal</h3>
+                                <div class="price-info">
+                                    <span class="original">₹100/km</span>
+                                    <span class="discounted">₹70/km</span>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="ambulance-option">
+                            <input type="radio" name="ambulance-type" value="oxygen">
+                            <div class="ambulance-card">
+                                <i data-lucide="wind"></i>
+                                <h3>Oxygen</h3>
+                                <div class="price-info">
+                                    <span class="original">₹150/km</span>
+                                    <span class="discounted">₹130/km</span>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="ambulance-option">
+                            <input type="radio" name="ambulance-type" value="icu">
+                            <div class="ambulance-card">
+                                <i data-lucide="activity"></i>
+                                <h3>ICU</h3>
+                                <div class="price-info">
+                                    <span class="original">₹200/km</span>
+                                    <span class="discounted">₹180/km</span>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="ambulance-option">
+                            <input type="radio" name="ambulance-type" value="ventilator">
+                            <div class="ambulance-card">
+                                <i data-lucide="fan"></i>
+                                <h3>Ventilator</h3>
+                                <div class="price-info">
+                                    <span class="original">₹300/km</span>
+                                    <span class="discounted">₹280/km</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="distance-section">
+                        <div class="form-group">
+                            <label>Estimated Distance (KM)</label>
+                            <input type="number" id="distance-input" value="10" min="0" step="0.1">
+                        </div>
+                    </div>
+                </section>
+
+                <h1 class="headline mt-20">Choose Payment Method</h1>
+                
+                <div class="tabs-container">
+                    <div class="tabs-list">
+                        <button class="tab-btn active" data-tab="upi">
+                            <i data-lucide="smartphone"></i>
+                            <span>UPI</span>
+                        </button>
+                        <button class="tab-btn" data-tab="card">
+                            <i data-lucide="credit-card"></i>
+                            <span>Cards</span>
+                        </button>
+                        <button class="tab-btn" data-tab="netbanking">
+                            <i data-lucide="landmark"></i>
+                            <span>Net Banking</span>
+                        </button>
+                        <button class="tab-btn" data-tab="cash">
+                            <i data-lucide="banknote"></i>
+                            <span>Cash</span>
+                        </button>
+                    </div>
+
+                    <div class="tab-content active" id="upi-content">
+                        <h3>UPI Options</h3>
+                        <div class="upi-grid">
+                            <label class="upi-option">
+                                <input type="radio" name="upi-method" value="gpay" checked>
+                                <div class="upi-card">
+                                    <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/google-pay-icon.png" alt="Google Pay">
+                                    <span>Google Pay</span>
+                                </div>
+                            </label>
+                            <label class="upi-option">
+                                <input type="radio" name="upi-method" value="phonepe">
+                                <div class="upi-card">
+                                    <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/phonepe-icon.png" alt="PhonePe">
+                                    <span>PhonePe</span>
+                                </div>
+                            </label>
+                            <label class="upi-option">
+                                <input type="radio" name="upi-method" value="amazonpay">
+                                <div class="upi-card">
+                                    <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/amazon-pay-icon.png" alt="Amazon Pay">
+                                    <span>Amazon Pay</span>
+                                </div>
+                            </label>
+                            <label class="upi-option">
+                                <input type="radio" name="upi-method" value="upi">
+                                <div class="upi-card">
+                                    <img src="https://img.icons8.com/color/512/bhim.png" alt="UPI">
+                                    <span>UPI</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="upi-id-input">
+                            <label>Or enter UPI ID</label>
+                            <div class="input-group">
+                                <input type="text" placeholder="e.g. mobile@upi">
+                                <button class="primary-btn">Verify</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="card-content">
+                        <h3>Credit / Debit Card</h3>
+                        <form class="card-form">
+                            <div class="form-group">
+                                <label>Card Number</label>
+                                <input type="text" placeholder="0000 0000 0000 0000">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Expiry Date</label>
+                                    <input type="text" placeholder="MM/YY">
+                                </div>
+                                <div class="form-group">
+                                    <label>CVV</label>
+                                    <input type="password" placeholder="***">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Bank</label>
+                                <div class="bank-select-wrapper">
+                                    <input type="text" id="card-bank-search" placeholder="Search your bank..." class="bank-search-input">
+                                    <div class="bank-dropdown" id="card-bank-list">
+                                        <!-- Populated by JS -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="save-card">
+                                <label for="save-card">Save card details securely</label>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-content" id="netbanking-content">
+                        <h3>Popular Banks</h3>
+                        <div class="bank-grid" id="popular-banks">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div class="form-group mt-20">
+                            <label>All Banks</label>
+                            <div class="bank-select-wrapper">
+                                <input type="text" id="net-bank-search" placeholder="Search your bank..." class="bank-search-input">
+                                <div class="bank-dropdown" id="net-bank-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="cash-content">
+                        <div class="offer-banner">
+                            <i data-lucide="gift"></i>
+                            <div class="offer-text">
+                                <h4>Special Cash Offer!</h4>
+                                <p>After 5th payment in cash, the 6th platform charge (₹40) will be discounted.</p>
+                            </div>
+                        </div>
+                        <div class="cash-instructions">
+                            <p>Pay directly to the driver upon arrival. Please ensure you have the exact change if possible.</p>
+                            <div class="progress-container">
+                                <label>Cash Payment Streak: 3/5</label>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 60%;"></div>
+                                </div>
+                                <small>2 more payments to unlock your reward!</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: Summary -->
+            <aside class="payment-summary">
+                <div class="summary-card">
+                    <h2 class="headline">Order Summary</h2>
+                    <div class="summary-details">
+                        <div class="summary-row" id="distance-charge-row">
+                            <span>Distance Charge</span>
+                            <div class="price-display">
+                                <span class="original strikethrough">₹0</span>
+                                <span class="discounted">₹0</span>
+                            </div>
+                        </div>
+                        <div class="summary-row savings" id="savings-row">
+                            <span class="offer-label">Limited Time Offer Applied</span>
+                            <span class="save-amount">Saved ₹0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Hospital Reservation</span>
+                            <span>₹500</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Platform Charge</span>
+                            <span>₹40</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="coupon-section">
+                            <label>Have a coupon?</label>
+                            <div class="input-group">
+                                <input type="text" id="coupon-code" placeholder="ENTER CODE">
+                                <button id="apply-coupon" class="secondary-btn">Apply</button>
+                            </div>
+                            <p id="coupon-msg" class="coupon-status"></p>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="summary-row total">
+                            <span>Total Amount</span>
+                            <span id="total-amount">₹1,740</span>
+                        </div>
+                        <button class="pay-btn">
+                            Pay Securely
+                            <i data-lucide="shield-check"></i>
+                        </button>
+                        <p class="secure-text">
+                            <i data-lucide="lock"></i>
+                            256-bit SSL Secure Encryption
+                        </p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+</div>
+
         <!-- Edit Modal -->
         <div class="modal-overlay" id="editModal" style="display: none;">
             <div class="modal-content">
@@ -1850,6 +2106,9 @@
         <script src="../Backend/map_Integration/map_api.js?v=2"></script>
         <script src="../Backend/user_Database/db_manager.js?v=2"></script>
         <script src="script.js?v=2"></script>
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 
 </html>
