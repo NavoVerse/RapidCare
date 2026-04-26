@@ -23,37 +23,39 @@ The RapidCare platform has undergone a full architectural stabilization and secu
 
 ```
 RapidCare/
-├── Backend/                    # Unified Express.js server (port 5000)
-│   ├── server.js               # ~1400-line monolith — all routes
-│   ├── db.js                   # Knex init + migration runner
-│   ├── config/database.js      # Knex connection config (SQLite dev / PG prod)
-│   ├── knexfile.js             # Knex CLI config
-│   ├── migrations/             # 13 database migration files
-│   ├── services/
-│   │   ├── logger.service.js   # Winston logger (daily rotation)
-│   │   └── notification.service.js  # Nodemailer OTP emails
-│   ├── middleware/
-│   │   ├── rbac.js             # Role-based access control
-│   │   ├── rateLimiter.js      # Express rate limiting
-│   │   └── validate.js         # Zod schema validation
-│   ├── validators/             # Zod schemas for auth routes
-│   └── user_Database/          # SQLite DB file (gitignored)
+├── Frontend/                      # All client-side UI modules
+│   ├── choose_User/               # Role selection landing page (entry point)
+│   ├── rapid_Care_Login/          # Login / Register / Forgot Password
+│   ├── patient_Dashboard/         # Main patient SPA (profile, map, vitals)
+│   ├── driver_dashboard/          # Driver-facing interface
+│   ├── driver_registration/       # Driver onboarding form
+│   ├── hospital_registration/     # Hospital onboarding form
+│   ├── Insurance_Interface/       # Insurance management UI
+│   ├── DeveloperDashboard/        # Admin data viewer / editor
+│   ├── excel_dashboard/           # Admin data export (CSV/Excel)
+│   ├── login_urgency/             # Emergency triage categorization
+│   └── shared_assets/             # Shared CSS theme + JS config
+│       ├── css/theme.css
+│       └── js/config.js, theme-manager.js
 │
-├── rapid_Care_Login/           # Login / Register / Forgot Password UI
-├── patient_Dashboard/          # Main patient SPA (profile, map, vitals, history)
-├── DeveloperDashboard/         # Admin data viewer / editor
-├── choose_User/                # Role selection landing page (entry point)
-├── driver_dashboard/           # Driver-facing interface
-├── driver_registration/        # Driver onboarding
-├── hospital_registration/      # Hospital onboarding
-├── Insurance_Interface/        # Insurance management UI
-├── excel_dashboard/            # Admin data export (CSV/Excel)
-├── login_urgency/              # Emergency triage categorization
-├── shared_assets/              # Shared CSS theme + JS theme manager
+├── Backend/                       # Unified Express.js server (port 5000)
+│   ├── server.js                  # All API routes + static serving
+│   ├── db.js                      # Knex init + migration runner
+│   ├── config/database.js         # Knex connection (SQLite dev / PG prod)
+│   ├── knexfile.js                # Knex CLI config
+│   ├── migrations/                # 13 database migration files
+│   ├── seeds/                     # Core data seeding
+│   ├── tests/                     # Jest + Supertest integration tests
+│   ├── services/                  # Winston logger, Nodemailer
+│   ├── middleware/                # RBAC, rate limiter, Zod validation
+│   ├── validators/                # Zod schemas for auth routes
+│   └── user_Database/             # SQLite DB file (gitignored)
 │
-├── start_rapidcare.bat         # Windows launcher script
-├── backendRoadMap.md           # Development roadmap (all phases DONE)
-└── README.md                   # ← You are here
+├── index.html                     # Root redirect → role selection
+├── start_rapidcare.bat            # Windows launcher script
+├── ecosystem.config.js            # PM2 production config
+├── nginx.conf.template            # Nginx reverse proxy template
+└── README.md
 ```
 
 ---
