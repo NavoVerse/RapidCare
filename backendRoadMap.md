@@ -1020,12 +1020,21 @@ DONE | Build hospital-facing dashboard APIs (bed management, incoming patients) 
 |---|---|---|
 DONE | Migrate from SQLite to PostgreSQL via Knex | 🔴 High | 4 hours |
 DONE | Add Winston structured logging | 🟡 Medium | 2 hours |
+<<<<<<< HEAD
 DONE | Add comprehensive error handling middleware | 🟡 Medium | 2 hours |
 DONE | Encrypt medical data fields (AES-256) | 🟡 Medium | 3 hours |
 DONE | Set up PM2 process manager | 🟡 Medium | 1 hour |
 DONE | Configure Nginx reverse proxy with HTTPS | 🟡 Medium | 2 hours |
 DONE | Write deployment docs | 🟢 Low | 2 hours |
 DONE | Write API documentation (Swagger/OpenAPI) | 🟢 Low | 4 hours |
+=======
+| Add comprehensive error handling middleware | 🟡 Medium | 2 hours |
+| Encrypt medical data fields (AES-256) | 🟡 Medium | 3 hours |
+| Set up PM2 process manager | 🟡 Medium | 1 hour |
+| Configure Nginx reverse proxy with HTTPS | 🟡 Medium | 2 hours |
+| Write deployment docs | 🟢 Low | 2 hours |
+| Write API documentation (Swagger/OpenAPI) | 🟢 Low | 4 hours |
+>>>>>>> e3e413782f4e38c2e40d07151c6297690eefcbb3
 
 **Deliverable**: Production-ready backend with encrypted data, logging, and HTTPS.
 
