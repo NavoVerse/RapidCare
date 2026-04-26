@@ -309,18 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Search bar focus effect
-    const searchBarInput = document.querySelector('.search-bar input');
-    const searchBarEl = document.querySelector('.search-bar');
-    
-    if (searchBarInput && searchBarEl) {
-        searchBarInput.addEventListener('focus', () => {
-            searchBarEl.style.boxShadow = '0 0 0 2px rgba(21, 128, 61, 0.2)';
-        });
-        searchBarInput.addEventListener('blur', () => {
-            searchBarEl.style.boxShadow = 'none';
-        });
-    }
+    // Search bar focus effect is now handled by CSS :focus-within for better performance and transitions.
 
     // =============================================
     // MAP & HOSPITAL INTEGRATION (Leaflet)
