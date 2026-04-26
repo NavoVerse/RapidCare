@@ -1019,7 +1019,7 @@ DONE | Connect `excel_dashboard` to live data from `/api/v1/admin/export` | 🟡
 | Task | Priority | Effort |
 |---|---|---|
 DONE | Migrate from SQLite to PostgreSQL via Knex | 🔴 High | 4 hours |
-| Add Winston structured logging | 🟡 Medium | 2 hours |
+DONE | Add Winston structured logging | 🟡 Medium | 2 hours |
 | Add comprehensive error handling middleware | 🟡 Medium | 2 hours |
 | Encrypt medical data fields (AES-256) | 🟡 Medium | 3 hours |
 | Set up PM2 process manager | 🟡 Medium | 1 hour |
