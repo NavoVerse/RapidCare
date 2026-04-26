@@ -19,6 +19,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { initializeDB, knex } = require('./db');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+const logger = require('./services/logger.service');
 
 const app = express();
 const server = http.createServer(app);
@@ -169,14 +170,14 @@ const mapEmailOrPhone = (input) => {
 // 1. Register New User
 app.post('/api/v1/auth/register', validate(registerSchema), async (req, res) => {
     const { name, email, password, role, phone } = req.body;
-    
+
     // Map email/phone input
     const { mappedEmail, mappedPhone } = mapEmailOrPhone(email);
     const finalPhone = mappedPhone || phone; // Prefer the one extracted from 'email' field if it was a phone number
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        
+
         const userId = await knex.transaction(async (trx) => {
             const [id] = await trx('users').insert({
                 name,
@@ -216,7 +217,7 @@ app.post('/api/v1/drivers/register', async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        
+
         const userId = await knex.transaction(async (trx) => {
             const [id] = await trx('users').insert({
                 name,
@@ -258,7 +259,7 @@ app.post('/api/v1/hospitals/register', async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(data.password, 10);
-        
+
         const userId = await knex.transaction(async (trx) => {
             const [id] = await trx('users').insert({
                 name: data.hospital_name,
@@ -500,8 +501,8 @@ app.get('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
 
 // 7. Update Patient Profile
 app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (req, res) => {
-    const { 
-        name, avatar_url, gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, 
+    const {
+        name, avatar_url, gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure,
         allergies, chronic_conditions, own_diagnosis, health_barriers, habits,
         chronic_disease, diabetes_emergencies, surgeries, family_history, diabetes_complications
     } = req.body;
@@ -511,7 +512,7 @@ app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
             const userUpdate = {};
             if (name !== undefined) userUpdate.name = name;
             if (avatar_url !== undefined) userUpdate.avatar_url = avatar_url;
-            
+
             if (Object.keys(userUpdate).length > 0) {
                 await trx('users').where({ id: req.user.id }).update(userUpdate);
             }
@@ -553,7 +554,7 @@ app.get('/api/v1/medical_records', authenticateToken, authorize('patient'), asyn
         const records = await knex('medical_records')
             .where({ patient_id: req.user.id })
             .orderBy('created_at', 'desc');
-            
+
         // Fetch prescriptions for each record
         for (let record of records) {
             record.diagnosis = decrypt(record.diagnosis);
@@ -562,7 +563,7 @@ app.get('/api/v1/medical_records', authenticateToken, authorize('patient'), asyn
 
             const prescriptions = await knex('prescriptions')
                 .where({ medical_record_id: record.id });
-            
+
             record.prescriptions = prescriptions.map(p => ({
                 ...p,
                 medication_name: decrypt(p.medication_name),
@@ -579,14 +580,14 @@ app.get('/api/v1/medical_records', authenticateToken, authorize('patient'), asyn
 // Create a new medical record
 app.post('/api/v1/medical_records', authenticateToken, authorize('patient', 'hospital', 'admin'), async (req, res) => {
     const { patient_id, diagnosis, treatment_plan, clinical_notes, prescriptions } = req.body;
-    
+
     // If patient is creating it, force patient_id to be themselves
     const targetPatientId = req.user.role === 'patient' ? req.user.id : patient_id;
-    
+
     if (!targetPatientId) {
         return res.status(400).json({ error: 'patient_id is required' });
     }
-    
+
     try {
         await knex.transaction(async trx => {
             const inserted = await trx('medical_records').insert({
@@ -596,7 +597,7 @@ app.post('/api/v1/medical_records', authenticateToken, authorize('patient', 'hos
                 treatment_plan: encrypt(treatment_plan),
                 clinical_notes: encrypt(clinical_notes)
             }).returning('id');
-            
+
             const recordId = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
 
             if (prescriptions && prescriptions.length > 0) {
@@ -613,7 +614,7 @@ app.post('/api/v1/medical_records', authenticateToken, authorize('patient', 'hos
                 await trx('prescriptions').insert(prescriptionsToInsert);
             }
         });
-        
+
         res.status(201).json({ message: 'Medical record created successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -805,9 +806,9 @@ app.post('/api/v1/appointments', authenticateToken, authorize('patient'), async 
         }).returning('id');
 
         const appointmentId = typeof id === 'object' ? id.id : id;
-        res.status(201).json({ 
-            message: 'Appointment booked successfully', 
-            appointment_id: appointmentId 
+        res.status(201).json({
+            message: 'Appointment booked successfully',
+            appointment_id: appointmentId
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -847,7 +848,7 @@ app.put('/api/v1/appointments/:id', authenticateToken, async (req, res) => {
         await knex('appointments')
             .where({ id: req.params.id })
             .update({ status, updated_at: knex.fn.now() });
-            
+
         res.json({ message: 'Appointment updated successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -863,7 +864,7 @@ const tripTimeouts = new Map();
 // Request a new trip (Patient)
 app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async (req, res) => {
     const { pickup_lat, pickup_lng, hospital_id } = req.body;
-    
+
     if (!pickup_lat || !pickup_lng || !hospital_id) {
         return res.status(400).json({ error: 'pickup_lat, pickup_lng, and hospital_id are required' });
     }
@@ -884,7 +885,7 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
             if (driver.current_lat && driver.current_lng) {
                 // Approximate distance calculation
                 const dist = Math.sqrt(
-                    Math.pow(driver.current_lat - pickup_lat, 2) + 
+                    Math.pow(driver.current_lat - pickup_lat, 2) +
                     Math.pow(driver.current_lng - pickup_lng, 2)
                 );
                 if (dist < minDistance) {
@@ -909,7 +910,7 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
             status: 'requested',
             start_time: knex.fn.now()
         }).returning('id');
-        
+
         const tripId = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
 
         const io = req.app.get('io');
@@ -945,7 +946,7 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
                 console.error('Timeout error:', err);
             }
         }, 60000);
-        
+
         tripTimeouts.set(tripId, timeoutId);
 
         res.status(201).json({
@@ -1034,7 +1035,7 @@ app.post('/api/v1/trips/:id/reject', authenticateToken, authorize('driver'), asy
 app.put('/api/v1/trips/:id/status', authenticateToken, authorize('driver'), async (req, res) => {
     const { status } = req.body;
     const allowedStatuses = ['heading_to_patient', 'arrived', 'heading_to_hospital', 'at_hospital', 'completed', 'cancelled'];
-    
+
     if (!allowedStatuses.includes(status)) {
         return res.status(400).json({ error: 'Invalid status' });
     }
@@ -1191,8 +1192,8 @@ async function fetchDashboardData(res) {
         const rawPatients = await knex('users as u')
             .join('patients as p', 'u.id', 'p.user_id')
             .select('u.*', 'p.blood_group', 'p.medical_history', 'p.emergency_contact',
-                   'p.gender', 'p.date_of_birth', 'p.height', 'p.weight',
-                   'p.blood_pressure', 'p.home_location', 'p.allergies', 'p.chronic_conditions', 'p.own_diagnosis', 'p.health_barriers', 'p.habits')
+                'p.gender', 'p.date_of_birth', 'p.height', 'p.weight',
+                'p.blood_pressure', 'p.home_location', 'p.allergies', 'p.chronic_conditions', 'p.own_diagnosis', 'p.health_barriers', 'p.habits')
             .where('u.role', 'patient');
 
         // Decrypt medical fields
@@ -1321,8 +1322,8 @@ app.get('/api/v1/analytics/patient', authenticateToken, async (req, res) => {
         const trips = await knex('trips').where({ patient_id: patientId, status: 'completed' });
 
         let totalDistance = 0;
-        let totalResponseTime = 0; 
-        
+        let totalResponseTime = 0;
+
         trips.forEach(t => {
             const baseFees = 540;
             const distance = Math.max(0, (t.total_fare - baseFees) / 70);
@@ -1336,7 +1337,7 @@ app.get('/api/v1/analytics/patient', authenticateToken, async (req, res) => {
         });
 
         const avgResponseTime = trips.length > 0 ? (totalResponseTime / trips.length / 60).toFixed(1) : 0;
-        
+
         res.json({
             metrics: {
                 avg_response_time: parseFloat(avgResponseTime),
@@ -1385,11 +1386,7 @@ async function startServer() {
             logger.info(`❤️ Health: http://localhost:${PORT}/health`);
         });
     } catch (err) {
-<<<<<<< HEAD
         logger.error('Failed to start server:', err);
-=======
-        logger.error('Failed to start server', { error: err.message, stack: err.stack });
->>>>>>> 8ace967177f1fa8b9f899141d1a20f40b1eae2d9
         process.exit(1);
     }
 }
