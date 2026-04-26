@@ -254,11 +254,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (el) el.src = dataUrl;
                 });
             } else {
-                throw new Error('Failed to upload avatar');
+                const errData = await response.json().catch(() => ({}));
+                console.error('Server error during avatar upload:', response.status, errData);
+                throw new Error(errData.error || 'Failed to upload avatar');
             }
         } catch (error) {
             console.error('Avatar upload error:', error);
-            alert('Failed to update profile picture.');
+            alert('Failed to update profile picture: ' + error.message);
         }
     }
 
@@ -1143,9 +1145,11 @@ document.addEventListener('DOMContentLoaded', () => {
         saveBtn.style.display = 'flex';
         cancelBtn.style.display = 'flex';
 
-        // Show emoji picker
+        // Show emoji picker and hide display
         const picker = document.getElementById('habitEmojiPicker');
+        const display = document.getElementById('habitEmojisDisplay');
         if (picker) picker.style.display = 'grid';
+        if (display) display.style.visibility = 'hidden';
 
         editableFields.forEach(field => {
             if (field.id === 'ownDiagnosisTags' || field.id === 'healthBarriersTags') {
@@ -1177,9 +1181,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // Hide emoji picker
+        // Hide emoji picker and show display
         const picker = document.getElementById('habitEmojiPicker');
+        const display = document.getElementById('habitEmojisDisplay');
         if (picker) picker.style.display = 'none';
+        if (display) display.style.visibility = 'visible';
 
         if (save) {
             // Recalculate BMI if needed

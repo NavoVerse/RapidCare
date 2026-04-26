@@ -461,19 +461,20 @@ header {
 }
 
 .editable-field[contenteditable="true"] {
-    background-color: rgba(21, 128, 61, 0.05);
-    border-bottom: 2px solid var(--primary-color);
+    background-color: rgba(6, 182, 212, 0.1);
+    border-bottom: 2px solid #06b6d4; /* Cyan/Blue from screenshot */
     outline: none;
     min-width: 50px;
+    border-radius: 4px 4px 0 0;
 }
 
 .editable-field[contenteditable="true"]:hover {
-    background-color: rgba(21, 128, 61, 0.1);
+    background-color: rgba(6, 182, 212, 0.15);
 }
 
 .editable-field[contenteditable="true"]:focus {
-    background-color: rgba(21, 128, 61, 0.15);
-    box-shadow: 0 2px 10px rgba(21, 128, 61, 0.1);
+    background-color: rgba(6, 182, 212, 0.2);
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15);
 }
 
 .name-header .editable-field {
@@ -499,11 +500,12 @@ header {
 
 .habit-emojis-container {
     display: flex;
-    gap: 8px;
-    min-height: 32px;
+    gap: 12px;
+    min-height: 40px;
     justify-content: center;
-    flex-wrap: wrap;
-    max-width: 128px;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
 }
 
 .habit-emoji {
@@ -513,21 +515,28 @@ header {
 }
 
 .habit-emoji-picker {
-    position: absolute;
-    top: 140px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+    margin-top: 15px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 16px;
-    padding: 10px;
+    padding: 8px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    box-shadow: var(--shadow-lg);
-    z-index: 1000;
-    width: max-content;
-    animation: fadeIn 0.3s ease;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns to fit in sidebar */
+    gap: 6px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    width: fit-content;
+    animation: slideDownFade 0.3s ease-out;
+}
+
+@keyframes slideDownFade {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 .picker-option {
@@ -547,8 +556,9 @@ header {
 }
 
 .picker-option.selected {
-    background: rgba(21, 128, 61, 0.1);
-    box-shadow: inset 0 0 0 2px var(--primary-color);
+    background: rgba(6, 182, 212, 0.2);
+    box-shadow: inset 0 0 0 2px #06b6d4; /* Cyan border */
+    border-radius: 12px;
 }
 
 @keyframes bounceIn {
@@ -1288,28 +1298,51 @@ header {
 }
 
 .vitals-row {
-    display: flex;
-    gap: 30px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    width: 100%;
+}
+
+.vital-item:nth-child(5), 
+.vital-item:nth-child(6) {
+    grid-column: span 2;
 }
 
 .vital-item {
-    background: var(--bg-color);
-    padding: 12px 20px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    min-width: 120px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 15px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    min-width: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: transform 0.2s;
+}
+
+.vital-item:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .vital-val {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--primary-text);
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
 }
 
 .vital-val small {
+    font-size: 13px;
+    color: var(--secondary-text);
+    margin-left: 4px;
+}
+
+.vital-label {
     font-size: 12px;
     color: var(--secondary-text);
-    font-weight: 600;
+    text-transform: capitalize;
 }
 
 .vital-trend {
@@ -1947,6 +1980,28 @@ header {
     font-weight: 600;
     color: var(--secondary-text);
     margin-left: 4px;
+}
+
+.diagnosis-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.diag-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.diag-group label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--secondary-text);
+    letter-spacing: 0.5px;
 }
 
 .eta-label {
