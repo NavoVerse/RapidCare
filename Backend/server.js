@@ -20,7 +20,6 @@ const { Server } = require('socket.io');
 const { initializeDB, knex } = require('./db');
 const logger = require('./utils/logger');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-const logger = require('./services/logger.service');
 
 const app = express();
 const server = http.createServer(app);
@@ -1380,15 +1379,6 @@ async function startServer() {
     try {
         await initializeDB();
         server.listen(PORT, () => {
-<<<<<<< HEAD
-            logger.info(`RapidCare Unified Backend started on port ${PORT}`);
-            logger.info(`Auth API : http://localhost:${PORT}/api/v1/auth`);
-            logger.info(`Dev Dash : http://localhost:${PORT}/dev`);
-            logger.info(`Health   : http://localhost:${PORT}/health`);
-        });
-    } catch (err) {
-        logger.error('Failed to start server', { error: err.message, stack: err.stack });
-=======
             logger.info(`🚀 RapidCare Unified Backend running on http://localhost:${PORT}`);
             logger.info(`🔐 Auth API: http://localhost:${PORT}/api/v1/auth`);
             logger.info(`🛠️ Admin API: http://localhost:${PORT}/api/data`);
@@ -1396,8 +1386,7 @@ async function startServer() {
             logger.info(`❤️ Health: http://localhost:${PORT}/health`);
         });
     } catch (err) {
-        logger.error('Failed to start server:', err);
->>>>>>> e3e413782f4e38c2e40d07151c6297690eefcbb3
+        logger.error('Failed to start server', { error: err.message, stack: err.stack });
         process.exit(1);
     }
 }
