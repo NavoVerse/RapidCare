@@ -114,7 +114,7 @@ body {
 }
 
 .nav-item.active {
-    background-color: rgba(25, 25, 112, 0.1);
+    background-color: var(--primary-bg-active);
     color: var(--primary-color);
     font-weight: 600;
 }
@@ -279,22 +279,34 @@ button#sidebar-toggle:hover {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     height: 100vh;
+    position: relative;
+    scroll-behavior: smooth;
 }
 
 header {
-    background-color: var(--surface-color);
+    background: rgba(var(--surface-color-rgb), 0.7);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
     padding: 0 24px;
     height: 64px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid rgba(var(--surface-color-rgb), 0.3);
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1100;
     flex-shrink: 0;
+    margin-bottom: -64px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] header {
+    background: rgba(30, 30, 30, 0.75);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .header-left {
@@ -306,27 +318,71 @@ header {
 .search-bar {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background-color: var(--bg-color);
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
-    padding: 8px 18px;
-    border-radius: 50px;
-    width: 320px;
-    transition: all 0.3s;
+    padding: 10px 20px;
+    border-radius: 14px;
+    width: 340px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] .search-bar {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.search-bar:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(21, 128, 61, 0.3);
+}
+
+[data-theme="dark"] .search-bar:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .search-bar:focus-within {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+    width: 400px;
+    background: var(--surface-color);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1), 0 0 0 4px var(--primary-bg-active);
+}
+
+[data-theme="dark"] .search-bar:focus-within {
+    background: #1a1a1a;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 4px var(--primary-bg-active);
 }
 
 .search-bar input {
-    background: none;
-    border: none;
-    outline: none;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
     width: 100%;
-    font-size: 13.5px;
+    font-size: 15px;
+    font-weight: 500;
     color: var(--primary-text);
+    padding: 4px 0 !important;
+    box-shadow: none !important;
+}
+
+.search-bar input::placeholder {
+    color: var(--secondary-text);
+    opacity: 0.7;
+}
+
+.search-bar svg {
+    color: var(--secondary-text);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.search-bar:focus-within svg {
+    color: var(--primary-color);
+    transform: scale(1.1);
 }
 
 .header-right {
@@ -1130,9 +1186,10 @@ header {
     bottom: -1.5px;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 3.3px;
     background: var(--primary-color);
     border-radius: 10px;
+    box-shadow: 0 0 10px var(--primary-color);
 }
 
 .profile-main-card {
@@ -4006,8 +4063,7 @@ header {
 #payment-view,
 #payments-view {
     flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
+    padding-top: 64px; /* Offset for sticky header */
     min-height: 0;
 }
 
@@ -4015,7 +4071,7 @@ header {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    padding-top: 64px; /* Offset for sticky header */
     min-height: 0;
 }
 

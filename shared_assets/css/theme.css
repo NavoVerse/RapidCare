@@ -8,7 +8,9 @@
 
     /* Light Theme */
     --bg-color: #ECEFF1;
+    --bg-color-rgb: 236, 239, 241;
     --surface-color: #F5F7F8;
+    --surface-color-rgb: 245, 247, 248;
     --primary-color: #191970;
     --primary-text: #0D1117;
     --secondary-text: #546E7A;
@@ -18,6 +20,7 @@
     --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     --primary-hover: #121250;
     --btn-text: #FFFFFF;
+    --primary-bg-active: rgba(40, 40, 157, 0.1);
 
     /* SOS Button - Light Mode */
     --sos-bg: #D32F2F;
@@ -65,18 +68,25 @@ textarea {
 [data-theme="dark"] {
     /* Dark Theme - Charcoal & Electric Blue (Medical Standard) */
     --bg-color: #121212;
+    --bg-color-rgb: 18, 18, 18;
     --surface-color: #1E1E1E;
-    --primary-color: #191970; /* Midnight Blue */
-    --primary-text: #ECEFF1;  /* Mist Gray */
-    --secondary-text: #9E9E9E; /* Medium Gray */
-    --accent-color: #00B0FF;  /* Electric Blue */
+    --surface-color-rgb: 30, 30, 30;
+    --primary-color: #21aaff;
+    /* Lighter Indigo for visibility */
+    --primary-text: #ECEFF1;
+    /* Mist Gray */
+    --secondary-text: #B0B0B0;
+    /* Brighter Gray for better contrast */
+    --accent-color: #0099ff;
+    /* Electric Blue */
     --border-color: #333333;
     --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --primary-hover: #1e1e8a;
+    --primary-hover: #9ca3af;
     --btn-text: #ECEFF1;
-    
+
     /* Active State Glow */
     --accent-glow: rgba(0, 176, 255, 0.4);
+    --primary-bg-active: rgba(129, 140, 248, 0.15);
 
     /* SOS Button - Dark Mode (Maintained for Emergency visibility) */
     --sos-bg: #ef4444;
