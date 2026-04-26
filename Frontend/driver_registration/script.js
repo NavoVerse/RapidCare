@@ -92,8 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 
                 if (response.ok) {
+                    localStorage.setItem('rapidcare_token', data.token);
+                    localStorage.setItem('rapidcare_user', JSON.stringify(data.user));
                     alert('Driver Registration Submitted successfully!');
-                    window.location.href = '../rapid_Care_Login/index.html';
+                    window.location.href = '/driver';
                 } else {
                     alert('Registration failed: ' + (data.error || 'Unknown error'));
                 }

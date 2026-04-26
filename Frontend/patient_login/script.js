@@ -165,9 +165,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('rapidcare_token', data.token);
                 localStorage.setItem('rapidcare_user', JSON.stringify(data.user));
                 showToast(`Welcome back, ${data.user.name}!`, 'success');
-                // Redirect to patient dashboard
+                
+                // Redirect based on role
                 setTimeout(() => {
-                    window.location.href = '/dashboard';
+                    if (data.user.role === 'driver') {
+                        window.location.href = '/driver';
+                    } else if (data.user.role === 'hospital') {
+                        window.location.href = '/hospital-register';
+                    } else {
+                        window.location.href = '/dashboard';
+                    }
                 }, 1500);
             } else {
                 showToast(data.error || 'Login failed', 'error');

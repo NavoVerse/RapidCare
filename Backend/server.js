@@ -122,7 +122,8 @@ app.use((req, res, next) => {
 
 // ── Static: Frontend Modules ──────────────────────────────────────────────────
 app.use('/shared_assets', express.static(path.resolve(__dirname, '../Frontend/shared_assets')));
-app.use('/login', express.static(path.resolve(__dirname, '../Frontend/rapid_Care_Login')));
+app.use('/login', express.static(path.resolve(__dirname, '../Frontend/patient_login')));
+app.use('/driver-login', express.static(path.resolve(__dirname, '../Frontend/driver_login')));
 app.use('/dashboard', express.static(path.resolve(__dirname, '../Frontend/patient_Dashboard')));
 app.use('/driver', express.static(path.resolve(__dirname, '../Frontend/driver_dashboard')));
 app.use('/hospital-register', express.static(path.resolve(__dirname, '../Frontend/hospital_registration')));
@@ -254,7 +255,11 @@ app.post('/api/v1/drivers/register', async (req, res) => {
             return id;
         });
 
-        res.status(201).json({ message: 'Driver registered successfully', userId });
+        // Generate token so driver can be logged in immediately
+        const token = jwt.sign({ id: userId, email, role: 'driver' }, JWT_SECRET, { expiresIn: '1d' });
+        const user = { id: userId, name, email, role: 'driver' };
+
+        res.status(201).json({ message: 'Driver registered successfully', token, user });
     } catch (err) {
         if (err.message.includes('UNIQUE constraint failed') || err.message.includes('duplicate key value')) {
             return res.status(400).json({ error: 'Email, license, or vehicle number already exists' });

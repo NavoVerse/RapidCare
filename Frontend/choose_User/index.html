@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,11 @@
     <link rel="stylesheet" href="../shared_assets/css/theme.css">
     <link rel="stylesheet" href="style.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body data-theme="dark">
 
     <div class="cursor" id="cur"></div>
@@ -31,8 +35,10 @@
         <div class="mouse-glow" id="mGlow"></div>
         <div class="grid-overlay"></div>
         <div class="rings">
-            <div class="ring"></div><div class="ring"></div>
-            <div class="ring"></div><div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
         </div>
 
         <div class="corner-label tl">RC — 2026</div>
@@ -41,7 +47,9 @@
         <div class="corner-label br">Healthcare OS</div>
 
         <div class="splash-content">
-            <div class="live-pill"><div class="live-dot"></div>Live System Active</div>
+            <div class="live-pill">
+                <div class="live-dot"></div>Live System Active
+            </div>
             <div class="logo-mark">
                 <div class="logo-glow"></div>
                 <div class="logo-cross-h"></div>
@@ -49,7 +57,8 @@
             </div>
             <div class="splash-title" id="splashTitle">RAPID CARE</div>
             <div class="splash-tagline">Emergency Care · Instantly Connected · Worldwide</div>
-            <button class="btn-prim" onclick="document.getElementById('roles').scrollIntoView({behavior:'smooth'})" style="margin-top: 30px;">Get Started</button>
+            <button class="btn-prim" onclick="document.getElementById('roles').scrollIntoView({behavior:'smooth'})"
+                style="margin-top: 30px;">Get Started</button>
         </div>
 
         <div class="scroll-hint" onclick="document.getElementById('globe-sec').scrollIntoView({behavior:'smooth'})">
@@ -62,7 +71,8 @@
     <section id="globe-sec">
         <div class="tag reveal">— Global Network</div>
         <div class="sec-title reveal">CONNECTED WORLDWIDE</div>
-        <div class="sec-sub reveal" style="max-width:520px;margin:0 auto">RapidCare operates across 40+ countries, routing emergency care through a real-time global network of drivers, clinics and hospitals.</div>
+        <div class="sec-sub reveal" style="max-width:520px;margin:0 auto">RapidCare operates across 40+ countries,
+            routing emergency care through a real-time global network of drivers, clinics and hospitals.</div>
 
         <div class="globe-wrap reveal">
             <canvas id="globe" width="380" height="380"></canvas>
@@ -72,10 +82,22 @@
         </div>
 
         <div class="globe-stats reveal">
-            <div class="g-stat"><div class="g-num">40<em>+</em></div><div class="g-lbl">Countries</div></div>
-            <div class="g-stat"><div class="g-num">12<em>k</em></div><div class="g-lbl">Drivers</div></div>
-            <div class="g-stat"><div class="g-num">500<em>+</em></div><div class="g-lbl">Hospitals</div></div>
-            <div class="g-stat"><div class="g-num">3.8<em>min</em></div><div class="g-lbl">Avg Response</div></div>
+            <div class="g-stat">
+                <div class="g-num">40<em>+</em></div>
+                <div class="g-lbl">Countries</div>
+            </div>
+            <div class="g-stat">
+                <div class="g-num">12<em>k</em></div>
+                <div class="g-lbl">Drivers</div>
+            </div>
+            <div class="g-stat">
+                <div class="g-num">500<em>+</em></div>
+                <div class="g-lbl">Hospitals</div>
+            </div>
+            <div class="g-stat">
+                <div class="g-num">3.8<em>min</em></div>
+                <div class="g-lbl">Avg Response</div>
+            </div>
         </div>
     </section>
 
@@ -86,8 +108,8 @@
         <div class="sec-sub reveal">Choose how you'll use RapidCare today</div>
 
         <div class="roles-grid reveal">
-            <div class="role-card" onclick="chooseRole(this, '/login')">
-                <div class="chosen-badge">Selected</div>
+            <!-- Patient Card -->
+            <div class="role-card" onclick="navigateWithTransition('/login')">
                 <div class="card-img-wrap">
                     <img class="card-img" src="patient.jpg" alt="Patient">
                     <div class="card-grad"></div>
@@ -101,8 +123,8 @@
                 </div>
             </div>
 
-            <div class="role-card" onclick="chooseRole(this, '/driver-register')">
-                <div class="chosen-badge">Selected</div>
+            <!-- Driver Card -->
+            <div class="role-card" onclick="navigateWithTransition('/driver-login')">
                 <div class="card-img-wrap">
                     <img class="card-img" src="ambulance.png" alt="Driver">
                     <div class="card-grad"></div>
@@ -116,8 +138,8 @@
                 </div>
             </div>
 
-            <div class="role-card" onclick="chooseRole(this, '/hospital-register')">
-                <div class="chosen-badge">Selected</div>
+            <!-- Hospital Card -->
+            <div class="role-card" onclick="navigateWithTransition('/login')">
                 <div class="card-img-wrap">
                     <img class="card-img" src="hospital.jpg" alt="Hospital">
                     <div class="card-grad"></div>
@@ -147,7 +169,9 @@
                     <div class="step-body">
                         <div class="step-tag2">Patient</div>
                         <h3>One Tap SOS Request</h3>
-                        <p>Press the emergency button — your GPS locks instantly and broadcasts your location and condition to the nearest available drivers and partner hospitals in real time. No typing, no waiting.</p>
+                        <p>Press the emergency button — your GPS locks instantly and broadcasts your location and
+                            condition to the nearest available drivers and partner hospitals in real time. No typing, no
+                            waiting.</p>
                     </div>
                 </div>
                 <div class="step">
@@ -155,7 +179,9 @@
                     <div class="step-body">
                         <div class="step-tag2">Driver</div>
                         <h3>Nearest Driver Confirms</h3>
-                        <p>Certified emergency drivers receive a push alert with the patient's precise coordinates and medical note. The closest available driver confirms pickup in a single tap — en route in seconds.</p>
+                        <p>Certified emergency drivers receive a push alert with the patient's precise coordinates and
+                            medical note. The closest available driver confirms pickup in a single tap — en route in
+                            seconds.</p>
                     </div>
                 </div>
                 <div class="step">
@@ -163,7 +189,9 @@
                     <div class="step-body">
                         <div class="step-tag2">Hospital</div>
                         <h3>Hospital Prepares in Advance</h3>
-                        <p>Partner hospitals receive real-time ETA updates and basic patient vitals before arrival — so the right team, room, and equipment are ready the moment the patient walks through the door.</p>
+                        <p>Partner hospitals receive real-time ETA updates and basic patient vitals before arrival — so
+                            the right team, room, and equipment are ready the moment the patient walks through the door.
+                        </p>
                     </div>
                 </div>
                 <div class="step">
@@ -171,7 +199,8 @@
                     <div class="step-body">
                         <div class="step-tag2">All Users</div>
                         <h3>Live Tracking & Transparency</h3>
-                        <p>Patients track their driver live. Family members receive a shareable link. Hospitals monitor the ETA dashboard. Every party stays informed at every moment.</p>
+                        <p>Patients track their driver live. Family members receive a shareable link. Hospitals monitor
+                            the ETA dashboard. Every party stays informed at every moment.</p>
                     </div>
                 </div>
             </div>
@@ -187,33 +216,49 @@
         </div>
         <div class="bento reveal">
             <div class="bento-cell wide">
-                <div class="cell-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                <div class="cell-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg></div>
                 <div class="cell-title">Real-Time Dispatch Engine</div>
-                <div class="cell-body">Our AI-powered dispatcher matches patients with the closest certified driver within 200ms — factoring in traffic, ETA, and driver availability simultaneously.</div>
+                <div class="cell-body">Our AI-powered dispatcher matches patients with the closest certified driver
+                    within 200ms — factoring in traffic, ETA, and driver availability simultaneously.</div>
             </div>
             <div class="bento-cell tall">
                 <div>
-                    <div class="cell-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                    <div class="cell-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg></div>
                     <div class="cell-title">HIPAA Secure</div>
-                    <div class="cell-body">End-to-end encryption on all patient data with full HIPAA and GDPR compliance.</div>
+                    <div class="cell-body">End-to-end encryption on all patient data with full HIPAA and GDPR
+                        compliance.</div>
                 </div>
                 <div class="cell-stat">256<em>bit</em></div>
             </div>
             <div class="bento-cell">
-                <div class="cell-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div class="cell-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg></div>
                 <div class="cell-title">Sub-4 Min Response</div>
                 <div class="cell-body">Verified average across all active zones.</div>
                 <div class="cell-stat">3.8<em>min</em></div>
             </div>
             <div class="bento-cell">
-                <div class="cell-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.75a16 16 0 0 0 6.29 6.29l1.85-1.85a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 15.4z"/></svg></div>
+                <div class="cell-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.75a16 16 0 0 0 6.29 6.29l1.85-1.85a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 15.4z" />
+                    </svg></div>
                 <div class="cell-title">24/7 Command Center</div>
                 <div class="cell-body">Human operators available around the clock for escalations.</div>
             </div>
             <div class="bento-cell wide">
-                <div class="cell-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+                <div class="cell-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="M9 12l2 2 4-4" />
+                    </svg></div>
                 <div class="cell-title">Verified Driver Network</div>
-                <div class="cell-body">Every driver on RapidCare is background-checked, first-aid certified, and rated by a minimum of 50 verified patient trips before activation.</div>
+                <div class="cell-body">Every driver on RapidCare is background-checked, first-aid certified, and rated
+                    by a minimum of 50 verified patient trips before activation.</div>
             </div>
         </div>
     </section>
@@ -223,9 +268,12 @@
         <div class="fcta-inner">
             <div class="tag reveal">— Join Us</div>
             <div class="fcta-title reveal">READY WHEN<br>YOU NEED IT MOST</div>
-            <div class="fcta-sub reveal">Sign up today — free for patients. Partner your hospital or register as a driver to start saving lives.</div>
+            <div class="fcta-sub reveal">Sign up today — free for patients. Partner your hospital or register as a
+                driver to start saving lives.</div>
             <div class="btn-row reveal">
-                <button class="btn-prim" onclick="document.getElementById('roles').scrollIntoView({behavior:'smooth'})">Get Started — It's Free</button>
+                <button class="btn-prim"
+                    onclick="document.getElementById('roles').scrollIntoView({behavior:'smooth'})">Get Started — It's
+                    Free</button>
                 <button class="btn-out">Watch the Demo</button>
             </div>
         </div>
@@ -233,4 +281,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

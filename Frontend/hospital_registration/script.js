@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (response.ok) {
                     alert('Hospital Registration Submitted successfully!');
-                    window.location.href = '../rapid_Care_Login/index.html';
+                    window.location.href = '../patient_login/index.html';
                 } else {
                     alert('Registration failed: ' + (data.error || 'Unknown error'));
                 }
