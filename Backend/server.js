@@ -519,6 +519,7 @@ app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
 
     try {
         await knex.transaction(async (trx) => {
+            // ── Users table: only update fields that were sent ────────────
             const userUpdate = {};
             if (name !== undefined) userUpdate.name = name;
             if (avatar_url !== undefined) userUpdate.avatar_url = avatar_url;
@@ -527,25 +528,29 @@ app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
                 await trx('users').where({ id: req.user.id }).update(userUpdate);
             }
 
-            await trx('patients').where({ user_id: req.user.id }).update({
-                gender,
-                date_of_birth,
-                height,
-                weight,
-                blood_group: blood_type,
-                home_location,
-                blood_pressure,
-                allergies: encrypt(allergies),
-                chronic_conditions: encrypt(chronic_conditions),
-                own_diagnosis: encrypt(own_diagnosis),
-                health_barriers: encrypt(health_barriers),
-                habits: encrypt(habits),
-                chronic_disease: encrypt(chronic_disease),
-                diabetes_emergencies: encrypt(diabetes_emergencies),
-                surgeries: encrypt(surgeries),
-                family_history: encrypt(family_history),
-                diabetes_complications: encrypt(diabetes_complications)
-            });
+            // ── Patients table: only update fields that were sent ─────────
+            const patientUpdate = {};
+            if (gender !== undefined) patientUpdate.gender = gender;
+            if (date_of_birth !== undefined) patientUpdate.date_of_birth = date_of_birth;
+            if (height !== undefined) patientUpdate.height = height;
+            if (weight !== undefined) patientUpdate.weight = weight;
+            if (blood_type !== undefined) patientUpdate.blood_group = blood_type;
+            if (home_location !== undefined) patientUpdate.home_location = home_location;
+            if (blood_pressure !== undefined) patientUpdate.blood_pressure = blood_pressure;
+            if (allergies !== undefined) patientUpdate.allergies = encrypt(allergies);
+            if (chronic_conditions !== undefined) patientUpdate.chronic_conditions = encrypt(chronic_conditions);
+            if (own_diagnosis !== undefined) patientUpdate.own_diagnosis = encrypt(own_diagnosis);
+            if (health_barriers !== undefined) patientUpdate.health_barriers = encrypt(health_barriers);
+            if (habits !== undefined) patientUpdate.habits = encrypt(habits);
+            if (chronic_disease !== undefined) patientUpdate.chronic_disease = encrypt(chronic_disease);
+            if (diabetes_emergencies !== undefined) patientUpdate.diabetes_emergencies = encrypt(diabetes_emergencies);
+            if (surgeries !== undefined) patientUpdate.surgeries = encrypt(surgeries);
+            if (family_history !== undefined) patientUpdate.family_history = encrypt(family_history);
+            if (diabetes_complications !== undefined) patientUpdate.diabetes_complications = encrypt(diabetes_complications);
+
+            if (Object.keys(patientUpdate).length > 0) {
+                await trx('patients').where({ user_id: req.user.id }).update(patientUpdate);
+            }
         });
         res.json({ message: 'Profile updated successfully' });
     } catch (err) {

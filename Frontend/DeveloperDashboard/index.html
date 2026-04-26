@@ -94,6 +94,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th class="user-avatar-cell">Pic</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Medical Details</th>
@@ -101,7 +102,7 @@
                                 </tr>
                             </thead>
                             <tbody id="patients-list">
-                                <tr><td colspan="5" class="loading">Loading records...</td></tr>
+                                <tr><td colspan="6" class="loading">Loading records...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -119,6 +120,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th class="user-avatar-cell">Pic</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>License / Vehicle</th>
@@ -127,7 +129,7 @@
                                 </tr>
                             </thead>
                             <tbody id="drivers-list">
-                                <tr><td colspan="6" class="loading">Loading records...</td></tr>
+                                <tr><td colspan="7" class="loading">Loading records...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -164,6 +166,13 @@
 
     <script>
         let dashboardData = { patients: [], drivers: [], hospitals: [] };
+
+        function getAvatar(user) {
+            if (user.avatar_url) return `<img src="${user.avatar_url}" class="dev-avatar" alt="Pic">`;
+            const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
+            const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=random&color=fff&size=128`;
+            return `<img src="${fallback}" class="dev-avatar" alt="${initials}">`;
+        }
 
         // Toast functionality
         function showToast(msg, isError = false) {
@@ -300,6 +309,7 @@
         function renderTables() {
             updateTable('patients-list', dashboardData.patients, (p) => `
                 <td><strong>${p.id}</strong></td>
+                <td class="user-avatar-cell">${getAvatar(p)}</td>
                 <td><strong contenteditable="true" data-original="${p.name}" onblur="updateField('patient', ${p.id}, 'name', this)">${p.name}</strong></td>
                 <td><span contenteditable="true" data-original="${p.email}" onblur="updateField('patient', ${p.id}, 'email', this)">${p.email}</span></td>
                 <td>
@@ -342,6 +352,7 @@
 
             updateTable('drivers-list', dashboardData.drivers, (d) => `
                 <td><strong>${d.id}</strong></td>
+                <td class="user-avatar-cell">${getAvatar(d)}</td>
                 <td><strong contenteditable="true" data-original="${d.name}" onblur="updateField('driver', ${d.id}, 'name', this)">${d.name}</strong></td>
                 <td><span contenteditable="true" data-original="${d.email}" onblur="updateField('driver', ${d.id}, 'email', this)">${d.email}</span></td>
                 <td>
