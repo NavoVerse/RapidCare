@@ -16,14 +16,14 @@ async function fetchInsuranceData() {
 
     try {
         // Fetch Policies
-        const policiesRes = await fetch('http://localhost:5000/api/v1/insurance/policies', {
+        const policiesRes = await fetch(RapidCareConfig.API_BASE + '/insurance/policies', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const policies = await policiesRes.json();
         renderPolicies(policies);
 
         // Fetch Claims
-        const claimsRes = await fetch('http://localhost:5000/api/v1/insurance/claims', {
+        const claimsRes = await fetch(RapidCareConfig.API_BASE + '/insurance/claims', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const claims = await claimsRes.json();
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                const res = await fetch('http://localhost:5000/api/v1/insurance/policies', {
+                const res = await fetch(RapidCareConfig.API_BASE + '/insurance/policies', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const token = localStorage.getItem('rapidcare_token');
             try {
-                const res = await fetch('http://localhost:5000/api/v1/insurance/claims', {
+                const res = await fetch(RapidCareConfig.API_BASE + '/insurance/claims', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

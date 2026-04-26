@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sendCodeBtn.disabled = true;
 
         try {
-            const response = await fetch('http://localhost:5000/api/v1/auth/request-otp', {
+            const response = await fetch(RapidCareConfig.API_BASE + '/auth/request-otp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailInput.value })
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resendBtn.disabled = true;
 
         try {
-            const response = await fetch('http://localhost:5000/api/v1/auth/request-otp', {
+            const response = await fetch(RapidCareConfig.API_BASE + '/auth/request-otp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailInput.value })
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         verifyBtn.disabled = true;
 
         try {
-            const response = await fetch('http://localhost:5000/api/v1/auth/verify-otp', {
+            const response = await fetch(RapidCareConfig.API_BASE + '/auth/verify-otp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailInput.value, otp: otpCode })
@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
             alert(alertMsg);
-            window.location.href = '../payment_User/index.html';
+            window.location.href = '/payments';
         }, 300);
     });
 

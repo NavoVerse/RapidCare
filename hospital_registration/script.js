@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     password: document.querySelector('input[placeholder="••••••••"]')?.value
                 };
 
-                const response = await fetch('http://localhost:5000/api/v1/hospitals/register', {
+                const response = await fetch(RapidCareConfig.API_BASE + '/hospitals/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
