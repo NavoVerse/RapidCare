@@ -1,4 +1,28 @@
 :root {
+    /* Light Theme - Glassmorphism */
+    --bg-dark: #f8fafc;
+    --sidebar-bg: rgba(255, 255, 255, 0.35);
+    --card-bg: rgba(255, 255, 255, 0.4);
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --accent: #0ea5e9;
+    --accent-hover: rgba(14, 165, 233, 0.1);
+    
+    --patient: #10b981;
+    --driver: #f59e0b;
+    --hospital: #ef4444;
+    --border: rgba(0, 0, 0, 0.05);
+    --btn-border: 1px solid rgba(0, 0, 0, 0.1);
+    
+    /* Glassmorphism Tokens */
+    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    --glass-blur: blur(16px);
+}
+
+[data-theme="dark"] {
+    /* Dark Theme - Glassmorphism */
     --bg-dark: #0f172a;
     --sidebar-bg: rgba(15, 23, 42, 0.7);
     --card-bg: rgba(30, 41, 59, 0.6);
@@ -7,17 +31,10 @@
     --accent: #38bdf8;
     --accent-hover: rgba(56, 189, 248, 0.2);
     
-    --patient: #10b981;
-    --driver: #f59e0b;
-    --hospital: #ef4444;
     --border: rgba(255, 255, 255, 0.08);
-    --btn-border: 1px solid rgba(255, 255, 255, 0.2);
-    
-    /* Glassmorphism Tokens */
     --glass-bg: rgba(255, 255, 255, 0.03);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    --glass-blur: blur(12px);
 }
 
 * {
@@ -27,13 +44,19 @@
 }
 
 body {
-    background: url('assets/bg.png') no-repeat center center fixed;
+    background: url('assets/bg_light.png') no-repeat center center fixed;
     background-size: cover;
     color: var(--text-main);
     display: flex;
     height: 100vh;
     overflow: hidden;
     font-family: 'Inter', sans-serif;
+    transition: background 0.5s ease;
+}
+
+[data-theme="dark"] body {
+    background: url('assets/bg_dark.png') no-repeat center center fixed;
+    background-size: cover;
 }
 
 /* Sidebar */
@@ -57,6 +80,12 @@ body {
     font-size: 1.5rem;
     font-weight: 800;
     letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--text-main), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] .logo-container h1 {
     background: linear-gradient(135deg, #fff, var(--accent));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -191,41 +220,93 @@ header h2 {
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
-    padding: 28px;
+    padding: 24px;
     border-radius: 20px;
     box-shadow: var(--glass-shadow);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
-.metric-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 100%;
-    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
-    pointer-events: none;
+.metric-card.card-patient { border-left: 4px solid var(--patient); }
+.metric-card.card-driver { border-left: 4px solid var(--driver); }
+.metric-card.card-hospital { border-left: 4px solid var(--hospital); }
+
+.card-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
 }
+
+.card-patient .card-icon { color: var(--patient); background: rgba(16, 185, 129, 0.1); }
+.card-driver .card-icon { color: var(--driver); background: rgba(245, 158, 11, 0.1); }
+.card-hospital .card-icon { color: var(--hospital); background: rgba(239, 68, 68, 0.1); }
 
 .metric-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px) scale(1.02);
+    background: rgba(30, 41, 59, 0.8);
     border-color: rgba(255, 255, 255, 0.2);
-    background: rgba(30, 41, 59, 0.7);
 }
 
+.card-patient:hover { box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15); }
+.card-driver:hover { box-shadow: 0 20px 40px rgba(245, 158, 11, 0.15); }
+.card-hospital:hover { box-shadow: 0 20px 40px rgba(239, 68, 68, 0.15); }
+
 .metric-card h3 {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 12px;
-    font-weight: 600;
+    letter-spacing: 1.2px;
+    margin-bottom: 4px;
+    font-weight: 700;
 }
 
 .metric-card .value {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #fff, rgba(255,255,255,0.7));
+}
+
+.card-patient .value {
+    background: linear-gradient(135deg, var(--text-main) 30%, var(--patient));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.card-driver .value {
+    background: linear-gradient(135deg, var(--text-main) 30%, var(--driver));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.card-hospital .value {
+    background: linear-gradient(135deg, var(--text-main) 30%, var(--hospital));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] .card-patient .value {
+    background: linear-gradient(135deg, #fff 30%, var(--patient));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] .card-driver .value {
+    background: linear-gradient(135deg, #fff 30%, var(--driver));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] .card-hospital .value {
+    background: linear-gradient(135deg, #fff 30%, var(--hospital));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
