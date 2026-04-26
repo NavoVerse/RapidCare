@@ -983,11 +983,19 @@ DONE | Create `medical_records` + `prescriptions` tables via migration | 🔴 Hi
 DONE | Build CRUD APIs for medical records | 🔴 High | 3 hours |
 DONE | Replace hardcoded data in `history_patient/script.js` with API calls | 🔴 High | 3 hours |
 DONE | Create `payments` table via migration | 🔴 High | 1 hour |
+<<<<<<< HEAD
+| Build fare calculation API (`/api/v1/payments/calculate`) | 🔴 High | 2 hours |
+| Build payment recording API | 🟡 Medium | 2 hours |
+| Connect `payment_User/script.js` to payment APIs | 🟡 Medium | 3 hours |
+| Build doctor booking APIs | 🟡 Medium | 2 hours |
+| Connect booking modal in `history_patient` to API | 🟡 Medium | 2 hours |
+=======
 DONE | Build fare calculation API (`/api/v1/payments/calculate`) | 🔴 High | 2 hours |
 DONE | Build payment recording API | 🟡 Medium | 2 hours |
 DONE | Connect `payment_User/script.js` (integrated in patient_Dashboard) to payment APIs | 🟡 Medium | 3 hours |
 DONE | Build doctor booking APIs | 🟡 Medium | 2 hours |
 DONE | Connect booking modal in `history_patient` to API | 🟡 Medium | 2 hours |
+>>>>>>> 5c8f305862f4291707758baf3a60c7492a193c73
 
 **Deliverable**: Medical records and payments stored in DB; history page shows real data.
 
