@@ -1,29 +1,21 @@
+# RapidCare — Nginx Production Configuration Template
+# Place this in /etc/nginx/sites-available/rapidcare and link to sites-enabled
+
 server {
     listen 80;
-    server_name rapidcare.local; # Replace with your domain
+    server_name your_domain.com; # Replace with actual domain or IP
 
-    # Redirect HTTP to HTTPS
+    # Gzip compression
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+    # Security Headers
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Content-Type-Options "nosniff";
+
+    # Root Redirect
     location / {
-        return 301 https://$host$request_uri;
-    }
-}
-
-server {
-    listen 443 ssl http2;
-    server_name rapidcare.local;
-
-    ssl_certificate /etc/nginx/ssl/rapidcare.crt;
-    ssl_certificate_key /etc/nginx/ssl/rapidcare.key;
-
-    # Frontend Static Files
-    location / {
-        root /var/www/rapidcare/frontend;
-        index index.html;
-        try_files $uri $uri/ /index.html;
-    }
-
-    # Backend API Proxy
-    location /api/ {
         proxy_pass http://localhost:5000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -35,12 +27,22 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # WebSocket Support for Socket.IO
+    # Socket.IO support
     location /socket.io/ {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+
         proxy_pass http://localhost:5000/socket.io/;
+
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "Upgrade";
-        proxy_set_header Host $host;
+        proxy_set_header Connection "upgrade";
     }
+
+    # Optional: Serve shared_assets directly via Nginx for speed
+    # location /shared_assets/ {
+    #     alias /path/to/RapidCare/shared_assets/;
+    #     expires 30d;
+    #     access_log off;
+    # }
 }
