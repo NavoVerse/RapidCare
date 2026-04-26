@@ -234,11 +234,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // SOS Button Redirection
-    const sosButton = document.querySelector('.sos-button');
-    if (sosButton) {
-        sosButton.addEventListener('click', () => {
-            window.location.href = '/urgency';
-        });
-    }
 });
