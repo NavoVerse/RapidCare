@@ -85,5 +85,19 @@
 
     <script src="mockData.js"></script>
     <script src="script.js"></script>
+    <!-- Skeleton Loading Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const boxes = document.querySelectorAll('.stat-card, .card, .profile-panel, .info-card, .metric-card, .driver-profile-card, .vehicle-card, .emergency-details-card, .form-section, .table-container');
+            boxes.forEach(box => box.classList.add('skeleton-box'));
+            
+            setTimeout(() => {
+                boxes.forEach(box => box.classList.add('loaded'));
+                setTimeout(() => {
+                    boxes.forEach(box => box.classList.remove('skeleton-box', 'loaded'));
+                }, 600); // Match transition duration
+            }, 1500);
+        });
+    </script>
 </body>
 </html>
