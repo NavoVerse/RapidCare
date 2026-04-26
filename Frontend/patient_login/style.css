@@ -3,7 +3,6 @@
 :root {
     --primary-green: var(--primary-color);
     --acc-green: var(--accent-color);
-    --primary-yellow: #facc15;
     --acc-yellow: #eab308;
     --white: var(--surface-color);
     --pure-white: #ffffff;
@@ -246,7 +245,8 @@ input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus {
     border-color: var(--primary-green);
-    background-color: var(--white); /* Theme-aware background */
+    background-color: var(--white);
+    /* Theme-aware background */
     box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.1);
 }
 
@@ -302,8 +302,8 @@ input::placeholder {
 }
 
 .checkbox-group input[type="checkbox"]:checked {
-    background-color: var(--primary-green);
-    border-color: var(--primary-green);
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
 }
 
 .checkbox-group input[type="checkbox"]::before {
@@ -327,7 +327,7 @@ input::placeholder {
 }
 
 .checkbox-group label a {
-    color: var(--primary-green);
+    color: var(--primary-blue);
     font-weight: 600;
     text-decoration: none;
 }
@@ -335,7 +335,7 @@ input::placeholder {
 .create-btn {
     width: 100%;
     padding: 18px;
-    background-color: var(--primary-green);
+    background-color: var(--primary-blue);
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -343,13 +343,13 @@ input::placeholder {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
 }
 
 .create-btn:hover {
-    background-color: var(--acc-green);
+    background-color: var(--acc-blue);
     transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.3);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
 }
 
 .divider {

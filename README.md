@@ -25,7 +25,7 @@ The RapidCare platform has undergone a full architectural stabilization and secu
 RapidCare/
 ├── Frontend/                      # All client-side UI modules
 │   ├── choose_User/               # Role selection landing page (entry point)
-│   ├── rapid_Care_Login/          # Login / Register / Forgot Password
+│   ├── patient_login/              # Patient Login / Register / Forgot Password
 │   ├── patient_Dashboard/         # Main patient SPA (profile, map, vitals)
 │   ├── driver_dashboard/          # Driver-facing interface
 │   ├── driver_registration/       # Driver onboarding form
