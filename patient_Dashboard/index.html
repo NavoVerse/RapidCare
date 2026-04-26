@@ -290,8 +290,11 @@
                         <div class="profile-main-card">
                             <div class="profile-info-grid">
                                 <div class="profile-image-section">
-                                  <div class="profile-avatar-container">
+                                  <div class="profile-avatar-container" style="position: relative; cursor: pointer;" onclick="document.getElementById('avatarInput').click()">
                                     <img src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff&size=128" alt="Avatar" id="mainProfileAvatar">
+                                    <div class="avatar-edit-overlay" style="position: absolute; bottom: 10px; right: 10px; background: var(--primary-color); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--surface-color); font-size: 0.7rem; box-shadow: var(--shadow-sm);">📷</div>
+                                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                                  </div>
                                     <div class="habit-emojis-container" id="habitEmojisDisplay">
                                         <!-- Habit emojis will be rendered here -->
                                     </div>
@@ -306,7 +309,6 @@
                                         <div class="picker-option" data-emoji="🚭" title="No Smoking">🚭</div>
                                     </div>
                                     </div>
-                                </div>
                                 <div class="profile-details-section">
                                     <div class="name-header">
                                         <h2 id="displayProfileName" class="editable-field" data-field="name">Loading...</h2>
