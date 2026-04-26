@@ -50,18 +50,34 @@
         <div id="toast" class="toast">Update successful!</div>
 
         <!-- Metrics Section -->
+        <!-- Metrics Section -->
         <div class="metrics-grid" id="metrics-grid">
-            <div class="metric-card">
-                <h3>Total Patients</h3>
-                <div class="value" id="count-patients" style="color: var(--patient)">0</div>
+            <div class="metric-card card-patient">
+                <div class="card-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <div class="card-info">
+                    <h3>Total Patients</h3>
+                    <div class="value" id="count-patients">0</div>
+                </div>
             </div>
-            <div class="metric-card">
-                <h3>Active Drivers</h3>
-                <div class="value" id="count-drivers" style="color: var(--driver)">0</div>
+            <div class="metric-card card-driver">
+                <div class="card-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M8 3H3v5m0 8h5v5m13-5h-5v5"></path><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path></svg>
+                </div>
+                <div class="card-info">
+                    <h3>Active Drivers</h3>
+                    <div class="value" id="count-drivers">0</div>
+                </div>
             </div>
-            <div class="metric-card">
-                <h3>Hospitals</h3>
-                <div class="value" id="count-hospitals" style="color: var(--hospital)">0</div>
+            <div class="metric-card card-hospital">
+                <div class="card-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </div>
+                <div class="card-info">
+                    <h3>Hospitals</h3>
+                    <div class="value" id="count-hospitals">0</div>
+                </div>
             </div>
         </div>
 
