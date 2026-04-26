@@ -113,30 +113,4 @@ Then open `choose_User/index.html` in your browser.
 
 ---
 
-## 📋 What Needs to Happen Next
-
-### Priority 1: Cleanup (30 min)
-- [x] Delete `Backend/migrations/20260426131803_create_payments_table.js` (duplicate)
-- [x] Delete `Backend/utils/logger.js` (dead code; `services/logger.service.js` is used)
-- [x] Remove `better-sqlite3` and `sqlite` from `package.json` (unused)
-- [x] Replace 3 remaining `console.error` calls with `logger.error`
-
-### Priority 2: Frontend Serving (1-2 hours)
-- [x] Serve all frontend modules through Express static middleware instead of `file://`
-- [x] Extract `http://localhost:5000` into a shared `config.js` or environment variable
-- [x] Add a top-level `index.html` redirect to `choose_User/index.html`
-
-### Priority 3: Testing (2-3 hours)
-- [x] Write integration tests for the 5 core auth endpoints
-- [x] Write integration tests for the trip lifecycle (request → accept → complete)
-- [x] Test fresh-database startup (delete `rapidcare.db`, run migrations, seed, verify)
-
-### Priority 4: Deployment (2-4 hours)
-- [x] Configure `DB_TYPE=postgresql` and `DATABASE_URL` for production
-- [x] Set up PM2 with `ecosystem.config.js` (already exists)
-- [x] Deploy behind Nginx using `nginx.conf.template` (already exists)
-- [x] Set `NODE_ENV=production` to disable console logging and debug mode
-
----
-
 **Last Updated**: 2026-04-26 (v3.0.0 — Post-Merge Stabilization)
