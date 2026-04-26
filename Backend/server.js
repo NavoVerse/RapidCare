@@ -18,6 +18,7 @@ const nodemailer = require('nodemailer');
 const http = require('http');
 const { Server } = require('socket.io');
 const { initializeDB, knex } = require('./db');
+const logger = require('./utils/logger');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
@@ -25,6 +26,21 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: { origin: '*' }
 });
+
+// Structured Logging Middleware
+app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        logger.info(`${req.method} ${req.originalUrl}`, {
+            status: res.statusCode,
+            duration: `${duration}ms`,
+            ip: req.ip
+        });
+    });
+    next();
+});
+
 
 // Expose io instance to routes if needed
 app.set('io', io);
@@ -457,6 +473,16 @@ app.get('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
             .first();
 
         if (!patient) return res.status(404).json({ error: 'Patient profile not found' });
+
+        // Decrypt sensitive fields
+        const sensitiveFields = [
+            'allergies', 'chronic_conditions', 'own_diagnosis', 'health_barriers', 'habits',
+            'chronic_disease', 'diabetes_emergencies', 'surgeries', 'family_history', 'diabetes_complications'
+        ];
+        sensitiveFields.forEach(field => {
+            if (patient[field]) patient[field] = decrypt(patient[field]);
+        });
+
         res.json(patient);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -489,19 +515,18 @@ app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
                 blood_group: blood_type,
                 home_location,
                 blood_pressure,
-                allergies,
-                chronic_conditions,
-                own_diagnosis,
-                health_barriers,
-                habits,
-                chronic_disease,
-                diabetes_emergencies,
-                surgeries,
-                family_history,
-                diabetes_complications
+                allergies: encrypt(allergies),
+                chronic_conditions: encrypt(chronic_conditions),
+                own_diagnosis: encrypt(own_diagnosis),
+                health_barriers: encrypt(health_barriers),
+                habits: encrypt(habits),
+                chronic_disease: encrypt(chronic_disease),
+                diabetes_emergencies: encrypt(diabetes_emergencies),
+                surgeries: encrypt(surgeries),
+                family_history: encrypt(family_history),
+                diabetes_complications: encrypt(diabetes_complications)
             });
         });
-
         res.json({ message: 'Profile updated successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -522,8 +547,19 @@ app.get('/api/v1/medical_records', authenticateToken, authorize('patient'), asyn
             
         // Fetch prescriptions for each record
         for (let record of records) {
-            record.prescriptions = await knex('prescriptions')
+            record.diagnosis = decrypt(record.diagnosis);
+            record.treatment_plan = decrypt(record.treatment_plan);
+            record.clinical_notes = decrypt(record.clinical_notes);
+
+            const prescriptions = await knex('prescriptions')
                 .where({ medical_record_id: record.id });
+            
+            record.prescriptions = prescriptions.map(p => ({
+                ...p,
+                medication_name: decrypt(p.medication_name),
+                indication: decrypt(p.indication),
+                sig: decrypt(p.sig)
+            }));
         }
         res.json(records);
     } catch (err) {
@@ -547,9 +583,9 @@ app.post('/api/v1/medical_records', authenticateToken, authorize('patient', 'hos
             const inserted = await trx('medical_records').insert({
                 patient_id: targetPatientId,
                 hospital_id: req.user.role === 'hospital' ? req.user.id : null,
-                diagnosis,
-                treatment_plan,
-                clinical_notes
+                diagnosis: encrypt(diagnosis),
+                treatment_plan: encrypt(treatment_plan),
+                clinical_notes: encrypt(clinical_notes)
             }).returning('id');
             
             const recordId = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
@@ -558,9 +594,9 @@ app.post('/api/v1/medical_records', authenticateToken, authorize('patient', 'hos
                 const prescriptionsToInsert = prescriptions.map(p => ({
                     medical_record_id: recordId,
                     patient_id: targetPatientId,
-                    medication_name: p.medication_name,
-                    indication: p.indication,
-                    sig: p.sig,
+                    medication_name: encrypt(p.medication_name),
+                    indication: encrypt(p.indication),
+                    sig: encrypt(p.sig),
                     status: p.status || 'active',
                     start_date: p.start_date,
                     assigned_by: p.assigned_by || req.user.name
@@ -598,6 +634,216 @@ app.delete('/api/v1/medical_records/:id', authenticateToken, authorize('patient'
     }
 });
 
+// =============================================================================
+// PAYMENTS API (/api/v1/payments)
+// =============================================================================
+
+// Pricing Configuration (Keep in sync with frontend)
+const pricingConfig = {
+    normal: { rate: 70 },
+    oxygen: { rate: 130 },
+    icu: { rate: 180 },
+    ventilator: { rate: 280 }
+};
+const FIXED_CHARGES = {
+    hospitalReservation: 500,
+    platformCharge: 40
+};
+
+// Calculate fare
+app.post('/api/v1/payments/calculate', authenticateToken, async (req, res) => {
+    const { distance, ambulanceType, couponCode } = req.body;
+
+    if (!distance || !ambulanceType) {
+        return res.status(400).json({ error: 'distance and ambulanceType are required' });
+    }
+
+    const config = pricingConfig[ambulanceType.toLowerCase()];
+    if (!config) {
+        return res.status(400).json({ error: 'Invalid ambulance type' });
+    }
+
+    try {
+        const distanceCharge = Math.round(distance * config.rate);
+        let total = distanceCharge + FIXED_CHARGES.hospitalReservation + FIXED_CHARGES.platformCharge;
+
+        let discount = 0;
+        if (couponCode) {
+            const code = couponCode.toUpperCase();
+            if (code === 'RAPID20') {
+                discount = Math.round(total * 0.2);
+                total -= discount;
+            } else if (code === 'FIRSTCARE') {
+                discount = 100;
+                total -= discount;
+            }
+        }
+
+        res.json({
+            distanceCharge,
+            hospitalReservation: FIXED_CHARGES.hospitalReservation,
+            platformCharge: FIXED_CHARGES.platformCharge,
+            discount,
+            total,
+            currency: 'INR'
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Record a payment
+app.post('/api/v1/payments', authenticateToken, async (req, res) => {
+    const { trip_id, amount, payment_method, transaction_id } = req.body;
+
+    if (!trip_id || !amount || !payment_method) {
+        return res.status(400).json({ error: 'trip_id, amount, and payment_method are required' });
+    }
+
+    try {
+        await knex.transaction(async trx => {
+            // 1. Insert payment record
+            await trx('payments').insert({
+                trip_id,
+                patient_id: req.user.id,
+                amount,
+                payment_method,
+                transaction_id,
+                status: 'completed'
+            });
+
+            // 2. Update trip status
+            await trx('trips')
+                .where({ id: trip_id })
+                .update({
+                    payment_status: 'paid',
+                    total_fare: amount
+                });
+        });
+
+        res.status(201).json({ message: 'Payment recorded successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Get payment history for logged-in user
+app.get('/api/v1/payments', authenticateToken, async (req, res) => {
+    try {
+        const payments = await knex('payments')
+            .where({ patient_id: req.user.id })
+            .orderBy('created_at', 'desc');
+        res.json(payments);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+
+
+// =============================================================================
+// DOCTORS & APPOINTMENTS API (/api/v1/doctors, /api/v1/appointments)
+// =============================================================================
+
+// Get all doctors
+app.get('/api/v1/doctors', authenticateToken, async (req, res) => {
+    try {
+        const { specialization, hospital_id } = req.query;
+        let query = knex('doctors');
+
+        if (specialization) query = query.where({ specialization });
+        if (hospital_id) query = query.where({ hospital_id });
+
+        const doctors = await query.select('*');
+        res.json(doctors);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Get single doctor
+app.get('/api/v1/doctors/:id', authenticateToken, async (req, res) => {
+    try {
+        const doctor = await knex('doctors').where({ id: req.params.id }).first();
+        if (!doctor) return res.status(404).json({ error: 'Doctor not found' });
+        res.json(doctor);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Book an appointment
+app.post('/api/v1/appointments', authenticateToken, authorize('patient'), async (req, res) => {
+    const { doctor_id, appointment_date, type, notes } = req.body;
+
+    if (!doctor_id || !appointment_date) {
+        return res.status(400).json({ error: 'doctor_id and appointment_date are required' });
+    }
+
+    try {
+        const doctor = await knex('doctors').where({ id: doctor_id }).first();
+        if (!doctor) return res.status(404).json({ error: 'Doctor not found' });
+
+        const [id] = await knex('appointments').insert({
+            patient_id: req.user.id,
+            doctor_id,
+            hospital_id: doctor.hospital_id,
+            appointment_date,
+            type: type || 'in-person',
+            notes,
+            status: 'pending'
+        }).returning('id');
+
+        const appointmentId = typeof id === 'object' ? id.id : id;
+        res.status(201).json({ 
+            message: 'Appointment booked successfully', 
+            appointment_id: appointmentId 
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Get patient's appointments
+app.get('/api/v1/appointments', authenticateToken, async (req, res) => {
+    try {
+        const appointments = await knex('appointments')
+            .join('doctors', 'appointments.doctor_id', 'doctors.id')
+            .where({ 'appointments.patient_id': req.user.id })
+            .select(
+                'appointments.*',
+                'doctors.name as doctor_name',
+                'doctors.specialization as doctor_specialization'
+            )
+            .orderBy('appointment_date', 'asc');
+        res.json(appointments);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Update appointment status (e.g., cancel)
+app.put('/api/v1/appointments/:id', authenticateToken, async (req, res) => {
+    const { status } = req.body;
+    try {
+        const appointment = await knex('appointments').where({ id: req.params.id }).first();
+        if (!appointment) return res.status(404).json({ error: 'Appointment not found' });
+
+        // Ensure user owns the appointment or is an admin/hospital
+        if (req.user.role === 'patient' && appointment.patient_id !== req.user.id) {
+            return res.status(403).json({ error: 'Unauthorized' });
+        }
+
+        await knex('appointments')
+            .where({ id: req.params.id })
+            .update({ status, updated_at: knex.fn.now() });
+            
+        res.json({ message: 'Appointment updated successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // =============================================================================
 // TRIPS & REAL-TIME DISPATCH API (/api/v1/trips)
@@ -824,6 +1070,50 @@ app.put('/api/v1/trips/:id/status', authenticateToken, authorize('driver'), asyn
 
 
 // =============================================================================
+// INSURANCE MODULE APIs
+// =============================================================================
+
+app.get('/api/v1/insurance/policies', authenticateToken, async (req, res) => {
+    try {
+        const policies = await knex('insurance_policies').where('patient_id', req.user.id);
+        res.json(policies);
+    } catch (err) { res.status(500).json({ error: 'Database error fetching policies' }); }
+});
+
+app.post('/api/v1/insurance/policies', authenticateToken, async (req, res) => {
+    const { policy_number, provider_name, category, coverage_amount, portal_link } = req.body;
+    try {
+        const [id] = await knex('insurance_policies').insert({
+            patient_id: req.user.id, policy_number, provider_name, category, coverage_amount, portal_link
+        }).returning('id');
+        const policyId = typeof id === 'object' ? id.id : id;
+        res.status(201).json({ id: policyId, message: 'Policy added successfully' });
+    } catch (err) { res.status(500).json({ error: 'Database error creating policy' }); }
+});
+
+app.get('/api/v1/insurance/claims', authenticateToken, async (req, res) => {
+    try {
+        const claims = await knex('insurance_claims as ic')
+            .join('insurance_policies as ip', 'ic.policy_id', 'ip.id')
+            .where('ic.patient_id', req.user.id)
+            .select('ic.*', 'ip.provider_name as scheme_name');
+        res.json(claims);
+    } catch (err) { res.status(500).json({ error: 'Database error fetching claims' }); }
+});
+
+app.post('/api/v1/insurance/claims', authenticateToken, async (req, res) => {
+    const { policy_id, amount, claim_type, hospital_id } = req.body;
+    try {
+        const reference_number = 'CLM-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        const [id] = await knex('insurance_claims').insert({
+            patient_id: req.user.id, policy_id, amount, claim_type, hospital_id, reference_number, status: 'pending'
+        }).returning('id');
+        const claimId = typeof id === 'object' ? id.id : id;
+        res.status(201).json({ id: claimId, reference_number, message: 'Claim submitted' });
+    } catch (err) { res.status(500).json({ error: 'Database error raising claim' }); }
+});
+
+// =============================================================================
 // ADMIN EXPORT API (/api/v1/admin/export)
 // Used by excel_dashboard to download live data.
 // =============================================================================
@@ -885,14 +1175,26 @@ app.get('/api/v1/admin/export', authenticateToken, authorize('admin'), async (re
 // Also accessible as /api/admin/data for the new API versioning plan.
 // =============================================================================
 
+const { encrypt, decrypt } = require('./utils/crypto');
+
 async function fetchDashboardData(res) {
     try {
-        const patients = await knex('users as u')
+        const rawPatients = await knex('users as u')
             .join('patients as p', 'u.id', 'p.user_id')
             .select('u.*', 'p.blood_group', 'p.medical_history', 'p.emergency_contact',
                    'p.gender', 'p.date_of_birth', 'p.height', 'p.weight',
                    'p.blood_pressure', 'p.home_location', 'p.allergies', 'p.chronic_conditions', 'p.own_diagnosis', 'p.health_barriers', 'p.habits')
             .where('u.role', 'patient');
+
+        // Decrypt medical fields
+        const patients = rawPatients.map(p => ({
+            ...p,
+            medical_history: decrypt(p.medical_history),
+            allergies: decrypt(p.allergies),
+            chronic_conditions: decrypt(p.chronic_conditions),
+            own_diagnosis: decrypt(p.own_diagnosis),
+            habits: decrypt(p.habits)
+        }));
 
         const drivers = await knex('users as u')
             .join('drivers as d', 'u.id', 'd.user_id')
@@ -906,10 +1208,11 @@ async function fetchDashboardData(res) {
 
         res.json({ patients, drivers, hospitals });
     } catch (error) {
-        console.error('Database error:', error);
+        logger.error('Database error in fetchDashboardData', { error: error.message });
         res.status(500).json({ error: 'Failed to fetch data' });
     }
 }
+
 
 // Legacy endpoint (used by DeveloperDashboard/index.html when served at /dev)
 app.get('/api/data', (req, res) => fetchDashboardData(res));
@@ -934,7 +1237,12 @@ app.put('/api/admin/data', express.json(), async (req, res) => {
         if (userFields.includes(field)) {
             await knex('users').where({ id }).update({ [field]: value });
         } else if (role === 'patient' && patientFields.includes(field)) {
-            await knex('patients').where({ user_id: id }).update({ [field]: value });
+            let finalValue = value;
+            const sensitiveFields = ['medical_history', 'allergies', 'chronic_conditions', 'own_diagnosis', 'habits'];
+            if (sensitiveFields.includes(field)) {
+                finalValue = encrypt(value);
+            }
+            await knex('patients').where({ user_id: id }).update({ [field]: finalValue });
         } else if (role === 'driver' && driverFields.includes(field)) {
             await knex('drivers').where({ user_id: id }).update({ [field]: value });
         } else if (role === 'hospital' && hospitalFields.includes(field)) {
@@ -964,6 +1272,90 @@ app.delete('/api/admin/data', express.json(), async (req, res) => {
 });
 
 // =============================================================================
+// HOSPITAL MODULE APIs
+// =============================================================================
+
+app.get('/api/v1/hospital/status', authenticateToken, authorize('hospital'), async (req, res) => {
+    try {
+        const hospital = await knex('hospitals').where('user_id', req.user.id).first();
+        res.json({ total_beds: hospital.total_beds, available_beds: hospital.available_beds });
+    } catch (err) { res.status(500).json({ error: 'Error fetching hospital status' }); }
+});
+
+app.put('/api/v1/hospital/status', authenticateToken, authorize('hospital'), async (req, res) => {
+    const { available_beds } = req.body;
+    try {
+        await knex('hospitals').where('user_id', req.user.id).update({ available_beds });
+        res.json({ message: 'Bed availability updated' });
+    } catch (err) { res.status(500).json({ error: 'Error updating beds' }); }
+});
+
+app.get('/api/v1/hospital/incoming', authenticateToken, authorize('hospital'), async (req, res) => {
+    try {
+        const incoming = await knex('trips as t')
+            .join('users as up', 't.patient_id', 'up.id')
+            .join('users as ud', 't.driver_id', 'ud.id')
+            .where('t.hospital_id', req.user.id)
+            .whereIn('t.status', ['accepted', 'heading_to_patient', 'heading_to_hospital', 'at_hospital'])
+            .select('t.*', 'up.name as patient_name', 'ud.name as driver_name');
+        res.json(incoming);
+    } catch (err) { res.status(500).json({ error: 'Error fetching incoming' }); }
+});
+
+// =============================================================================
+// ANALYTICS MODULE APIs
+// =============================================================================
+
+app.get('/api/v1/analytics/patient', authenticateToken, async (req, res) => {
+    try {
+        const patientId = req.user.id;
+        const trips = await knex('trips').where({ patient_id: patientId, status: 'completed' });
+
+        let totalDistance = 0;
+        let totalResponseTime = 0; 
+        
+        trips.forEach(t => {
+            const baseFees = 540;
+            const distance = Math.max(0, (t.total_fare - baseFees) / 70);
+            totalDistance += distance;
+
+            if (t.start_time && t.end_time) {
+                const start = new Date(t.start_time);
+                const end = new Date(t.end_time);
+                totalResponseTime += (end - start) / 1000;
+            }
+        });
+
+        const avgResponseTime = trips.length > 0 ? (totalResponseTime / trips.length / 60).toFixed(1) : 0;
+        
+        res.json({
+            metrics: {
+                avg_response_time: parseFloat(avgResponseTime),
+                total_distance: parseFloat(totalDistance.toFixed(1)),
+                safety_score: 92,
+                total_trips: trips.length
+            }
+        });
+    } catch (err) { res.status(500).json({ error: 'Database error fetching analytics' }); }
+});
+
+// =============================================================================
+// GLOBAL ERROR HANDLING MIDDLEWARE
+// =============================================================================
+app.use((err, req, res, next) => {
+    logger.error(`${req.method} ${req.originalUrl} - ${err.message}`, {
+        stack: err.stack,
+        ip: req.ip
+    });
+
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({
+        error: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message,
+        status: 'error'
+    });
+});
+
+// =============================================================================
 // HEALTH CHECK
 // =============================================================================
 app.get('/health', (req, res) => {
@@ -977,21 +1369,16 @@ async function startServer() {
     try {
         await initializeDB();
         server.listen(PORT, () => {
-            console.log('');
-            console.log('╔════════════════════════════════════════════════╗');
-            console.log(`║   RapidCare Unified Backend — Port ${PORT}        ║`);
-            console.log('╠════════════════════════════════════════════════╣');
-            console.log(`║  Auth API :  http://localhost:${PORT}/api/v1/auth ║`);
-            console.log(`║  Admin API:  http://localhost:${PORT}/api/data    ║`);
-            console.log(`║  Dev Dash :  http://localhost:${PORT}/dev         ║`);
-            console.log(`║  Health   :  http://localhost:${PORT}/health      ║`);
-            console.log('╚════════════════════════════════════════════════╝');
-            console.log('');
+            logger.info(`RapidCare Unified Backend started on port ${PORT}`);
+            logger.info(`Auth API : http://localhost:${PORT}/api/v1/auth`);
+            logger.info(`Dev Dash : http://localhost:${PORT}/dev`);
+            logger.info(`Health   : http://localhost:${PORT}/health`);
         });
     } catch (err) {
-        console.error('Failed to start server:', err);
+        logger.error('Failed to start server', { error: err.message, stack: err.stack });
         process.exit(1);
     }
 }
+
 
 startServer();
