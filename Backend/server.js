@@ -337,7 +337,7 @@ app.post('/api/v1/hospitals/register', async (req, res) => {
 
 // 2. Login with Password
 app.post('/api/v1/auth/login', loginLimiter, validate(loginSchema), async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, expectedRole } = req.body;
     const { mappedEmail } = mapEmailOrPhone(email);
 
     try {
@@ -349,6 +349,16 @@ app.post('/api/v1/auth/login', loginLimiter, validate(loginSchema), async (req, 
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
             return res.status(401).json({ error: 'Invalid password' });
+        }
+
+        // Role-gated login: reject if the user's role doesn't match the expected role
+        if (expectedRole && user.role !== expectedRole) {
+            const pageMap = { patient: '/login', driver: '/driver-login', hospital: '/login' };
+            const correctPage = pageMap[user.role] || '/login';
+            return res.status(403).json({
+                error: `This login page is for ${expectedRole}s only. Your account is registered as a ${user.role}. Please use the correct login page.`,
+                correctLoginPage: correctPage
+            });
         }
 
         const token = jwt.sign(
