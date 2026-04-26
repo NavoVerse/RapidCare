@@ -9,8 +9,17 @@ echo         RAPIDCARE SYSTEM INITIALIZER
 echo ==================================================
 echo.
 
+:: Check for Node.js
+where node >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+    echo [!] Node.js is not installed or not in PATH.
+    echo Please install Node.js from https://nodejs.org/
+    pause
+    exit /b 1
+)
+
 :: Check for port 5000 and kill if necessary
-echo [1/3] Checking if port 5000 is in use...
+echo [1/4] Checking if port 5000 is in use...
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr :5000 ^| findstr LISTENING') do (
     echo Port 5000 is in use by PID %%a. Terminating process...
     taskkill /F /PID %%a >nul 2>&1
@@ -23,18 +32,22 @@ if not exist "Backend\.env" (
     copy "Backend\.env.example" "Backend\.env" >nul
 )
 
-:: Start Unified Backend
-echo [2/3] Starting Unified Backend (Port 5000)...
+:: Check dependencies
+echo [2/4] Verifying backend dependencies...
 cd "Backend"
-<<<<<<< HEAD
-=======
+if not exist "node_modules\" (
+    echo [!] node_modules missing. Running npm install...
+    call npm install
+)
+
+:: Start Unified Backend
+echo [3/4] Starting Unified Backend (Port 5000)...
 :: Use cmd /k so the window stays open on error
->>>>>>> 643899151e5044f9c2a9722d5d91c1dcced2a4a3
 start "RapidCare Backend" cmd /k "node server.js"
 cd /d "%ROOT_DIR%"
 
 :: Open Frontend
-echo [3/3] Launching App Entry Point...
+echo [4/4] Launching App Entry Point...
 timeout /t 3 >nul
 start "" "choose_User\index.html"
 
@@ -49,4 +62,5 @@ echo   Keep it open while using the application.
 echo ==================================================
 echo.
 pause
+
 

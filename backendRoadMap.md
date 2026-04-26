@@ -982,7 +982,7 @@ DONE | Build trip status progression (en_route → arrived → at_hospital → c
 DONE | Create `medical_records` + `prescriptions` tables via migration | 🔴 High | 1 hour |
 DONE | Build CRUD APIs for medical records | 🔴 High | 3 hours |
 DONE | Replace hardcoded data in `history_patient/script.js` with API calls | 🔴 High | 3 hours |
-| Create `payments` table via migration | 🔴 High | 1 hour |
+DONE | Create `payments` table via migration | 🔴 High | 1 hour |
 | Build fare calculation API (`/api/v1/payments/calculate`) | 🔴 High | 2 hours |
 | Build payment recording API | 🟡 Medium | 2 hours |
 | Connect `payment_User/script.js` to payment APIs | 🟡 Medium | 3 hours |
