@@ -23,7 +23,7 @@ if (!isProduction) {
 }
 
 const knex = require('knex')({
-    client: isProduction ? 'pg' : 'better-sqlite3',
+    client: isProduction ? 'pg' : 'sqlite3',
 
     connection: isProduction
         ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }

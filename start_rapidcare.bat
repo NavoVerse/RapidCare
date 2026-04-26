@@ -12,7 +12,7 @@ echo.
 :: Start Unified Backend (Auth + Dev Dashboard on Port 5000)
 echo [1/2] Starting Unified Backend (Port 5000)...
 cd "Backend"
-start "RapidCare Backend" cmd /c "node server.js"
+start "RapidCare Backend" cmd /k "node server.js"
 cd /d "%ROOT_DIR%"
 
 :: Open Frontend
@@ -24,7 +24,7 @@ echo.
 echo ==================================================
 echo   Unified backend running on http://localhost:5000
 echo   Dev Dashboard: http://localhost:5000/dev
-echo   Auth API:      http://localhost:5000/api/auth
+echo   Auth API:      http://localhost:5000/api/v1/auth
 echo.
 echo   Close the backend terminal window to stop.
 echo ==================================================
