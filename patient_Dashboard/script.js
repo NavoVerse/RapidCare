@@ -620,6 +620,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             if (response.ok) {
+                localStorage.setItem('rapidcare_last_trip_id', data.trip_id);
                 alert(`🚑 DISPATCHING RAPIDCARE!\n\nDestination: ${hospitalName}\nTrip ID: ${data.trip_id}\n\nFinding nearest driver...`);
             } else {
                 alert(`Dispatch Error: ${data.error}`);
@@ -2148,7 +2149,13 @@ let selectedRecordId = null; // Track current record for re-rendering
 function init() {
     fetchMedicalRecords();
     setupEventListeners();
+    loadAppointments();
+    fetchPayments();
+    fetchAnalytics();
 }
+
+
+
 
 async function fetchMedicalRecords() {
     const token = localStorage.getItem('rapidcare_token');
@@ -2180,10 +2187,65 @@ async function fetchMedicalRecords() {
             }));
             renderHistory();
         }
-    } catch (error) {
-        console.error('Error fetching medical records:', error);
+    } catch (err) {
+        console.error('Error fetching medical records:', err);
     }
 }
+
+async function fetchPayments() {
+    const token = localStorage.getItem('rapidcare_token');
+    if (!token) return;
+
+    try {
+        const response = await fetch('http://localhost:5000/api/v1/payments', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const payments = await response.json();
+            const tbody = document.getElementById('payment-history-body');
+            if (!tbody) return;
+
+            tbody.innerHTML = payments.map(p => `
+                <tr>
+                    <td>${new Date(p.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                    <td>${p.payment_method === 'cash' ? 'Ambulance (Cash)' : 'Ambulance (Online)'}</td>
+                    <td>Trip ID: ${p.trip_id}</td>
+                    <td class="amt" style="font-weight: 700;">₹${p.amount.toLocaleString()}</td>
+                    <td><span class="badge-insurance approved">${p.status === 'completed' ? 'Paid' : p.status}</span></td>
+                    <td><a href="#" style="color: var(--primary-green); text-decoration: none; font-weight: 600;">Download</a></td>
+                </tr>
+            `).join('');
+        }
+    } catch (err) {
+        console.error('Error fetching payments:', err);
+    }
+}
+
+async function fetchAnalytics() {
+    const token = localStorage.getItem('rapidcare_token');
+    if (!token) return;
+
+    try {
+        const response = await fetch('http://localhost:5000/api/v1/analytics/patient', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const { metrics } = data;
+            
+            if (document.getElementById('val-response')) 
+                document.getElementById('val-response').textContent = metrics.avg_response_time;
+            if (document.getElementById('val-safety')) 
+                document.getElementById('val-safety').textContent = metrics.safety_score;
+            if (document.getElementById('val-distance')) 
+                document.getElementById('val-distance').textContent = metrics.total_distance;
+        }
+    } catch (err) {
+        console.error('Error fetching analytics:', err);
+    }
+}
+
+
 
 // Render History List
 function renderHistory() {
@@ -2414,6 +2476,7 @@ function closeMobileDetail() {
 // Modal Functions
 function openBookingModal() {
     document.getElementById('booking-modal').classList.add('active');
+    loadDoctors();
 }
 
 function closeBookingModal() {
@@ -2421,30 +2484,116 @@ function closeBookingModal() {
     document.getElementById('booking-form').reset();
 }
 
-function handleBookingSubmit(event) {
+
+async function loadDoctors() {
+    try {
+        const token = localStorage.getItem('rapidcare_token');
+        const response = await fetch('http://localhost:5000/api/v1/doctors', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const doctors = await response.json();
+        
+        // Populate datalist for doctor selection
+        let datalist = document.getElementById('doctors-datalist');
+        if (!datalist) {
+            datalist = document.createElement('datalist');
+            datalist.id = 'doctors-datalist';
+            document.body.appendChild(datalist);
+            document.getElementById('book-doctor').setAttribute('list', 'doctors-datalist');
+        }
+        
+        datalist.innerHTML = doctors.map(d => `<option value="${d.name}" data-id="${d.id}" data-specialty="${d.specialization}" data-hospital="${d.hospital_id}">`).join('');
+        
+        // Auto-fill specialty when doctor is selected
+        document.getElementById('book-doctor').addEventListener('input', (e) => {
+            const selectedOption = Array.from(datalist.options).find(opt => opt.value === e.target.value);
+            if (selectedOption) {
+                document.getElementById('book-specialty').value = selectedOption.dataset.specialty;
+                // You might need to fetch hospital name here if needed, or just leave it for now
+                document.getElementById('book-hospital').value = "Hospital ID: " + selectedOption.dataset.hospital;
+                e.target.dataset.selectedId = selectedOption.dataset.id;
+            }
+        });
+    } catch (err) {
+        console.error('Error loading doctors:', err);
+    }
+}
+
+async function loadAppointments() {
+    try {
+        const token = localStorage.getItem('rapidcare_token');
+        const response = await fetch('http://localhost:5000/api/v1/appointments', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const appointments = await response.json();
+        
+        // Map backend appointments to frontend format
+        const formatted = appointments.map(a => ({
+            id: a.id,
+            doctor: a.doctor_name,
+            specialty: a.doctor_specialization,
+            date: a.appointment_date.split('T')[0],
+            time: new Date(a.appointment_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            hospital: 'General Hospital', // Simplified
+            type: a.type
+        }));
+        
+        // Clear and update the global array (if used for rendering)
+        doctorBookings.length = 0;
+        doctorBookings.push(...formatted);
+        
+        // Re-render if necessary
+        if (selectedRecordId) selectRecord(selectedRecordId);
+    } catch (err) {
+        console.error('Error loading appointments:', err);
+    }
+}
+
+async function handleBookingSubmit(event) {
     event.preventDefault();
     
-    const newBooking = {
-        id: Date.now(),
-        doctor: document.getElementById('book-doctor').value,
-        specialty: document.getElementById('book-specialty').value,
-        date: document.getElementById('book-date').value,
-        time: document.getElementById('book-time').value,
-        hospital: document.getElementById('book-hospital').value,
-        type: document.getElementById('book-type').value
-    };
+    const doctorInput = document.getElementById('book-doctor');
+    const doctorId = doctorInput.dataset.selectedId;
+    const date = document.getElementById('book-date').value;
+    const time = document.getElementById('book-time').value;
+    const type = document.getElementById('book-type').value;
+    const notes = "Booked via RapidCare Dashboard";
 
-    doctorBookings.unshift(newBooking); // Add to beginning of list
-    closeBookingModal();
-    
-    // Re-render the detail pane if a record is still selected
-    if (selectedRecordId) {
-        selectRecord(selectedRecordId);
+    if (!doctorId) {
+        alert('Please select a doctor from the list');
+        return;
     }
-    
-    // Optional: Show success feedback
-    console.log('Booking confirmed:', newBooking);
+
+    try {
+        const token = localStorage.getItem('rapidcare_token');
+        const response = await fetch('http://localhost:5000/api/v1/appointments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                doctor_id: doctorId,
+                appointment_date: `${date}T${time}:00`,
+                type: type,
+                notes: notes
+            })
+        });
+
+        if (response.ok) {
+            alert('Appointment booked successfully!');
+            closeBookingModal();
+            loadAppointments();
+        } else {
+            const data = await response.json();
+            alert('Booking failed: ' + data.error);
+        }
+    } catch (err) {
+        console.error('Booking error:', err);
+        alert('Failed to connect to server');
+    }
 }
+
 
 window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
@@ -2558,51 +2707,65 @@ document.addEventListener('DOMContentLoaded', () => {
     recalculatePricing();
     
     // --- Pricing Logic ---
-    function recalculatePricing() {
+    async function recalculatePricing() {
         const selectedType = document.querySelector('input[name="ambulance-type"]:checked').value;
         const distance = parseFloat(distanceInput.value) || 0;
+        const couponCode = couponInput.value.toUpperCase();
         
         if (distance <= 0) {
             payBtn.disabled = true;
             payBtn.style.opacity = '0.5';
             payBtn.style.cursor = 'not-allowed';
+            return;
         } else {
             payBtn.disabled = false;
             payBtn.style.opacity = '1';
             payBtn.style.cursor = 'pointer';
         }
 
-        const rates = pricingConfig[selectedType];
-        const originalTotal = Math.round(distance * rates.original);
-        const discountedTotal = Math.round(distance * rates.discounted);
-        const savings = originalTotal - discountedTotal;
+        try {
+            const token = localStorage.getItem('rapidcare_token');
+            const response = await fetch('http://localhost:5000/api/v1/payments/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    distance,
+                    ambulanceType: selectedType,
+                    couponCode: couponMsg.classList.contains('success') ? couponCode : null
+                })
+            });
 
-        // Update Summary
-        const distanceRow = document.getElementById('distance-charge-row');
-        distanceRow.querySelector('.original').textContent = `₹${originalTotal.toLocaleString()}`;
-        distanceRow.querySelector('.discounted').textContent = `₹${discountedTotal.toLocaleString()}`;
+            if (!response.ok) throw new Error('Calculation failed');
+            const data = await response.json();
 
-        const savingsRow = document.getElementById('savings-row');
-        savingsRow.querySelector('.save-amount').textContent = `Saved ₹${savings.toLocaleString()}`;
-
-        // Fixed charges
-        const hospitalReservation = 500;
-        const platformCharge = 40;
-        
-        let finalTotal = discountedTotal + hospitalReservation + platformCharge;
-        
-        // Handle applied coupons
-        const couponCode = couponInput.value.toUpperCase();
-        if (couponMsg.classList.contains('success')) {
-            if (couponCode === 'RAPID20') {
-                finalTotal = Math.round(finalTotal * 0.8);
-            } else if (couponCode === 'FIRSTCARE') {
-                finalTotal -= 100;
+            // Update Summary
+            const distanceRow = document.getElementById('distance-charge-row');
+            if (distanceRow) {
+                distanceRow.querySelector('.original').textContent = `₹${(distance * pricingConfig[selectedType].original).toLocaleString()}`;
+                distanceRow.querySelector('.discounted').textContent = `₹${data.distanceCharge.toLocaleString()}`;
             }
-        }
 
-        totalAmountDisplay.textContent = `₹${finalTotal.toLocaleString()}`;
+            const savingsRow = document.getElementById('savings-row');
+            if (savingsRow) {
+                const originalTotal = distance * pricingConfig[selectedType].original;
+                const totalSavings = originalTotal - data.distanceCharge + data.discount;
+                savingsRow.querySelector('.save-amount').textContent = `Saved ₹${totalSavings.toLocaleString()}`;
+            }
+
+            // Fixed charges display (if they exist in UI)
+            // Note: index.html might need placeholders for these if we want to show them dynamically
+            
+            if (totalAmountDisplay) {
+                totalAmountDisplay.textContent = `₹${data.total.toLocaleString()}`;
+            }
+        } catch (err) {
+            console.error('Fare calculation error:', err);
+        }
     }
+
 
     ambulanceOptions.forEach(opt => opt.addEventListener('change', recalculatePricing));
     distanceInput.addEventListener('input', recalculatePricing);
@@ -2746,17 +2909,54 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Payment Feedback ---
-    document.querySelector('.pay-btn').addEventListener('click', () => {
+    document.querySelector('.pay-btn').addEventListener('click', async () => {
         const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
         let method = activeTab.toUpperCase();
         
         const btn = document.querySelector('.pay-btn');
+        const originalText = btn.innerHTML;
         btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Processing...';
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
         
-        setTimeout(() => {
-            alert(`Payment of ${totalAmountDisplay.textContent} via ${method} was successful!`);
-            window.location.href = '../patient_Dashboard/index.html';
-        }, 2000);
+        try {
+            const token = localStorage.getItem('rapidcare_token');
+            const tripId = localStorage.getItem('rapidcare_last_trip_id');
+            const amountText = totalAmountDisplay.textContent.replace('₹', '').replace(',', '');
+            const amount = parseInt(amountText);
+
+            if (!tripId) {
+                alert('No active trip found to pay for.');
+                btn.innerHTML = originalText;
+                return;
+            }
+
+            const response = await fetch('http://localhost:5000/api/v1/payments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    trip_id: tripId,
+                    amount: amount,
+                    payment_method: method.toLowerCase(),
+                    transaction_id: 'TXN-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+                })
+            });
+
+            if (response.ok) {
+                alert(`Payment of ₹${amount} via ${method} was successful!`);
+                localStorage.removeItem('rapidcare_last_trip_id'); // Clear after payment
+                window.location.href = '../patient_Dashboard/index.html';
+            } else {
+                const error = await response.json();
+                throw new Error(error.error || 'Payment failed');
+            }
+        } catch (err) {
+            console.error('Payment error:', err);
+            alert(`Payment failed: ${err.message}`);
+            btn.innerHTML = originalText;
+        }
     });
+
 });
