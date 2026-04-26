@@ -19,6 +19,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { initializeDB, knex } = require('./db');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+const logger = require('./services/logger.service');
 
 const app = express();
 const server = http.createServer(app);
@@ -31,14 +32,14 @@ app.set('io', io);
 
 // Socket.IO event handling
 io.on('connection', (socket) => {
-    console.log(`[Socket.IO] New client connected: ${socket.id}`);
+    logger.info(`[Socket.IO] New client connected: ${socket.id}`);
 
     // Join room based on user role and id (e.g., patient_1, driver_5)
     socket.on('join', (data) => {
         const { userId, role } = data;
         if (userId && role) {
             socket.join(`${role}_${userId}`);
-            console.log(`[Socket.IO] User ${userId} (${role}) joined their room: ${role}_${userId}`);
+            logger.info(`[Socket.IO] User ${userId} (${role}) joined their room: ${role}_${userId}`);
         }
     });
 
@@ -72,12 +73,12 @@ io.on('connection', (socket) => {
             // io.to('admin_room').emit('global:driver_moved', { userId, lat, lng });
 
         } catch (err) {
-            console.error('[Socket.IO] Error in driver:location_update:', err);
+            logger.error('[Socket.IO] Error in driver:location_update:', err);
         }
     });
 
     socket.on('disconnect', () => {
-        console.log(`[Socket.IO] Client disconnected: ${socket.id}`);
+        logger.info(`[Socket.IO] Client disconnected: ${socket.id}`);
     });
 });
 const PORT = process.env.PORT || 5000;
@@ -88,11 +89,21 @@ const notificationService = require('./services/notification.service');
 
 // ── Global Middleware ──────────────────────────────────────────────────────────
 app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Private-Network', 'true');
     next();
 });
-app.use(express.json());
+
+// Request Logging Middleware
+app.use((req, res, next) => {
+    logger.info(`${req.method} ${req.url}`, {
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+    });
+    next();
+});
 
 // ── Static: Dev Dashboard (served at /dev) ────────────────────────────────────
 app.use('/dev', express.static(path.resolve(__dirname, '../DeveloperDashboard')));
@@ -348,15 +359,15 @@ app.post('/api/v1/auth/request-otp', otpLimiter, validate(requestOtpSchema), asy
 
         if (email.includes('@')) {
             await notificationService.sendOTPEmail(email, otp);
-            console.log(`[OTP DEBUG] OTP for ${email} (mapped: ${mappedEmail}): ${otp}`);
+            logger.debug(`[OTP DEBUG] OTP for ${email} (mapped: ${mappedEmail}): ${otp}`);
         } else {
             // Simulate SMS if it's a phone number
-            console.log(`[OTP DEBUG] SMS Simulation. OTP for ${email} (mapped: ${mappedEmail}): ${otp}`);
+            logger.debug(`[OTP DEBUG] SMS Simulation. OTP for ${email} (mapped: ${mappedEmail}): ${otp}`);
         }
 
         res.json({ message: 'OTP sent successfully. Please check your email.' });
     } catch (err) {
-        console.error('Error sending OTP:', err);
+        logger.error('Error sending OTP:', err);
         res.status(500).json({ error: 'Failed to send OTP' });
     }
 });
@@ -735,7 +746,7 @@ app.post('/api/v1/trips/:id/accept', authenticateToken, authorize('driver'), asy
                 status: 'accepted',
                 message: 'An ambulance has accepted a request and is heading to your facility.'
             });
-            console.log(`[Socket.IO] Hospital ${trip.hospital_id} alerted about incoming trip ${trip.id}`);
+            logger.info(`[Socket.IO] Hospital ${trip.hospital_id} alerted about incoming trip ${trip.id}`);
         }
 
         res.json({ message: 'Trip accepted successfully' });
@@ -977,19 +988,14 @@ async function startServer() {
     try {
         await initializeDB();
         server.listen(PORT, () => {
-            console.log('');
-            console.log('╔════════════════════════════════════════════════╗');
-            console.log(`║   RapidCare Unified Backend — Port ${PORT}        ║`);
-            console.log('╠════════════════════════════════════════════════╣');
-            console.log(`║  Auth API :  http://localhost:${PORT}/api/v1/auth ║`);
-            console.log(`║  Admin API:  http://localhost:${PORT}/api/data    ║`);
-            console.log(`║  Dev Dash :  http://localhost:${PORT}/dev         ║`);
-            console.log(`║  Health   :  http://localhost:${PORT}/health      ║`);
-            console.log('╚════════════════════════════════════════════════╝');
-            console.log('');
+            logger.info(`🚀 RapidCare Unified Backend running on http://localhost:${PORT}`);
+            logger.info(`🔐 Auth API: http://localhost:${PORT}/api/v1/auth`);
+            logger.info(`🛠️ Admin API: http://localhost:${PORT}/api/data`);
+            logger.info(`🖥️ Dev Dashboard: http://localhost:${PORT}/dev`);
+            logger.info(`❤️ Health: http://localhost:${PORT}/health`);
         });
     } catch (err) {
-        console.error('Failed to start server:', err);
+        logger.error('Failed to start server:', err);
         process.exit(1);
     }
 }

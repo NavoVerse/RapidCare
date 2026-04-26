@@ -246,12 +246,22 @@ input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus {
     border-color: var(--primary-green);
-    background-color: #ffffff;
+    background-color: var(--white); /* Theme-aware background */
     box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.1);
 }
 
+/* Autofill Overrides */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--input-bg) inset !important;
+    -webkit-text-fill-color: var(--text-dark) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 input::placeholder {
-    color: #9ca3af;
+    color: var(--text-muted);
 }
 
 .password-group .eye-icon {
