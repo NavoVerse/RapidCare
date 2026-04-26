@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../shared_assets/css/theme.css">
     <link rel="stylesheet" href="style.css">
     <script src="../shared_assets/js/theme-manager.js"></script>
+    <script src="../shared_assets/js/config.js"></script>
 </head>
 <body>
 
@@ -221,7 +222,7 @@
 
             element.style.opacity = '0.5';
             try {
-                const response = await fetch('http://localhost:5000/api/admin/data', {
+                const response = await fetch(RapidCareConfig.API_BASE.replace('/v1', '') + '/admin/data', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ role, id, field, value })
@@ -253,7 +254,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:5000/api/admin/data', {
+                const response = await fetch(RapidCareConfig.API_BASE.replace('/v1', '') + '/admin/data', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id })
@@ -275,7 +276,7 @@
         // Data Fetching
         async function fetchData() {
             try {
-                const response = await fetch('http://localhost:5000/api/data');
+                const response = await fetch(RapidCareConfig.API_BASE.replace('/v1', '') + '/data');
                 dashboardData = await response.json();
 
                 // Update Metrics

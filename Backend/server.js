@@ -120,8 +120,19 @@ app.use((req, res, next) => {
     next();
 });
 
-// ── Static: Dev Dashboard (served at /dev) ────────────────────────────────────
+// ── Static: Frontend Modules ──────────────────────────────────────────────────
+app.use('/shared_assets', express.static(path.resolve(__dirname, '../shared_assets')));
+app.use('/login', express.static(path.resolve(__dirname, '../rapid_Care_Login')));
+app.use('/dashboard', express.static(path.resolve(__dirname, '../patient_Dashboard')));
+app.use('/driver', express.static(path.resolve(__dirname, '../driver_dashboard')));
+app.use('/hospital-register', express.static(path.resolve(__dirname, '../hospital_registration')));
+app.use('/driver-register', express.static(path.resolve(__dirname, '../driver_registration')));
+app.use('/insurance', express.static(path.resolve(__dirname, '../Insurance_Interface')));
+app.use('/admin/export', express.static(path.resolve(__dirname, '../excel_dashboard')));
+app.use('/urgency', express.static(path.resolve(__dirname, '../login_urgency')));
 app.use('/dev', express.static(path.resolve(__dirname, '../DeveloperDashboard')));
+app.use('/payments', express.static(path.resolve(__dirname, '../payment_User')));
+app.use('/', express.static(path.resolve(__dirname, '../choose_User')));
 
 // ── Auth Middleware ───────────────────────────────────────────────────────────
 const authenticateToken = (req, res, next) => {

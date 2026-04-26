@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     // REAL-TIME DISPATCH (Socket.IO)
     // =============================================
-    const socket = io('http://localhost:5000');
+    const API_BASE = RapidCareConfig.API_BASE;
+    const socket = io(RapidCareConfig.SOCKET_URL);
 
     socket.on('connect', () => {
         console.log('[Socket.IO] Connected to backend');
@@ -56,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/v1/patients/me', {
+            const response = await fetch(API_BASE + '/patients/me', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!response.ok) throw new Error('Failed to fetch profile');
@@ -237,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function uploadAvatar(dataUrl) {
         try {
             const token = localStorage.getItem('rapidcare_token');
-            const response = await fetch('http://localhost:5000/api/v1/patients/me', {
+            const response = await fetch(API_BASE + '/patients/me', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -270,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sosBtn = document.getElementById('sos-btn');
     if (sosBtn) {
         sosBtn.addEventListener('click', () => {
-            window.location.href = '../login_urgency/index.html';
+            window.location.href = '/urgency';
         });
     }
 
@@ -605,7 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/v1/trips/request', {
+            const response = await fetch(API_BASE + '/trips/request', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1233,7 +1234,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const token = localStorage.getItem('rapidcare_token');
                 if (token) {
-                    const response = await fetch('http://localhost:5000/api/v1/patients/me', {
+                    const response = await fetch(API_BASE + '/patients/me', {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1396,7 +1397,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const token = localStorage.getItem('rapidcare_token');
                     if (token) {
-                        const response = await fetch('http://localhost:5000/api/v1/patients/me', {
+                        const response = await fetch(API_BASE + '/patients/me', {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1424,7 +1425,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const token = localStorage.getItem('rapidcare_token');
                     if (token) {
-                        const response = await fetch('http://localhost:5000/api/v1/patients/me', {
+                        const response = await fetch(API_BASE + '/patients/me', {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -2162,7 +2163,7 @@ async function fetchMedicalRecords() {
     if (!token) return;
 
     try {
-        const response = await fetch('http://localhost:5000/api/v1/medical_records', {
+        const response = await fetch(API_BASE + '/medical_records', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -2197,7 +2198,7 @@ async function fetchPayments() {
     if (!token) return;
 
     try {
-        const response = await fetch('http://localhost:5000/api/v1/payments', {
+        const response = await fetch(API_BASE + '/payments', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -2226,7 +2227,7 @@ async function fetchAnalytics() {
     if (!token) return;
 
     try {
-        const response = await fetch('http://localhost:5000/api/v1/analytics/patient', {
+        const response = await fetch(API_BASE + '/analytics/patient', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -2488,7 +2489,7 @@ function closeBookingModal() {
 async function loadDoctors() {
     try {
         const token = localStorage.getItem('rapidcare_token');
-        const response = await fetch('http://localhost:5000/api/v1/doctors', {
+        const response = await fetch(API_BASE + '/doctors', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const doctors = await response.json();
@@ -2522,7 +2523,7 @@ async function loadDoctors() {
 async function loadAppointments() {
     try {
         const token = localStorage.getItem('rapidcare_token');
-        const response = await fetch('http://localhost:5000/api/v1/appointments', {
+        const response = await fetch(API_BASE + '/appointments', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const appointments = await response.json();
@@ -2566,7 +2567,7 @@ async function handleBookingSubmit(event) {
 
     try {
         const token = localStorage.getItem('rapidcare_token');
-        const response = await fetch('http://localhost:5000/api/v1/appointments', {
+        const response = await fetch(API_BASE + '/appointments', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -2725,7 +2726,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const token = localStorage.getItem('rapidcare_token');
-            const response = await fetch('http://localhost:5000/api/v1/payments/calculate', {
+            const response = await fetch(API_BASE + '/payments/calculate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -2930,7 +2931,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const response = await fetch('http://localhost:5000/api/v1/payments', {
+            const response = await fetch(API_BASE + '/payments', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -2947,7 +2948,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 alert(`Payment of ₹${amount} via ${method} was successful!`);
                 localStorage.removeItem('rapidcare_last_trip_id'); // Clear after payment
-                window.location.href = '../patient_Dashboard/index.html';
+                window.location.href = '/dashboard';
             } else {
                 const error = await response.json();
                 throw new Error(error.error || 'Payment failed');

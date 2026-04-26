@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000/api/v1/auth';
+const API_BASE = RapidCareConfig.API_BASE + '/auth';
 
 // --- Toast Notification System ---
 function showToast(message, type = 'info') {
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(`Welcome back, ${data.user.name}!`, 'success');
                 // Redirect to patient dashboard
                 setTimeout(() => {
-                    window.location.href = '../patient_Dashboard/index.html';
+                    window.location.href = '/dashboard';
                 }, 1500);
             } else {
                 showToast(data.error || 'Login failed', 'error');
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sosButton = document.querySelector('.sos-button');
     if (sosButton) {
         sosButton.addEventListener('click', () => {
-            window.location.href = '../login_urgency/index.html';
+            window.location.href = '/urgency';
         });
     }
 });

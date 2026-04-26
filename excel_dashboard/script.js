@@ -41,7 +41,7 @@ async function fetchLiveData() {
     // }
 
     try {
-        const response = await fetch('http://localhost:5000/api/v1/admin/export', {
+        const response = await fetch(RapidCareConfig.API_BASE + '/admin/export', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

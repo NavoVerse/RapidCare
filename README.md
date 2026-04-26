@@ -121,9 +121,9 @@ Then open `choose_User/index.html` in your browser.
 - [x] Replace 3 remaining `console.error` calls with `logger.error`
 
 ### Priority 2: Frontend Serving (1-2 hours)
-- [ ] Serve all frontend modules through Express static middleware instead of `file://`
-- [ ] Extract `http://localhost:5000` into a shared `config.js` or environment variable
-- [ ] Add a top-level `index.html` redirect to `choose_User/index.html`
+- [x] Serve all frontend modules through Express static middleware instead of `file://`
+- [x] Extract `http://localhost:5000` into a shared `config.js` or environment variable
+- [x] Add a top-level `index.html` redirect to `choose_User/index.html`
 
 ### Priority 3: Testing (2-3 hours)
 - [ ] Write integration tests for the 5 core auth endpoints

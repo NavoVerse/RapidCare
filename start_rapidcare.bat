@@ -62,7 +62,7 @@ cd /d "%ROOT_DIR%"
 echo.
 echo Launching App Entry Point in 3 seconds...
 timeout /t 3 >nul
-start "" "choose_User\index.html"
+start "" "http://localhost:5000"
 
 echo.
 echo ==================================================
