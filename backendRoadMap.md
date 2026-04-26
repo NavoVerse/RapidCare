@@ -982,12 +982,12 @@ DONE | Build trip status progression (en_route → arrived → at_hospital → c
 DONE | Create `medical_records` + `prescriptions` tables via migration | 🔴 High | 1 hour |
 DONE | Build CRUD APIs for medical records | 🔴 High | 3 hours |
 DONE | Replace hardcoded data in `history_patient/script.js` with API calls | 🔴 High | 3 hours |
-| Create `payments` table via migration | 🔴 High | 1 hour |
-| Build fare calculation API (`/api/v1/payments/calculate`) | 🔴 High | 2 hours |
-| Build payment recording API | 🟡 Medium | 2 hours |
-| Connect `payment_User/script.js` to payment APIs | 🟡 Medium | 3 hours |
-| Build doctor booking APIs | 🟡 Medium | 2 hours |
-| Connect booking modal in `history_patient` to API | 🟡 Medium | 2 hours |
+DONE | Create `payments` table via migration | 🔴 High | 1 hour |
+DONE | Build fare calculation API (`/api/v1/payments/calculate`) | 🔴 High | 2 hours |
+DONE | Build payment recording API | 🟡 Medium | 2 hours |
+DONE | Connect `payment_User/script.js` (integrated in patient_Dashboard) to payment APIs | 🟡 Medium | 3 hours |
+DONE | Build doctor booking APIs | 🟡 Medium | 2 hours |
+DONE | Connect booking modal in `history_patient` to API | 🟡 Medium | 2 hours |
 
 **Deliverable**: Medical records and payments stored in DB; history page shows real data.
 
@@ -999,14 +999,14 @@ DONE | Replace hardcoded data in `history_patient/script.js` with API calls | �
 
 | Task | Priority | Effort |
 |---|---|---|
-| Create `insurance_policies` + `insurance_claims` tables | 🟡 Medium | 1 hour |
-| Build insurance CRUD APIs | 🟡 Medium | 3 hours |
-| Connect `Insurance_Interface` to backend | 🟡 Medium | 3 hours |
-| Build analytics APIs with real trip data aggregation | 🟡 Medium | 4 hours |
-| Connect `analytics_interface` to real data instead of simulation | 🟡 Medium | 3 hours |
+DONE | Create `insurance_policies` + `insurance_claims` tables | 🟡 Medium | 1 hour |
+DONE | Build insurance CRUD APIs | 🟡 Medium | 3 hours |
+DONE | Connect `Insurance_Interface` to backend | 🟡 Medium | 3 hours |
+DONE | Build analytics APIs with real trip data aggregation | 🟡 Medium | 4 hours |
+DONE | Connect `analytics_interface` (integrated in patient_Dashboard) to real data | 🟡 Medium | 3 hours |
 DONE | Build admin export API to replace `excel_dashboard/mockData.js` | 🟡 Medium | 2 hours |
 DONE | Connect `excel_dashboard` to live data from `/api/v1/admin/export` | 🟡 Medium | 2 hours |
-| Build hospital-facing dashboard APIs (bed management, incoming patients) | 🟡 Medium | 4 hours |
+DONE | Build hospital-facing dashboard APIs (bed management, incoming patients) | 🟡 Medium | 4 hours |
 
 **Deliverable**: All 13 frontend modules connected to real backend APIs.
 
@@ -1019,13 +1019,13 @@ DONE | Connect `excel_dashboard` to live data from `/api/v1/admin/export` | 🟡
 | Task | Priority | Effort |
 |---|---|---|
 DONE | Migrate from SQLite to PostgreSQL via Knex | 🔴 High | 4 hours |
-| Add Winston structured logging | 🟡 Medium | 2 hours |
-| Add comprehensive error handling middleware | 🟡 Medium | 2 hours |
-| Encrypt medical data fields (AES-256) | 🟡 Medium | 3 hours |
-| Set up PM2 process manager | 🟡 Medium | 1 hour |
-| Configure Nginx reverse proxy with HTTPS | 🟡 Medium | 2 hours |
-| Write deployment docs | 🟢 Low | 2 hours |
-| Write API documentation (Swagger/OpenAPI) | 🟢 Low | 4 hours |
+DONE | Add Winston structured logging | 🟡 Medium | 2 hours |
+DONE | Add comprehensive error handling middleware | 🟡 Medium | 2 hours |
+DONE | Encrypt medical data fields (AES-256) | 🟡 Medium | 3 hours |
+DONE | Set up PM2 process manager | 🟡 Medium | 1 hour |
+DONE | Configure Nginx reverse proxy with HTTPS | 🟡 Medium | 2 hours |
+DONE | Write deployment docs | 🟢 Low | 2 hours |
+DONE | Write API documentation (Swagger/OpenAPI) | 🟢 Low | 4 hours |
 
 **Deliverable**: Production-ready backend with encrypted data, logging, and HTTPS.
 
