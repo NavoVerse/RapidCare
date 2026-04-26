@@ -943,7 +943,7 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
                 }
                 tripTimeouts.delete(tripId);
             } catch (err) {
-                console.error('Timeout error:', err);
+                logger.error('Timeout error:', err);
             }
         }, 60000);
 
@@ -1262,7 +1262,7 @@ app.put('/api/admin/data', express.json(), async (req, res) => {
         }
         res.json({ success: true });
     } catch (error) {
-        console.error('Update error:', error);
+        logger.error('Update error:', error);
         res.status(500).json({ error: 'Failed to update data' });
     }
 });
@@ -1276,7 +1276,7 @@ app.delete('/api/admin/data', express.json(), async (req, res) => {
         await knex('users').where({ id }).del();
         res.json({ success: true });
     } catch (error) {
-        console.error('Delete error:', error);
+        logger.error('Delete error:', error);
         res.status(500).json({ error: 'Failed to delete user' });
     }
 });

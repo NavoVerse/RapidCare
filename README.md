@@ -4,18 +4,7 @@
 
 ---
 
-## 🚨 Current Issues (Fixed & Remaining)
-
-### ✅ Issues Fixed (This Session)
-
-| # | Issue | Root Cause | Fix Applied |
-|---|-------|-----------|-------------|
-| 1 | **Server crashes on startup** — `ReferenceError: logger is not defined` | The `logger` import (`require('./services/logger.service')`) was removed from `server.js` during a bad git merge. The variable is used ~30 times in the file but never imported. | Re-added `const logger = require('./services/logger.service')` after `dotenv.config()` on line 22. |
-| 2 | **Server crashes on startup** — `SyntaxError: Unexpected token '<<'` | Git conflict markers (`<<<<<<< HEAD`, `=======`, `>>>>>>>`) were left inside `server.js` at line 1388, making the file syntactically invalid JavaScript. | Resolved the conflict — kept the simpler `logger.error('Failed to start server:', err)` form. |
-| 3 | **`start_rapidcare.bat` fails to run** | The batch file contained 3 separate unresolved git conflict blocks, making it unparseable by Windows CMD. | Rewrote the entire batch file with clean logic: Node.js check → port cleanup → npm install → knex migrate → start server → open browser. |
-| 4 | **Login page — typed text invisible** | `input:focus` background was hardcoded to `#ffffff`, making text invisible in dark mode. Browser autofill also forced white backgrounds. | Changed focus background to `var(--white)` (theme-aware). Added `-webkit-autofill` CSS overrides. |
-| 5 | **`backendRoadMap.md` has conflict markers** | Multiple unresolved merge conflicts in the Phase 4, 5, and 6 task tables. | Cleaned all conflict markers, kept the "DONE" versions. |
-| 6 | **Profile picture upload fails** — `Failed to update profile picture` alert | Express.js default body limit is 100KB; base64 images easily exceed this. | Increased `express.json({ limit: '10mb' })` and `express.urlencoded({ limit: '10mb' })`. |
+## 🚨 Current Issues
 
 ### ⚠️ Remaining Issues / Technical Debt
 
@@ -126,10 +115,10 @@ Then open `choose_User/index.html` in your browser.
 ## 📋 What Needs to Happen Next
 
 ### Priority 1: Cleanup (30 min)
-- [ ] Delete `Backend/migrations/20260426131803_create_payments_table.js` (duplicate)
-- [ ] Delete `Backend/utils/logger.js` (dead code; `services/logger.service.js` is used)
-- [ ] Remove `better-sqlite3` and `sqlite` from `package.json` (unused)
-- [ ] Replace 3 remaining `console.error` calls with `logger.error`
+- [x] Delete `Backend/migrations/20260426131803_create_payments_table.js` (duplicate)
+- [x] Delete `Backend/utils/logger.js` (dead code; `services/logger.service.js` is used)
+- [x] Remove `better-sqlite3` and `sqlite` from `package.json` (unused)
+- [x] Replace 3 remaining `console.error` calls with `logger.error`
 
 ### Priority 2: Frontend Serving (1-2 hours)
 - [ ] Serve all frontend modules through Express static middleware instead of `file://`
