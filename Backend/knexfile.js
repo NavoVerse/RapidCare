@@ -24,7 +24,7 @@ if (!isProduction) {
 
 module.exports = {
     development: {
-        client: 'better-sqlite3',
+        client: 'sqlite3',
         connection: {
             filename: path.resolve(__dirname, './user_Database/rapidcare.db')
         },
