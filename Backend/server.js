@@ -19,7 +19,6 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { initializeDB, knex } = require('./db');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-const logger = require('./services/logger.service');
 
 const app = express();
 const server = http.createServer(app);
@@ -1386,7 +1385,11 @@ async function startServer() {
             logger.info(`❤️ Health: http://localhost:${PORT}/health`);
         });
     } catch (err) {
+<<<<<<< HEAD
         logger.error('Failed to start server:', err);
+=======
+        logger.error('Failed to start server', { error: err.message, stack: err.stack });
+>>>>>>> 8ace967177f1fa8b9f899141d1a20f40b1eae2d9
         process.exit(1);
     }
 }
