@@ -17,7 +17,7 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const http = require('http');
 const { Server } = require('socket.io');
-const { getDb, initializeDB, knex } = require('./db');
+const { initializeDB, knex } = require('./db');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
@@ -144,7 +144,6 @@ const mapEmailOrPhone = (input) => {
 // 1. Register New User
 app.post('/api/v1/auth/register', validate(registerSchema), async (req, res) => {
     const { name, email, password, role, phone } = req.body;
-    const db = getDb();
     
     // Map email/phone input
     const { mappedEmail, mappedPhone } = mapEmailOrPhone(email);
@@ -152,25 +151,30 @@ app.post('/api/v1/auth/register', validate(registerSchema), async (req, res) => 
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const result = await db.run(
-            'INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)',
-            [name, mappedEmail, hashedPassword, role, finalPhone]
-        );
+        
+        const userId = await knex.transaction(async (trx) => {
+            const [id] = await trx('users').insert({
+                name,
+                email: mappedEmail,
+                password: hashedPassword,
+                role,
+                phone: finalPhone
+            });
 
-        const userId = result.lastID;
-
-        // Initialize role-specific tables
-        if (role === 'patient') {
-            await db.run('INSERT INTO patients (user_id) VALUES (?)', [userId]);
-        } else if (role === 'driver') {
-            await db.run('INSERT INTO drivers (user_id, status) VALUES (?, ?)', [userId, 'available']);
-        } else if (role === 'hospital') {
-            await db.run('INSERT INTO hospitals (user_id) VALUES (?)', [userId]);
-        }
+            // Initialize role-specific tables
+            if (role === 'patient') {
+                await trx('patients').insert({ user_id: id });
+            } else if (role === 'driver') {
+                await trx('drivers').insert({ user_id: id, status: 'available' });
+            } else if (role === 'hospital') {
+                await trx('hospitals').insert({ user_id: id });
+            }
+            return id;
+        });
 
         res.status(201).json({ message: 'User registered successfully', userId });
     } catch (err) {
-        if (err.message.includes('UNIQUE constraint failed')) {
+        if (err.message.includes('UNIQUE constraint failed') || err.message.includes('duplicate key value')) {
             return res.status(400).json({ error: 'Email already exists' });
         }
         res.status(500).json({ error: err.message });
@@ -184,32 +188,39 @@ app.post('/api/v1/drivers/register', async (req, res) => {
         dob, alt_phone, address, city, state, pincode,
         aadhaar_number, pan_number, license_number, vehicle_number
     } = req.body;
-    const db = getDb();
 
     try {
-        await db.run('BEGIN TRANSACTION');
         const hashedPassword = await bcrypt.hash(password, 10);
-        const result = await db.run(
-            'INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)',
-            [name, email, hashedPassword, 'driver', phone]
-        );
-        const userId = result.lastID;
+        
+        const userId = await knex.transaction(async (trx) => {
+            const [id] = await trx('users').insert({
+                name,
+                email,
+                password: hashedPassword,
+                role: 'driver',
+                phone
+            });
 
-        await db.run(`
-            INSERT INTO drivers (
-                user_id, status, license_number, vehicle_number, dob, alt_phone, 
-                address, city, state, pincode, aadhaar_number, pan_number
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [
-            userId, 'available', license_number, vehicle_number, dob, alt_phone,
-            address, city, state, pincode, aadhaar_number, pan_number
-        ]);
+            await trx('drivers').insert({
+                user_id: id,
+                status: 'available',
+                license_number,
+                vehicle_number,
+                dob,
+                alt_phone,
+                address,
+                city,
+                state,
+                pincode,
+                aadhaar_number,
+                pan_number
+            });
+            return id;
+        });
 
-        await db.run('COMMIT');
         res.status(201).json({ message: 'Driver registered successfully', userId });
     } catch (err) {
-        await db.run('ROLLBACK');
-        if (err.message.includes('UNIQUE constraint failed')) {
+        if (err.message.includes('UNIQUE constraint failed') || err.message.includes('duplicate key value')) {
             return res.status(400).json({ error: 'Email, license, or vehicle number already exists' });
         }
         res.status(500).json({ error: err.message });
@@ -219,49 +230,64 @@ app.post('/api/v1/drivers/register', async (req, res) => {
 // 1c. Register Hospital (5-step form)
 app.post('/api/v1/hospitals/register', async (req, res) => {
     const data = req.body;
-    const db = getDb();
 
     try {
-        await db.run('BEGIN TRANSACTION');
-
         const hashedPassword = await bcrypt.hash(data.password, 10);
-        const result = await db.run(
-            'INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)',
-            [data.hospital_name, data.email, hashedPassword, 'hospital', data.reception_number]
-        );
-        const userId = result.lastID;
+        
+        const userId = await knex.transaction(async (trx) => {
+            const [id] = await trx('users').insert({
+                name: data.hospital_name,
+                email: data.email,
+                password: hashedPassword,
+                role: 'hospital',
+                phone: data.reception_number
+            });
 
-        await db.run(`
-            INSERT INTO hospitals (
-                user_id, address, city, total_beds, available_beds,
-                hospital_type, year_established, district, state, pincode,
-                state_health_license, license_expiry, nabh_accreditation, nabl_accreditation,
-                pharmacy_license, fire_noc, pan_tan, gst,
-                reception_number, emergency_casualty_number, ambulance_dispatch_number,
-                icu_helpline, admin_billing_number, website,
-                icu_beds, nicu_beds, picu_beds, ccu_beds, ventilators, dialysis, ot, ambulances,
-                departments, ayushman_bharat, state_insurance, admin_name, designation
-            ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-            )
-        `, [
-            userId, data.address, data.district, data.total_beds, data.total_beds,
-            data.hospital_type, data.year_established, data.district, data.state, data.pincode,
-            data.state_health_license, data.license_expiry, data.nabh_accreditation, data.nabl_accreditation,
-            data.pharmacy_license, data.fire_noc, data.pan_tan, data.gst,
-            data.reception_number, data.emergency_casualty_number, data.ambulance_dispatch_number,
-            data.icu_helpline, data.admin_billing_number, data.website,
-            data.icu_beds || 0, data.nicu_beds || 0, data.picu_beds || 0, data.ccu_beds || 0,
-            data.ventilators || 0, data.dialysis || 0, data.ot || 0, data.ambulances || 0,
-            JSON.stringify(data.departments || []), data.ayushman_bharat, data.state_insurance,
-            data.admin_name, data.designation
-        ]);
+            await trx('hospitals').insert({
+                user_id: id,
+                address: data.address,
+                city: data.district, // Note: using district as city per original code
+                total_beds: data.total_beds,
+                available_beds: data.total_beds,
+                hospital_type: data.hospital_type,
+                year_established: data.year_established,
+                district: data.district,
+                state: data.state,
+                pincode: data.pincode,
+                state_health_license: data.state_health_license,
+                license_expiry: data.license_expiry,
+                nabh_accreditation: data.nabh_accreditation,
+                nabl_accreditation: data.nabl_accreditation,
+                pharmacy_license: data.pharmacy_license,
+                fire_noc: data.fire_noc,
+                pan_tan: data.pan_tan,
+                gst: data.gst,
+                reception_number: data.reception_number,
+                emergency_casualty_number: data.emergency_casualty_number,
+                ambulance_dispatch_number: data.ambulance_dispatch_number,
+                icu_helpline: data.icu_helpline,
+                admin_billing_number: data.admin_billing_number,
+                website: data.website,
+                icu_beds: data.icu_beds || 0,
+                nicu_beds: data.nicu_beds || 0,
+                picu_beds: data.picu_beds || 0,
+                ccu_beds: data.ccu_beds || 0,
+                ventilators: data.ventilators || 0,
+                dialysis: data.dialysis || 0,
+                ot: data.ot || 0,
+                ambulances: data.ambulances || 0,
+                departments: JSON.stringify(data.departments || []),
+                ayushman_bharat: data.ayushman_bharat,
+                state_insurance: data.state_insurance,
+                admin_name: data.admin_name,
+                designation: data.designation
+            });
+            return id;
+        });
 
-        await db.run('COMMIT');
         res.status(201).json({ message: 'Hospital registered successfully', userId });
     } catch (err) {
-        await db.run('ROLLBACK');
-        if (err.message.includes('UNIQUE constraint failed')) {
+        if (err.message.includes('UNIQUE constraint failed') || err.message.includes('duplicate key value')) {
             return res.status(400).json({ error: 'Email or Contact already exists' });
         }
         res.status(500).json({ error: err.message });
@@ -271,11 +297,10 @@ app.post('/api/v1/hospitals/register', async (req, res) => {
 // 2. Login with Password
 app.post('/api/v1/auth/login', loginLimiter, validate(loginSchema), async (req, res) => {
     const { email, password } = req.body;
-    const db = getDb();
     const { mappedEmail } = mapEmailOrPhone(email);
 
     try {
-        const user = await db.get('SELECT * FROM users WHERE email = ?', [mappedEmail]);
+        const user = await knex('users').where({ email: mappedEmail }).first();
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
@@ -303,11 +328,10 @@ app.post('/api/v1/auth/login', loginLimiter, validate(loginSchema), async (req, 
 // 3. Request OTP
 app.post('/api/v1/auth/request-otp', otpLimiter, validate(requestOtpSchema), async (req, res) => {
     const { email } = req.body;
-    const db = getDb();
     const { mappedEmail } = mapEmailOrPhone(email);
 
     try {
-        const user = await db.get('SELECT * FROM users WHERE email = ?', [mappedEmail]);
+        const user = await knex('users').where({ email: mappedEmail }).first();
         if (!user) {
             return res.status(404).json({ error: 'User not found. Please register first.' });
         }
@@ -315,11 +339,12 @@ app.post('/api/v1/auth/request-otp', otpLimiter, validate(requestOtpSchema), asy
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expiresAt = new Date(Date.now() + 10 * 60000); // 10 minutes
 
-        await db.run('DELETE FROM otps WHERE email = ?', [mappedEmail]);
-        await db.run(
-            'INSERT INTO otps (email, otp, expires_at) VALUES (?, ?, ?)',
-            [mappedEmail, otp, expiresAt.toISOString()]
-        );
+        await knex('otps').where({ email: mappedEmail }).del();
+        await knex('otps').insert({
+            email: mappedEmail,
+            otp,
+            expires_at: expiresAt.toISOString()
+        });
 
         if (email.includes('@')) {
             await notificationService.sendOTPEmail(email, otp);
@@ -339,14 +364,12 @@ app.post('/api/v1/auth/request-otp', otpLimiter, validate(requestOtpSchema), asy
 // 4. Verify OTP
 app.post('/api/v1/auth/verify-otp', validate(verifyOtpSchema), async (req, res) => {
     const { email, otp } = req.body;
-    const db = getDb();
     const { mappedEmail } = mapEmailOrPhone(email);
 
     try {
-        const otpRecord = await db.get(
-            'SELECT * FROM otps WHERE email = ? AND otp = ?',
-            [mappedEmail, otp]
-        );
+        const otpRecord = await knex('otps')
+            .where({ email: mappedEmail, otp })
+            .first();
 
         if (!otpRecord) {
             return res.status(401).json({ error: 'Invalid OTP' });
@@ -355,8 +378,8 @@ app.post('/api/v1/auth/verify-otp', validate(verifyOtpSchema), async (req, res) 
             return res.status(401).json({ error: 'OTP expired' });
         }
 
-        const user = await db.get('SELECT * FROM users WHERE email = ?', [mappedEmail]);
-        await db.run('DELETE FROM otps WHERE email = ?', [mappedEmail]);
+        const user = await knex('users').where({ email: mappedEmail }).first();
+        await knex('otps').where({ email: mappedEmail }).del();
 
         const token = jwt.sign(
             { id: user.id, email: user.email, role: user.role },
@@ -376,7 +399,6 @@ app.post('/api/v1/auth/verify-otp', validate(verifyOtpSchema), async (req, res) 
 // 4b. Reset Password
 app.post('/api/v1/auth/reset-password', async (req, res) => {
     const { email, otp, newPassword } = req.body;
-    const db = getDb();
     const { mappedEmail } = mapEmailOrPhone(email);
 
     if (!email || !otp || !newPassword || newPassword.length < 6) {
@@ -384,10 +406,9 @@ app.post('/api/v1/auth/reset-password', async (req, res) => {
     }
 
     try {
-        const otpRecord = await db.get(
-            'SELECT * FROM otps WHERE email = ? AND otp = ?',
-            [mappedEmail, otp]
-        );
+        const otpRecord = await knex('otps')
+            .where({ email: mappedEmail, otp })
+            .first();
 
         if (!otpRecord) {
             return res.status(401).json({ error: 'Invalid OTP' });
@@ -397,8 +418,10 @@ app.post('/api/v1/auth/reset-password', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-        await db.run('UPDATE users SET password = ? WHERE email = ?', [hashedPassword, mappedEmail]);
-        await db.run('DELETE FROM otps WHERE email = ?', [mappedEmail]);
+        await knex.transaction(async (trx) => {
+            await trx('users').where({ email: mappedEmail }).update({ password: hashedPassword });
+            await trx('otps').where({ email: mappedEmail }).del();
+        });
 
         res.json({ message: 'Password reset successfully' });
     } catch (err) {
@@ -408,31 +431,30 @@ app.post('/api/v1/auth/reset-password', async (req, res) => {
 
 // 5. Get Profile (protected)
 app.get('/api/v1/auth/profile', authenticateToken, authorize('patient', 'driver', 'hospital', 'admin'), async (req, res) => {
-    const db = getDb();
     try {
-        const user = await db.get(
-            'SELECT id, name, email, role, phone, created_at FROM users WHERE id = ?',
-            [req.user.id]
-        );
+        const user = await knex('users')
+            .select('id', 'name', 'email', 'role', 'phone', 'created_at')
+            .where({ id: req.user.id })
+            .first();
         res.json(user);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// 6. Get Patient Profile
 app.get('/api/v1/patients/me', authenticateToken, authorize('patient'), async (req, res) => {
-    const db = getDb();
     try {
-        const patient = await db.get(`
-            SELECT u.name, u.email, u.phone, 
-                   p.gender, p.date_of_birth, p.height, p.weight, 
-                   p.blood_group as blood_type, p.home_location, p.blood_pressure, 
-                   p.allergies, p.chronic_conditions, p.own_diagnosis, p.health_barriers, p.habits
-            FROM users u
-            JOIN patients p ON u.id = p.user_id
-            WHERE u.id = ?
-        `, [req.user.id]);
+        const patient = await knex('users as u')
+            .join('patients as p', 'u.id', 'p.user_id')
+            .select(
+                'u.name', 'u.email', 'u.phone', 'u.avatar_url',
+                'p.gender', 'p.date_of_birth', 'p.height', 'p.weight',
+                'p.blood_group as blood_type', 'p.home_location', 'p.blood_pressure',
+                'p.allergies', 'p.chronic_conditions', 'p.own_diagnosis', 'p.health_barriers', 'p.habits',
+                'p.chronic_disease', 'p.diabetes_emergencies', 'p.surgeries', 'p.family_history', 'p.diabetes_complications'
+            )
+            .where('u.id', req.user.id)
+            .first();
 
         if (!patient) return res.status(404).json({ error: 'Patient profile not found' });
         res.json(patient);
@@ -443,26 +465,45 @@ app.get('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
 
 // 7. Update Patient Profile
 app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (req, res) => {
-    const { name, gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, allergies, chronic_conditions, own_diagnosis, health_barriers, habits } = req.body;
-    const db = getDb();
+    const { 
+        name, avatar_url, gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, 
+        allergies, chronic_conditions, own_diagnosis, health_barriers, habits,
+        chronic_disease, diabetes_emergencies, surgeries, family_history, diabetes_complications
+    } = req.body;
 
     try {
-        await db.run('BEGIN TRANSACTION');
-        if (name !== undefined) {
-            await db.run('UPDATE users SET name = ? WHERE id = ?', [name, req.user.id]);
-        }
-        await db.run(`
-            UPDATE patients SET 
-                gender = ?, date_of_birth = ?, height = ?, weight = ?, 
-                blood_group = ?, home_location = ?, blood_pressure = ?, 
-                allergies = ?, chronic_conditions = ?, own_diagnosis = ?, health_barriers = ?, habits = ?
-            WHERE user_id = ?
-        `, [gender, date_of_birth, height, weight, blood_type, home_location, blood_pressure, allergies, chronic_conditions, own_diagnosis, health_barriers, habits, req.user.id]);
-        await db.run('COMMIT');
+        await knex.transaction(async (trx) => {
+            const userUpdate = {};
+            if (name !== undefined) userUpdate.name = name;
+            if (avatar_url !== undefined) userUpdate.avatar_url = avatar_url;
+            
+            if (Object.keys(userUpdate).length > 0) {
+                await trx('users').where({ id: req.user.id }).update(userUpdate);
+            }
+
+            await trx('patients').where({ user_id: req.user.id }).update({
+                gender,
+                date_of_birth,
+                height,
+                weight,
+                blood_group: blood_type,
+                home_location,
+                blood_pressure,
+                allergies,
+                chronic_conditions,
+                own_diagnosis,
+                health_barriers,
+                habits,
+                chronic_disease,
+                diabetes_emergencies,
+                surgeries,
+                family_history,
+                diabetes_complications
+            });
+        });
 
         res.json({ message: 'Profile updated successfully' });
     } catch (err) {
-        await db.run('ROLLBACK');
         res.status(500).json({ error: err.message });
     }
 });
@@ -845,30 +886,23 @@ app.get('/api/v1/admin/export', authenticateToken, authorize('admin'), async (re
 // =============================================================================
 
 async function fetchDashboardData(res) {
-    const db = getDb();
     try {
-        const patients = await db.all(`
-            SELECT u.*, p.blood_group, p.medical_history, p.emergency_contact,
-                   p.gender, p.date_of_birth, p.height, p.weight,
-                   p.blood_pressure, p.home_location, p.allergies, p.chronic_conditions, p.own_diagnosis, p.health_barriers, p.habits
-            FROM users u
-            JOIN patients p ON u.id = p.user_id
-            WHERE u.role = 'patient'
-        `);
+        const patients = await knex('users as u')
+            .join('patients as p', 'u.id', 'p.user_id')
+            .select('u.*', 'p.blood_group', 'p.medical_history', 'p.emergency_contact',
+                   'p.gender', 'p.date_of_birth', 'p.height', 'p.weight',
+                   'p.blood_pressure', 'p.home_location', 'p.allergies', 'p.chronic_conditions', 'p.own_diagnosis', 'p.health_barriers', 'p.habits')
+            .where('u.role', 'patient');
 
-        const drivers = await db.all(`
-            SELECT u.*, d.license_number, d.vehicle_number, d.status
-            FROM users u
-            JOIN drivers d ON u.id = d.user_id
-            WHERE u.role = 'driver'
-        `);
+        const drivers = await knex('users as u')
+            .join('drivers as d', 'u.id', 'd.user_id')
+            .select('u.*', 'd.license_number', 'd.vehicle_number', 'd.status')
+            .where('u.role', 'driver');
 
-        const hospitals = await db.all(`
-            SELECT u.*, h.address, h.total_beds, h.specialty
-            FROM users u
-            JOIN hospitals h ON u.id = h.user_id
-            WHERE u.role = 'hospital'
-        `);
+        const hospitals = await knex('users as u')
+            .join('hospitals as h', 'u.id', 'h.user_id')
+            .select('u.*', 'h.address', 'h.total_beds', 'h.specialty')
+            .where('u.role', 'hospital');
 
         res.json({ patients, drivers, hospitals });
     } catch (error) {
@@ -886,7 +920,6 @@ app.get('/api/admin/data', authenticateToken, authorize('admin'), (req, res) => 
 // Update endpoint for Developer Dashboard
 app.put('/api/admin/data', express.json(), async (req, res) => {
     const { role, id, field, value } = req.body;
-    const db = getDb();
 
     // Validate inputs
     const allowedRoles = ['patient', 'driver', 'hospital'];
@@ -899,13 +932,13 @@ app.put('/api/admin/data', express.json(), async (req, res) => {
 
     try {
         if (userFields.includes(field)) {
-            await db.run(`UPDATE users SET ${field} = ? WHERE id = ?`, [value, id]);
+            await knex('users').where({ id }).update({ [field]: value });
         } else if (role === 'patient' && patientFields.includes(field)) {
-            await db.run(`UPDATE patients SET ${field} = ? WHERE user_id = ?`, [value, id]);
+            await knex('patients').where({ user_id: id }).update({ [field]: value });
         } else if (role === 'driver' && driverFields.includes(field)) {
-            await db.run(`UPDATE drivers SET ${field} = ? WHERE user_id = ?`, [value, id]);
+            await knex('drivers').where({ user_id: id }).update({ [field]: value });
         } else if (role === 'hospital' && hospitalFields.includes(field)) {
-            await db.run(`UPDATE hospitals SET ${field} = ? WHERE user_id = ?`, [value, id]);
+            await knex('hospitals').where({ user_id: id }).update({ [field]: value });
         } else {
             return res.status(400).json({ error: 'Invalid field' });
         }
@@ -919,11 +952,10 @@ app.put('/api/admin/data', express.json(), async (req, res) => {
 // Delete endpoint for Developer Dashboard
 app.delete('/api/admin/data', express.json(), async (req, res) => {
     const { id } = req.body;
-    const db = getDb();
     if (!id) return res.status(400).json({ error: 'ID is required' });
 
     try {
-        await db.run('DELETE FROM users WHERE id = ?', [id]);
+        await knex('users').where({ id }).del();
         res.json({ success: true });
     } catch (error) {
         console.error('Delete error:', error);

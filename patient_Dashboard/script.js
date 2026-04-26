@@ -96,8 +96,27 @@ document.addEventListener('DOMContentLoaded', () => {
             setVal('ownDiagnosisTags', data.own_diagnosis, '', 'None added');
             setVal('healthBarriersTags', data.health_barriers, '', 'None added');
 
-            // Render habit emojis
-            selectedHabits = data.habits ? data.habits.split(',').filter(h => h) : [];
+            // Detailed Medical History
+            setVal('hist-chronic', data.chronic_disease, '', 'None added');
+            setVal('hist-emergencies', data.diabetes_emergencies, '', 'None added');
+            setVal('hist-surgery', data.surgeries, '', 'None added');
+            setVal('hist-family', data.family_history, '', 'None added');
+            setVal('hist-complication', data.diabetes_complications, '', 'None added');
+
+            // Render habit emojis (map text back to emojis if needed)
+            selectedHabits = [];
+            if (data.habits) {
+                const habitNames = data.habits.split(',').map(h => h.trim());
+                habitNames.forEach(name => {
+                    // Try to find the emoji for this name from the picker options
+                    const opt = document.querySelector(`.picker-option[title="${name}"]`);
+                    if (opt) {
+                        selectedHabits.push(opt.dataset.emoji);
+                    } else if (name.length <= 2) { // Fallback if it's already an emoji
+                        selectedHabits.push(name);
+                    }
+                });
+            }
             renderHabitEmojis(selectedHabits);
             updateEmojiPickerSelection();
 
@@ -105,9 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const sidebarName = document.getElementById('sidebarName');
             if (sidebarName && data.name) sidebarName.textContent = data.name;
             
-            // Set dynamic avatars
-            if (data.name) {
-                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=2563eb&color=fff&size=128`;
+            // Set avatars (Prefer uploaded one, fallback to UI Avatars)
+            let avatarUrl = data.avatar_url;
+            if (!avatarUrl && data.name) {
+                avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=2563eb&color=fff&size=128`;
+            }
+            
+            if (avatarUrl) {
                 const sidebarAvatar = document.getElementById('sidebarAvatar');
                 if (sidebarAvatar) sidebarAvatar.src = avatarUrl;
                 const headerAvatar = document.getElementById('headerAvatar');
@@ -161,6 +184,82 @@ document.addEventListener('DOMContentLoaded', () => {
             renderHabitEmojis(selectedHabits);
             updateEmojiPickerSelection();
         });
+    }
+
+    // =============================================
+    // PROFILE PICTURE UPLOAD & COMPRESSION
+    // =============================================
+    const avatarInput = document.getElementById('avatarInput');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    // Create canvas for resizing
+                    const canvas = document.createElement('canvas');
+                    const MAX_SIZE = 256;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_SIZE) {
+                            height *= MAX_SIZE / width;
+                            width = MAX_SIZE;
+                        }
+                    } else {
+                        if (height > MAX_SIZE) {
+                            width *= MAX_SIZE / height;
+                            height = MAX_SIZE;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Convert to low-quality JPEG for database storage
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    // Upload to backend
+                    uploadAvatar(dataUrl);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function uploadAvatar(dataUrl) {
+        try {
+            const token = localStorage.getItem('rapidcare_token');
+            const response = await fetch('http://localhost:5000/api/v1/patients/me', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ avatar_url: dataUrl })
+            });
+
+            if (response.ok) {
+                // Update all avatar instances on the page
+                const avatars = ['sidebarAvatar', 'headerAvatar', 'mainProfileAvatar'];
+                avatars.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.src = dataUrl;
+                });
+            } else {
+                throw new Error('Failed to upload avatar');
+            }
+        } catch (error) {
+            console.error('Avatar upload error:', error);
+            alert('Failed to update profile picture.');
+        }
     }
 
     loadUserProfile();
@@ -1117,8 +1216,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             
-            // Add habits to payload
-            payload.habits = selectedHabits.join(',');
+            // Add habits to payload as text (mapping emojis to their titles)
+            const habitLabels = selectedHabits.map(emoji => {
+                const opt = document.querySelector(`.picker-option[data-emoji="${emoji}"]`);
+                return opt ? opt.getAttribute('title') : emoji;
+            });
+            payload.habits = habitLabels.join(', ');
 
             try {
                 const token = localStorage.getItem('rapidcare_token');
@@ -1299,6 +1402,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch (error) {
                     console.error('Update error:', error);
                     alert('Error updating profile in database.');
+                }
+            }
+
+            if (activeEditConfig && activeEditConfig.id === 'editMedicalHistory') {
+                const payload = {
+                    chronic_disease: document.getElementById('m-c')?.value,
+                    diabetes_emergencies: document.getElementById('m-e')?.value,
+                    surgeries: document.getElementById('m-s')?.value,
+                    family_history: document.getElementById('m-f')?.value,
+                    diabetes_complications: document.getElementById('m-x')?.value
+                };
+
+                try {
+                    const token = localStorage.getItem('rapidcare_token');
+                    if (token) {
+                        const response = await fetch('http://localhost:5000/api/v1/patients/me', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) throw new Error('Failed to update medical history');
+                    }
+                } catch (error) {
+                    console.error('Update error:', error);
+                    alert('Error updating medical history in database.');
                 }
             }
             
