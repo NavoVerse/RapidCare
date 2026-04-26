@@ -933,7 +933,7 @@ DONE | Update `DeveloperDashboard` to call unified server | 🟡 Medium | 30 min
 
 ---
 
-### Phase 2: Registration & Data Persistence (Week 2-3)
+### Phase 2: Registration & Data Persistence (Week 2-3) DONE
 
 > **Goal**: Make driver and hospital registration forms actually save data.
 
@@ -953,7 +953,7 @@ DONE | Implement Custom Email OTP System (Nodemailer) | 🟡 Medium | 2 hours |
 
 ---
 
-### Phase 3: Trip Lifecycle & Real-Time (Week 3-5)
+### Phase 3: Trip Lifecycle & Real-Time (Week 3-5) DONE
 
 > **Goal**: Build the core emergency dispatch system with Socket.IO.
 
@@ -1018,7 +1018,7 @@ DONE | Connect `excel_dashboard` to live data from `/api/v1/admin/export` | 🟡
 
 | Task | Priority | Effort |
 |---|---|---|
-| Migrate from SQLite to PostgreSQL via Knex | 🔴 High | 4 hours |
+DONE | Migrate from SQLite to PostgreSQL via Knex | 🔴 High | 4 hours |
 | Add Winston structured logging | 🟡 Medium | 2 hours |
 | Add comprehensive error handling middleware | 🟡 Medium | 2 hours |
 | Encrypt medical data fields (AES-256) | 🟡 Medium | 3 hours |
