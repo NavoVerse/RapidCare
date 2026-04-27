@@ -114,6 +114,41 @@ body {
 .logo {
     display: flex;
     align-items: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none !important;
+    animation: arrive-motion 1.2s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4));
+}
+
+@keyframes arrive-motion {
+    0% {
+        transform: translateX(-150%) skewX(-20deg);
+        opacity: 0;
+    }
+    60% {
+        transform: translateX(20%) skewX(10deg);
+        opacity: 1;
+    }
+    80% {
+        transform: translateX(-5%) skewX(-5deg);
+    }
+    100% {
+        transform: translateX(0) skewX(0);
+    }
 }
 
 .logo-text {

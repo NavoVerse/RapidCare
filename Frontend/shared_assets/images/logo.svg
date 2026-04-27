@@ -1,0 +1,20 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Speed Lines -->
+  <path d="M60 40H85" stroke="#1E40AF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M62 50H95" stroke="#1E40AF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M60 60H80" stroke="#1E40AF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M58 70H75" stroke="#1E40AF" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Ambulance Body -->
+  <path d="M10 75V55C10 49.4772 14.4772 45 20 45H35L50 30H75C77.7614 30 80 32.2386 80 35V75H10Z" stroke="#1E40AF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Wheels -->
+  <circle cx="25" cy="75" r="10" stroke="#1E40AF" stroke-width="5" fill="white"/>
+  <circle cx="65" cy="75" r="10" stroke="#1E40AF" stroke-width="5" fill="white"/>
+  
+  <!-- Siren -->
+  <rect x="55" y="24" width="12" height="6" rx="2" stroke="#1E40AF" stroke-width="3" fill="white"/>
+  
+  <!-- Red Cross -->
+  <path d="M42 45V65M32 55H52" stroke="#EF4444" stroke-width="10" stroke-linecap="butt"/>
+</svg>
