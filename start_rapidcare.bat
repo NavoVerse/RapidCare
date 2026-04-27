@@ -26,10 +26,7 @@ if not exist "Backend\.env" (
 :: Start Unified Backend
 echo [2/3] Starting Unified Backend (Port 5000)...
 cd "Backend"
-<<<<<<< HEAD
-=======
 :: Use cmd /k so the window stays open on error
->>>>>>> 643899151e5044f9c2a9722d5d91c1dcced2a4a3
 start "RapidCare Backend" cmd /k "node server.js"
 cd /d "%ROOT_DIR%"
 
