@@ -85,10 +85,184 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Availability Toggle Persistence
     const toggle = document.getElementById('availability-toggle');
+    const user = JSON.parse(localStorage.getItem('rapidcare_user'));
+
+    // 1.5 Real-Time Connection (Socket.IO)
+    const socket = io();
+    
+    if (user) {
+        socket.emit('join', { userId: user.id, role: 'driver' });
+    }
+
+    // Handle Incoming Trip Requests
+    socket.on('trip:new_request', (data) => {
+        console.log('New trip request received:', data);
+        showIncomingAlert(data);
+    });
+
+    // --- Geolocation & Live Tracking ---
+    let locationInterval = null;
+
+    function startTracking() {
+        if (locationInterval) return;
+        console.log('Starting location tracking...');
+        sendLocation(); // Initial update
+        locationInterval = setInterval(sendLocation, 10000); // Every 10s
+    }
+
+    function stopTracking() {
+        if (locationInterval) {
+            console.log('Stopping location tracking.');
+            clearInterval(locationInterval);
+            locationInterval = null;
+        }
+    }
+
+    function sendLocation() {
+        if (!navigator.geolocation) {
+            console.warn('Geolocation not supported');
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition((position) => {
+            const { latitude, longitude } = position.coords;
+            console.log(`Sending location: ${latitude}, ${longitude}`);
+            socket.emit('driver:location_update', {
+                userId: user.id,
+                lat: latitude,
+                lng: longitude
+            });
+        }, (err) => {
+            console.error('Geolocation error:', err);
+        }, {
+            enableHighAccuracy: true
+        });
+    }
+
+    let alertTimerInterval = null;
+    let currentTripId = null;
+
+    function showIncomingAlert(data) {
+        currentTripId = data.trip_id;
+        const overlay = document.getElementById('incoming-alert-overlay');
+        if (!overlay) return;
+
+        // Populate Data
+        document.getElementById('alert-patient-name').textContent = data.patient_name || 'Emergency Patient';
+        document.getElementById('alert-hospital-name').textContent = data.hospital_name || 'City General Hospital';
+        document.getElementById('alert-pickup-location').textContent = `Lat: ${data.pickup_lat.toFixed(4)}, Lng: ${data.pickup_lng.toFixed(4)}`;
+        
+        const initials = (data.patient_name || 'P').split(' ').map(n => n[0]).join('').toUpperCase();
+        document.getElementById('alert-patient-avatar').textContent = initials;
+
+        // Reset & Show
+        overlay.style.display = 'flex';
+        startAlertTimer(30);
+
+        // Sound Notification (Optional but recommended for emergency apps)
+        playEmergencySound();
+    }
+
+    function startAlertTimer(seconds) {
+        if (alertTimerInterval) clearInterval(alertTimerInterval);
+        
+        let timeLeft = seconds;
+        const timerText = document.getElementById('alert-timer-text');
+        const timerProgress = document.querySelector('.timer-progress');
+        const circumference = 113; // 2 * pi * 18
+
+        function updateTimer() {
+            timerText.textContent = `${timeLeft}s`;
+            const offset = circumference - (timeLeft / seconds) * circumference;
+            timerProgress.style.strokeDashoffset = offset;
+
+            if (timeLeft <= 0) {
+                clearInterval(alertTimerInterval);
+                hideIncomingAlert();
+            }
+            timeLeft--;
+        }
+
+        updateTimer();
+        alertTimerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function hideIncomingAlert() {
+        const overlay = document.getElementById('incoming-alert-overlay');
+        if (overlay) overlay.style.display = 'none';
+        if (alertTimerInterval) clearInterval(alertTimerInterval);
+        currentTripId = null;
+    }
+
+    function playEmergencySound() {
+        // We could use an Audio object here if we had a sound file
+        // For now, console log or vibration if supported
+        console.log('🚨 EMERGENCY ALERT SOUND PLAYING');
+        if ('vibrate' in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
+    }
+
+    // Accept / Reject Handlers
+    const acceptBtn = document.getElementById('accept-trip-btn');
+    const rejectBtn = document.getElementById('reject-trip-btn');
+
+    if (acceptBtn) {
+        acceptBtn.addEventListener('click', async () => {
+            if (!currentTripId) return;
+            
+            try {
+                const response = await fetch(`/api/v1/trips/${currentTripId}/accept`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    hideIncomingAlert();
+                    // Navigate to Active Call view or update current status
+                    window.location.reload(); // Refresh to show active trip state for now
+                } else {
+                    const err = await response.json();
+                    alert(`Failed to accept: ${err.error}`);
+                }
+            } catch (err) {
+                console.error('Accept error:', err);
+            }
+        });
+    }
+
+    if (rejectBtn) {
+        rejectBtn.addEventListener('click', async () => {
+            if (!currentTripId) return;
+
+            try {
+                const response = await fetch(`/api/v1/trips/${currentTripId}/reject`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    hideIncomingAlert();
+                }
+            } catch (err) {
+                console.error('Reject error:', err);
+                hideIncomingAlert();
+            }
+        });
+    }
+
     if (toggle) {
+        // Initial tracking state
+        if (toggle.checked) startTracking();
+
         toggle.addEventListener('change', async () => {
             const isLive = toggle.checked;
             updateAvailabilityUI(isLive);
+
+            if (isLive) startTracking();
+            else stopTracking();
 
             try {
                 await fetch('/api/v1/drivers/status', {

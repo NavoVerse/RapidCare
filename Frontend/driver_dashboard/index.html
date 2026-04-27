@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
     <script src="../shared_assets/js/theme-manager.js"></script>
 </head>
 
@@ -530,8 +531,69 @@
             </div>
         </main>
     </div>
+    <!-- Emergency Incoming Call Overlay -->
+    <div id="incoming-alert-overlay" class="overlay-container" style="display: none;">
+        <div class="alert-backdrop"></div>
+        <div class="alert-card animate-slide-up">
+            <div class="alert-header">
+                <div class="emergency-tag">
+                    <span class="pulse-dot"></span>
+                    EMERGENCY CALL
+                </div>
+                <div class="timer-ring">
+                    <svg class="timer-svg" viewBox="0 0 40 40">
+                        <circle class="timer-bg" cx="20" cy="20" r="18"></circle>
+                        <circle class="timer-progress" cx="20" cy="20" r="18"></circle>
+                    </svg>
+                    <span id="alert-timer-text">30s</span>
+                </div>
+            </div>
+            
+            <div class="alert-content">
+                <div class="patient-profile">
+                    <div class="alert-avatar" id="alert-patient-avatar">P</div>
+                    <div class="patient-main">
+                        <h3 id="alert-patient-name">Patient Name</h3>
+                        <p id="alert-patient-condition">Critical · Respiratory Distress</p>
+                    </div>
+                </div>
+
+                <div class="alert-details-grid">
+                    <div class="detail-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div class="txt">
+                            <label>PICKUP</label>
+                            <span id="alert-pickup-location">Calculating...</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fa-solid fa-hospital"></i>
+                        <div class="txt">
+                            <label>HOSPITAL</label>
+                            <span id="alert-hospital-name">City General Hospital</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fa-solid fa-route"></i>
+                        <div class="txt">
+                            <label>DISTANCE</label>
+                            <span id="alert-distance">1.2 km</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert-actions">
+                <button class="decline-btn" id="reject-trip-btn">DECLINE</button>
+                <button class="accept-btn" id="accept-trip-btn">
+                    <span>ACCEPT CALL</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
-    <!-- Skeleton Loading Script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const boxes = document.querySelectorAll('.stat-card, .card, .profile-panel, .info-card, .metric-card, .driver-profile-card, .vehicle-card, .emergency-details-card, .form-section');
@@ -541,8 +603,8 @@
                 boxes.forEach(box => box.classList.add('loaded'));
                 setTimeout(() => {
                     boxes.forEach(box => box.classList.remove('skeleton-box', 'loaded'));
-                }, 600); // Match transition duration
-            }, 1500);
+                }, 500);
+            }, 1000);
         });
     </script>
 </body>
