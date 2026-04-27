@@ -67,7 +67,7 @@ function switchSection(sectionId) {
     
     // Re-initialize specific section components if needed
     if (sectionId === 'bed-management') {
-        generateBeds('general', 'bed-grid-main');
+        initDetailedBeds();
     }
 }
 
@@ -154,9 +154,9 @@ function handleAction(requestId, action) {
  * Bed Map Management
  */
 const bedData = {
-    general: { free: 15, occupied: 20, reserved: 5, total: 40 },
-    icu: { free: 2, occupied: 4, reserved: 2, total: 8 },
-    emergency: { free: 7, occupied: 4, reserved: 1, total: 12 }
+    general: { free: 12, occupied: 20, reserved: 5, maintenance: 3, total: 40 },
+    icu: { free: 2, occupied: 4, reserved: 1, maintenance: 1, total: 8 },
+    emergency: { free: 6, occupied: 4, reserved: 1, maintenance: 1, total: 12 }
 };
 
 function initBedMap() {
@@ -198,6 +198,7 @@ function generateBeds(ward, containerId) {
     for (let i = 0; i < stats.free; i++) beds.push('free');
     for (let i = 0; i < stats.occupied; i++) beds.push('occupied');
     for (let i = 0; i < stats.reserved; i++) beds.push('reserved');
+    for (let i = 0; i < stats.maintenance; i++) beds.push('maintenance');
     
     // Shuffle for visual interest
     beds.sort(() => Math.random() - 0.5);
@@ -239,7 +240,31 @@ function showToast(message, type = 'info') {
     // Auto remove
     setTimeout(() => {
         toast.style.opacity = '0';
-        toast.style.transform = 'translateX(20px)';
+        toast.style.transform = 'translateX(100%)';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
+}
+
+/**
+ * Handle Patient Requests (Accept/Reject)
+ */
+function handleRequest(action, patientName) {
+    if (action === 'accept') {
+        showToast(`Patient ${patientName} request accepted. Ward assignment in progress.`, 'success');
+    } else {
+        showToast(`Patient ${patientName} request rejected.`, 'error');
+    }
+    
+    // Simulate removing card from queue with animation
+    const cards = document.querySelectorAll('.patient-card');
+    cards.forEach(card => {
+        if (card.querySelector('h3').textContent === patientName) {
+            card.style.opacity = '0';
+            card.style.transform = 'translateX(20px)';
+            setTimeout(() => {
+                card.remove();
+                // Check if queue is empty to show empty state (optional)
+            }, 300);
+        }
+    });
 }
