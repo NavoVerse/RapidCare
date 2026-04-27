@@ -1330,7 +1330,7 @@
         
         <div id="analytics-view" style="display: none;">
             <div style="padding: 20px; display: flex; justify-content: flex-end;">
-                <button class="primary-btn" onclick="document.getElementById('simModal').classList.add('active')">Simulate Data Entry</button>
+                <button class="primary-btn" onclick="window.openSimModal()">Simulate Data Entry</button>
             </div>
             <div class="analytics-container">
             <!-- Top Metrics Row -->
@@ -1572,7 +1572,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Simulate Data Edit</h2>
-                <button class="close-btn" onclick="closeSimModal()">&times;</button>
+                <button class="close-btn" onclick="window.closeSimModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <p>Edit vitals to see how the intelligence dashboard reacts in real-time.</p>
@@ -1588,7 +1588,7 @@
                     <label>Safety Score (0-100)</label>
                     <input type="range" id="input-safety" min="0" max="100" value="88">
                 </div>
-                <button class="primary-btn" onclick="applySimulation()" style="width: 100%; margin-top: 20px;">
+                <button class="primary-btn" onclick="window.applySimulation()" style="width: 100%; margin-top: 20px;">
                     Apply & Update Analytics
                 </button>
             </div>
@@ -1815,19 +1815,19 @@
                 
                 <div class="tabs-container">
                     <div class="tabs-list">
-                        <button class="tab-btn active" data-tab="upi">
+                        <button class="tab-btn active" data-tab="upi" onclick="window.switchPaymentTab(this)">
                             <i data-lucide="smartphone"></i>
                             <span>UPI</span>
                         </button>
-                        <button class="tab-btn" data-tab="card">
+                        <button class="tab-btn" data-tab="card" onclick="window.switchPaymentTab(this)">
                             <i data-lucide="credit-card"></i>
                             <span>Cards</span>
                         </button>
-                        <button class="tab-btn" data-tab="netbanking">
+                        <button class="tab-btn" data-tab="netbanking" onclick="window.switchPaymentTab(this)">
                             <i data-lucide="landmark"></i>
                             <span>Net Banking</span>
                         </button>
-                        <button class="tab-btn" data-tab="cash">
+                        <button class="tab-btn" data-tab="cash" onclick="window.switchPaymentTab(this)">
                             <i data-lucide="banknote"></i>
                             <span>Cash</span>
                         </button>
@@ -1875,71 +1875,92 @@
                     </div>
 
                     <div class="tab-content" id="card-content">
-                        <h3>Credit / Debit Card</h3>
-                        <form class="card-form">
+                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">Credit / Debit Card</h3>
+                        <form class="card-form" style="display: flex; flex-direction: column; gap: 16px;">
                             <div class="form-group">
-                                <label>Card Number</label>
-                                <input type="text" placeholder="0000 0000 0000 0000">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Card Number</label>
+                                <input type="text" placeholder="0000 0000 0000 0000" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
                             </div>
-                            <div class="form-row">
+                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                                 <div class="form-group">
-                                    <label>Expiry Date</label>
-                                    <input type="text" placeholder="MM/YY">
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Cardholder Name</label>
+                                    <input type="text" placeholder="Full Name" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
                                 </div>
                                 <div class="form-group">
-                                    <label>CVV</label>
-                                    <input type="password" placeholder="***">
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Name on Card</label>
+                                    <input type="text" placeholder="Name as printed" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
+                                </div>
+                            </div>
+                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Expiry Date</label>
+                                    <input type="text" placeholder="MM / YY" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
+                                </div>
+                                <div class="form-group">
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">CVV</label>
+                                    <input type="password" placeholder="•••" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Select Bank</label>
-                                <div class="bank-select-wrapper">
-                                    <input type="text" id="card-bank-search" placeholder="Search your bank..." class="bank-search-input">
-                                    <div class="bank-dropdown" id="card-bank-list">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Select Bank</label>
+                                <div class="bank-select-wrapper" style="position: relative;">
+                                    <input type="text" id="card-bank-search" placeholder="Search your bank..." class="bank-search-input" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
+                                    <div class="bank-dropdown" id="card-bank-list" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
                                         <!-- Populated by JS -->
                                     </div>
                                 </div>
                             </div>
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="save-card">
-                                <label for="save-card">Save card details securely</label>
+                            <div class="checkbox-group" style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                                <input type="checkbox" id="save-card" style="cursor: pointer;">
+                                <label for="save-card" style="font-size: 0.85rem; opacity: 0.7; cursor: pointer;">Save card details securely</label>
                             </div>
                         </form>
                     </div>
 
                     <div class="tab-content" id="netbanking-content">
-                        <h3>Popular Banks</h3>
-                        <div class="bank-grid" id="popular-banks">
-                            <!-- Populated by JS -->
+                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">Net Banking</h3>
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Popular Banks</label>
+                            <div class="bank-grid" id="popular-banks" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px;">
+                                <!-- Populated by JS -->
+                            </div>
                         </div>
-                        <div class="form-group mt-20">
-                            <label>All Banks</label>
-                            <div class="bank-select-wrapper">
-                                <input type="text" id="net-bank-search" placeholder="Search your bank..." class="bank-search-input">
-                                <div class="bank-dropdown" id="net-bank-list">
+                        <div class="form-group">
+                            <label style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">All Other Banks</label>
+                            <div class="bank-select-wrapper" style="position: relative;">
+                                <input type="text" id="net-bank-search" placeholder="Search your bank..." class="bank-search-input" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
+                                <div class="bank-dropdown" id="net-bank-list" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
                                     <!-- Populated by JS -->
                                 </div>
                             </div>
                         </div>
+                        <div style="margin-top: 30px; padding: 16px; border-radius: 16px; background: rgba(6, 182, 212, 0.05); border: 1px dashed rgba(6, 182, 212, 0.2); text-align: center;">
+                            <p style="font-size: 13px; opacity: 0.7;">You will be redirected to your bank's secure website to complete the transaction.</p>
+                        </div>
                     </div>
 
                     <div class="tab-content" id="cash-content">
-                        <div class="offer-banner">
-                            <i data-lucide="gift"></i>
+                        <div class="offer-banner" style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 16px; padding: 16px; display: flex; gap: 12px; margin-bottom: 20px;">
+                            <i data-lucide="sparkles" style="color: #06b6d4;"></i>
                             <div class="offer-text">
-                                <h4>Special Cash Offer!</h4>
-                                <p>After 5th payment in cash, the 6th platform charge (₹40) will be discounted.</p>
+                                <h4 style="color: #06b6d4; margin-bottom: 4px;">RapidCare Loyalty Rewards</h4>
+                                <p style="font-size: 13px; opacity: 0.8;">Every 4th ride has a <strong>₹0 Platform Fee</strong>! Pay in cash to build your streak.</p>
                             </div>
                         </div>
-                        <div class="cash-instructions">
-                            <p>Pay directly to the driver upon arrival. Please ensure you have the exact change if possible.</p>
-                            <div class="progress-container">
-                                <label>Cash Payment Streak: 3/5</label>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 60%;"></div>
+                        <div class="streak-container">
+                            <div class="streak-header">
+                                <span class="streak-title">Your Ride Streak</span>
+                                <div class="streak-dots" id="streak-dots">
+                                    <div class="streak-dot active"></div>
+                                    <div class="streak-dot"></div>
+                                    <div class="streak-dot"></div>
+                                    <div class="streak-dot reward"><i data-lucide="gift" style="width: 8px; height: 8px; color: white;"></i></div>
                                 </div>
-                                <small>2 more payments to unlock your reward!</small>
                             </div>
+                            <p class="streak-msg" id="streak-msg">3 more cash payments to unlock your ₹40 discount!</p>
+                        </div>
+                        <div class="cash-instructions" style="margin-top: 20px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.03);">
+                            <p style="font-size: 13px; opacity: 0.7;">Pay directly to the driver. The platform fee discount will be automatically applied to your 4th ride.</p>
                         </div>
                     </div>
                 </div>
@@ -2124,6 +2145,7 @@
     <!-- Skeleton Loading Script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
             const boxes = document.querySelectorAll('.stat-card, .card, .profile-panel, .info-card, .metric-card, .driver-profile-card, .vehicle-card, .emergency-details-card, .form-section');
             boxes.forEach(box => box.classList.add('skeleton-box'));
             
@@ -2135,6 +2157,125 @@
             }, 1500);
         });
     </script>
-</body>
 
+    <!-- Payment Overlay (Multi-Step Stepper) -->
+    <div class="payment-overlay" id="payment-overlay">
+        <div class="payment-modal">
+            <button class="modal-close" onclick="window.closePaymentOverlay()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; cursor: pointer; opacity: 0.5; font-size: 24px;">&times;</button>
+            
+            <div class="stepper">
+                <div class="stepper-progress" id="stepper-progress"></div>
+                <div class="step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <span class="step-label">Review</span>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <span class="step-label">Payment</span>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <span class="step-label">Success</span>
+                </div>
+            </div>
+
+            <!-- Stage 1: Review -->
+            <div class="stage-content active" id="stage-review">
+                <h2 style="margin-bottom: 24px; font-size: 24px;">Confirm Your Booking</h2>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-bottom: 30px;">
+                    <div class="receipt-row" style="margin-bottom: 15px;">
+                        <span style="opacity: 0.6;">Ambulance Type</span>
+                        <strong id="review-ambulance">ICU</strong>
+                    </div>
+                    <div class="receipt-row" style="margin-bottom: 15px;">
+                        <span style="opacity: 0.6;">Destination</span>
+                        <strong id="review-hospital">City General Hospital</strong>
+                    </div>
+                    <div class="receipt-row" style="margin-bottom: 15px;">
+                        <span style="opacity: 0.6;">Total Distance</span>
+                        <strong id="review-distance">12.5 KM</strong>
+                    </div>
+                    <div class="receipt-row total" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 15px; font-size: 20px;">
+                        <span>Final Amount</span>
+                        <span id="review-total" style="color: #06b6d4;">₹1,840</span>
+                    </div>
+                </div>
+                <button class="primary-btn" onclick="window.proceedToPayment()" style="width: 100%; padding: 18px; font-size: 16px; font-weight: 800;">Proceed to Secure Payment</button>
+            </div>
+
+            <!-- Stage 2: Processing -->
+            <div class="stage-content" id="stage-processing">
+                <div class="connecting-bank">
+                    <div class="pulse-loader">
+                        <i data-lucide="shield-check" style="width: 32px; height: 32px; color: #06b6d4;"></i>
+                    </div>
+                    <div style="text-align: center;">
+                        <h3 style="font-size: 20px; margin-bottom: 8px;">Connecting to Bank</h3>
+                        <p style="opacity: 0.6; font-size: 14px;">Securing a tunnel with your bank's gateway...</p>
+                    </div>
+                    <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden;">
+                        <div style="width: 40%; height: 100%; background: #06b6d4; animation: slideProgress 2s infinite;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage 3: Success -->
+            <div class="stage-content" id="stage-success">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 60px; height: 60px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                        <i data-lucide="check" style="color: white; width: 32px; height: 32px;"></i>
+                    </div>
+                    <h2 style="font-size: 24px; color: #10b981;">Payment Successful!</h2>
+                    <p style="opacity: 0.6; font-size: 14px;">Your ambulance is on the way.</p>
+                </div>
+
+                <div class="receipt" id="digital-receipt">
+                    <div class="receipt-header">
+                        <div class="receipt-logo">
+                            <i data-lucide="activity" style="color: #06b6d4;"></i> RapidCare
+                        </div>
+                        <div style="font-size: 12px; opacity: 0.6;">Digital Transaction Receipt</div>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Patient Name</span>
+                        <strong id="receipt-patient">User</strong>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Payment Method</span>
+                        <strong id="receipt-method">UPI</strong>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Transaction ID</span>
+                        <strong id="receipt-txn">RC-992834710</strong>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Date</span>
+                        <strong id="receipt-date">27-04-2026</strong>
+                    </div>
+                    <div class="receipt-row total">
+                        <span>Paid Amount</span>
+                        <span id="receipt-total">₹1,840</span>
+                    </div>
+                    <div class="quote-box">
+                        <p id="health-quote">"Your health is an investment, not an expense."</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; display: flex; gap: 12px;">
+                    <button class="icon-btn" onclick="window.printReceipt()" style="flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; background: rgba(0,0,0,0.05); color: #1a1a2e; border: 1.5px solid #ddd; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer;">
+                        <i data-lucide="printer" style="width: 18px;"></i> Print
+                    </button>
+                    <button class="primary-btn" onclick="window.location.href='/dashboard'" style="flex: 2; padding: 12px; border-radius: 12px;">Back to Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes slideProgress {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(250%); }
+        }
+    </style>
+</body>
 </html>
