@@ -6,7 +6,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initClock();
-    initBedMap();
     initMobileSidebar();
 });
 
@@ -43,9 +42,12 @@ function updateThemeIcon(theme) {
 }
 
 /**
- * Section Navigation
+ * Section Navigation (Simplified for Dashboard Only)
  */
 function switchSection(sectionId) {
+    // Current layout only supports dashboard
+    if (sectionId !== 'dashboard') return;
+
     // Update nav links
     document.querySelectorAll('.nav-item').forEach(link => {
         if (link.getAttribute('data-section') === sectionId) {
@@ -63,11 +65,6 @@ function switchSection(sectionId) {
     const target = document.getElementById(`${sectionId}-section`);
     if (target) {
         target.classList.add('active');
-    }
-    
-    // Re-initialize specific section components if needed
-    if (sectionId === 'bed-management') {
-        initDetailedBeds();
     }
 }
 
@@ -111,9 +108,9 @@ function initMobileSidebar() {
     
     // Close sidebar when clicking outside on mobile
     document.addEventListener('click', (e) => {
-        if (sidebar.classList.contains('active') && 
+        if (sidebar && sidebar.classList.contains('active') && 
             !sidebar.contains(e.target) && 
-            !toggleBtn.contains(e.target)) {
+            toggleBtn && !toggleBtn.contains(e.target)) {
             sidebar.classList.remove('active');
         }
     });
@@ -124,6 +121,8 @@ function initMobileSidebar() {
  */
 function handleAction(requestId, action) {
     const row = document.querySelector(`.request-row[data-id="${requestId}"]`);
+    if (!row) return;
+
     const patientName = row.querySelector('.patient-info strong').textContent;
     
     if (action === 'accept') {
@@ -151,77 +150,12 @@ function handleAction(requestId, action) {
 }
 
 /**
- * Bed Map Management
- */
-const bedData = {
-    general: { free: 12, occupied: 20, reserved: 5, maintenance: 3, total: 40 },
-    icu: { free: 2, occupied: 4, reserved: 1, maintenance: 1, total: 8 },
-    emergency: { free: 6, occupied: 4, reserved: 1, maintenance: 1, total: 12 }
-};
-
-function initBedMap() {
-    generateBeds('general', 'bed-grid');
-}
-
-function switchTab(ward) {
-    // Update tab UI
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        if (btn.textContent.toLowerCase().includes(ward)) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
-    });
-    
-    // Update summary text if it exists
-    const stats = bedData[ward];
-    const summaryEl = document.querySelector('.bed-stats-summary');
-    if (summaryEl) {
-        summaryEl.innerHTML = `<span>${stats.free} free</span> • <span>${stats.occupied} occupied</span> • <span>${stats.reserved} reserved</span>`;
-    }
-    
-    // Regenerate grid in active container
-    const activeSection = document.querySelector('.content-section.active');
-    const gridId = activeSection.id === 'dashboard-section' ? 'bed-grid' : 'bed-grid-main';
-    generateBeds(ward, gridId);
-}
-
-function generateBeds(ward, containerId) {
-    const grid = document.getElementById(containerId);
-    if (!grid) return;
-    
-    const stats = bedData[ward];
-    grid.innerHTML = '';
-    
-    // Populate with types based on stats
-    const beds = [];
-    for (let i = 0; i < stats.free; i++) beds.push('free');
-    for (let i = 0; i < stats.occupied; i++) beds.push('occupied');
-    for (let i = 0; i < stats.reserved; i++) beds.push('reserved');
-    for (let i = 0; i < stats.maintenance; i++) beds.push('maintenance');
-    
-    // Shuffle for visual interest
-    beds.sort(() => Math.random() - 0.5);
-    
-    beds.forEach((type, index) => {
-        const bed = document.createElement('div');
-        bed.className = `bed-item ${type}`;
-        bed.textContent = `${ward[0].toUpperCase()}${index + 1}`;
-        bed.title = `Bed ${index + 1}: ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-        
-        bed.addEventListener('click', () => {
-            showToast(`Bed ${ward[0].toUpperCase()}${index + 1} details opened`, 'info');
-        });
-        
-        grid.appendChild(bed);
-    });
-}
-
-/**
  * Feedback Toast
  */
 function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
+    if (!container) return;
+
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     
@@ -245,26 +179,3 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-/**
- * Handle Patient Requests (Accept/Reject)
- */
-function handleRequest(action, patientName) {
-    if (action === 'accept') {
-        showToast(`Patient ${patientName} request accepted. Ward assignment in progress.`, 'success');
-    } else {
-        showToast(`Patient ${patientName} request rejected.`, 'error');
-    }
-    
-    // Simulate removing card from queue with animation
-    const cards = document.querySelectorAll('.patient-card');
-    cards.forEach(card => {
-        if (card.querySelector('h3').textContent === patientName) {
-            card.style.opacity = '0';
-            card.style.transform = 'translateX(20px)';
-            setTimeout(() => {
-                card.remove();
-                // Check if queue is empty to show empty state (optional)
-            }, 300);
-        }
-    });
-}
