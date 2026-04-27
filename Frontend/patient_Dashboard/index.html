@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="../shared_assets/js/theme-manager.js"></script>
     <script src="../shared_assets/js/config.js"></script>
-    <!-- Lucide Icons (via CDN) -->
+    <!-- External Libraries -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -1958,7 +1958,7 @@
                         <div class="form-group" style="margin-bottom: 24px;">
                             <label style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Choose your Bank</label>
                             <div class="bank-select-wrapper">
-                                <select name="bank" id="net-bank-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text); font-size: 14px; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px;">
+                                <select name="bank" id="bankSelect" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text); font-size: 14px; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px;">
                                     <option value="" disabled selected>Search your bank...</option>
                                     <optgroup label="Public Sector Banks" style="background: var(--surface-color); color: var(--primary-text);">
                                         <option value="sbi">State Bank of India (SBI)</option>
@@ -2004,8 +2004,12 @@
                             </div>
                         </div>
 
-                        <div style="margin-top: 30px; padding: 16px; border-radius: 16px; background: rgba(6, 182, 212, 0.05); border: 1px dashed rgba(6, 182, 212, 0.2); text-align: center;">
-                            <p style="font-size: 13px; opacity: 0.7;">You will be redirected to your bank's secure website for two-factor authentication.</p>
+                        <div style="margin-top: 30px; text-align: center;">
+                            <button type="button" class="verify-details-btn" style="width: 100%; padding: 16px; border-radius: 16px; background: rgba(6, 182, 212, 0.1); border: 1.5px solid rgba(6, 182, 212, 0.3); color: var(--primary-color); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i>
+                                Verify & Proceed to Secure Login
+                            </button>
+                            <p style="font-size: 11px; opacity: 0.5; margin-top: 10px;">You will be redirected to your bank's secure page for 2FA</p>
                         </div>
                     </div>
 
@@ -2223,129 +2227,108 @@
                 boxes.forEach(box => box.classList.add('loaded'));
                 setTimeout(() => {
                     boxes.forEach(box => box.classList.remove('skeleton-box', 'loaded'));
-                }, 600); // Match transition duration
+                }, 600);
             }, 1500);
         });
     </script>
 
-    <!-- Payment Overlay (Multi-Step Stepper) -->
+    <!-- Payment Overlay -->
     <div class="payment-overlay" id="payment-overlay">
         <div class="payment-modal">
-            <button class="modal-close" onclick="window.closePaymentOverlay()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; cursor: pointer; opacity: 0.5; font-size: 24px;">&times;</button>
+            <div class="modal-header">
+                <h3>Finalize Payment</h3>
+                <button class="close-modal-btn" onclick="window.closePaymentOverlay()">&times;</button>
+            </div>
             
-            <div class="stepper">
-                <div class="stepper-progress" id="stepper-progress"></div>
+            <div class="payment-stepper">
                 <div class="step active" data-step="1">
-                    <div class="step-circle">1</div>
-                    <span class="step-label">Review</span>
+                    <div class="step-icon">1</div>
+                    <span>Review</span>
                 </div>
                 <div class="step" data-step="2">
-                    <div class="step-circle">2</div>
-                    <span class="step-label">Payment</span>
+                    <div class="step-icon">2</div>
+                    <span>Processing</span>
                 </div>
                 <div class="step" data-step="3">
-                    <div class="step-circle">3</div>
-                    <span class="step-label">Success</span>
+                    <div class="step-icon">3</div>
+                    <span>Success</span>
+                </div>
+                <div class="stepper-line">
+                    <div class="line-progress" id="stepper-progress"></div>
                 </div>
             </div>
 
-            <!-- Stage 1: Review -->
-            <div class="stage-content active" id="stage-review">
-                <h2 style="margin-bottom: 24px; font-size: 24px;">Confirm Your Booking</h2>
-                <div style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-bottom: 30px;">
-                    <div class="receipt-row" style="margin-bottom: 15px;">
-                        <span style="opacity: 0.6;">Ambulance Type</span>
-                        <strong id="review-ambulance">ICU</strong>
-                    </div>
-                    <div class="receipt-row" style="margin-bottom: 15px;">
-                        <span style="opacity: 0.6;">Destination</span>
-                        <strong id="review-hospital">City General Hospital</strong>
-                    </div>
-                    <div class="receipt-row" style="margin-bottom: 15px;">
-                        <span style="opacity: 0.6;">Total Distance</span>
-                        <strong id="review-distance">12.5 KM</strong>
-                    </div>
-                    <div class="receipt-row total" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 15px; font-size: 20px;">
-                        <span>Final Amount</span>
-                        <span id="review-total" style="color: #06b6d4;">₹1,840</span>
-                    </div>
-                </div>
-                <button class="primary-btn" onclick="window.proceedToPayment()" style="width: 100%; padding: 18px; font-size: 16px; font-weight: 800;">Proceed to Secure Payment</button>
-            </div>
-
-            <!-- Stage 2: Processing -->
-            <div class="stage-content" id="stage-processing">
-                <div class="connecting-bank">
-                    <div class="pulse-loader">
-                        <i data-lucide="shield-check" style="width: 32px; height: 32px; color: #06b6d4;"></i>
-                    </div>
-                    <div style="text-align: center;">
-                        <h3 style="font-size: 20px; margin-bottom: 8px;">Connecting to Bank</h3>
-                        <p style="opacity: 0.6; font-size: 14px;">Securing a tunnel with your bank's gateway...</p>
-                    </div>
-                    <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden;">
-                        <div style="width: 40%; height: 100%; background: #06b6d4; animation: slideProgress 2s infinite;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stage 3: Success -->
-            <div class="stage-content" id="stage-success">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <div style="width: 60px; height: 60px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                        <i data-lucide="check" style="color: white; width: 32px; height: 32px;"></i>
-                    </div>
-                    <h2 style="font-size: 24px; color: #10b981;">Payment Successful!</h2>
-                    <p style="opacity: 0.6; font-size: 14px;">Your ambulance is on the way.</p>
-                </div>
-
-                <div class="receipt" id="digital-receipt">
-                    <div class="receipt-header">
-                        <div class="receipt-logo">
-                            <i data-lucide="activity" style="color: #06b6d4;"></i> RapidCare
+            <div class="modal-body">
+                <!-- Stage 1: Review -->
+                <div class="stage-content active" id="stage-review">
+                    <div class="order-summary-box">
+                        <div class="summary-item">
+                            <span>Ambulance Type</span>
+                            <strong id="review-ambulance">Advanced Life Support</strong>
                         </div>
-                        <div style="font-size: 12px; opacity: 0.6;">Digital Transaction Receipt</div>
+                        <div class="summary-item">
+                            <span>Destination</span>
+                            <strong id="review-hospital">Apollo Gleneagles</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Total Distance</span>
+                            <strong id="review-distance">12.4 KM</strong>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-item total">
+                            <span>Grand Total</span>
+                            <strong id="review-total">₹1,740</strong>
+                        </div>
                     </div>
-                    <div class="receipt-row">
-                        <span>Patient Name</span>
-                        <strong id="receipt-patient">User</strong>
-                    </div>
-                    <div class="receipt-row">
-                        <span>Payment Method</span>
-                        <strong id="receipt-method">UPI</strong>
-                    </div>
-                    <div class="receipt-row">
-                        <span>Transaction ID</span>
-                        <strong id="receipt-txn">RC-992834710</strong>
-                    </div>
-                    <div class="receipt-row">
-                        <span>Date</span>
-                        <strong id="receipt-date">27-04-2026</strong>
-                    </div>
-                    <div class="receipt-row total">
-                        <span>Paid Amount</span>
-                        <span id="receipt-total">₹1,840</span>
-                    </div>
-                    <div class="quote-box">
-                        <p id="health-quote">"Your health is an investment, not an expense."</p>
+                    <p style="font-size: 12px; opacity: 0.6; margin-top: 15px; text-align: center;">By clicking proceed, you agree to our terms of service.</p>
+                    <button class="proceed-btn" onclick="window.proceedToPayment()" style="width: 100%; margin-top: 20px; padding: 14px; border-radius: 12px; background: var(--primary-color); color: white; border: none; font-weight: 700; cursor: pointer;">
+                        Proceed to Payment
+                    </button>
+                </div>
+
+                <!-- Stage 2: Processing -->
+                <div class="stage-content" id="stage-processing">
+                    <div class="processing-view">
+                        <div class="loader-ring"></div>
+                        <h4>Connecting to Bank...</h4>
+                        <p>Please do not refresh or close this window.</p>
+                        <div class="security-badges" style="margin-top: 30px; display: flex; justify-content: center; gap: 20px; opacity: 0.5;">
+                            <i data-lucide="shield-check"></i>
+                            <i data-lucide="lock"></i>
+                        </div>
                     </div>
                 </div>
 
-                <div style="margin-top: 30px; display: flex; gap: 12px;">
-                    <button class="icon-btn" onclick="window.printReceipt()" style="flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; background: rgba(0,0,0,0.05); color: #1a1a2e; border: 1.5px solid #ddd; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer;">
-                        <i data-lucide="printer" style="width: 18px;"></i> Print
-                    </button>
-                    <button class="primary-btn" onclick="window.location.href='/dashboard'" style="flex: 2; padding: 12px; border-radius: 12px;">Back to Dashboard</button>
+                <!-- Stage 3: Success -->
+                <div class="stage-content" id="stage-success">
+                    <div class="success-view">
+                        <div class="success-icon-wrapper">
+                            <i data-lucide="check-circle-2"></i>
+                        </div>
+                        <h2>Payment Successful!</h2>
+                        <p>Your ambulance is on the way.</p>
+                        
+                        <div class="txn-details">
+                            <div class="txn-row">
+                                <span>Transaction ID</span>
+                                <strong id="success-txn-id">TXN826401XY</strong>
+                            </div>
+                            <div class="txn-row">
+                                <span>Date & Time</span>
+                                <strong id="success-datetime">27 Apr 2026, 14:30</strong>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn-receipt" onclick="window.viewHistoryReceipt()">
+                                <i data-lucide="file-text"></i> View Receipt
+                            </button>
+                            <button class="btn-done" onclick="window.closePaymentOverlay()">Close</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <style>
-        @keyframes slideProgress {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(250%); }
-        }
-    </style>
 </body>
 </html>

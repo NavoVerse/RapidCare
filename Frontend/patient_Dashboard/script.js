@@ -2867,15 +2867,33 @@ window.addEventListener('resize', () => {
 
     // --- Initialization ---
     try {
-        if (cardBankSearch && cardBankList && netBankSearch && netBankList) {
-            populateBankLists();
-            setupSearch(cardBankSearch, cardBankList);
-            setupSearch(netBankSearch, netBankList);
-        } else {
-            console.warn('Payment UI elements not found. Initialization skipped.');
-        }
+        populateBankLists();
+        
+        // Setup select bank global handler
+        window.selectBank = (bankName) => {
+            const select = document.getElementById('bankSelect');
+            if (select) {
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].text.toLowerCase().includes(bankName.toLowerCase())) {
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        };
+
     } catch (e) {
         console.error('Payment Initialization Error:', e);
+    }
+
+    function populateBankLists() {
+        if (!popularBanksGrid) return;
+        popularBanksGrid.innerHTML = popularBanks.map(bank => `
+            <div class="bank-card" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 12px; cursor: pointer; transition: all 0.2s; background: var(--bg-color);" onclick="window.selectBank('${bank.name}')">
+                <img src="${bank.icon}" alt="${bank.name}" style="width: 32px; height: 32px; object-fit: contain;">
+                <span style="font-size: 11px; font-weight: 600; text-align: center; opacity: 0.8;">${bank.name}</span>
+            </div>
+        `).join('');
     }
     
     // --- Pricing Logic ---
@@ -3016,18 +3034,27 @@ window.addEventListener('resize', () => {
     window.proceedToPayment = async () => {
         setStage(2);
         
-        // Artificial delay for "Connecting to Bank"
+        // Artificial delay for "Connecting to Bank" (set to 2 seconds as requested)
         setTimeout(async () => {
             const success = await finalizePayment();
             if (success) {
+                // Generate Dynamic Data for Success Stage
+                const txnId = 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
+                const now = new Date();
+                const dateTimeStr = now.toLocaleDateString('en-IN') + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+                const successTxnElem = document.getElementById('success-txn-id');
+                const successDateElem = document.getElementById('success-datetime');
+                if (successTxnElem) successTxnElem.textContent = txnId;
+                if (successDateElem) successDateElem.textContent = dateTimeStr;
+
                 setStage(3);
-                // Trigger auto-print after 1 second
-                setTimeout(() => window.printReceipt(), 1000);
+                // (Auto-print removed per new manual download request)
             } else {
                 alert('Payment verification failed. Please try again.');
                 setStage(1);
             }
-        }, 3000);
+        }, 2000);
     };
 
     function setStage(stepNum) {
@@ -3122,24 +3149,112 @@ window.addEventListener('resize', () => {
         window.print();
     };
 
+    window.viewHistoryReceipt = () => {
+        // Add to history table
+        const tbody = document.getElementById('payment-history-body');
+        if (tbody) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            const txnId = document.getElementById('success-txn-id').textContent;
+            const amt = "₹1,740";
+            const service = localStorage.getItem('rapidcare_selected_ambulance') || 'Emergency Ambulance';
+            const provider = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Hospital';
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${dateStr}</td>
+                <td>${service}</td>
+                <td>${provider}</td>
+                <td class="amt" style="font-weight: 700;">${amt}</td>
+                <td><span class="badge-insurance approved">Paid</span></td>
+                <td><a href="javascript:void(0)" onclick="window.downloadReceipt()" style="color: var(--primary-green); text-decoration: none; font-weight: 600;">Download</a></td>
+            `;
+            tbody.insertBefore(newRow, tbody.firstChild);
+        }
+
+        // Navigate to History view
+        window.closePaymentOverlay();
+        const historyBtn = document.querySelector('[data-view="history"]');
+        if (historyBtn) historyBtn.click();
+    };
+
+    window.downloadReceipt = () => {
+        const txnId = document.getElementById('success-txn-id') ? document.getElementById('success-txn-id').textContent : 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
+        const now = new Date();
+        const dateStr = now.toLocaleString('en-IN');
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>RapidCare Receipt - ${txnId}</title>
+                    <style>
+                        body { font-family: 'Inter', sans-serif; padding: 40px; color: #1a1a2e; }
+                        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #06b6d4; padding-bottom: 20px; margin-bottom: 30px; }
+                        .logo { font-size: 24px; font-weight: 800; color: #06b6d4; }
+                        .receipt-info { margin-bottom: 30px; }
+                        .details-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                        .details-table th, .details-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+                        .total-row { font-size: 20px; font-weight: 800; color: #10b981; }
+                        .footer { margin-top: 50px; text-align: center; font-size: 14px; opacity: 0.6; }
+                        @media print { .no-print { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="logo">RapidCare</div>
+                        <div>Official Transaction Receipt</div>
+                    </div>
+                    <div class="receipt-info">
+                        <p><strong>Transaction ID:</strong> ${txnId}</p>
+                        <p><strong>Date & Time:</strong> ${dateStr}</p>
+                        <p><strong>Status:</strong> <span style="color: #10b981;">Payment Successful</span></p>
+                    </div>
+                    <table class="details-table">
+                        <thead>
+                            <tr><th>Description</th><th>Details</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Service Type</td><td>${localStorage.getItem('rapidcare_selected_ambulance') || 'Emergency Ambulance'}</td></tr>
+                            <tr><td>Provider</td><td>${localStorage.getItem('rapidcare_selected_hospital') || 'City General Hospital'}</td></tr>
+                            <tr><td>Patient Name</td><td>${localStorage.getItem('rapidcare_user_name') || 'Valued Patient'}</td></tr>
+                            <tr><td>Payment Method</td><td>Online Banking / Card</td></tr>
+                            <tr class="total-row"><td>Amount Paid</td><td>₹1,740</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="footer">
+                        <p>Thank you for using RapidCare. Your health is our priority.</p>
+                        <p>&copy; 2026 RapidCare Medical Services</p>
+                    </div>
+                    <script>window.print(); setTimeout(() => window.close(), 500);</script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+    };
+
     // --- Payment Feedback (Updated for Stepper) ---
-    payBtn.addEventListener('click', () => {
-        const hospitalName = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Available';
-        const ambulanceType = document.querySelector('input[name="ambulance-type"]:checked').nextElementSibling.querySelector('h3').textContent;
-        const distance = document.getElementById('distance-input').value;
-        const total = totalAmountDisplay.textContent;
+    const payBtn = document.querySelector('.pay-btn');
+    if (payBtn) {
+        payBtn.addEventListener('click', () => {
+            const hospitalName = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Available';
+            const ambulanceTypeElem = document.querySelector('input[name="ambulance-type"]:checked');
+            const ambulanceType = ambulanceTypeElem ? ambulanceTypeElem.nextElementSibling.querySelector('h3').textContent : 'Standard';
+            const distance = document.getElementById('distance-input').value;
+            const total = totalAmountDisplay.textContent;
 
-        document.getElementById('review-ambulance').textContent = ambulanceType;
-        document.getElementById('review-hospital').textContent = hospitalName;
-        document.getElementById('review-distance').textContent = `${distance} KM`;
-        document.getElementById('review-total').textContent = total;
+            document.getElementById('review-ambulance').textContent = ambulanceType;
+            document.getElementById('review-hospital').textContent = hospitalName;
+            document.getElementById('review-distance').textContent = `${distance} KM`;
+            document.getElementById('review-total').textContent = total;
 
-        overlay.classList.add('active');
-        setStage(1);
-    });
+            overlay.classList.add('active');
+        });
+    }
 
     // Initialize
     updateRideStreak();
     recalculatePricing();
-
+    if (window.lucide) lucide.createIcons();
 });
