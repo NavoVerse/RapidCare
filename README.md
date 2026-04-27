@@ -113,4 +113,30 @@ Then open `choose_User/index.html` in your browser.
 
 ---
 
-**Last Updated**: 2026-04-26 (v3.0.0 — Post-Merge Stabilization)
+## 🛠️ Driver Interface Backend Integration (TODO)
+
+This section tracks the progress of connecting the newly designed Driver Dashboard to the RapidCare backend infrastructure.
+
+### Phase 1: Authentication & Identity
+- [x] **Session Persistence**: Implement JWT validation on dashboard entry.
+- [x] **Profile API**: Implement `GET /api/v1/drivers/me` to populate the sidebar and profile cards.
+- [ ] **Document Verification**: Fetch status of DL, RC, and Aadhaar for the profile checkmarks.
+
+### Phase 2: Real-Time Coordination
+- [x] **Availability Sync**: Link the "LIVE" toggle to the `drivers` table `status` field.
+- [x] **Live Tracking**: Implement `driver:location_update` emits via Socket.IO for active ambulance tracking.
+- [x] **Incoming Alert**: Socket.IO listener to trigger the "Active Call" overlay for new emergency requests.
+
+### Phase 3: Trip Management
+- [ ] **Status Workflow**: Map "Arrived", "Picked Up", and "Hospital Transfer" buttons to `PUT /api/v1/trips/:id/status`.
+- [ ] **Dynamic Navigation**: Load coordinates for pickup and hospital drop-off onto the Leaflet map.
+- [ ] **Emergency SOS**: Connect the SOS button to a high-priority backend alert system.
+
+### Phase 4: Analytics & Insights
+- [ ] **Performance Stats**: Dynamically calculate "Completed Trips" and "Efficiency" for the stat cards.
+- [x] **Trip History**: Fetch and render the "Recent Trips" list from the database.
+- [ ] **Invoice Generation**: (Bonus) Implement the "Invoices" tab to show billing data for completed trips.
+
+---
+
+**Last Updated**: 2026-04-27 (v3.1.0 — UI/UX Hardening & Integration Roadmap)

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,12 @@
     <link rel="stylesheet" href="../shared_assets/css/theme.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
     <script src="../shared_assets/js/theme-manager.js"></script>
 </head>
+
 <body>
     <div class="app-container">
         <!-- Sidebar -->
@@ -77,272 +81,275 @@
             <div class="dashboard-scroll-area">
                 <div id="dashboard-view" class="view-section active">
                     <div class="dashboard-grid-90">
-                    <!-- Top Stats Row -->
-                    <div class="stats-row">
-                        <div class="stat-card">
-                            <span class="stat-label">ACTIVE CALL</span>
-                            <div class="stat-value-container">
-                                <span class="stat-number highlight-red">1</span>
-                                <span class="stat-desc">Call in progress</span>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-label">ETA TO PATIENT</span>
-                            <div class="stat-value-container">
-                                <span class="stat-number highlight-orange">4 min</span>
-                                <span class="stat-desc">2.1 km remaining</span>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-label">TRIPS TODAY</span>
-                            <div class="stat-value-container">
-                                <span class="stat-number highlight-green">6</span>
-                                <span class="stat-desc">5 done · 1 active</span>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-label">SHIFT REMAINING</span>
-                            <div class="stat-value-container">
-                                <span class="stat-number">6.8h</span>
-                                <span class="stat-desc">Ends at 19:00</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Main Dashboard Content -->
-                    <div class="content-layout">
-                        <!-- Left Column -->
-                        <div class="content-column">
-                            <!-- Patient Info Card -->
-                            <div class="card patient-info-card">
-                                <div class="card-header">
-                                    <span class="patient-id">Patient ID #KA-0851</span>
-                                    <span class="elapsed-time">06:21 elapsed</span>
-                                </div>
-                                <div class="patient-summary">
-                                    <div class="patient-avatar">P5</div>
-                                    <div class="complaint-info">
-                                        <p class="complaint">Chest pain · difficulty breathing</p>
-                                        <span class="priority-badge critical">Critical</span>
-                                    </div>
-                                </div>
-                                <div class="activity-timeline">
-                                    <div class="timeline-item">
-                                        <span class="dot pickup"></span>
-                                        <span class="timeline-text">Pickup</span>
-                                    </div>
-                                    <div class="timeline-line"></div>
-                                    <div class="timeline-item">
-                                        <span class="dot drop"></span>
-                                        <span class="timeline-text">Drop</span>
-                                    </div>
-                                </div>
-                                <div class="vitals-grid">
-                                    <div class="vital-item">
-                                        <span class="vital-value">112</span>
-                                        <span class="vital-label">HEART RATE</span>
-                                    </div>
-                                    <div class="vital-item">
-                                        <span class="vital-value">148/92</span>
-                                        <span class="vital-label">BLOOD PRESSURE</span>
-                                    </div>
-                                    <div class="vital-item">
-                                        <span class="vital-value highlight-blue">94%</span>
-                                        <span class="vital-label">SpO2</span>
-                                    </div>
-                                </div>
-                                <div class="action-buttons">
-                                    <button class="btn btn-red">Arrived at patient</button>
-                                    <button class="btn btn-dark">Contact Hospital</button>
-                                    <button class="btn btn-green-outline">Patient picked up</button>
+                        <!-- Top Stats Row -->
+                        <div class="stats-row">
+                            <div class="stat-card">
+                                <span class="stat-label">ACTIVE CALL</span>
+                                <div class="stat-value-container">
+                                    <span class="stat-number highlight-red" id="stat-active-calls">0</span>
+                                    <span class="stat-desc">Call in progress</span>
                                 </div>
                             </div>
-
-                            <!-- Live Navigation -->
-                            <div class="card live-nav-card">
-                                <div class="card-header">
-                                    <h3>Live navigation</h3>
-                                    <span class="nav-status">Open</span>
-                                </div>
-                                <div class="map-placeholder">
-                                    <!-- Simplified Map Visual -->
-                                    <div class="map-grid"></div>
-                                    <div class="route-line">
-                                        <div class="car-marker"></div>
-                                        <div class="destination-marker"></div>
-                                    </div>
-                                </div>
-                                <div class="nav-stats">
-                                    <div class="nav-stat">
-                                        <span class="val">2.1 km</span>
-                                        <span class="lab">Remaining</span>
-                                    </div>
-                                    <div class="nav-stat">
-                                        <span class="val">4 min</span>
-                                        <span class="lab">ETA</span>
-                                    </div>
-                                    <div class="nav-stat">
-                                        <span class="val highlight-red">Heavy</span>
-                                        <span class="lab">Traffic</span>
-                                    </div>
+                            <div class="stat-card">
+                                <span class="stat-label">ETA TO PATIENT</span>
+                                <div class="stat-value-container">
+                                    <span class="stat-number highlight-orange" id="stat-eta">--</span>
+                                    <span class="stat-desc" id="stat-distance">No active trip</span>
                                 </div>
                             </div>
-
-                            <!-- Incoming Queue -->
-                            <div class="card queue-card">
-                                <div class="card-header">
-                                    <h3>Incoming queue</h3>
-                                    <a href="#" class="view-all">View all</a>
+                            <div class="stat-card">
+                                <span class="stat-label">TRIPS TODAY</span>
+                                <div class="stat-value-container">
+                                    <span class="stat-number highlight-green" id="stat-trips-today">0</span>
+                                    <span class="stat-desc" id="stat-trips-today-desc">0 done · 0 active</span>
                                 </div>
-                                <div class="queue-list">
-                                    <div class="queue-item">
-                                        <div class="item-header">
-                                            <span class="name">Ramesh Kumar</span>
-                                            <span class="time">2 min ago</span>
-                                        </div>
-                                        <div class="item-details">
-                                            <span class="location">65 Van de Meer Rd.</span>
-                                            <span class="distance">3.4 km</span>
-                                        </div>
-                                        <span class="status-tag medium">Medium</span>
-                                    </div>
-                                    <div class="queue-item">
-                                        <div class="item-header">
-                                            <span class="name">Anjali Das</span>
-                                            <span class="time">5 min ago</span>
-                                        </div>
-                                        <div class="item-details">
-                                            <span class="location">Hospital Rd, Shyam Bazar</span>
-                                            <span class="distance">1.8 km</span>
-                                        </div>
-                                        <span class="status-tag minor">Minor</span>
-                                    </div>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">SHIFT REMAINING</span>
+                                <div class="stat-value-container">
+                                    <span class="stat-number" id="stat-shift-remaining">8.0h</span>
+                                    <span class="stat-desc" id="stat-shift-end">Started recently</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right Column -->
-                        <div class="content-column">
-                            <!-- Weather/Conditions Card -->
-                            <div class="card conditions-card">
-                                <div class="conditions-header">
-                                    <div class="temp-main">
-                                        <span class="temp">34°C</span>
-                                        <span class="location">Kasaba, Zone 8 - HSR</span>
+                        <!-- Main Dashboard Content -->
+                        <div class="content-layout">
+                            <!-- Left Column -->
+                            <div class="content-column">
+                                <!-- Patient Info Card -->
+                                <div class="card patient-info-card">
+                                    <div class="card-header">
+                                        <span class="patient-id" id="active-patient-id">No active call</span>
+                                        <span class="elapsed-time">06:21 elapsed</span>
                                     </div>
-                                    <i class="fa-solid fa-cloud-sun weather-icon"></i>
+                                    <div class="patient-summary">
+                                        <div class="patient-avatar">P5</div>
+                                        <div class="complaint-info">
+                                            <p class="complaint" id="active-patient-condition">Waiting for request...</p>
+                                            <span class="priority-badge critical" id="active-patient-priority">Normal</span>
+                                        </div>
+                                    </div>
+                                    <div class="activity-timeline">
+                                        <div class="timeline-item">
+                                            <span class="dot pickup"></span>
+                                            <span class="timeline-text">Pickup</span>
+                                        </div>
+                                        <div class="timeline-line"></div>
+                                        <div class="timeline-item">
+                                            <span class="dot drop"></span>
+                                            <span class="timeline-text">Drop</span>
+                                        </div>
+                                    </div>
+                                    <div class="vitals-grid">
+                                        <div class="vital-item">
+                                            <span class="vital-value">112</span>
+                                            <span class="vital-label">HEART RATE</span>
+                                        </div>
+                                        <div class="vital-item">
+                                            <span class="vital-value">148/92</span>
+                                            <span class="vital-label">BLOOD PRESSURE</span>
+                                        </div>
+                                        <div class="vital-item">
+                                            <span class="vital-value highlight-blue">94%</span>
+                                            <span class="vital-label">SpO2</span>
+                                        </div>
+                                    </div>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-red" id="btn-arrived-patient" style="display: none;">Arrived at patient</button>
+                                        <button class="btn btn-green-outline" id="btn-picked-up" style="display: none;">Patient picked up</button>
+                                        <button class="btn btn-orange" id="btn-arrived-hospital" style="display: none;">Arrived at Hospital</button>
+                                        <button class="btn btn-green" id="btn-complete-trip" style="display: none;">Complete Trip</button>
+                                        <button class="btn btn-dark" id="btn-contact-hospital">Contact Hospital</button>
+                                    </div>
                                 </div>
-                                <div class="conditions-grid">
-                                    <div class="cond-item">
-                                        <span class="lab">VISIBILITY</span>
-                                        <span class="val">6.2 km</span>
+
+                                <!-- Live Navigation -->
+                                <div class="card live-nav-card">
+                                    <div class="card-header">
+                                        <h3>Live navigation</h3>
+                                        <span class="nav-status">Open</span>
                                     </div>
-                                    <div class="cond-item">
-                                        <span class="lab">HUMIDITY</span>
-                                        <span class="val">72%</span>
+                                    <div class="map-placeholder">
+                                        <!-- Simplified Map Visual -->
+                                        <div class="map-grid"></div>
+                                        <div class="route-line">
+                                            <div class="car-marker"></div>
+                                            <div class="destination-marker"></div>
+                                        </div>
                                     </div>
-                                    <div class="cond-item">
-                                        <span class="lab">WIND</span>
-                                        <span class="val">2 km/h</span>
+                                    <div class="nav-stats">
+                                        <div class="nav-stat">
+                                            <span class="val">2.1 km</span>
+                                            <span class="lab">Remaining</span>
+                                        </div>
+                                        <div class="nav-stat">
+                                            <span class="val">4 min</span>
+                                            <span class="lab">ETA</span>
+                                        </div>
+                                        <div class="nav-stat">
+                                            <span class="val highlight-red">Heavy</span>
+                                            <span class="lab">Traffic</span>
+                                        </div>
                                     </div>
-                                    <div class="cond-item">
-                                        <span class="lab">ROAD</span>
-                                        <span class="val highlight-green">Good</span>
+                                </div>
+
+                                <!-- Incoming Queue -->
+                                <div class="card queue-card">
+                                    <div class="card-header">
+                                        <h3>Incoming queue</h3>
+                                        <a href="#" class="view-all">View all</a>
+                                    </div>
+                                    <div class="queue-list">
+                                        <div class="queue-item">
+                                            <div class="item-header">
+                                                <span class="name">Ramesh Kumar</span>
+                                                <span class="time">2 min ago</span>
+                                            </div>
+                                            <div class="item-details">
+                                                <span class="location">65 Van de Meer Rd.</span>
+                                                <span class="distance">3.4 km</span>
+                                            </div>
+                                            <span class="status-tag medium">Medium</span>
+                                        </div>
+                                        <div class="queue-item">
+                                            <div class="item-header">
+                                                <span class="name">Anjali Das</span>
+                                                <span class="time">5 min ago</span>
+                                            </div>
+                                            <div class="item-details">
+                                                <span class="location">Hospital Rd, Shyam Bazar</span>
+                                                <span class="distance">1.8 km</span>
+                                            </div>
+                                            <span class="status-tag minor">Minor</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Pre-trip Checklist -->
-                            <div class="card checklist-card">
-                                <div class="card-header">
-                                    <h3>Pre-trip checklist</h3>
-                                </div>
-                                <div class="checklist-items">
-                                    <div class="check-item done">
-                                        <div class="custom-checkbox checked">
-                                            <i class="fa-solid fa-check"></i>
+                            <!-- Right Column -->
+                            <div class="content-column">
+                                <!-- Weather/Conditions Card -->
+                                <div class="card conditions-card">
+                                    <div class="conditions-header">
+                                        <div class="temp-main">
+                                            <span class="temp">34°C</span>
+                                            <span class="location">Kasaba, Zone 8 - HSR</span>
                                         </div>
-                                        <span>Vehicle inspection</span>
+                                        <i class="fa-solid fa-cloud-sun weather-icon"></i>
                                     </div>
-                                    <div class="check-item done">
-                                        <div class="custom-checkbox checked">
-                                            <i class="fa-solid fa-check"></i>
+                                    <div class="conditions-grid">
+                                        <div class="cond-item">
+                                            <span class="lab">VISIBILITY</span>
+                                            <span class="val">6.2 km</span>
                                         </div>
-                                        <span>Oxygen supply > 240 bar</span>
-                                    </div>
-                                    <div class="check-item done">
-                                        <div class="custom-checkbox checked">
-                                            <i class="fa-solid fa-check"></i>
+                                        <div class="cond-item">
+                                            <span class="lab">HUMIDITY</span>
+                                            <span class="val">72%</span>
                                         </div>
-                                        <span>Defibrillator ready</span>
-                                    </div>
-                                    <div class="check-item warning">
-                                        <div class="custom-checkbox warning">
-                                            <i class="fa-solid fa-exclamation"></i>
+                                        <div class="cond-item">
+                                            <span class="lab">WIND</span>
+                                            <span class="val">2 km/h</span>
                                         </div>
-                                        <span>First aid kit 2/12 remaining</span>
-                                    </div>
-                                    <div class="check-item">
-                                        <div class="custom-checkbox"></div>
-                                        <span>Stretcher lock test</span>
+                                        <div class="cond-item">
+                                            <span class="lab">ROAD</span>
+                                            <span class="val highlight-green">Good</span>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <!-- Pre-trip Checklist -->
+                                <div class="card checklist-card">
+                                    <div class="card-header">
+                                        <h3>Pre-trip checklist</h3>
+                                    </div>
+                                    <div class="checklist-items">
+                                        <div class="check-item done">
+                                            <div class="custom-checkbox checked">
+                                                <i class="fa-solid fa-check"></i>
+                                            </div>
+                                            <span>Vehicle inspection</span>
+                                        </div>
+                                        <div class="check-item done">
+                                            <div class="custom-checkbox checked">
+                                                <i class="fa-solid fa-check"></i>
+                                            </div>
+                                            <span>Oxygen supply > 240 bar</span>
+                                        </div>
+                                        <div class="check-item done">
+                                            <div class="custom-checkbox checked">
+                                                <i class="fa-solid fa-check"></i>
+                                            </div>
+                                            <span>Defibrillator ready</span>
+                                        </div>
+                                        <div class="check-item warning">
+                                            <div class="custom-checkbox warning">
+                                                <i class="fa-solid fa-exclamation"></i>
+                                            </div>
+                                            <span>First aid kit 2/12 remaining</span>
+                                        </div>
+                                        <div class="check-item">
+                                            <div class="custom-checkbox"></div>
+                                            <span>Stretcher lock test</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Today's Trips -->
+                                <div class="card trips-card">
+                                    <div class="card-header">
+                                        <h3>Today's trips</h3>
+                                    </div>
+                                    <div class="trips-list" id="profile-trip-list">
+                                        <div class="trip-item">
+                                            <div class="trip-icon success">
+                                                <i class="fa-solid fa-check"></i>
+                                            </div>
+                                            <div class="trip-info">
+                                                <span class="trip-dest">Saket Hospital</span>
+                                                <span class="trip-meta">08:14 · 4.2 km · 16 min</span>
+                                            </div>
+                                            <span class="trip-price">₹1,450</span>
+                                        </div>
+                                        <div class="trip-item">
+                                            <div class="trip-icon success">
+                                                <i class="fa-solid fa-check"></i>
+                                            </div>
+                                            <div class="trip-info">
+                                                <span class="trip-dest">Belle Vue Clinic (Hospital)</span>
+                                                <span class="trip-meta">10:42 · 2.9 km · 12 min</span>
+                                            </div>
+                                            <span class="trip-price">₹1,220</span>
+                                        </div>
+                                        <div class="trip-item">
+                                            <div class="trip-icon success">
+                                                <i class="fa-solid fa-check"></i>
+                                            </div>
+                                            <div class="trip-info">
+                                                <span class="trip-dest">NRS Medical College</span>
+                                                <span class="trip-meta">12:12 · 5.1 km · 22 min</span>
+                                            </div>
+                                            <span class="trip-price">₹1,880</span>
+                                        </div>
+                                        <div class="trip-item cancelled">
+                                            <div class="trip-icon error">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </div>
+                                            <div class="trip-info">
+                                                <span class="trip-dest">Cancellation</span>
+                                                <span class="trip-meta">13:30 · Patient unreachable</span>
+                                            </div>
+                                            <span class="trip-price">₹0</span>
+                                        </div>
+                                    </div>
+                                    <div class="trips-footer">
+                                        <span>Total today</span>
+                                        <span class="total-amount">₹4,550</span>
+                                    </div>
+                                </div>
+
+
                             </div>
-
-                            <!-- Today's Trips -->
-                            <div class="card trips-card">
-                                <div class="card-header">
-                                    <h3>Today's trips</h3>
-                                </div>
-                                <div class="trips-list">
-                                    <div class="trip-item">
-                                        <div class="trip-icon success">
-                                            <i class="fa-solid fa-check"></i>
-                                        </div>
-                                        <div class="trip-info">
-                                            <span class="trip-dest">Saket Hospital</span>
-                                            <span class="trip-meta">08:14 · 4.2 km · 16 min</span>
-                                        </div>
-                                        <span class="trip-price">₹1,450</span>
-                                    </div>
-                                    <div class="trip-item">
-                                        <div class="trip-icon success">
-                                            <i class="fa-solid fa-check"></i>
-                                        </div>
-                                        <div class="trip-info">
-                                            <span class="trip-dest">Belle Vue Clinic (Hospital)</span>
-                                            <span class="trip-meta">10:42 · 2.9 km · 12 min</span>
-                                        </div>
-                                        <span class="trip-price">₹1,220</span>
-                                    </div>
-                                    <div class="trip-item">
-                                        <div class="trip-icon success">
-                                            <i class="fa-solid fa-check"></i>
-                                        </div>
-                                        <div class="trip-info">
-                                            <span class="trip-dest">NRS Medical College</span>
-                                            <span class="trip-meta">12:12 · 5.1 km · 22 min</span>
-                                        </div>
-                                        <span class="trip-price">₹1,880</span>
-                                    </div>
-                                    <div class="trip-item cancelled">
-                                        <div class="trip-icon error">
-                                            <i class="fa-solid fa-xmark"></i>
-                                        </div>
-                                        <div class="trip-info">
-                                            <span class="trip-dest">Cancellation</span>
-                                            <span class="trip-meta">13:30 · Patient unreachable</span>
-                                        </div>
-                                        <span class="trip-price">₹0</span>
-                                    </div>
-                                </div>
-                                <div class="trips-footer">
-                                    <span>Total today</span>
-                                    <span class="total-amount">₹4,550</span>
-                                </div>
-                            </div>
-
-
                         </div>
                     </div>
                 </div>
@@ -351,160 +358,257 @@
                 <!-- Driver Profile View -->
                 <div id="profile-view" class="view-section" style="display: none;">
                     <div class="dashboard-grid-90">
-                        <div class="profile-header-banner" style="margin-bottom: 30px; display: flex; align-items: center; gap: 20px;">
-                            <div class="profile-avatar-large" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent-red), #ff7675); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: white;">AR</div>
-                            <div class="profile-title-info">
-                                <h2 style="font-size: 28px; margin-bottom: 5px;">Arjun Rao</h2>
-                                <span class="profile-role-badge" style="background: rgba(255, 77, 77, 0.1); color: var(--accent-red); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid rgba(255, 77, 77, 0.2);">Emergency Driver #D564821</span>
-                            </div>
-                        </div>
-
-                        <div class="content-layout">
-                            <div class="content-column">
-                                <div class="card profile-card" style="margin-bottom: 25px;">
-                                    <div class="card-header">
-                                        <h3>Personal Information</h3>
-                                        <button class="btn-icon" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer;"><i class="fa-solid fa-pen"></i></button>
-                                    </div>
-                                    <div class="info-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">FULL NAME</span>
-                                            <span class="info-val" style="font-size: 14px; font-weight: 600;">Arjun Rao</span>
-                                        </div>
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">PHONE NUMBER</span>
-                                            <span class="info-val" style="font-size: 14px; font-weight: 600;">+91 98765 43210</span>
-                                        </div>
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">EMAIL ADDRESS</span>
-                                            <span class="info-val" style="font-size: 14px; font-weight: 600;">arjun.rao@rapidcare.com</span>
-                                        </div>
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">DATE OF BIRTH</span>
-                                            <span class="info-val" style="font-size: 14px; font-weight: 600;">12 May 1988</span>
-                                        </div>
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">BLOOD GROUP</span>
-                                            <span class="info-val highlight-red" style="font-size: 14px; font-weight: 800; color: var(--accent-red);">O+</span>
-                                        </div>
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">JOINED ON</span>
-                                            <span class="info-val" style="font-size: 14px; font-weight: 600;">15 Jan 2024</span>
-                                        </div>
-                                    </div>
+                        <div class="profile-layout-grid">
+                            <!-- Left Sidebar: Profile Summary -->
+                            <div class="profile-sidebar-card">
+                                <div class="profile-img-container">
+                                    <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=150&h=150&auto=format&fit=crop"
+                                        alt="Arjun Rao" class="main-avatar">
+                                    <button class="edit-btn"><i class="fa-solid fa-pen"></i></button>
                                 </div>
+                                <h2 class="profile-name" id="profile-display-name">Arjun Rao</h2>
+                                <span class="status-pill available">Active Driver</span>
 
-                                <div class="card profile-card">
-                                    <div class="card-header">
-                                        <h3>License & Documents</h3>
+                                <button class="primary-profile-btn">Edit Documents</button>
+
+                                <div class="profile-field-group">
+                                    <div class="field-item">
+                                        <label>Email</label>
+                                        <span id="profile-email">arjun.rao@rapidcare.com</span>
                                     </div>
-                                    <div class="document-list" style="display: flex; flex-direction: column; gap: 15px;">
-                                        <div class="doc-item verified" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color);">
-                                            <div class="doc-icon" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(46, 204, 113, 0.1); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 18px;"><i class="fa-solid fa-id-card"></i></div>
-                                            <div class="doc-details" style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-                                                <span class="doc-name" style="font-size: 14px; font-weight: 600;">Driving License (Commercial)</span>
-                                                <span class="doc-number" style="font-size: 12px; color: var(--text-secondary);">DL-142023001234</span>
-                                            </div>
-                                            <span class="doc-status" style="font-size: 11px; font-weight: 700; color: var(--accent-green);">Verified <i class="fa-solid fa-circle-check" style="margin-left: 3px;"></i></span>
-                                        </div>
-                                        <div class="doc-item verified" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color);">
-                                            <div class="doc-icon" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(46, 204, 113, 0.1); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 18px;"><i class="fa-solid fa-file-contract"></i></div>
-                                            <div class="doc-details" style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-                                                <span class="doc-name" style="font-size: 14px; font-weight: 600;">Aadhaar Card</span>
-                                                <span class="doc-number" style="font-size: 12px; color: var(--text-secondary);">XXXX XXXX 8912</span>
-                                            </div>
-                                            <span class="doc-status" style="font-size: 11px; font-weight: 700; color: var(--accent-green);">Verified <i class="fa-solid fa-circle-check" style="margin-left: 3px;"></i></span>
-                                        </div>
-                                        <div class="doc-item verified" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color);">
-                                            <div class="doc-icon" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(46, 204, 113, 0.1); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 18px;"><i class="fa-solid fa-certificate"></i></div>
-                                            <div class="doc-details" style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-                                                <span class="doc-name" style="font-size: 14px; font-weight: 600;">First Aid Certification</span>
-                                                <span class="doc-number" style="font-size: 12px; color: var(--text-secondary);">Valid till: Oct 2026</span>
-                                            </div>
-                                            <span class="doc-status" style="font-size: 11px; font-weight: 700; color: var(--accent-green);">Verified <i class="fa-solid fa-circle-check" style="margin-left: 3px;"></i></span>
-                                        </div>
+                                    <div class="field-item">
+                                        <label>Gender</label>
+                                        <span id="profile-gender">Male</span>
+                                    </div>
+                                    <div class="field-item">
+                                        <label>Notifications</label>
+                                        <span>Allows Emergency Alerts</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="content-column">
-                                <div class="card profile-card" style="margin-bottom: 25px;">
-                                    <div class="card-header">
-                                        <h3>Vehicle Assignment</h3>
-                                    </div>
-                                    <div class="vehicle-info-box" style="padding: 20px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px;">
-                                        <div class="vehicle-icon" style="width: 60px; height: 60px; border-radius: 15px; background: rgba(255, 159, 67, 0.1); color: var(--accent-orange); display: flex; align-items: center; justify-content: center; font-size: 28px;"><i class="fa-solid fa-truck-medical"></i></div>
-                                        <div class="vehicle-primary" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <h4 style="font-size: 16px; font-weight: 700;">Advanced Life Support (ALS)</h4>
-                                            <span class="vehicle-number" style="display: inline-block; background: #FFCE00; color: black; font-weight: 800; font-size: 16px; padding: 4px 15px; border-radius: 6px; letter-spacing: 1px; border: 1px solid #E6B800; margin-top: 5px;">KA 01 AB 1234</span>
+                            <!-- Right Content Area -->
+                            <div class="profile-main-area">
+                                <!-- Top Stats Row -->
+                                <div class="profile-stats-row">
+                                    <div class="profile-stat-card blue">
+                                        <div class="stat-main">
+                                            <span class="num" id="stat-total-bookings">0</span>
+                                            <span class="lab">All Bookings</span>
+                                            <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 35.67%</div>
                                         </div>
-                                        <div class="vehicle-specs" style="display: flex; justify-content: center; gap: 30px; width: 100%; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 5px;">
-                                            <div class="spec" style="display: flex; flex-direction: column; gap: 5px;">
-                                                <span class="spec-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">HOSPITAL</span>
-                                                <span class="spec-val" style="font-size: 12px; font-weight: 600;">Saket City Hospital</span>
-                                            </div>
-                                            <div class="spec" style="display: flex; flex-direction: column; gap: 5px;">
-                                                <span class="spec-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">EQUIPMENT</span>
-                                                <span class="spec-val" style="font-size: 12px; font-weight: 600;">Defibrillator, Ventilator</span>
-                                            </div>
+                                        <div class="stat-chart">
+                                            <div class="bar" style="height: 40%"></div>
+                                            <div class="bar" style="height: 60%"></div>
+                                            <div class="bar" style="height: 30%"></div>
+                                            <div class="bar" style="height: 90%"></div>
+                                            <div class="bar" style="height: 70%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="profile-stat-card purple">
+                                        <div class="stat-main">
+                                            <span class="num" id="stat-completed-bookings">0</span>
+                                            <span class="lab">Completed</span>
+                                            <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 25%</div>
+                                        </div>
+                                        <div class="stat-chart">
+                                            <div class="bar" style="height: 30%"></div>
+                                            <div class="bar" style="height: 50%"></div>
+                                            <div class="bar" style="height: 80%"></div>
+                                            <div class="bar" style="height: 40%"></div>
+                                            <div class="bar" style="height: 85%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="profile-stat-card orange">
+                                        <div class="stat-main">
+                                            <span class="num" id="stat-cancelled-bookings">0</span>
+                                            <span class="lab">Cancelled</span>
+                                            <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 35.67%</div>
+                                        </div>
+                                        <div class="stat-chart">
+                                            <div class="bar" style="height: 20%"></div>
+                                            <div class="bar" style="height: 40%"></div>
+                                            <div class="bar" style="height: 60%"></div>
+                                            <div class="bar" style="height: 30%"></div>
+                                            <div class="bar" style="height: 50%"></div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="card profile-card" style="margin-bottom: 25px;">
-                                    <div class="card-header">
-                                        <h3>Performance Metrics</h3>
+                                <!-- Detailed List -->
+                                <div class="profile-list-card">
+                                    <div class="list-header">
+                                        <div class="list-tabs">
+                                            <button class="tab active">Recent Trips</button>
+                                            <button class="tab">Invoices</button>
+                                        </div>
+                                        <div class="list-filter">
+                                            <span id="stat-total-count-filter">All Time (0)</span>
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </div>
                                     </div>
-                                    <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                                        <div class="metric-item" style="padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                                            <div class="metric-icon highlight-blue" style="font-size: 20px; color: var(--accent-blue);"><i class="fa-solid fa-star"></i></div>
-                                            <div class="metric-content" style="display: flex; flex-direction: column; gap: 2px;">
-                                                <span class="metric-val" style="font-size: 16px; font-weight: 800;">4.9/5.0</span>
-                                                <span class="metric-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">Avg Rating</span>
+
+                                    <div class="list-body">
+                                        <div class="list-item">
+                                            <div class="item-date">
+                                                <span class="day">29</span>
+                                                <span class="month">Sep</span>
+                                            </div>
+                                            <div class="item-info">
+                                                <span class="task">Emergency Response</span>
+                                                <span class="time">11:00 - 12:30</span>
+                                            </div>
+                                            <span class="status-badge cancelled">Cancelled</span>
+                                            <div class="item-price">
+                                                <span class="total">₹0</span>
+                                                <span class="rate">₹0/km</span>
                                             </div>
                                         </div>
-                                        <div class="metric-item" style="padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                                            <div class="metric-icon highlight-green" style="font-size: 20px; color: var(--accent-green);"><i class="fa-solid fa-truck-fast"></i></div>
-                                            <div class="metric-content" style="display: flex; flex-direction: column; gap: 2px;">
-                                                <span class="metric-val" style="font-size: 16px; font-weight: 800;">1,248</span>
-                                                <span class="metric-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">Total Trips</span>
+                                        <div class="list-item">
+                                            <div class="item-date">
+                                                <span class="day">15</span>
+                                                <span class="month">Oct</span>
+                                            </div>
+                                            <div class="item-info">
+                                                <span class="task">Patient Transfer</span>
+                                                <span class="time">13:45 - 15:30</span>
+                                            </div>
+                                            <span class="status-badge booked">Booked</span>
+                                            <div class="item-price">
+                                                <span class="total">₹1,250</span>
+                                                <span class="rate">₹45/km</span>
                                             </div>
                                         </div>
-                                        <div class="metric-item" style="padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                                            <div class="metric-icon highlight-orange" style="font-size: 20px; color: var(--accent-orange);"><i class="fa-solid fa-clock"></i></div>
-                                            <div class="metric-content" style="display: flex; flex-direction: column; gap: 2px;">
-                                                <span class="metric-val" style="font-size: 16px; font-weight: 800;">98%</span>
-                                                <span class="metric-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">On-time Rate</span>
+                                        <div class="list-item">
+                                            <div class="item-date">
+                                                <span class="day">11</span>
+                                                <span class="month">Nov</span>
+                                            </div>
+                                            <div class="item-info">
+                                                <span class="task">Scheduled Pickup</span>
+                                                <span class="time">09:00 - 12:30</span>
+                                            </div>
+                                            <span class="status-badge done">Done</span>
+                                            <div class="item-price">
+                                                <span class="total">₹2,450</span>
+                                                <span class="rate">₹55/km</span>
+                                            </div>
+                                        </div>
+                                        <div class="list-item">
+                                            <div class="item-date">
+                                                <span class="day">13</span>
+                                                <span class="month">Apr</span>
+                                            </div>
+                                            <div class="item-info">
+                                                <span class="task">Critical Transport</span>
+                                                <span class="time">11:00 - 15:30</span>
+                                            </div>
+                                            <span class="status-badge done">Done</span>
+                                            <div class="item-price">
+                                                <span class="total">₹3,850</span>
+                                                <span class="rate">₹55/km</span>
+                                            </div>
+                                        </div>
+                                        <div class="list-item">
+                                            <div class="item-date">
+                                                <span class="day">24</span>
+                                                <span class="month">Feb</span>
+                                            </div>
+                                            <div class="item-info">
+                                                <span class="task">Medical Courier</span>
+                                                <span class="time">10:00 - 19:30</span>
+                                            </div>
+                                            <span class="status-badge booked">Booked</span>
+                                            <div class="item-price">
+                                                <span class="total">₹1,180</span>
+                                                <span class="rate">₹22/km</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <button class="btn btn-red" style="width: 100%; margin-top: 10px; padding: 15px; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 10px;">
-                                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
         </main>
     </div>
+    <!-- Emergency Incoming Call Overlay -->
+    <div id="incoming-alert-overlay" class="overlay-container" style="display: none;">
+        <div class="alert-backdrop"></div>
+        <div class="alert-card animate-slide-up">
+            <div class="alert-header">
+                <div class="emergency-tag">
+                    <span class="pulse-dot"></span>
+                    EMERGENCY CALL
+                </div>
+                <div class="timer-ring">
+                    <svg class="timer-svg" viewBox="0 0 40 40">
+                        <circle class="timer-bg" cx="20" cy="20" r="18"></circle>
+                        <circle class="timer-progress" cx="20" cy="20" r="18"></circle>
+                    </svg>
+                    <span id="alert-timer-text">30s</span>
+                </div>
+            </div>
+            
+            <div class="alert-content">
+                <div class="patient-profile">
+                    <div class="alert-avatar" id="alert-patient-avatar">P</div>
+                    <div class="patient-main">
+                        <h3 id="alert-patient-name">Patient Name</h3>
+                        <p id="alert-patient-condition">Critical · Respiratory Distress</p>
+                    </div>
+                </div>
+
+                <div class="alert-details-grid">
+                    <div class="detail-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div class="txt">
+                            <label>PICKUP</label>
+                            <span id="alert-pickup-location">Calculating...</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fa-solid fa-hospital"></i>
+                        <div class="txt">
+                            <label>HOSPITAL</label>
+                            <span id="alert-hospital-name">City General Hospital</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fa-solid fa-route"></i>
+                        <div class="txt">
+                            <label>DISTANCE</label>
+                            <span id="alert-distance">1.2 km</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert-actions">
+                <button class="decline-btn" id="reject-trip-btn">DECLINE</button>
+                <button class="accept-btn" id="accept-trip-btn">
+                    <span>ACCEPT CALL</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
-    <!-- Skeleton Loading Script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const boxes = document.querySelectorAll('.stat-card, .card, .profile-panel, .info-card, .metric-card, .driver-profile-card, .vehicle-card, .emergency-details-card, .form-section');
             boxes.forEach(box => box.classList.add('skeleton-box'));
-            
+
             setTimeout(() => {
                 boxes.forEach(box => box.classList.add('loaded'));
                 setTimeout(() => {
                     boxes.forEach(box => box.classList.remove('skeleton-box', 'loaded'));
-                }, 600); // Match transition duration
-            }, 1500);
+                }, 500);
+            }, 1000);
         });
     </script>
 </body>
+
 </html>
