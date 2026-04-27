@@ -2863,7 +2863,7 @@ window.addEventListener('resize', () => {
     const totalAmountDisplay = document.getElementById('total-amount');
     const distanceInput = document.getElementById('distance-input');
     const ambulanceOptions = document.querySelectorAll('input[name="ambulance-type"]');
-    const payBtn = document.querySelector('.pay-btn');
+    const payBtnElement = document.querySelector('.pay-btn');
 
     // --- Initialization ---
     try {
@@ -2902,23 +2902,22 @@ window.addEventListener('resize', () => {
         const distEl = document.getElementById('distance-input');
         const coupEl = document.getElementById('coupon-code');
         const totalEl = document.getElementById('total-amount');
-        const payBtnEl = document.querySelector('.pay-btn');
 
-        if (!typeEl || !distEl || !totalEl || !payBtnEl) return;
+        if (!typeEl || !distEl || !totalEl || !payBtnElement) return;
 
         const selectedType = typeEl.value;
         const distance = parseFloat(distEl.value) || 0;
         const couponCode = coupEl ? coupEl.value.toUpperCase() : '';
         
         if (distance <= 0) {
-            payBtnEl.disabled = true;
-            payBtnEl.style.opacity = '0.5';
-            payBtnEl.style.cursor = 'not-allowed';
+            payBtnElement.disabled = true;
+            payBtnElement.style.opacity = '0.5';
+            payBtnElement.style.cursor = 'not-allowed';
             return;
         } else {
-            payBtnEl.disabled = false;
-            payBtnEl.style.opacity = '1';
-            payBtnEl.style.cursor = 'pointer';
+            payBtnElement.disabled = false;
+            payBtnElement.style.opacity = '1';
+            payBtnElement.style.cursor = 'pointer';
         }
 
         try {
@@ -3129,11 +3128,18 @@ window.addEventListener('resize', () => {
     }
 
     function populateReceipt(method, txnId, amount) {
-        document.getElementById('receipt-patient').textContent = localStorage.getItem('rapidcare_user_name') || 'Valued Patient';
-        document.getElementById('receipt-method').textContent = method;
-        document.getElementById('receipt-txn').textContent = txnId;
-        document.getElementById('receipt-date').textContent = new Date().toLocaleDateString('en-IN');
-        document.getElementById('receipt-total').textContent = `₹${amount.toLocaleString()}`;
+        const patientEl = document.getElementById('receipt-patient');
+        const methodEl = document.getElementById('receipt-method');
+        const txnEl = document.getElementById('receipt-txn');
+        const dateEl = document.getElementById('receipt-date');
+        const totalEl = document.getElementById('receipt-total');
+        const quoteEl = document.getElementById('health-quote');
+
+        if (patientEl) patientEl.textContent = localStorage.getItem('rapidcare_user_name') || 'Valued Patient';
+        if (methodEl) methodEl.textContent = method;
+        if (txnEl) txnEl.textContent = txnId;
+        if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN');
+        if (totalEl) totalEl.textContent = `₹${amount.toLocaleString()}`;
 
         const quotes = [
             "Your health is an investment, not an expense.",
@@ -3142,7 +3148,7 @@ window.addEventListener('resize', () => {
             "Take care of your body. It’s the only place you have to live.",
             "Health is not valued till sickness comes."
         ];
-        document.getElementById('health-quote').textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+        if (quoteEl) quoteEl.textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
     }
 
     window.printReceipt = () => {
@@ -3157,7 +3163,7 @@ window.addEventListener('resize', () => {
             const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
             const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
             const txnId = document.getElementById('success-txn-id').textContent;
-            const amt = "₹1,740";
+            const amt = document.getElementById('review-total').textContent;
             const service = localStorage.getItem('rapidcare_selected_ambulance') || 'Emergency Ambulance';
             const provider = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Hospital';
 
@@ -3183,6 +3189,7 @@ window.addEventListener('resize', () => {
         const txnId = document.getElementById('success-txn-id') ? document.getElementById('success-txn-id').textContent : 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
         const now = new Date();
         const dateStr = now.toLocaleString('en-IN');
+        const amount = document.getElementById('review-total') ? document.getElementById('review-total').textContent : '₹1,740';
         
         const printWindow = window.open('', '_blank');
         printWindow.document.write(`
@@ -3220,7 +3227,7 @@ window.addEventListener('resize', () => {
                             <tr><td>Provider</td><td>${localStorage.getItem('rapidcare_selected_hospital') || 'City General Hospital'}</td></tr>
                             <tr><td>Patient Name</td><td>${localStorage.getItem('rapidcare_user_name') || 'Valued Patient'}</td></tr>
                             <tr><td>Payment Method</td><td>Online Banking / Card</td></tr>
-                            <tr class="total-row"><td>Amount Paid</td><td>₹1,740</td></tr>
+                            <tr class="total-row"><td>Amount Paid</td><td>${amount}</td></tr>
                         </tbody>
                     </table>
                     <div class="footer">
@@ -3235,9 +3242,8 @@ window.addEventListener('resize', () => {
     };
 
     // --- Payment Feedback (Updated for Stepper) ---
-    const payBtn = document.querySelector('.pay-btn');
-    if (payBtn) {
-        payBtn.addEventListener('click', () => {
+    if (payBtnElement) {
+        payBtnElement.addEventListener('click', () => {
             const hospitalName = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Available';
             const ambulanceTypeElem = document.querySelector('input[name="ambulance-type"]:checked');
             const ambulanceType = ambulanceTypeElem ? ambulanceTypeElem.nextElementSibling.querySelector('h3').textContent : 'Standard';
