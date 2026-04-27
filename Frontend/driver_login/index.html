@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapidCare Driver Login</title>
+    <link rel="stylesheet" href="../shared_assets/css/theme.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+    <script src="../shared_assets/js/theme-manager.js"></script>
+    <script src="../shared_assets/js/config.js"></script>
+</head>
+<body class="driver-theme">
+    <div class="container">
+        <div class="card">
+            <!-- Left Side -->
+            <div class="left-panel">
+                <div class="slider" id="slider">
+                    <img src="Login_Images/image_1.png" class="slide active" alt="Capturing Moments">
+                    <img src="Login_Images/image_2.png" class="slide" alt="Creating Memories">
+                    <img src="Login_Images/image_3.png" class="slide" alt="Visual Journey">
+                </div>
+                <div class="overlay"></div>
+
+                <div class="top-nav">
+                    <div class="logo">
+                        <!-- We emulate the AMU logo styling from the image -->
+                        <span class="logo-text">RapidCare</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <a href="../choose_User/index.html" class="back-link">Back to website &rarr;</a>
+                    </div>
+                </div>
+
+                <div class="bottom-content">
+                    <h1>Every second counts<br>Every life matters</h1>
+                    <div class="indicators">
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side -->
+            <div class="right-panel">
+                <!-- Signup View -->
+                <div id="signup-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h2>Create account</h2>
+                        <div class="theme-toggle" id="theme-toggle">
+                        </div>
+                    </div>
+                    <p class="subtitle">Already have an account? <a href="#" id="show-login">Log in</a></p>
+
+                    <form action="#" class="login-form">
+                        <div class="input-row">
+                            <div class="input-group">
+                                <input type="text" id="firstName" placeholder="First Name" required>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" id="lastName" placeholder="Last Name" required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="text" id="signup-email" placeholder="Email / Phone Number" required>
+                        </div>
+
+                        <div class="input-group password-group">
+                            <input type="password" id="signup-password" placeholder="Enter a Password" required>
+                            <span class="eye-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </span>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="terms" checked>
+                            <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
+                        </div>
+
+                        <button type="submit" class="create-btn">Create account</button>
+
+                        <div class="divider">
+                            <span>Or register with</span>
+                        </div>
+
+                        <div class="social-buttons">
+                            <button type="button" class="social-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="#4285F4"
+                                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                    <path fill="#34A853"
+                                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.16v2.84C3.99 20.53 7.7 23 12 23z" />
+                                    <path fill="#FBBC05"
+                                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.16C1.43 8.55 1 10.22 1 12s.43 3.45 1.16 4.93l3.68-2.84z" />
+                                    <path fill="#EA4335"
+                                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.16 7.07l3.68 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                                </svg>
+                                Google
+                            </button>
+                            <button type="button" class="social-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.05 2.53.8 3.25.8.7 0 2.21-.92 3.86-.78 1.45.06 2.75.55 3.65 1.48-3.23 1.94-2.69 6.26.4 7.5-.7 1.83-1.57 3.57-3.16 3.97zm-5.06-13.6c-.16-2.58 2.16-4.66 4.79-4.68.3 2.65-2.24 4.88-4.79 4.68z" />
+                                </svg>
+                                Apple
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Login View -->
+                <div id="login-view">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h2>DRIVER LOG IN</h2>
+                        <!-- Theme toggle added here for consistency, but script might need adjustment if multiple IDs exist -->
+                        <div class="theme-toggle" id="theme-toggle-login">
+                        </div>
+                    </div>
+                    <p class="subtitle">New here? <a href="#" id="show-signup">Create an account</a></p>
+
+                    <form action="#" class="login-form">
+                        <div class="input-group">
+                            <input type="text" id="login-email" placeholder="Email / Phone" required>
+                        </div>
+
+                        <div class="input-group password-group">
+                            <input type="password" id="login-password" placeholder="Password" required>
+                            <span class="eye-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </span>
+                        </div>
+                        
+                        <div style="text-align: right; margin-bottom: 24px; margin-top: -8px;">
+                            <a href="#" id="show-forgot-password" style="font-size: 14px; color: var(--primary);">Forgot password?</a>
+                        </div>
+
+                        <button type="submit" class="create-btn">Log in</button>
+
+                        <div class="divider">
+                            <span>Or log in with</span>
+                        </div>
+
+                        <div class="social-buttons">
+                            <button type="button" class="social-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="#4285F4"
+                                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                </svg>
+                                Google
+                            </button>
+                            <button type="button" class="social-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.05 2.53.8 3.25.8.7 0 2.21-.92 3.86-.78 1.45.06 2.75.55 3.65 1.48-3.23 1.94-2.69 6.26.4 7.5-.7 1.83-1.57 3.57-3.16 3.97zm-5.06-13.6c-.16-2.58 2.16-4.66 4.79-4.68.3 2.65-2.24 4.88-4.79 4.68z" />
+                                </svg>
+                                Apple
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Forgot Password View -->
+                <div id="forgot-password-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h2>Reset Password</h2>
+                        <div class="theme-toggle" id="theme-toggle-forgot">
+                        </div>
+                    </div>
+                    <p class="subtitle">Remembered? <a href="#" id="back-to-login">Back to login</a></p>
+
+                    <!-- Step 1: Request OTP -->
+                    <form action="#" class="forgot-request-form" id="forgot-step-1">
+                        <div class="input-group">
+                            <input type="text" id="forgot-email" placeholder="Email / Phone" required>
+                        </div>
+                        <button type="submit" class="create-btn">Send OTP</button>
+                    </form>
+
+                    <!-- Step 2: Verify OTP and Reset -->
+                    <form action="#" class="forgot-reset-form" id="forgot-step-2" style="display: none;">
+                        <p class="subtitle" style="margin-bottom: 15px;">Enter the OTP sent to your email/phone</p>
+                        <div class="input-group">
+                            <input type="text" id="forgot-otp" placeholder="6-digit OTP" required maxlength="6">
+                        </div>
+                        <div class="input-group password-group">
+                            <input type="password" id="forgot-new-password" placeholder="New Password" required minlength="6">
+                            <span class="eye-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </span>
+                        </div>
+                        <button type="submit" class="create-btn">Reset Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

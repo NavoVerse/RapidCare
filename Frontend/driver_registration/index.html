@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Registration - RapidCare</title>
+    <link rel="stylesheet" href="../shared_assets/css/theme.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="../shared_assets/js/theme-manager.js"></script>
+    <script src="../shared_assets/js/config.js"></script>
+</head>
+
+<body>
+    <div class="theme-toggle" id="theme-toggle"
+        style="position: absolute; top: 20px; right: 20px; cursor: pointer; color: var(--text-dark); z-index: 1000;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </div>
+    <div class="registration-container">
+        <!-- Branding Header -->
+        <div class="branding-header">
+            <h1 class="brand-logo">RAPIDCARE</h1>
+            <h2 class="page-title">RAPIDCARE DRIVER REGISTRATION PROCESS</h2>
+            <p class="service-quote">"Your skill behind the wheel can be the difference between a life lost and a life
+                saved."</p>
+        </div>
+
+        <!-- 5-Step Stepper -->
+        <div class="stepper">
+            <div class="step active" onclick="goToStep(1)">
+                <span class="step-text">1. Personal</span>
+            </div>
+            <div class="step" onclick="goToStep(2)">
+                <span class="step-text">2. Document Verification</span>
+            </div>
+            <div class="step" onclick="goToStep(3)">
+                <span class="step-text">3. Vehicle Documents</span>
+            </div>
+            <div class="step" onclick="goToStep(4)">
+                <span class="step-text">4. Vehicle Photos</span>
+            </div>
+            <div class="step" onclick="goToStep(5)">
+                <span class="step-text">5. Emergency Training</span>
+            </div>
+        </div>
+
+        <!-- Step 1 Form -->
+        <div class="form-section active" id="step1">
+            <div class="section-header">
+                <h2>PERSONAL INFORMATION <span class="step-badge">STEP 1</span></h2>
+            </div>
+
+            <form id="personalForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fullName">Full name <span class="required">*</span></label>
+                        <input type="text" id="fullName" placeholder="As per Aadhaar card" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dob">Date of birth <span class="required">*</span></label>
+                        <input type="date" id="dob" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email address <span class="required">*</span></label>
+                        <input type="email" id="email" placeholder="driver@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password <span class="required">*</span></label>
+                        <input type="password" id="password" placeholder="Create a password" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mobileNum">Mobile number <span class="required">*</span></label>
+                        <input type="tel" id="mobileNum" placeholder="+91 XXXXX XXXXX" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="altNum">Alternate number</label>
+                        <input type="tel" id="altNum" placeholder="+91 XXXXX XXXXX">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Permanent address <span class="required">*</span></label>
+                    <input type="text" id="address" placeholder="House no, Street, Area" required>
+                </div>
+
+                <div class="form-row three-cols">
+                    <div class="form-group">
+                        <label for="city">City <span class="required">*</span></label>
+                        <input type="text" id="city" placeholder="City" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State <span class="required">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="state" required>
+                                <option value="" disabled selected>Select state</option>
+                                <option value="MH">Maharashtra</option>
+                                <option value="KA">Karnataka</option>
+                                <option value="DL">Delhi</option>
+                                <option value="TN">Tamil Nadu</option>
+                                <option value="UP">Uttar Pradesh</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pinCode">PIN code <span class="required">*</span></label>
+                        <input type="text" id="pinCode" placeholder="6-digit PIN" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-next" onclick="nextStep(1)">Next Step</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Step 2 Form -->
+        <div class="form-section" id="step2">
+            <div class="section-header">
+                <h2>IDENTITY VERIFICATION (KYC) <span class="step-badge required-badge">REQUIRED</span></h2>
+            </div>
+
+            <form id="commercialForm">
+                <!-- Aadhaar Card -->
+                <div class="document-card">
+                    <div class="doc-header">
+                        <h3>Aadhaar card</h3>
+                        <p>12-digit unique identification number - UIDAI issued</p>
+                    </div>
+                    <div class="doc-input-row">
+                        <input type="text" id="aadhaarNum" class="doc-input" placeholder="XXXX XXXX XXXX" required>
+                        <button type="button" class="btn-verify">Verify via OTP</button>
+                        <span class="status-badge pending">Pending</span>
+                    </div>
+                    <div class="upload-row">
+                        <div class="upload-box">
+                            <span class="upload-icon">+</span>
+                            <span class="upload-title">Front side</span>
+                            <span class="upload-desc">JPG / PNG / PDF • max 5 MB</span>
+                        </div>
+                        <div class="upload-box">
+                            <span class="upload-icon">+</span>
+                            <span class="upload-title">Back side</span>
+                            <span class="upload-desc">JPG / PNG / PDF • max 5 MB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAN Card -->
+                <div class="document-card">
+                    <div class="doc-header">
+                        <h3>PAN card</h3>
+                        <p>10-character alphanumeric - Income Tax Department</p>
+                    </div>
+                    <div class="doc-input-row">
+                        <input type="text" id="panNum" class="doc-input" placeholder="ABCDE1234F" required>
+                        <button type="button" class="btn-verify">Verify PAN</button>
+                        <span class="status-badge pending">Pending</span>
+                    </div>
+                    <div class="upload-row">
+                        <div class="upload-box full-width">
+                            <span class="upload-icon">+</span>
+                            <span class="upload-title">Upload PAN card image</span>
+                            <span class="upload-desc">JPG / PNG / PDF • max 5 MB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Driving Licence -->
+                <div class="document-card">
+                    <div class="doc-header">
+                        <h3>Driving licence</h3>
+                        <p>Must be valid for commercial / transport vehicle (MCWG, LMV-TR, HMV)</p>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Licence number <span class="required">*</span></label>
+                            <input type="text" id="dlNum" placeholder="XX-XXXXXXXXXXX" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Issuing state <span class="required">*</span></label>
+                            <div class="select-wrapper">
+                                <select required>
+                                    <option value="" disabled selected>Select RTO state</option>
+                                    <option value="MH">Maharashtra</option>
+                                    <option value="KA">Karnataka</option>
+                                    <option value="DL">Delhi</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date of issue <span class="required">*</span></label>
+                            <input type="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Valid until <span class="required">*</span></label>
+                            <input type="date" required>
+                        </div>
+                    </div>
+                    <div class="doc-input-row flex-end">
+                        <button type="button" class="btn-verify full-width-btn">Verify via Sarathi Parivahan
+                            (MoRTH)</button>
+                        <span class="status-badge not-verified">Not verified</span>
+                    </div>
+                    <div class="upload-row">
+                        <div class="upload-box">
+                            <span class="upload-icon">+</span>
+                            <span class="upload-title">Front of licence</span>
+                            <span class="upload-desc">JPG / PNG • max 5 MB</span>
+                        </div>
+                        <div class="upload-box">
+                            <span class="upload-icon">+</span>
+                            <span class="upload-title">Back of licence</span>
+                            <span class="upload-desc">JPG / PNG • max 5 MB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-footer">
+                    All KYC documents are verified against government databases (UIDAI, NSDL, Sarathi Parivahan). Data
+                    is encrypted and stored securely as per IT Act 2000.
+                </div>
+
+                <div class="form-actions dual-actions">
+                    <button type="button" class="btn-prev" onclick="goToStep(1)">Back</button>
+                    <button type="button" class="btn-next" onclick="nextStep(2)">Next Step</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Step 3 Form -->
+        <div class="form-section" id="step3">
+            <div class="section-header">
+                <h2>VEHICLE DOCUMENTS <span class="step-badge">STEP 3</span></h2>
+            </div>
+
+            <form id="vehicleDocsForm">
+                <div class="two-cols">
+                    <!-- RC -->
+                    <div class="document-card m-0">
+                        <div class="doc-header">
+                            <h3>RC (Registration certificate)</h3>
+                            <p>Vehicle registration number</p>
+                        </div>
+                        <input type="text" id="rcNum" placeholder="AB-XX-XXXX-XXXX" class="doc-input mb-15" required>
+                        <div class="upload-box full-width">
+                            <span class="upload-icon">+</span>
+                            <span class="upload-title">Upload RC copy</span>
+                            <span class="upload-desc">PDF / JPG - max 5 MB</span>
+                        </div>
+                    </div>
+
+                    <!-- Insurance -->
+                    <div class="document-card m-0">
+                        <div class="doc-header">
+                            <h3>Vehicle insurance</h3>
+                            <p>Valid comprehensive / third-party</p>
+                        </div>
+                        <input type="text" placeholder="Policy number" class="doc-input mb-15" required>
+                        <div class="upload-box full-width">
+                            <span class="upload-icon">+</span>
+                            <span class="upload-title">Upload insurance doc</span>
+                            <span class="upload-desc">PDF / JPG - max 5 MB</span>
+                        </div>
+                    </div>
+
+                    <!-- Fitness -->
+                    <div class="document-card m-0">
+                        <div class="doc-header mb-5">
+                            <h3>Fitness certificate</h3>
+                            <p>Motor vehicle fitness (FC)</p>
+                        </div>
+                        <label class="small-label">FC valid until</label>
+                        <input type="date" class="doc-input mb-15" required>
+                        <div class="upload-box full-width">
+                            <span class="upload-icon">+</span>
+                            <span class="upload-title">Upload FC document</span>
+                            <span class="upload-desc">PDF / JPG - max 5 MB</span>
+                        </div>
+                    </div>
+
+                    <!-- Permit -->
+                    <div class="document-card m-0">
+                        <div class="doc-header mb-5">
+                            <h3>Permit (If applicable)</h3>
+                            <p>State / national permit for transport</p>
+                        </div>
+                        <label class="small-label">Permit number</label>
+                        <input type="text" placeholder="Permit number" class="doc-input mb-15">
+                        <div class="upload-box full-width">
+                            <span class="upload-icon">+</span>
+                            <span class="upload-title">Upload permit</span>
+                            <span class="upload-desc">PDF / JPG - max 5 MB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions dual-actions mt-30">
+                    <button type="button" class="btn-prev" onclick="goToStep(2)">Back</button>
+                    <button type="button" class="btn-next" onclick="nextStep(3)">Next Step</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Step 4 Form -->
+        <div class="form-section" id="step4">
+            <div class="section-header">
+                <h2>VEHICLE PHOTOS <span class="step-badge"
+                        style="background:transparent; border:1px solid #3b82f6; color:#60a5fa;">ALL ANGLES
+                        REQUIRED</span></h2>
+            </div>
+
+            <form id="vehiclePhotosForm">
+                <div class="four-cols mb-15">
+                    <div class="upload-box full-width squared">
+                        <span class="upload-icon small">+</span>
+                        <span class="upload-title">Front view</span>
+                    </div>
+                    <div class="upload-box full-width squared">
+                        <span class="upload-icon small">+</span>
+                        <span class="upload-title">Rear view</span>
+                    </div>
+                    <div class="upload-box full-width squared">
+                        <span class="upload-icon small">+</span>
+                        <span class="upload-title">Left side</span>
+                    </div>
+                    <div class="upload-box full-width squared">
+                        <span class="upload-icon small">+</span>
+                        <span class="upload-title">Right side</span>
+                    </div>
+                    <div class="upload-box full-width squared">
+                        <span class="upload-icon small">+</span>
+                        <span class="upload-title">Interior / cabin</span>
+                    </div>
+                    <div class="upload-box full-width squared">
+                        <span class="upload-icon small">+</span>
+                        <span class="upload-title">Dashboard</span>
+                    </div>
+                    <div class="upload-box full-width squared">
+                        <span class="upload-icon small">+</span>
+                        <span class="upload-title">Number plate</span>
+                    </div>
+                    <div class="upload-box full-width squared">
+                        <span class="upload-icon small">+</span>
+                        <span class="upload-title">Medical kit</span>
+                    </div>
+                </div>
+
+                <p class="upload-desc text-left mb-30">Each photo must be taken in daylight. Min resolution 5MP. JPG/PNG
+                    only - max 5 MB each.</p>
+
+                <div class="form-actions dual-actions">
+                    <button type="button" class="btn-prev" onclick="goToStep(3)">Back</button>
+                    <button type="button" class="btn-next" onclick="nextStep(4)">Next Step</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Step 5 Form -->
+        <div class="form-section" id="step5">
+            <div class="section-header">
+                <h2>EMERGENCY TRAINING & CERTIFICATIONS</h2>
+            </div>
+
+            <form id="trainingForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Training type</label>
+                        <div class="select-wrapper">
+                            <select>
+                                <option value="" disabled selected>Select training</option>
+                                <option value="firstaid">First Aid</option>
+                                <option value="cpr">CPR Certified</option>
+                                <option value="bls">Basic Life Support</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Certificate valid until</label>
+                        <input type="date">
+                    </div>
+                </div>
+
+                <div class="upload-box full-width mb-30">
+                    <span class="upload-icon">+</span>
+                    <span class="upload-title">Upload training certificate (optional but recommended)</span>
+                    <span class="upload-desc">PDF / JPG - max 5 MB</span>
+                </div>
+
+                <!-- Declaration -->
+                <div class="declaration-box">
+                    <div class="section-header">
+                        <h2>DECLARATION</h2>
+                    </div>
+
+                    <label class="checkbox-container">
+                        <input type="checkbox" required>
+                        <span class="checkmark"></span>
+                        <span class="checkbox-text">I certify that all information and documents provided are accurate
+                            and authentic. I understand that false information may result in permanent disqualification
+                            and legal action as per applicable Indian laws.</span>
+                    </label>
+
+                    <label class="checkbox-container">
+                        <input type="checkbox" required>
+                        <span class="checkmark"></span>
+                        <span class="checkbox-text">I consent to background verification and agree to the <a
+                                href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</span>
+                    </label>
+                </div>
+
+                <div class="form-actions submit-actions mt-30">
+                    <button type="button" class="btn-prev">Save draft</button>
+                    <button type="submit" class="btn-next submit-btn">Submit for review ↗</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
