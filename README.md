@@ -118,12 +118,12 @@ Then open `choose_User/index.html` in your browser.
 This section tracks the progress of connecting the newly designed Driver Dashboard to the RapidCare backend infrastructure.
 
 ### Phase 1: Authentication & Identity
-- [ ] **Session Persistence**: Implement JWT validation on dashboard entry.
-- [ ] **Profile API**: Implement `GET /api/v1/drivers/me` to populate the sidebar and profile cards.
+- [x] **Session Persistence**: Implement JWT validation on dashboard entry.
+- [x] **Profile API**: Implement `GET /api/v1/drivers/me` to populate the sidebar and profile cards.
 - [ ] **Document Verification**: Fetch status of DL, RC, and Aadhaar for the profile checkmarks.
 
 ### Phase 2: Real-Time Coordination
-- [ ] **Availability Sync**: Link the "LIVE" toggle to the `drivers` table `status` field.
+- [x] **Availability Sync**: Link the "LIVE" toggle to the `drivers` table `status` field.
 - [ ] **Live Tracking**: Implement `driver:location_update` emits via Socket.IO for active ambulance tracking.
 - [ ] **Incoming Alert**: Socket.IO listener to trigger the "Active Call" overlay for new emergency requests.
 
@@ -134,7 +134,7 @@ This section tracks the progress of connecting the newly designed Driver Dashboa
 
 ### Phase 4: Analytics & Insights
 - [ ] **Performance Stats**: Dynamically calculate "Completed Trips" and "Efficiency" for the stat cards.
-- [ ] **Trip History**: Fetch and render the "Recent Trips" list from the database.
+- [x] **Trip History**: Fetch and render the "Recent Trips" list from the database.
 - [ ] **Invoice Generation**: (Bonus) Implement the "Invoices" tab to show billing data for completed trips.
 
 ---
