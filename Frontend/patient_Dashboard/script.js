@@ -458,6 +458,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         setTimeout(() => trackingMap.invalidateSize(), 150);
                     }
+                } else if (viewKey === 'payment') {
+                    // Standard select used now
                 }
             } else {
                 // Fallback
@@ -2832,24 +2834,11 @@ window.addEventListener('resize', () => {
 
     /* --- IMPORTED PAYMENT JS --- */
     // --- Data ---
-    const indianBanks = [
-        "State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak Mahindra Bank",
-        "Punjab National Bank", "Canara Bank", "Bank of Baroda", "Union Bank of India",
-        "IDFC FIRST Bank", "IndusInd Bank", "Yes Bank", "Federal Bank", "RBL Bank",
-        "Indian Bank", "UCO Bank", "Bank of India", "Central Bank of India",
-        "South Indian Bank", "Karnataka Bank", "City Union Bank", "Saraswat Bank",
-        "Bandhan Bank", "IDBI Bank", "Indian Overseas Bank", "Punjab & Sind Bank",
-        "Bank of Maharashtra", "DBS Bank India", "Karur Vysya Bank", "Tamilnad Mercantile Bank",
-        "Catholic Syrian Bank", "Dhanlaxmi Bank", "Jammu & Kashmir Bank", "Nainital Bank",
-        "DCB Bank", "HSBC India", "Standard Chartered India", "Deutsche Bank India",
-        "Barclays India", "JP Morgan Chase India", "Bank of America India"
-    ].sort();
-
     const popularBanks = [
-        { name: "SBI", icon: "assets/logos/sbi_logo.png" },
-        { name: "HDFC", icon: "assets/logos/hdfc_logo.png" },
-        { name: "ICICI", icon: "assets/logos/icici_logo.png" },
-        { name: "Axis", icon: "assets/logos/axis_logo.png" }
+        { name: "State Bank of India (SBI)", icon: "https://img.icons8.com/color/512/sbi.png" },
+        { name: "HDFC Bank Ltd.", icon: "https://img.icons8.com/color/512/hdfc-bank.png" },
+        { name: "ICICI Bank Ltd.", icon: "https://img.icons8.com/color/512/icici-bank.png" },
+        { name: "Axis Bank Ltd.", icon: "https://img.icons8.com/color/512/axis-bank.png" }
     ];
 
     const pricingConfig = {
@@ -2876,25 +2865,42 @@ window.addEventListener('resize', () => {
     const ambulanceOptions = document.querySelectorAll('input[name="ambulance-type"]');
     const payBtn = document.querySelector('.pay-btn');
 
-    // --- Bank Logic ---
-    populateBankLists();
-    // (recalculatePricing will be called at the end of script)
+    // --- Initialization ---
+    try {
+        if (cardBankSearch && cardBankList && netBankSearch && netBankList) {
+            populateBankLists();
+            setupSearch(cardBankSearch, cardBankList);
+            setupSearch(netBankSearch, netBankList);
+        } else {
+            console.warn('Payment UI elements not found. Initialization skipped.');
+        }
+    } catch (e) {
+        console.error('Payment Initialization Error:', e);
+    }
     
     // --- Pricing Logic ---
     window.recalculatePricing = async function() {
-        const selectedType = document.querySelector('input[name="ambulance-type"]:checked').value;
-        const distance = parseFloat(distanceInput.value) || 0;
-        const couponCode = couponInput.value.toUpperCase();
+        const typeEl = document.querySelector('input[name="ambulance-type"]:checked');
+        const distEl = document.getElementById('distance-input');
+        const coupEl = document.getElementById('coupon-code');
+        const totalEl = document.getElementById('total-amount');
+        const payBtnEl = document.querySelector('.pay-btn');
+
+        if (!typeEl || !distEl || !totalEl || !payBtnEl) return;
+
+        const selectedType = typeEl.value;
+        const distance = parseFloat(distEl.value) || 0;
+        const couponCode = coupEl ? coupEl.value.toUpperCase() : '';
         
         if (distance <= 0) {
-            payBtn.disabled = true;
-            payBtn.style.opacity = '0.5';
-            payBtn.style.cursor = 'not-allowed';
+            payBtnEl.disabled = true;
+            payBtnEl.style.opacity = '0.5';
+            payBtnEl.style.cursor = 'not-allowed';
             return;
         } else {
-            payBtn.disabled = false;
-            payBtn.style.opacity = '1';
-            payBtn.style.cursor = 'pointer';
+            payBtnEl.disabled = false;
+            payBtnEl.style.opacity = '1';
+            payBtnEl.style.cursor = 'pointer';
         }
 
         try {
@@ -2932,7 +2938,7 @@ window.addEventListener('resize', () => {
             // Fixed charges display (if they exist in UI)
             // Note: index.html might need placeholders for these if we want to show them dynamically
             
-            if (totalAmountDisplay) {
+            if (totalEl) {
                 let finalTotal = data.total;
                 
                 // Local Streak Reward Logic - Scoped to Payment View to prevent crashes
@@ -2944,7 +2950,7 @@ window.addEventListener('resize', () => {
                     finalTotal = Math.max(0, finalTotal - 40);
                 }
 
-                totalAmountDisplay.textContent = `₹${finalTotal.toLocaleString()}`;
+                totalEl.textContent = `₹${finalTotal.toLocaleString()}`;
             }
         } catch (err) {
             console.error('Fare calculation error:', err);
@@ -2958,112 +2964,7 @@ window.addEventListener('resize', () => {
     // --- Tab Switching Logic (Global) ---
     // (switchPaymentTab moved to top level)
 
-    // --- Bank Logic ---
-    function populateBankLists() {
-        indianBanks.sort().forEach(bank => {
-            // Populate Cards search list
-            const cardItem = createBankItem(bank, cardBankSearch, cardBankList);
-            cardBankList.appendChild(cardItem);
-            
-            // Populate Net Banking search list
-            const netItem = createBankItem(bank, netBankSearch, netBankList);
-            netBankList.appendChild(netItem);
-        });
-
-        // Popular banks grid
-        popularBanks.forEach(bank => {
-            const card = document.createElement('div');
-            card.className = 'upi-card'; 
-            card.innerHTML = `<img src="${bank.icon}" alt="${bank.name}" style="filter: none;"><span>${bank.name}</span>`;
-            card.onclick = () => {
-                const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
-                if (activeTab === 'card') {
-                    selectBank(bank.name, cardBankSearch, cardBankList);
-                } else if (activeTab === 'netbanking') {
-                    selectBank(bank.name, netBankSearch, netBankList);
-                }
-            };
-            popularBanksGrid.appendChild(card);
-        });
-    }
-
-    function createBankItem(bankName, input, list) {
-        const item = document.createElement('div');
-        item.className = 'bank-item';
-        item.textContent = bankName;
-        item.onclick = () => selectBank(bankName, input, list);
-        return item;
-    }
-
-    function selectBank(bankName, input, list) {
-        input.value = bankName;
-        list.style.display = 'none';
-    }
-
-    const bankAcronyms = {
-        "SBI": "State Bank of India",
-        "HDFC": "HDFC Bank",
-        "ICICI": "ICICI Bank",
-        "PNB": "Punjab National Bank",
-        "BOB": "Bank of Baroda",
-        "KOTAK": "Kotak Mahindra Bank",
-        "IDFC": "IDFC FIRST Bank",
-    };
-
-    function setupSearch(input, list) {
-        if (!input || !list) return;
-        
-        input.addEventListener('focus', () => {
-            list.style.display = 'block';
-        });
-
-        input.addEventListener('input', (e) => {
-            const term = e.target.value.trim().toLowerCase();
-            const items = list.querySelectorAll('.bank-item:not(.no-results)');
-            let hasResults = false;
-            
-            items.forEach(item => {
-                const bankName = item.textContent;
-                const acronymMatch = Object.entries(bankAcronyms).some(([acr, full]) => 
-                    acr.toLowerCase().includes(term) && full === bankName
-                );
-
-                if (bankName.toLowerCase().includes(term) || acronymMatch) {
-                    item.style.display = 'block';
-                    hasResults = true;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-
-            // Show "Not Available" if no results
-            const existingNoRes = list.querySelector('.no-results');
-            if (!hasResults && term.length > 0) {
-                list.style.display = 'block'; // Ensure list is visible
-                if (!existingNoRes) {
-                    const noRes = document.createElement('div');
-                    noRes.className = 'bank-item no-results';
-                    noRes.style.color = 'var(--accent-color)';
-                    noRes.style.fontWeight = '600';
-                    noRes.style.textAlign = 'center';
-                    noRes.innerHTML = '<i data-lucide="alert-circle" style="width:16px; vertical-align:middle; margin-right:5px;"></i> Bank not available';
-                    list.appendChild(noRes);
-                    lucide.createIcons();
-                }
-            } else if (existingNoRes) {
-                existingNoRes.remove();
-            }
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!input.contains(e.target) && !list.contains(e.target)) {
-                list.style.display = 'none';
-            }
-        });
-    }
-
-    setupSearch(cardBankSearch, cardBankList);
-    setupSearch(netBankSearch, netBankList);
+    // (Standard select components used in HTML)
 
     // --- Coupon Logic ---
     applyCouponBtn.addEventListener('click', () => {
