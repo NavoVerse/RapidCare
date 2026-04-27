@@ -3,41 +3,48 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     // REAL-TIME DISPATCH (Socket.IO)
     // =============================================
-    const API_BASE = RapidCareConfig.API_BASE;
-    const socket = io(RapidCareConfig.SOCKET_URL);
+    const API_BASE = (window.RapidCareConfig && RapidCareConfig.API_BASE) || 'http://localhost:5000/api/v1';
+    window.API_BASE = API_BASE; // Make accessible to global functions
+    
+    let socket = null;
+    try {
+        if (typeof io !== 'undefined') {
+            const SOCKET_URL = (window.RapidCareConfig && RapidCareConfig.SOCKET_URL) || window.location.origin;
+            socket = io(SOCKET_URL);
 
-    socket.on('connect', () => {
-        console.log('[Socket.IO] Connected to backend');
-        // Join room if user already in localStorage
-        const userStr = localStorage.getItem('rapidcare_user');
-        if (userStr) {
-            const user = JSON.parse(userStr);
-            socket.emit('join', { userId: user.id, role: user.role });
+            socket.on('connect', () => {
+                console.log('[Socket.IO] Connected to backend');
+                const userStr = localStorage.getItem('rapidcare_user');
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    socket.emit('join', { userId: user.id, role: user.role });
+                }
+            });
+
+            socket.on('trip:accepted', (data) => {
+                alert(`🚑 RapidCare Accepted! Trip #${data.trip_id}. Driver is on the way.`);
+            });
+
+            socket.on('trip:timeout', (data) => {
+                alert(`⚠️ Dispatch Timeout: ${data.message}`);
+            });
+
+            socket.on('trip:rejected', (data) => {
+                alert(`❌ Dispatch Rejected: ${data.message}`);
+            });
+
+            socket.on('trip:driver_location', (data) => {
+                console.log('[Socket.IO] Received driver location:', data);
+                if (ambulanceMarker) {
+                    ambulanceMarker.setLatLng([data.lat, data.lng]);
+                }
+            });
+        } else {
+            console.warn('[Socket.IO] socket.io library not loaded. Real-time features disabled.');
         }
-    });
-
-    socket.on('trip:accepted', (data) => {
-        alert(`🚑 RapidCare Accepted! Trip #${data.trip_id}. Driver is on the way.`);
-    });
-
-    socket.on('trip:timeout', (data) => {
-        alert(`⚠️ Dispatch Timeout: ${data.message}`);
-    });
-
-    socket.on('trip:rejected', (data) => {
-        alert(`❌ Dispatch Rejected: ${data.message}`);
-    });
-
-    socket.on('trip:driver_location', (data) => {
-        console.log('[Socket.IO] Received driver location:', data);
-        if (ambulanceMarker) {
-            ambulanceMarker.setLatLng([data.lat, data.lng]);
-            // If the tracking tab is open, we might want to follow the driver
-            if (trackingMap) {
-                // trackingMap.panTo([data.lat, data.lng]);
-            }
-        }
-    });
+    } catch (err) {
+        console.warn('[Socket.IO] Could not connect:', err.message);
+    }
     // =============================================
     // PROFILE DATA FETCHING
     // =============================================
@@ -141,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Ensure socket room is joined
-            socket.emit('join', { userId: data.id || JSON.parse(localStorage.getItem('rapidcare_user')).id, role: 'patient' });
+            if (socket) socket.emit('join', { userId: data.id || JSON.parse(localStorage.getItem('rapidcare_user')).id, role: 'patient' });
 
         } catch (error) {
             console.error('Error loading profile:', error);
@@ -265,7 +272,73 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // =============================================
+    // GEOLOCATION DETECTION
+    // =============================================
+    async function updateUserLocation() {
+        const locationText = document.getElementById('userLocationText');
+        const locationStatus = document.getElementById('locationStatus');
+        
+        if (!navigator.geolocation) {
+            if (locationText) locationText.textContent = "Geolocation not supported";
+            return;
+        }
+
+        if (locationText) locationText.textContent = "Locating...";
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+            localStorage.setItem('userLat', latitude);
+            localStorage.setItem('userLng', longitude);
+
+            // Update UI with coordinates initially
+            if (locationText) locationText.textContent = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+            if (locationStatus) {
+                locationStatus.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg> GPS Active`;
+                locationStatus.style.color = "var(--primary-green)";
+            }
+
+            // Update overview map
+            if (overviewMap) {
+                overviewMap.setView([latitude, longitude], 14);
+                if (userMarker) overviewMap.removeLayer(userMarker);
+                userMarker = L.marker([latitude, longitude], { icon: userIcon }).addTo(overviewMap).bindPopup('You are here').openPopup();
+            }
+
+            // Reverse Geocoding using Nominatim (OpenStreetMap)
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                const data = await response.json();
+                if (data.display_name && locationText) {
+                    const address = data.address.road || data.address.suburb || data.address.city || "Current Location";
+                    locationText.textContent = address;
+                }
+            } catch (error) {
+                console.error('Reverse geocoding failed:', error);
+            }
+
+            // Refresh hospitals based on new location
+            initHospitals(true);
+
+        }, (error) => {
+            console.error('Geolocation error:', error);
+            if (locationText) locationText.textContent = "Location access denied";
+            if (locationStatus) {
+                locationStatus.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> GPS Disabled`;
+                locationStatus.style.color = "#dc2626";
+            }
+        });
+    }
+
+    // Initial load
     loadUserProfile();
+    updateUserLocation();
+
+    // Refresh Location Button
+    const refreshLocBtn = document.getElementById('refreshLocationBtn');
+    if (refreshLocBtn) {
+        refreshLocBtn.addEventListener('click', updateUserLocation);
+    }
 
     // SOS Button Logic
     const sosBtn = document.getElementById('sos-btn');
@@ -312,65 +385,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Nav menu interaction
     const navItems = document.querySelectorAll('.nav-item');
-    const dashboardView = document.getElementById('dashboard-view');
-    const detailsView = document.getElementById('details-view');
-    const trackingView = document.getElementById('tracking-view');
-    const insuranceView = document.getElementById('insurance-view');
-    const analyticsView = document.getElementById('analytics-view');
-    const historyView = document.getElementById('history-view');
-    const paymentView = document.getElementById('payment-view');
-    const paymentsView = document.getElementById('payments-view');
+    const views = {
+        'dashboard': document.getElementById('dashboard-view'),
+        'details': document.getElementById('details-view'),
+        'tracking': document.getElementById('tracking-view'),
+        'insurance': document.getElementById('insurance-view'),
+        'analytics': document.getElementById('analytics-view'),
+        'history': document.getElementById('history-view'),
+        'payment': document.getElementById('payment-view'),
+        'payments': document.getElementById('payments-view')
+    };
 
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
-            const label = item.querySelector('span').textContent.trim();
+            const viewKey = item.getAttribute('data-view');
             
-            // Only prevent default for # links
             if (item.getAttribute('href') === '#') {
                 e.preventDefault();
             }
 
+            // Update active state
             navItems.forEach(nav => nav.classList.remove('active'));
             item.classList.add('active');
 
-            // View Switching Logic
-            dashboardView.style.display = 'none';
-            detailsView.style.display = 'none';
-            trackingView.style.display = 'none';
-            insuranceView.style.display = 'none';
-            if(analyticsView) analyticsView.style.display = 'none';
-            if(historyView) historyView.style.display = 'none';
-            if(paymentView) paymentView.style.display = 'none';
-            if(paymentsView) paymentsView.style.display = 'none';
+            // Hide all views
+            Object.values(views).forEach(view => {
+                if (view) view.style.display = 'none';
+            });
 
-            if (label === 'Details') {
-                detailsView.style.display = 'block';
-            } else if (label === 'Overview') {
-                dashboardView.style.display = 'block';
-                // Trigger map resize since it was hidden
-                if (typeof overviewMap !== 'undefined' && overviewMap.invalidateSize) {
-                    setTimeout(() => overviewMap.invalidateSize(), 150);
+            // Show selected view
+            const selectedView = views[viewKey];
+            if (selectedView) {
+                // History uses flex for its split pane layout
+                selectedView.style.display = (viewKey === 'history') ? 'flex' : 'block';
+                
+                // Specific View Initializations
+                if (viewKey === 'dashboard') {
+                    if (typeof overviewMap !== 'undefined' && overviewMap.invalidateSize) {
+                        setTimeout(() => overviewMap.invalidateSize(), 150);
+                    }
+                } else if (viewKey === 'tracking') {
+                    if (typeof trackingMap === 'undefined' || !trackingMap) {
+                        initLiveTrackingMap();
+                    } else {
+                        setTimeout(() => trackingMap.invalidateSize(), 150);
+                    }
                 }
-            } else if (label === 'Tracking') {
-                trackingView.style.display = 'block';
-                // Trigger tracking map resize or init
-                if (typeof trackingMap === 'undefined' || !trackingMap) {
-                    initLiveTrackingMap();
-                } else {
-                    setTimeout(() => trackingMap.invalidateSize(), 150);
-                }
-            } else if (label === 'Insurance') {
-                insuranceView.style.display = 'block';
-            } else if (label === 'Analytics') {
-                if(analyticsView) analyticsView.style.display = 'block';
-            } else if (label === 'History') {
-                if(historyView) historyView.style.display = 'flex';
-            } else if (label === 'Payment') {
-                if(paymentView) paymentView.style.display = 'block';
-            } else if (label === 'Payment History') {
-                if(paymentsView) paymentsView.style.display = 'block';
             } else {
-                dashboardView.style.display = 'block';
+                // Fallback
+                if (views['dashboard']) views['dashboard'].style.display = 'block';
             }
         });
     });

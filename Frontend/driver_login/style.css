@@ -13,12 +13,22 @@
     --input-bg: var(--bg-color);
     --input-border: var(--border-color);
     --shadow: var(--card-shadow);
+
+    /* Driver-specific light theme */
+    --primary-blue: #191970;
+    --acc-blue: #121250;
+    --card-bg: #F5F7F8;
+    --form-bg: #F5F7F8;
 }
 
-[data-theme="dark"] :root {
+[data-theme="dark"] {
     --primary-yellow: #ca8a04;
     --acc-yellow: #eab308;
     --pure-white: #ffffff;
+    --primary-blue: #21aaff;
+    --acc-blue: #0099ff;
+    --card-bg: #1E1E1E;
+    --form-bg: #1E1E1E;
 }
 
 * {
@@ -48,24 +58,26 @@ body {
 }
 
 .card {
-    background-color: var(--white);
+    background-color: var(--card-bg);
     border-radius: 20px;
     display: flex;
+    flex-direction: row;
     overflow: hidden;
     box-shadow: var(--shadow);
     min-height: 600px;
-    border: 1px solid rgba(21, 128, 61, 0.1);
+    border: 1px solid var(--border-color);
 }
 
 /* LEFT PANEL (Slider) */
 .left-panel {
     flex: 0 0 45%;
     position: relative;
-    padding: 40px;
+    padding: 30px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
+    min-height: 600px;
 }
 
 .slider-container,
@@ -109,6 +121,7 @@ body {
     align-items: center;
     position: relative;
     z-index: 3;
+    flex-shrink: 0;
 }
 
 .logo {
@@ -153,7 +166,7 @@ body {
 
 .logo-text {
     font-family: 'Blending', cursive;
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 400;
     color: #ffffff;
 }
@@ -161,12 +174,13 @@ body {
 .back-link {
     color: #ffffff;
     text-decoration: none;
-    font-size: 13px;
+    font-size: 12px;
     background: rgba(255, 255, 255, 0.2);
-    padding: 8px 18px;
+    padding: 8px 16px;
     border-radius: 30px;
     transition: all 0.3s;
     backdrop-filter: blur(5px);
+    white-space: nowrap;
 }
 
 .back-link:hover {
@@ -177,15 +191,16 @@ body {
 .bottom-content {
     position: relative;
     z-index: 3;
-    text-align: center;
-    padding-bottom: 20px;
+    text-align: left;
+    padding-bottom: 10px;
     color: #ffffff;
+    flex-shrink: 0;
 }
 
 .bottom-content h1 {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 600;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     line-height: 1.3;
     letter-spacing: -0.5px;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -193,7 +208,7 @@ body {
 
 .indicators {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 12px;
 }
 
@@ -214,48 +229,55 @@ body {
 /* RIGHT PANEL (Form) */
 .right-panel {
     flex: 1;
-    padding: 50px 70px;
+    padding: 40px 50px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    overflow-y: auto;
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 .right-panel h2 {
-    font-size: 34px;
+    font-size: 30px;
     font-weight: 700;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     color: var(--primary-text);
-    letter-spacing: -1px;
+    letter-spacing: -0.5px;
 }
 
 .subtitle {
     color: var(--text-muted);
-    font-size: 15px;
-    margin-bottom: 40px;
+    font-size: 14px;
+    margin-bottom: 30px;
 }
 
 .subtitle a {
-    color: var(--acc-green);
+    color: var(--primary-blue);
     font-weight: 600;
     text-decoration: none;
-    border-bottom: 2px solid var(--primary-yellow);
+    border-bottom: 2px solid var(--primary-blue);
     transition: all 0.3s;
 }
 
 .subtitle a:hover {
-    color: var(--primary-green);
-    border-bottom-color: var(--acc-yellow);
+    color: var(--acc-blue);
+    border-bottom-color: var(--acc-blue);
 }
 
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
 }
 
 .input-row {
     display: flex;
-    gap: 16px;
+    gap: 12px;
 }
 
 .input-group {
@@ -267,12 +289,12 @@ input[type="text"],
 input[type="email"],
 input[type="password"] {
     width: 100%;
-    padding: 16px;
+    padding: 14px 16px;
     background-color: var(--input-bg);
     border: 1.5px solid var(--input-border);
     border-radius: 10px;
     color: var(--text-dark);
-    font-size: 15px;
+    font-size: 14px;
     outline: none;
     transition: all 0.3s ease;
 }
@@ -280,9 +302,15 @@ input[type="password"] {
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus {
-    border-color: var(--primary-green);
-    background-color: var(--white); /* Theme-aware background */
-    box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.1);
+    border-color: var(--primary-blue);
+    background-color: var(--white);
+    box-shadow: 0 0 0 4px rgba(25, 25, 112, 0.1);
+}
+
+[data-theme="dark"] input[type="text"]:focus,
+[data-theme="dark"] input[type="email"]:focus,
+[data-theme="dark"] input[type="password"]:focus {
+    box-shadow: 0 0 0 4px rgba(33, 170, 255, 0.15);
 }
 
 /* Autofill Overrides */
@@ -312,19 +340,19 @@ input::placeholder {
 }
 
 .password-group .eye-icon:hover {
-    color: var(--primary-green);
+    color: var(--primary-blue);
 }
 
 .checkbox-group {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 5px 0 10px 0;
+    margin: 2px 0 8px 0;
 }
 
 .checkbox-group input[type="checkbox"] {
     appearance: none;
-    background-color: #f3f4f6;
+    background-color: var(--input-bg);
     margin: 0;
     width: 20px;
     height: 20px;
@@ -334,11 +362,12 @@ input::placeholder {
     cursor: pointer;
     border: 1.5px solid var(--input-border);
     transition: all 0.2s;
+    flex-shrink: 0;
 }
 
 .checkbox-group input[type="checkbox"]:checked {
-    background-color: var(--primary-green);
-    border-color: var(--primary-green);
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
 }
 
 .checkbox-group input[type="checkbox"]::before {
@@ -356,44 +385,52 @@ input::placeholder {
 }
 
 .checkbox-group label {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text-dark);
     cursor: pointer;
 }
 
 .checkbox-group label a {
-    color: var(--primary-green);
+    color: var(--primary-blue);
     font-weight: 600;
     text-decoration: none;
 }
 
 .create-btn {
     width: 100%;
-    padding: 18px;
-    background-color: var(--primary-green);
+    padding: 16px;
+    background-color: var(--primary-blue);
     color: #ffffff;
     border: none;
     border-radius: 10px;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(25, 25, 112, 0.2);
+}
+
+[data-theme="dark"] .create-btn {
+    box-shadow: 0 4px 6px -1px rgba(33, 170, 255, 0.2);
 }
 
 .create-btn:hover {
-    background-color: var(--acc-green);
+    background-color: var(--acc-blue);
     transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.3);
+    box-shadow: 0 10px 15px -3px rgba(25, 25, 112, 0.3);
+}
+
+[data-theme="dark"] .create-btn:hover {
+    box-shadow: 0 10px 15px -3px rgba(33, 170, 255, 0.3);
 }
 
 .divider {
     display: flex;
     align-items: center;
     text-align: center;
-    margin: 15px 0;
-    color: #9ca3af;
-    font-size: 13px;
+    margin: 10px 0;
+    color: var(--text-muted);
+    font-size: 12px;
     font-weight: 500;
 }
 
@@ -410,29 +447,29 @@ input::placeholder {
 
 .social-buttons {
     display: flex;
-    gap: 16px;
+    gap: 12px;
 }
 
 .social-btn {
     flex: 1;
-    padding: 14px;
-    background-color: var(--white);
+    padding: 12px;
+    background-color: var(--card-bg);
     border: 1.5px solid var(--input-border);
     border-radius: 10px;
     color: var(--text-dark);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     cursor: pointer;
     transition: all 0.3s;
 }
 
 .social-btn:hover {
     background-color: var(--bg-light);
-    border-color: var(--primary-green);
+    border-color: var(--primary-blue);
     transform: translateY(-1px);
 }
 
@@ -441,95 +478,144 @@ input::placeholder {
     height: 20px;
 }
 
-/* SOS Button Styles */
-.sos-button {
-    width: 100%;
-    margin-top: 30px;
-    padding: 22px;
-    background: var(--sos-bg);
-    color: var(--sos-text);
-    border: none;
-    border-radius: 15px;
-    font-family: 'Inter', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 10px 30px var(--sos-glow);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    letter-spacing: 1px;
-    animation: sos-pulse 2s infinite;
-}
+/* ═══════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ═══════════════════════════════════════════ */
 
-.sos-button:hover {
-    filter: brightness(1.1);
-    transform: translateY(-2px);
-}
-
-.sos-button:active {
-    transform: translateY(0) scale(1);
-}
-
-.sos-button::before {
-    content: '';
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    background-color: #ffffff;
-    border-radius: 50%;
-    animation: pulse-red 1.5s infinite;
-}
-
-@keyframes pulse-red {
-    0% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.8);
+/* Large tablets and small desktops */
+@media (max-width: 1100px) {
+    .container {
+        max-width: 960px;
     }
 
-    70% {
-        transform: scale(1.1);
-        box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
-    }
-
-    100% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    .right-panel {
+        padding: 35px 40px;
     }
 }
 
-@keyframes sos-pulse {
-    0% {
-        box-shadow: 0 0 0 0 var(--sos-glow);
-        transform: scale(1);
-    }
-
-    50% {
-        box-shadow: 0 0 25px 15px var(--sos-glow);
-        transform: scale(1.03);
-    }
-
-    100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-        transform: scale(1);
-    }
-}
-
-/* Mobile Responsiveness */
+/* Tablets */
 @media (max-width: 900px) {
+    .container {
+        padding: 15px;
+    }
+
     .card {
         flex-direction: column;
         min-height: auto;
     }
 
     .left-panel {
-        flex: 0 0 300px;
+        flex: none;
+        min-height: 280px;
+        padding: 25px;
+    }
+
+    .top-nav {
+        flex-direction: row;
+    }
+
+    .bottom-content h1 {
+        font-size: 22px;
     }
 
     .right-panel {
-        padding: 40px 30px;
+        padding: 30px 35px;
+    }
+
+    .right-panel h2 {
+        font-size: 26px;
+    }
+}
+
+/* Mobile phones */
+@media (max-width: 600px) {
+    body {
+        align-items: flex-start;
+        padding-top: 10px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .card {
+        border-radius: 16px;
+    }
+
+    .left-panel {
+        min-height: 220px;
+        padding: 20px;
+    }
+
+    .logo-text {
+        font-size: 22px;
+    }
+
+    .logo-icon {
+        width: 35px;
+        height: 35px;
+    }
+
+    .back-link {
+        font-size: 11px;
+        padding: 6px 12px;
+    }
+
+    .bottom-content h1 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    .right-panel {
+        padding: 24px 20px;
+    }
+
+    .right-panel h2 {
+        font-size: 22px;
+    }
+
+    .subtitle {
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .input-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        padding: 12px 14px;
+        font-size: 13px;
+    }
+
+    .create-btn {
+        padding: 14px;
+        font-size: 14px;
+    }
+
+    .social-btn {
+        padding: 10px;
+        font-size: 12px;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+    .right-panel {
+        padding: 20px 16px;
+    }
+
+    .left-panel {
+        min-height: 180px;
+        padding: 16px;
+    }
+
+    .social-buttons {
+        flex-direction: column;
+        gap: 8px;
     }
 }
 
@@ -568,37 +654,7 @@ input::placeholder {
     background: linear-gradient(135deg, #1d4ed8, #3b82f6);
 }
 
-.toast-error {
-    background: linear-gradient(135deg, #dc2626, #ef4444);
-}
-
-.toast-info {
-    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-}
-
 /* Driver Theme Overrides */
-.driver-theme {
-    --primary-green: #15803d;
-    --acc-green: #166534;
-}
-
 .driver-theme .overlay {
     background: linear-gradient(180deg, rgba(20, 83, 45, 0.4) 0%, rgba(20, 83, 45, 0.85) 100%);
-}
-
-.driver-theme .create-btn {
-    background-color: #0ea5e9; /* Light blue button like in the image */
-}
-
-.driver-theme .create-btn:hover {
-    background-color: #0284c7;
-}
-
-.driver-theme .subtitle a {
-    color: #38bdf8;
-    border-bottom-color: #38bdf8;
-}
-
-.driver-theme .subtitle a:hover {
-    color: #7dd3fc;
 }
