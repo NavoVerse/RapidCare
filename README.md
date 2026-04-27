@@ -124,8 +124,8 @@ This section tracks the progress of connecting the newly designed Driver Dashboa
 
 ### Phase 2: Real-Time Coordination
 - [x] **Availability Sync**: Link the "LIVE" toggle to the `drivers` table `status` field.
-- [ ] **Live Tracking**: Implement `driver:location_update` emits via Socket.IO for active ambulance tracking.
-- [ ] **Incoming Alert**: Socket.IO listener to trigger the "Active Call" overlay for new emergency requests.
+- [x] **Live Tracking**: Implement `driver:location_update` emits via Socket.IO for active ambulance tracking.
+- [x] **Incoming Alert**: Socket.IO listener to trigger the "Active Call" overlay for new emergency requests.
 
 ### Phase 3: Trip Management
 - [ ] **Status Workflow**: Map "Arrived", "Picked Up", and "Hospital Transfer" buttons to `PUT /api/v1/trips/:id/status`.

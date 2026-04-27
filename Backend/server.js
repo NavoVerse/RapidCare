@@ -949,6 +949,10 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
 
         const tripId = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
 
+        // Fetch patient and hospital names for the alert
+        const patientUser = await knex('users').where({ id: req.user.id }).first();
+        const hospitalUser = await knex('users').where({ id: hospital_id }).first();
+
         const io = req.app.get('io');
         if (io) {
             io.to(`driver_${nearestDriver.user_id}`).emit('trip:new_request', {
@@ -956,7 +960,9 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
                 pickup_lat,
                 pickup_lng,
                 hospital_id,
-                patient_id: req.user.id
+                hospital_name: hospitalUser ? hospitalUser.name : 'Unknown Hospital',
+                patient_id: req.user.id,
+                patient_name: patientUser ? patientUser.name : 'Emergency Patient'
             });
         }
 
