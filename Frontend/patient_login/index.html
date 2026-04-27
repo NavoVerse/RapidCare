@@ -24,15 +24,14 @@
                 </div>
                 <div class="overlay"></div>
 
+                <div class="top-nav">
                     <div class="logo">
                         <div class="logo-icon">
                             <img src="../shared_assets/images/logo.svg" alt="Logo">
                         </div>
                         <span class="logo-text">RapidCare</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 20px;">
-                        <a href="../choose_User/index.html" class="back-link">Back to website &rarr;</a>
-                    </div>
+                    <a href="../choose_User/index.html" class="back-link">Back to website &rarr;</a>
                 </div>
 
                 <div class="bottom-content">
@@ -49,7 +48,7 @@
             <div class="right-panel">
                 <!-- Signup View -->
                 <div id="signup-view" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div class="form-header">
                         <h2>Create an account</h2>
                         <div class="theme-toggle" id="theme-toggle">
                         </div>
@@ -120,7 +119,7 @@
 
                 <!-- Login View -->
                 <div id="login-view">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div class="form-header">
                         <h2>Log in</h2>
                         <!-- Theme toggle added here for consistency, but script might need adjustment if multiple IDs exist -->
                         <div class="theme-toggle" id="theme-toggle-login">
@@ -176,7 +175,7 @@
 
                 <!-- Forgot Password View -->
                 <div id="forgot-password-view" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div class="form-header">
                         <h2>Reset Password</h2>
                         <div class="theme-toggle" id="theme-toggle-forgot">
                         </div>
