@@ -1,50 +1,116 @@
-# RapidCare: Emergency Medical Response System
+# RapidCare — Emergency Medical Response System
 
-RapidCare is a state-of-the-art healthcare management and emergency response platform designed to bridge the gap between patients and critical medical services. By leveraging real-time tracking and intelligent data management, RapidCare ensures that life-saving help is always just a few clicks away.
-
----
-
-## 🚀 What's New (April 2026)
-
-The project has recently undergone a major transformation with several high-impact features and a complete visual overhaul:
-
-### 📍 Advanced Patient Dashboard
-The patient-facing interface has been completely redesigned for speed and clarity:
-- **Interactive Mapping**: Integrated **Leaflet API** for real-time map visualization with zero external API key dependencies.
-- **Smart GPS Tracking**: Automated and manual location management with live address detection via OpenStreetMap (Nominatim).
-- **Emergency Dispatch**: A simulated **Ambulance Booking** system with instant OTP generation and driver assignment.
-- **Proximity Analysis**: Live calculation of distances to the nearest hospitals with accurate **ETA (Estimated Time of Arrival)** tracking.
-
-### 🎨 Visual Rebranding & UI/UX
-- **Unified Aesthetic**: A new premium design system featuring a sleek **Dark Mode** and a vibrant **Green, Yellow, and White** color palette.
-- **Responsive Login**: Re-engineered login interface with a split-screen design and an **auto-scrolling immersive slider** for a premium first impression.
-- **Micro-Animations**: Added subtle interactive elements and transitions to enhance user engagement and system feedback.
+> A real-time healthcare management and emergency ambulance coordination platform.
 
 ---
 
-## ✨ Core Features
-- **Real-Time Map**: Track nearby medical facilities and emergency vehicles in real-time.
-- **Hospital Directory**: Up-to-the-minute status updates on hospital availability (Available, Busy, Limited).
-- **Patient Portal**: Seamless access to profile management, emergency history, and medical records.
-- **Multi-Device Support**: Fully responsive layout optimized for mobile, tablet, and desktop viewports.
+## ✅ System Status: STABLE
+
+The RapidCare platform has undergone a full architectural stabilization and security hardening. All previously identified technical debt—including duplicate migrations, hardcoded URLs, and static file serving—has been resolved.
+
+- **Unified Backend**: Consolidated into a single Express 5 server.
+- **Clean Routing**: Server-side routes replace relative filesystem paths.
+- **Production Ready**: Optimized for PostgreSQL, PM2, and Nginx.
+- **Full Coverage**: Verified with comprehensive integration tests.
+
+---
+
+
+
+---
+
+## 🏗️ Architecture
+
+```
+RapidCare/
+├── Frontend/                      # All client-side UI modules
+│   ├── choose_User/               # Role selection landing page (entry point)
+│   ├── patient_login/             # Patient Login / Register / Forgot Password
+│   ├── patient_Dashboard/         # Main patient SPA (profile, map, vitals)
+│   ├── driver_dashboard/          # Driver-facing interface
+│   ├── driver_registration/       # Driver onboarding form
+│   ├── hospital_registration/     # Hospital onboarding form
+│   ├── Insurance_Interface/       # Insurance management UI
+│   ├── DeveloperDashboard/        # Admin data viewer / editor
+│   ├── excel_dashboard/           # Admin data export (CSV/Excel)
+│   ├── login_urgency/             # Emergency triage categorization
+│   └── shared_assets/             # Shared CSS theme + JS config
+│       ├── css/theme.css
+│       └── js/config.js, theme-manager.js
+│
+├── Backend/                       # Unified Express.js server (port 5000)
+│   ├── server.js                  # All API routes + static serving
+│   ├── db.js                      # Knex init + migration runner
+│   ├── config/database.js         # Knex connection (SQLite dev / PG prod)
+│   ├── knexfile.js                # Knex CLI config
+│   ├── migrations/                # 13 database migration files
+│   ├── seeds/                     # Core data seeding
+│   ├── tests/                     # Jest + Supertest integration tests
+│   ├── services/                  # Winston logger, Nodemailer
+│   ├── middleware/                # RBAC, rate limiter, Zod validation
+│   ├── validators/                # Zod schemas for auth routes
+│   └── user_Database/             # SQLite DB file (gitignored)
+│
+├── index.html                     # Root redirect → role selection
+├── start_rapidcare.bat            # Windows launcher script
+├── ecosystem.config.js            # PM2 production config
+├── nginx.conf.template            # Nginx reverse proxy template
+└── README.md
+```
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- **Node.js** v18+ (tested on v24.14.1)
+- **npm** v9+
+
+### Option 1: Double-click launcher (Windows)
+```
+start_rapidcare.bat
+```
+This will:
+1. Check Node.js is installed
+2. Kill any process on port 5000
+3. Install npm dependencies if missing
+4. Run database migrations
+5. Start the backend server
+6. Open the app in your default browser
+
+### Option 2: Manual start
+```bash
+cd Backend
+npm install            # First time only
+npx knex migrate:latest  # Sync database schema
+node server.js         # Start on port 5000
+```
+Then open `choose_User/index.html` in your browser.
+
+### Endpoints (once running)
+| URL | Description |
+|-----|-------------|
+| `http://localhost:5000/health` | Health check |
+| `http://localhost:5000/dev` | Developer Dashboard |
+| `http://localhost:5000/api/v1/auth/register` | User registration |
+| `http://localhost:5000/api/v1/auth/login` | User login |
+| `http://localhost:5000/api/v1/patients/me` | Patient profile (auth required) |
+
+---
 
 ## 🛠️ Technology Stack
-- **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3.
-- **Mapping**: Leaflet.js, OpenStreetMap contributors.
-- **Styling**: Custom CSS Components with CSS Variables for theme management.
-- **Backend Architecture**: Node.js & Express (Scaling for high-concurrency emergency requests).
-- **Database**: MongoDB for persistent user and hospital data storage.
 
-## 📈 Project Roadmap
-- [x] **Phase 1: Foundation** - Core UI/UX and basic backend integration.
-- [x] **Phase 2: Mobility** - Mapping, GPS, and dispatch simulation.
-- [ ] **Phase 3: Real-Time Communication** - WebSockets for live driver-patient chat.
-- [ ] **Phase 4: Global Scaling** - Expanding service boundaries and multi-language support.
-
-## 🤝 Conclusion
-RapidCare is more than just a dashboard; it's a commitment to faster, smarter healthcare. We are continuously iterating to ensure that every second counts in an emergency.
-
-For technical queries or collaboration, contact the team at **support@rapidcare.com**.
+| Layer | Technology |
+|-------|-----------|
+| **Runtime** | Node.js + Express 5 |
+| **Database** | SQLite 3 (dev) / PostgreSQL (prod) via Knex.js |
+| **Auth** | JWT + bcrypt + OTP (Nodemailer) |
+| **Real-Time** | Socket.IO (WebSocket) |
+| **Logging** | Winston + Daily Rotate File |
+| **Validation** | Zod schemas |
+| **Security** | RBAC middleware, rate limiting, AES-256 field encryption |
+| **Frontend** | Vanilla JS (ES6+), HTML5, CSS3, Leaflet.js (maps) |
 
 ---
-**Last Updated**: 2026-04-19 (v2.1.0 - The Dashboard Update)
+
+**Last Updated**: 2026-04-26 (v3.0.0 — Post-Merge Stabilization)

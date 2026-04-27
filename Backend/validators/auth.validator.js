@@ -20,7 +20,8 @@ const registerSchema = z.object({
 // Schema for login
 const loginSchema = z.object({
     email: emailOrPhone,
-    password: z.string().min(1, "Password is required")
+    password: z.string().min(1, "Password is required"),
+    expectedRole: z.enum(['patient', 'driver', 'hospital']).optional()
 });
 
 // Schema for requesting an OTP

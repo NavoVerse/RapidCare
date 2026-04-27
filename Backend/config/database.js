@@ -14,8 +14,9 @@ const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const isProduction = process.env.DB_TYPE === 'postgresql';
+const isTest = process.env.NODE_ENV === 'test';
 
-if (!isProduction) {
+if (!isProduction && !isTest) {
     const dbDir = path.resolve(__dirname, '../user_Database');
     if (!fs.existsSync(dbDir)) {
         fs.mkdirSync(dbDir, { recursive: true });
@@ -27,7 +28,7 @@ const knex = require('knex')({
 
     connection: isProduction
         ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
-        : { filename: path.resolve(__dirname, '../user_Database/rapidcare.db') },
+        : { filename: isTest ? path.resolve(__dirname, '../user_Database/rapidcare_test.db') : path.resolve(__dirname, '../user_Database/rapidcare.db') },
 
     // SQLite only: allow knex to manage foreign keys
     useNullAsDefault: true,
