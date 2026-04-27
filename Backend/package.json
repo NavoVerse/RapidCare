@@ -41,5 +41,9 @@
     "cross-env": "^10.1.0",
     "jest": "^30.3.0",
     "supertest": "^7.2.2"
+  },
+  "overrides": {
+    "uuid": "^14.0.0",
+    "@tootallnate/once": "^3.0.1"
   }
 }
