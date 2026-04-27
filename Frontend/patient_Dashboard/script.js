@@ -1,12 +1,20 @@
+var API_BASE = (window.RapidCareConfig && RapidCareConfig.API_BASE) || 'http://localhost:5000/api/v1';
+window.API_BASE = API_BASE; // Make accessible to global functions
+
 document.addEventListener('DOMContentLoaded', () => {
     let selectedHabits = [];
     // =============================================
     // REAL-TIME DISPATCH (Socket.IO)
     // =============================================
-    const API_BASE = (window.RapidCareConfig && RapidCareConfig.API_BASE) || 'http://localhost:5000/api/v1';
-    window.API_BASE = API_BASE; // Make accessible to global functions
     
     let socket = null;
+    let overviewMap = null;
+    let trackingMap = null;
+    let userMarker = null;
+    let hospitals = [];
+    let hospitalMarkers = [];
+    let ambulanceMarker = null;
+
     try {
         if (typeof io !== 'undefined') {
             const SOCKET_URL = (window.RapidCareConfig && RapidCareConfig.SOCKET_URL) || window.location.origin;
@@ -275,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     // GEOLOCATION DETECTION
     // =============================================
-    async function updateUserLocation() {
+    async function detectUserLocation() {
         const locationText = document.getElementById('userLocationText');
         const locationStatus = document.getElementById('locationStatus');
         
@@ -299,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Update overview map
-            if (overviewMap) {
+            if (overviewMap && overviewMap.setView) {
                 overviewMap.setView([latitude, longitude], 14);
                 if (userMarker) overviewMap.removeLayer(userMarker);
                 userMarker = L.marker([latitude, longitude], { icon: userIcon }).addTo(overviewMap).bindPopup('You are here').openPopup();
@@ -332,12 +340,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial load
     loadUserProfile();
-    updateUserLocation();
+    // detectAutoLocation() will be called later in the script
 
     // Refresh Location Button
     const refreshLocBtn = document.getElementById('refreshLocationBtn');
     if (refreshLocBtn) {
-        refreshLocBtn.addEventListener('click', updateUserLocation);
+        refreshLocBtn.addEventListener('click', detectUserLocation);
     }
 
     // SOS Button Logic
@@ -479,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     // MAP & HOSPITAL INTEGRATION (Leaflet)
     // =============================================
-    const overviewMap = L.map('map').setView([22.5726, 88.3639], 12);
+    overviewMap = L.map('map').setView([22.5726, 88.3639], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -488,8 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     // LIVE TRACKING MAP (Integrated from Tracking Interface)
     // =============================================
-    let trackingMap = null;
-    let ambulanceMarker = null;
+    // trackingMap and ambulanceMarker are already declared at top of scope
 
     async function initLiveTrackingMap() {
         const mapEl = document.getElementById('live-tracking-map');
@@ -566,9 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    let hospitals = [];
-    let hospitalMarkers = [];
-    let userMarker = null;
+    // Hospitals data and markers are already declared at top of scope
 
     // Custom hospital marker icon
     const hospitalIcon = L.divIcon({
@@ -2111,85 +2116,83 @@ function handleMessage() {
 
 
 // --- ANALYTICS SCRIPT --- 
-document.addEventListener('DOMContentLoaded', () => {
-    // UI Elements
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
+    // Analytics UI Elements (moved or redundant logic removed)
     const themeToggle = document.getElementById('theme-toggle');
     const body = document.body;
 
-    // Simulation Data Elements
-    const elements = {
-        hr: document.getElementById('val-hr'),
-        bp: document.getElementById('val-bp'),
-        safety: document.getElementById('val-safety'),
-        barHr: document.getElementById('bar-hr'),
-        barBp: document.getElementById('bar-bp'),
-        barO2: document.getElementById('bar-o2')
-    };
-
-    // 1. Sidebar Toggle
-    sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-    });
-
-    // 2. Theme Toggle
-    themeToggle.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        const isDark = body.classList.contains('dark-mode');
-        themeToggle.innerHTML = isDark ? 
-            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>` : 
-            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>`;
-    });
+    // 2. Theme Toggle (Unified)
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('rapidcare-theme', isDark ? 'dark' : 'light');
+            
+            themeToggle.innerHTML = isDark ? 
+                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>` : 
+                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>`;
+        });
+    }
 
     // 3. Simulation Modal Handlers
     window.openSimModal = () => {
-        document.getElementById('simModal').classList.add('active');
+        const modal = document.getElementById('simModal');
+        if (modal) modal.classList.add('active');
     };
 
     window.closeSimModal = () => {
-        document.getElementById('simModal').classList.remove('active');
+        const modal = document.getElementById('simModal');
+        if (modal) modal.classList.remove('active');
     };
 
     window.applySimulation = () => {
+        const elements = {
+            hr: document.getElementById('val-hr'),
+            bp: document.getElementById('val-bp'),
+            safety: document.getElementById('val-safety'),
+            barHr: document.getElementById('bar-hr'),
+            barBp: document.getElementById('bar-bp'),
+            barO2: document.getElementById('bar-o2')
+        };
+        
         const HR = document.getElementById('input-hr').value;
         const BP = document.getElementById('input-bp').value;
         const Safety = document.getElementById('input-safety').value;
 
         // Update Values with animation
-        animateValue(elements.hr, HR);
-        animateValue(elements.safety, Safety);
-        elements.bp.innerText = `${BP}/76`;
+        if (elements.hr) animateValue(elements.hr, HR);
+        if (elements.safety) animateValue(elements.safety, Safety);
+        if (elements.bp) elements.bp.innerText = `${BP}/76`;
 
         // Update Bars
-        elements.barHr.style.width = `${(HR / 150) * 100}%`;
-        elements.barBp.style.width = `${(BP / 200) * 100}%`;
+        if (elements.barHr) elements.barHr.style.width = `${(HR / 150) * 100}%`;
+        if (elements.barBp) elements.barBp.style.width = `${(BP / 200) * 100}%`;
         
         // Update Safety card progress
-        document.querySelector('.metric-card .progress-bar-fill').style.width = `${Safety}%`;
+        const safetyFill = document.querySelector('.metric-card .progress-bar-fill');
+        if (safetyFill) safetyFill.style.width = `${Safety}%`;
 
-        // Update circular progress (Service quality simulation)
-        // Just for visual effect when they edit
+        // Update circular progress
         const fgCircle = document.querySelector('.circular-progress circle.fg');
-        const offset = 282.7 - (282.7 * (Safety / 100));
-        fgCircle.style.strokeDashoffset = offset;
-        document.querySelector('.progress-val span').innerText = `${Math.round(Safety * 1.07)}%`;
+        if (fgCircle) {
+            const offset = 282.7 - (282.7 * (Safety / 100));
+            fgCircle.style.strokeDashoffset = offset;
+        }
+        const progVal = document.querySelector('.progress-val span');
+        if (progVal) progVal.innerText = `${Math.round(Safety * 1.07)}%`;
 
         closeSimModal();
-        
-        // Visual feedback
         showNotification('Analytics profile updated successfully');
     };
 
@@ -2237,7 +2240,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     `;
     document.head.appendChild(style);
-});
+
+    // Initialize all views and data
+    if (typeof init === 'function') {
+        init();
+    }
+
 
 
 // --- HISTORY SCRIPT --- 
@@ -2271,9 +2279,7 @@ const noSelection = document.getElementById('no-selection');
 const detailContent = document.getElementById('detail-content');
 const searchInput = document.getElementById('history-search');
 const filterChips = document.querySelectorAll('.filter-chip');
-const sidebarToggle = document.getElementById('sidebar-toggle');
-const sidebar = document.getElementById('sidebar');
-const themeToggle = document.getElementById('theme-toggle');
+
 
 let currentFilter = 'all';
 let searchQuery = '';
@@ -2573,32 +2579,6 @@ function setupEventListeners() {
             renderHistory();
         });
     });
-
-    sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-    });
-
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const isDark = document.body.classList.contains('dark-mode');
-        themeToggle.innerHTML = isDark ? `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-        ` : `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-        `;
-    });
 }
 
 function closeMobileDetail() {
@@ -2734,8 +2714,6 @@ window.addEventListener('resize', () => {
         detailPane.classList.remove('mobile-active');
     }
 });
-
-init();
 
 // Resizer Logic
 document.addEventListener('DOMContentLoaded', () => {
