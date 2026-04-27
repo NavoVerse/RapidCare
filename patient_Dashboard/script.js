@@ -1772,8 +1772,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const confirmPayBtn = document.querySelector('.pay-now-btn-integrated');
     if (confirmPayBtn) {
-        confirmPayBtn.addEventListener('click', () => {
+        confirmPayBtn.addEventListener('click', async () => {
             const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            const amountText = document.getElementById('payBtnAmount').textContent;
+            const amount = parseInt(amountText) || 0;
+
             if (selectedMethod === 'cash') {
                 if (isCashRewardActivePayment) {
                     cashRideCountPayment = 0;
@@ -1782,13 +1785,80 @@ document.addEventListener('DOMContentLoaded', () => {
                     cashRideCountPayment++;
                 }
                 localStorage.setItem('rapidcare_cash_rides', cashRideCountPayment.toString());
+                alert('PAYMENT SUCCESSFUL!\n\nThank you for choosing RapidCare.\nYour bill is settled via Cash.');
+                updateCashRewardUIPayment();
+                updateTotalPayment();
+                document.querySelector('.nav-item[data-view="overview"]')?.click();
+                return;
             }
 
-            alert('PAYMENT SUCCESSFUL!\n\nThank you for choosing RapidCare.\nYour bill is settled.');
-            updateCashRewardUIPayment();
-            updateTotalPayment();
-            // Return to dashboard overview
-            document.querySelector('.nav-item[data-view="overview"]')?.click();
+            try {
+                confirmPayBtn.disabled = true;
+                confirmPayBtn.innerHTML = 'Processing...';
+
+                // 1. Create Order via Backend
+                const orderRes = await fetch('http://localhost:5000/api/v1/payments/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, currency: 'INR' })
+                });
+                const orderData = await orderRes.json();
+
+                if (!orderData.success) throw new Error('Could not create order');
+
+                // 2. Open Razorpay Checkout
+                const options = {
+                    key: 'rzp_test_placeholder', // Should match backend or be injected dynamically
+                    amount: orderData.order.amount,
+                    currency: orderData.order.currency,
+                    name: 'RapidCare',
+                    description: 'Medical Service Payment',
+                    order_id: orderData.order.id,
+                    handler: async function (response) {
+                        try {
+                            // 3. Verify Payment
+                            const verifyRes = await fetch('http://localhost:5000/api/v1/payments/verify-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    paymentDetails: { amount, user_id: 'patient_user' }
+                                })
+                            });
+                            
+                            const verifyData = await verifyRes.json();
+                            
+                            if (verifyData.success) {
+                                alert('PAYMENT SUCCESSFUL!\n\nThank you for choosing RapidCare.\nYour bill is settled.');
+                                updateCashRewardUIPayment();
+                                updateTotalPayment();
+                                document.querySelector('.nav-item[data-view="overview"]')?.click();
+                            } else {
+                                alert('Payment verification failed. Please contact support.');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            alert('Error verifying payment.');
+                        }
+                    },
+                    theme: { color: '#0d9488' }
+                };
+                
+                const rzp = new window.Razorpay(options);
+                rzp.on('payment.failed', function (response){
+                    alert('Payment Failed: ' + response.error.description);
+                });
+                rzp.open();
+                
+            } catch (err) {
+                console.error('Payment error:', err);
+                alert('Could not initiate payment. Please try again.');
+            } finally {
+                confirmPayBtn.disabled = false;
+                confirmPayBtn.innerHTML = `Pay ₹<span id="payBtnAmount">${amount}</span>`;
+            }
         });
     }
 
