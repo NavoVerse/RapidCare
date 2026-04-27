@@ -48,9 +48,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Profile Tab Fields
         const profileFields = {
-            'profile-name': driver.name,
+            'profile-display-name': driver.name,
+            'profile-name': driver.name, // For the main dashboard if applicable
             'profile-email': driver.email,
             'profile-phone': driver.phone,
+            'profile-gender': driver.gender || 'Not Specified',
             'profile-vehicle': `${driver.vehicle_number} (${driver.vehicle_type || 'Ambulance'})`,
             'profile-license': driver.license_number,
             'profile-address': `${driver.address || ''}, ${driver.city || ''}, ${driver.state || ''} - ${driver.pincode || ''}`
@@ -338,6 +340,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).join('');
 
         tripList.innerHTML = tripHtml;
+
+        // Update Profile Stats
+        const totalBookings = trips.length;
+        const completedBookings = trips.filter(t => t.status === 'completed').length;
+        const cancelledBookings = trips.filter(t => t.status === 'cancelled').length;
+
+        const totalEl = document.getElementById('stat-total-bookings');
+        const completedEl = document.getElementById('stat-completed-bookings');
+        const cancelledEl = document.getElementById('stat-cancelled-bookings');
+
+        if (totalEl) totalEl.textContent = totalBookings;
+        if (completedEl) completedEl.textContent = completedBookings;
+        if (cancelledEl) cancelledEl.textContent = cancelledBookings;
+
+        // Today's Stats
+        const today = new Date().toDateString();
+        const tripsToday = trips.filter(t => new Date(t.created_at).toDateString() === today);
+        const doneToday = tripsToday.filter(t => t.status === 'completed').length;
+        const activeToday = tripsToday.filter(t => !['completed', 'cancelled'].includes(t.status)).length;
+
+        const tripsTodayEl = document.getElementById('stat-trips-today');
+        const tripsTodayDescEl = document.getElementById('stat-trips-today-desc');
+        const activeCallsEl = document.getElementById('stat-active-calls');
+
+        if (tripsTodayEl) tripsTodayEl.textContent = tripsToday.length;
+        if (tripsTodayDescEl) tripsTodayDescEl.textContent = `${doneToday} done · ${activeToday} active`;
+        if (activeCallsEl) activeCallsEl.textContent = activeToday;
 
         // Simple version for dashboard
         if (dashboardTripList) {

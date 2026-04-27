@@ -86,7 +86,7 @@
                             <div class="stat-card">
                                 <span class="stat-label">ACTIVE CALL</span>
                                 <div class="stat-value-container">
-                                    <span class="stat-number highlight-red">1</span>
+                                    <span class="stat-number highlight-red" id="stat-active-calls">0</span>
                                     <span class="stat-desc">Call in progress</span>
                                 </div>
                             </div>
@@ -100,8 +100,8 @@
                             <div class="stat-card">
                                 <span class="stat-label">TRIPS TODAY</span>
                                 <div class="stat-value-container">
-                                    <span class="stat-number highlight-green">6</span>
-                                    <span class="stat-desc">5 done · 1 active</span>
+                                    <span class="stat-number highlight-green" id="stat-trips-today">0</span>
+                                    <span class="stat-desc" id="stat-trips-today-desc">0 done · 0 active</span>
                                 </div>
                             </div>
                             <div class="stat-card">
@@ -364,7 +364,7 @@
                                         alt="Arjun Rao" class="main-avatar">
                                     <button class="edit-btn"><i class="fa-solid fa-pen"></i></button>
                                 </div>
-                                <h2 class="profile-name">Arjun Rao</h2>
+                                <h2 class="profile-name" id="profile-display-name">Arjun Rao</h2>
                                 <span class="status-pill available">Active Driver</span>
 
                                 <button class="primary-profile-btn">Edit Documents</button>
@@ -372,11 +372,11 @@
                                 <div class="profile-field-group">
                                     <div class="field-item">
                                         <label>Email</label>
-                                        <span>arjun.rao@rapidcare.com</span>
+                                        <span id="profile-email">arjun.rao@rapidcare.com</span>
                                     </div>
                                     <div class="field-item">
                                         <label>Gender</label>
-                                        <span>Male</span>
+                                        <span id="profile-gender">Male</span>
                                     </div>
                                     <div class="field-item">
                                         <label>Notifications</label>
@@ -391,7 +391,7 @@
                                 <div class="profile-stats-row">
                                     <div class="profile-stat-card blue">
                                         <div class="stat-main">
-                                            <span class="num">154</span>
+                                            <span class="num" id="stat-total-bookings">0</span>
                                             <span class="lab">All Bookings</span>
                                             <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 35.67%</div>
                                         </div>
@@ -405,7 +405,7 @@
                                     </div>
                                     <div class="profile-stat-card purple">
                                         <div class="stat-main">
-                                            <span class="num">142</span>
+                                            <span class="num" id="stat-completed-bookings">0</span>
                                             <span class="lab">Completed</span>
                                             <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 25%</div>
                                         </div>
@@ -419,7 +419,7 @@
                                     </div>
                                     <div class="profile-stat-card orange">
                                         <div class="stat-main">
-                                            <span class="num">12</span>
+                                            <span class="num" id="stat-cancelled-bookings">0</span>
                                             <span class="lab">Cancelled</span>
                                             <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 35.67%</div>
                                         </div>
