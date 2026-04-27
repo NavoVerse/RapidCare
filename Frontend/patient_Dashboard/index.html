@@ -1329,6 +1329,9 @@
 
         
         <div id="analytics-view" style="display: none;">
+            <div style="padding: 20px; display: flex; justify-content: flex-end;">
+                <button class="primary-btn" onclick="document.getElementById('simModal').classList.add('active')">Simulate Data Entry</button>
+            </div>
             <div class="analytics-container">
             <!-- Top Metrics Row -->
             <div class="metrics-grid">
@@ -1593,57 +1596,6 @@
     </div>
 
     
-        
-        <div id="analytics-view" style="display: none;">
-            <div class="dashboard-container">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Health Analytics</h3>
-                        <span class="badge-insurance active">Real-time Insights</span>
-                    </div>
-                    <div style="padding: 40px; text-align: center; color: var(--text-muted);">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom: 20px; opacity: 0.5;">
-                            <path d="M18 20V10M12 20V4M6 20v-6"/>
-                        </svg>
-                        <h4>AI Analysis in Progress</h4>
-                        <p>We are analyzing your medical history and vitals to provide personalized insights.</p>
-                        <button class="primary-btn" onclick="openSimModal()" style="margin-top: 20px; margin-left: auto; margin-right: auto;">Simulate Data Entry</button>
-                    </div>
-                </div>
-                
-                <div class="main-grid" style="margin-top: 24px;">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Predictive Risk</h3>
-                        </div>
-                        <div style="padding: 20px;">
-                            <div class="progress-container">
-                                <label>Cardiac Health Risk</label>
-                                <div class="progress-bar" style="height: 12px; background: rgba(0,0,0,0.1);">
-                                    <div class="progress-fill" style="width: 25%; background: var(--primary-green);"></div>
-                                </div>
-                                <small>Low Risk - Keep it up!</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Suggested Precautions</h3>
-                        </div>
-                        <div style="padding: 20px;">
-                            <ul style="list-style: none; padding: 0;">
-                                <li style="margin-bottom: 12px; display: flex; gap: 10px;">
-                                    <span style="color: var(--primary-green);">✔</span> Regular BP monitoring advised.
-                                </li>
-                                <li style="margin-bottom: 12px; display: flex; gap: 10px;">
-                                    <span style="color: var(--primary-green);">✔</span> Maintain high fluid intake.
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div id="history-view" style="display: none;">
             <div class="history-container">

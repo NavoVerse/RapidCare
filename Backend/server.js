@@ -134,6 +134,12 @@ app.use('/urgency', express.static(path.resolve(__dirname, '../Frontend/login_ur
 app.use('/dev', express.static(path.resolve(__dirname, '../Frontend/DeveloperDashboard')));
 app.use('/', express.static(path.resolve(__dirname, '../Frontend/choose_User')));
 
+// ── Static: Backend Scripts (for frontend consumption) ──────────────────────
+app.use('/Backend/user_Location_Auto_Detection', express.static(path.resolve(__dirname, 'user_Location_Auto_Detection')));
+app.use('/Backend/map_Integration', express.static(path.resolve(__dirname, 'map_Integration')));
+app.use('/Backend/user_Database', express.static(path.resolve(__dirname, 'user_Database')));
+
+
 // ── Auth Middleware ───────────────────────────────────────────────────────────
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
