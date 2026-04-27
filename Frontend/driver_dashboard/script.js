@@ -97,6 +97,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Handle Incoming Trip Requests
+    let activeTripData = null;
+
     socket.on('trip:new_request', (data) => {
         console.log('New trip request received:', data);
         showIncomingAlert(data);
@@ -302,46 +304,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderTripHistory(trips) {
         const tripList = document.querySelector('.list-body'); // Profile tab list
         const dashboardTripList = document.getElementById('profile-trip-list'); // Main dashboard list
+        const queueList = document.querySelector('.queue-list'); // Dashboard incoming queue
         
         if (!tripList) return;
 
+        // --- 1. Render Profile History List ---
         if (trips.length === 0) {
             tripList.innerHTML = '<div class="list-item" style="justify-content: center; opacity: 0.5;">No recent trips found</div>';
-            if (dashboardTripList) dashboardTripList.innerHTML = '<div class="trip-item" style="justify-content: center; opacity: 0.5;">No trips today</div>';
-            return;
+        } else {
+            tripList.innerHTML = trips.map(trip => {
+                const date = new Date(trip.created_at);
+                const day = date.getDate();
+                const month = date.toLocaleString('default', { month: 'short' });
+                
+                let statusClass = 'booked';
+                if (trip.status === 'completed') statusClass = 'done';
+                if (trip.status === 'cancelled') statusClass = 'cancelled';
+
+                return `
+                    <div class="list-item">
+                        <div class="item-date">
+                            <span class="day">${day}</span>
+                            <span class="month">${month}</span>
+                        </div>
+                        <div class="item-info">
+                            <span class="task">${trip.patient_name || 'Emergency'}'s Request</span>
+                            <span class="time">${new Date(trip.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                        </div>
+                        <span class="status-badge ${statusClass}">${trip.status.charAt(0).toUpperCase() + trip.status.slice(1)}</span>
+                        <div class="item-price">
+                            <span class="total">₹${trip.total_fare || 0}</span>
+                            <span class="rate">₹70/km</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        const tripHtml = trips.map(trip => {
-            const date = new Date(trip.created_at);
-            const day = date.getDate();
-            const month = date.toLocaleString('default', { month: 'short' });
-            
-            let statusClass = 'booked';
-            if (trip.status === 'completed') statusClass = 'done';
-            if (trip.status === 'cancelled') statusClass = 'cancelled';
-
-            return `
-                <div class="list-item">
-                    <div class="item-date">
-                        <span class="day">${day}</span>
-                        <span class="month">${month}</span>
-                    </div>
-                    <div class="item-info">
-                        <span class="task">${trip.patient_name}'s Request</span>
-                        <span class="time">${new Date(trip.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                    </div>
-                    <span class="status-badge ${statusClass}">${trip.status.charAt(0).toUpperCase() + trip.status.slice(1)}</span>
-                    <div class="item-price">
-                        <span class="total">₹${trip.total_fare || 0}</span>
-                        <span class="rate">₹70/km</span>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        tripList.innerHTML = tripHtml;
-
-        // Update Profile Stats
+        // --- 2. Render Dashboard Stats ---
         const totalBookings = trips.length;
         const completedBookings = trips.filter(t => t.status === 'completed').length;
         const cancelledBookings = trips.filter(t => t.status === 'cancelled').length;
@@ -353,6 +353,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (totalEl) totalEl.textContent = totalBookings;
         if (completedEl) completedEl.textContent = completedBookings;
         if (cancelledEl) cancelledEl.textContent = cancelledBookings;
+
+        const totalCountFilterEl = document.getElementById('stat-total-count-filter');
+        if (totalCountFilterEl) totalCountFilterEl.textContent = `All Time (${totalBookings})`;
 
         // Today's Stats
         const today = new Date().toDateString();
@@ -368,7 +371,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (tripsTodayDescEl) tripsTodayDescEl.textContent = `${doneToday} done · ${activeToday} active`;
         if (activeCallsEl) activeCallsEl.textContent = activeToday;
 
-        // Simple version for dashboard
+        // ETA & Distance
+        activeTripData = trips.find(t => !['completed', 'cancelled'].includes(t.status));
+        const etaEl = document.getElementById('stat-eta');
+        const distEl = document.getElementById('stat-distance');
+        const activePatientIdEl = document.getElementById('active-patient-id');
+        const activeConditionEl = document.getElementById('active-patient-condition');
+
+        if (activeTripData) {
+            if (etaEl) etaEl.textContent = '4 min';
+            if (distEl) distEl.textContent = '2.1 km remaining';
+            if (activePatientIdEl) activePatientIdEl.textContent = `Patient ID #${activeTripData.patient_id}`;
+            if (activeConditionEl) activeConditionEl.textContent = activeTripData.complaint || 'Emergency Response';
+        } else {
+            if (etaEl) etaEl.textContent = '--';
+            if (distEl) distEl.textContent = 'No active trip';
+            if (activePatientIdEl) activePatientIdEl.textContent = 'No active call';
+            if (activeConditionEl) activeConditionEl.textContent = 'Waiting for request...';
+        }
+
+        updateActionButtons(activeTripData);
+
+        // --- 3. Render Dashboard Recent List ---
         if (dashboardTripList) {
             dashboardTripList.innerHTML = trips.slice(0, 5).map(trip => {
                 let statusClass = 'success';
@@ -379,13 +403,37 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <i class="fa-solid ${trip.status === 'completed' ? 'fa-check' : 'fa-xmark'}"></i>
                         </div>
                         <div class="trip-info">
-                            <span class="patient-id">Patient ID #${trip.patient_id}</span>
-                            <span class="trip-detail">${trip.hospital_name}</span>
+                            <span class="patient-id">Patient #${trip.patient_id}</span>
+                            <span class="trip-detail">${trip.hospital_name || 'Hospital Transfer'}</span>
                         </div>
                         <span class="trip-time">${new Date(trip.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                     </div>
                 `;
             }).join('');
+        }
+
+        // --- 4. Render Incoming Queue ---
+        if (queueList) {
+            const requestedTrips = trips.filter(t => t.status === 'requested');
+            if (requestedTrips.length === 0) {
+                queueList.innerHTML = '<div class="queue-item" style="justify-content: center; opacity: 0.5;">No pending requests</div>';
+            } else {
+                queueList.innerHTML = requestedTrips.map(trip => {
+                    return `
+                        <div class="queue-item">
+                            <div class="item-header">
+                                <span class="name">${trip.patient_name || 'Emergency Patient'}</span>
+                                <span class="time">${new Date(trip.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <div class="item-details">
+                                <span class="location">Lat: ${trip.pickup_lat.toFixed(4)}, Lng: ${trip.pickup_lng.toFixed(4)}</span>
+                                <span class="distance">Nearby</span>
+                            </div>
+                            <span class="status-tag medium">Requested</span>
+                        </div>
+                    `;
+                }).join('');
+            }
         }
     }
 
@@ -498,4 +546,77 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     });
+
+    // Status Workflow Handlers
+    function updateActionButtons(trip) {
+        const btnArrivedPatient = document.getElementById('btn-arrived-patient');
+        const btnPickedUp = document.getElementById('btn-picked-up');
+        const btnArrivedHospital = document.getElementById('btn-arrived-hospital');
+        const btnCompleteTrip = document.getElementById('btn-complete-trip');
+
+        // Hide all first
+        [btnArrivedPatient, btnPickedUp, btnArrivedHospital, btnCompleteTrip].forEach(btn => {
+            if (btn) btn.style.display = 'none';
+        });
+
+        if (!trip) return;
+
+        switch (trip.status) {
+            case 'accepted':
+            case 'heading_to_patient':
+                if (btnArrivedPatient) btnArrivedPatient.style.display = 'block';
+                break;
+            case 'arrived':
+                if (btnPickedUp) btnPickedUp.style.display = 'block';
+                break;
+            case 'heading_to_hospital':
+                if (btnArrivedHospital) btnArrivedHospital.style.display = 'block';
+                break;
+            case 'at_hospital':
+                if (btnCompleteTrip) btnCompleteTrip.style.display = 'block';
+                break;
+        }
+    }
+
+    async function changeTripStatus(newStatus) {
+        if (!activeTripData) return;
+
+        try {
+            const response = await fetch(`/api/v1/trips/${activeTripData.id}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (response.ok) {
+                // Refresh data to update UI
+                fetchAndRenderTrips();
+                showToast(`Status updated to ${newStatus}`);
+            } else {
+                const err = await response.json();
+                alert(`Error: ${err.error}`);
+            }
+        } catch (err) {
+            console.error('Status update error:', err);
+        }
+    }
+
+    // Attach listeners to buttons
+    document.getElementById('btn-arrived-patient')?.addEventListener('click', () => changeTripStatus('arrived'));
+    document.getElementById('btn-picked-up')?.addEventListener('click', () => changeTripStatus('heading_to_hospital'));
+    document.getElementById('btn-arrived-hospital')?.addEventListener('click', () => changeTripStatus('at_hospital'));
+    document.getElementById('btn-complete-trip')?.addEventListener('click', async () => {
+        await changeTripStatus('completed');
+        // If completed, also set driver back to available? 
+        // Backend handles this in some cases, but let's be sure.
+        window.location.reload(); 
+    });
+
+    function showToast(msg) {
+        // Simple toast or console log for now
+        console.log('TOAST:', msg);
+    }
 });

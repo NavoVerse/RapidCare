@@ -1351,7 +1351,7 @@ app.put('/api/admin/data', express.json(), async (req, res) => {
 
     const userFields = ['name', 'email', 'phone'];
     const patientFields = ['blood_group', 'medical_history', 'emergency_contact', 'gender', 'date_of_birth', 'height', 'weight', 'blood_pressure', 'home_location', 'allergies', 'chronic_conditions', 'own_diagnosis', 'health_barriers', 'habits'];
-    const driverFields = ['license_number', 'vehicle_number', 'status'];
+    const driverFields = ['license_number', 'vehicle_number', 'status', 'dob', 'alt_phone', 'address', 'city', 'state', 'pincode', 'aadhaar_number', 'pan_number', 'vehicle_type'];
     const hospitalFields = ['address', 'total_beds', 'specialty'];
 
     try {
