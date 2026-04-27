@@ -4,8 +4,11 @@
   "description": "RapidCare Unified Backend Server — Auth + Dev Dashboard API",
   "main": "server.js",
   "scripts": {
+    "setup": "node scripts/setup.js",
+    "prestart": "node scripts/setup.js",
     "start": "node server.js",
     "dev": "node server.js",
+    "postinstall": "npx knex migrate:latest || echo Migration deferred to server startup.",
     "migrate": "knex migrate:latest",
     "migrate:rollback": "knex migrate:rollback",
     "migrate:make": "knex migrate:make",
