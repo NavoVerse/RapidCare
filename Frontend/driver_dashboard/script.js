@@ -63,4 +63,51 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.card, .stat-card').forEach(card => {
         observer.observe(card);
     });
+
+    // Navigation Tab Switching
+    const navItems = document.querySelectorAll('.nav-item[data-target]');
+    const viewSections = document.querySelectorAll('.view-section');
+    const headerTitle = document.querySelector('.main-header h1');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Remove active from all nav items
+            navItems.forEach(nav => {
+                nav.classList.remove('active');
+                const dot = nav.querySelector('.active-dot');
+                if (dot) dot.style.display = 'none';
+            });
+
+            // Add active to clicked item
+            item.classList.add('active');
+            const dot = item.querySelector('.active-dot');
+            if (dot) dot.style.display = 'block';
+
+            // Hide all views
+            viewSections.forEach(section => {
+                section.style.display = 'none';
+                section.classList.remove('active');
+            });
+
+            // Show target view
+            const targetId = item.getAttribute('data-target');
+            const targetView = document.getElementById(targetId);
+            if (targetView) {
+                targetView.style.display = 'block';
+                // Small delay to allow display:block to apply before adding class for animations
+                setTimeout(() => {
+                    targetView.classList.add('active');
+                }, 10);
+            }
+
+            // Update Header Title
+            if (targetId === 'profile-view') {
+                headerTitle.textContent = 'Driver Profile';
+            } else {
+                headerTitle.textContent = 'Dashboard';
+            }
+        });
+    });
 });
