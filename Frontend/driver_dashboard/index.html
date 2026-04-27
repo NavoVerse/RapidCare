@@ -346,148 +346,183 @@
                         </div>
                     </div>
                 </div>
+                </div>
                 <!-- End Dashboard View -->
 
                 <!-- Driver Profile View -->
                 <div id="profile-view" class="view-section" style="display: none;">
                     <div class="dashboard-grid-90">
-                        <div class="profile-header-banner" style="margin-bottom: 30px; display: flex; align-items: center; gap: 20px;">
-                            <div class="profile-avatar-large" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent-red), #ff7675); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: white;">AR</div>
-                            <div class="profile-title-info">
-                                <h2 style="font-size: 28px; margin-bottom: 5px;">Arjun Rao</h2>
-                                <span class="profile-role-badge" style="background: rgba(255, 77, 77, 0.1); color: var(--accent-red); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid rgba(255, 77, 77, 0.2);">Emergency Driver #D564821</span>
+                    <div class="profile-layout-grid">
+                        <!-- Left Sidebar: Profile Summary -->
+                        <div class="profile-sidebar-card">
+                            <div class="profile-img-container">
+                                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=150&h=150&auto=format&fit=crop" alt="Arjun Rao" class="main-avatar">
+                                <button class="edit-btn"><i class="fa-solid fa-pen"></i></button>
+                            </div>
+                            <h2 class="profile-name">Arjun Rao</h2>
+                            <span class="status-pill available">Active Driver</span>
+                            
+                            <button class="primary-profile-btn">Add New Document</button>
+
+                            <div class="profile-field-group">
+                                <div class="field-item">
+                                    <label>Email</label>
+                                    <span>arjun.rao@rapidcare.com</span>
+                                </div>
+                                <div class="field-item">
+                                    <label>Gender</label>
+                                    <span>Male</span>
+                                </div>
+                                <div class="field-item">
+                                    <label>Notifications</label>
+                                    <span>Allows Emergency Alerts</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="content-layout">
-                            <div class="content-column">
-                                <div class="card profile-card" style="margin-bottom: 25px;">
-                                    <div class="card-header">
-                                        <h3>Personal Information</h3>
-                                        <button class="btn-icon" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer;"><i class="fa-solid fa-pen"></i></button>
+                        <!-- Right Content Area -->
+                        <div class="profile-main-area">
+                            <!-- Top Stats Row -->
+                            <div class="profile-stats-row">
+                                <div class="profile-stat-card blue">
+                                    <div class="stat-main">
+                                        <span class="num">154</span>
+                                        <span class="lab">All Bookings</span>
+                                        <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 35.67%</div>
                                     </div>
-                                    <div class="info-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">FULL NAME</span>
-                                            <span class="info-val" style="font-size: 14px; font-weight: 600;">Arjun Rao</span>
-                                        </div>
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">PHONE NUMBER</span>
-                                            <span class="info-val" style="font-size: 14px; font-weight: 600;">+91 98765 43210</span>
-                                        </div>
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">EMAIL ADDRESS</span>
-                                            <span class="info-val" style="font-size: 14px; font-weight: 600;">arjun.rao@rapidcare.com</span>
-                                        </div>
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">DATE OF BIRTH</span>
-                                            <span class="info-val" style="font-size: 14px; font-weight: 600;">12 May 1988</span>
-                                        </div>
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">BLOOD GROUP</span>
-                                            <span class="info-val highlight-red" style="font-size: 14px; font-weight: 800; color: var(--accent-red);">O+</span>
-                                        </div>
-                                        <div class="info-item" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span class="info-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px;">JOINED ON</span>
-                                            <span class="info-val" style="font-size: 14px; font-weight: 600;">15 Jan 2024</span>
-                                        </div>
+                                    <div class="stat-chart">
+                                        <div class="bar" style="height: 40%"></div>
+                                        <div class="bar" style="height: 60%"></div>
+                                        <div class="bar" style="height: 30%"></div>
+                                        <div class="bar" style="height: 90%"></div>
+                                        <div class="bar" style="height: 70%"></div>
                                     </div>
                                 </div>
-
-                                <div class="card profile-card">
-                                    <div class="card-header">
-                                        <h3>License & Documents</h3>
+                                <div class="profile-stat-card purple">
+                                    <div class="stat-main">
+                                        <span class="num">142</span>
+                                        <span class="lab">Completed</span>
+                                        <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 25%</div>
                                     </div>
-                                    <div class="document-list" style="display: flex; flex-direction: column; gap: 15px;">
-                                        <div class="doc-item verified" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color);">
-                                            <div class="doc-icon" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(46, 204, 113, 0.1); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 18px;"><i class="fa-solid fa-id-card"></i></div>
-                                            <div class="doc-details" style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-                                                <span class="doc-name" style="font-size: 14px; font-weight: 600;">Driving License (Commercial)</span>
-                                                <span class="doc-number" style="font-size: 12px; color: var(--text-secondary);">DL-142023001234</span>
-                                            </div>
-                                            <span class="doc-status" style="font-size: 11px; font-weight: 700; color: var(--accent-green);">Verified <i class="fa-solid fa-circle-check" style="margin-left: 3px;"></i></span>
-                                        </div>
-                                        <div class="doc-item verified" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color);">
-                                            <div class="doc-icon" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(46, 204, 113, 0.1); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 18px;"><i class="fa-solid fa-file-contract"></i></div>
-                                            <div class="doc-details" style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-                                                <span class="doc-name" style="font-size: 14px; font-weight: 600;">Aadhaar Card</span>
-                                                <span class="doc-number" style="font-size: 12px; color: var(--text-secondary);">XXXX XXXX 8912</span>
-                                            </div>
-                                            <span class="doc-status" style="font-size: 11px; font-weight: 700; color: var(--accent-green);">Verified <i class="fa-solid fa-circle-check" style="margin-left: 3px;"></i></span>
-                                        </div>
-                                        <div class="doc-item verified" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color);">
-                                            <div class="doc-icon" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(46, 204, 113, 0.1); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 18px;"><i class="fa-solid fa-certificate"></i></div>
-                                            <div class="doc-details" style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-                                                <span class="doc-name" style="font-size: 14px; font-weight: 600;">First Aid Certification</span>
-                                                <span class="doc-number" style="font-size: 12px; color: var(--text-secondary);">Valid till: Oct 2026</span>
-                                            </div>
-                                            <span class="doc-status" style="font-size: 11px; font-weight: 700; color: var(--accent-green);">Verified <i class="fa-solid fa-circle-check" style="margin-left: 3px;"></i></span>
-                                        </div>
+                                    <div class="stat-chart">
+                                        <div class="bar" style="height: 30%"></div>
+                                        <div class="bar" style="height: 50%"></div>
+                                        <div class="bar" style="height: 80%"></div>
+                                        <div class="bar" style="height: 40%"></div>
+                                        <div class="bar" style="height: 85%"></div>
+                                    </div>
+                                </div>
+                                <div class="profile-stat-card orange">
+                                    <div class="stat-main">
+                                        <span class="num">12</span>
+                                        <span class="lab">Cancelled</span>
+                                        <div class="trend up"><i class="fa-solid fa-arrow-up"></i> 35.67%</div>
+                                    </div>
+                                    <div class="stat-chart">
+                                        <div class="bar" style="height: 20%"></div>
+                                        <div class="bar" style="height: 40%"></div>
+                                        <div class="bar" style="height: 60%"></div>
+                                        <div class="bar" style="height: 30%"></div>
+                                        <div class="bar" style="height: 50%"></div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="content-column">
-                                <div class="card profile-card" style="margin-bottom: 25px;">
-                                    <div class="card-header">
-                                        <h3>Vehicle Assignment</h3>
+                            <!-- Detailed List -->
+                            <div class="profile-list-card">
+                                <div class="list-header">
+                                    <div class="list-tabs">
+                                        <button class="tab active">Recent Trips</button>
+                                        <button class="tab">Invoices</button>
                                     </div>
-                                    <div class="vehicle-info-box" style="padding: 20px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px;">
-                                        <div class="vehicle-icon" style="width: 60px; height: 60px; border-radius: 15px; background: rgba(255, 159, 67, 0.1); color: var(--accent-orange); display: flex; align-items: center; justify-content: center; font-size: 28px;"><i class="fa-solid fa-truck-medical"></i></div>
-                                        <div class="vehicle-primary" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <h4 style="font-size: 16px; font-weight: 700;">Advanced Life Support (ALS)</h4>
-                                            <span class="vehicle-number" style="display: inline-block; background: #FFCE00; color: black; font-weight: 800; font-size: 16px; padding: 4px 15px; border-radius: 6px; letter-spacing: 1px; border: 1px solid #E6B800; margin-top: 5px;">KA 01 AB 1234</span>
-                                        </div>
-                                        <div class="vehicle-specs" style="display: flex; justify-content: center; gap: 30px; width: 100%; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 5px;">
-                                            <div class="spec" style="display: flex; flex-direction: column; gap: 5px;">
-                                                <span class="spec-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">HOSPITAL</span>
-                                                <span class="spec-val" style="font-size: 12px; font-weight: 600;">Saket City Hospital</span>
-                                            </div>
-                                            <div class="spec" style="display: flex; flex-direction: column; gap: 5px;">
-                                                <span class="spec-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">EQUIPMENT</span>
-                                                <span class="spec-val" style="font-size: 12px; font-weight: 600;">Defibrillator, Ventilator</span>
-                                            </div>
-                                        </div>
+                                    <div class="list-filter">
+                                        <span>All Time (154)</span>
+                                        <i class="fa-solid fa-chevron-down"></i>
                                     </div>
                                 </div>
 
-                                <div class="card profile-card" style="margin-bottom: 25px;">
-                                    <div class="card-header">
-                                        <h3>Performance Metrics</h3>
+                                <div class="list-body">
+                                    <div class="list-item">
+                                        <div class="item-date">
+                                            <span class="day">29</span>
+                                            <span class="month">Sep</span>
+                                        </div>
+                                        <div class="item-info">
+                                            <span class="task">Emergency Response</span>
+                                            <span class="time">11:00 - 12:30</span>
+                                        </div>
+                                        <span class="status-badge cancelled">Cancelled</span>
+                                        <div class="item-price">
+                                            <span class="total">₹0</span>
+                                            <span class="rate">₹0/km</span>
+                                        </div>
                                     </div>
-                                    <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                                        <div class="metric-item" style="padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                                            <div class="metric-icon highlight-blue" style="font-size: 20px; color: var(--accent-blue);"><i class="fa-solid fa-star"></i></div>
-                                            <div class="metric-content" style="display: flex; flex-direction: column; gap: 2px;">
-                                                <span class="metric-val" style="font-size: 16px; font-weight: 800;">4.9/5.0</span>
-                                                <span class="metric-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">Avg Rating</span>
-                                            </div>
+                                    <div class="list-item">
+                                        <div class="item-date">
+                                            <span class="day">15</span>
+                                            <span class="month">Oct</span>
                                         </div>
-                                        <div class="metric-item" style="padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                                            <div class="metric-icon highlight-green" style="font-size: 20px; color: var(--accent-green);"><i class="fa-solid fa-truck-fast"></i></div>
-                                            <div class="metric-content" style="display: flex; flex-direction: column; gap: 2px;">
-                                                <span class="metric-val" style="font-size: 16px; font-weight: 800;">1,248</span>
-                                                <span class="metric-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">Total Trips</span>
-                                            </div>
+                                        <div class="item-info">
+                                            <span class="task">Patient Transfer</span>
+                                            <span class="time">13:45 - 15:30</span>
                                         </div>
-                                        <div class="metric-item" style="padding: 15px; background: var(--inner-box-bg); border-radius: 12px; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                                            <div class="metric-icon highlight-orange" style="font-size: 20px; color: var(--accent-orange);"><i class="fa-solid fa-clock"></i></div>
-                                            <div class="metric-content" style="display: flex; flex-direction: column; gap: 2px;">
-                                                <span class="metric-val" style="font-size: 16px; font-weight: 800;">98%</span>
-                                                <span class="metric-label" style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">On-time Rate</span>
-                                            </div>
+                                        <span class="status-badge booked">Booked</span>
+                                        <div class="item-price">
+                                            <span class="total">₹1,250</span>
+                                            <span class="rate">₹45/km</span>
+                                        </div>
+                                    </div>
+                                    <div class="list-item">
+                                        <div class="item-date">
+                                            <span class="day">11</span>
+                                            <span class="month">Nov</span>
+                                        </div>
+                                        <div class="item-info">
+                                            <span class="task">Scheduled Pickup</span>
+                                            <span class="time">09:00 - 12:30</span>
+                                        </div>
+                                        <span class="status-badge done">Done</span>
+                                        <div class="item-price">
+                                            <span class="total">₹2,450</span>
+                                            <span class="rate">₹55/km</span>
+                                        </div>
+                                    </div>
+                                    <div class="list-item">
+                                        <div class="item-date">
+                                            <span class="day">13</span>
+                                            <span class="month">Apr</span>
+                                        </div>
+                                        <div class="item-info">
+                                            <span class="task">Critical Transport</span>
+                                            <span class="time">11:00 - 15:30</span>
+                                        </div>
+                                        <span class="status-badge done">Done</span>
+                                        <div class="item-price">
+                                            <span class="total">₹3,850</span>
+                                            <span class="rate">₹55/km</span>
+                                        </div>
+                                    </div>
+                                    <div class="list-item">
+                                        <div class="item-date">
+                                            <span class="day">24</span>
+                                            <span class="month">Feb</span>
+                                        </div>
+                                        <div class="item-info">
+                                            <span class="task">Medical Courier</span>
+                                            <span class="time">10:00 - 19:30</span>
+                                        </div>
+                                        <span class="status-badge booked">Booked</span>
+                                        <div class="item-price">
+                                            <span class="total">₹1,180</span>
+                                            <span class="rate">₹22/km</span>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <button class="btn btn-red" style="width: 100%; margin-top: 10px; padding: 15px; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 10px;">
-                                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-                                </button>
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
-            </div>
             </div>
         </main>
     </div>
