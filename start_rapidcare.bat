@@ -42,12 +42,6 @@ if not exist ".env" (
     )
 )
 
-<<<<<<< HEAD
-:: Start Unified Backend
-echo [2/3] Starting Unified Backend (Port 5000)...
-cd "Backend"
-:: Use cmd /k so the window stays open on error
-=======
 if not exist "node_modules" (
     echo [!] node_modules missing. Installing dependencies...
     call npm install
@@ -59,7 +53,6 @@ call npx knex migrate:latest
 
 :: 5. Start Server
 echo [4/4] Starting Unified Backend...
->>>>>>> 710606fe6d5695ab49a518da017b8d0307fd685c
 start "RapidCare Backend" cmd /k "node server.js"
 
 :: Go back to root
