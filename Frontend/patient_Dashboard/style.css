@@ -53,16 +53,54 @@ body {
 }
 
 .logo-icon {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-    border-radius: 8px;
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-weight: bold;
     flex-shrink: 0;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    animation: arrive-motion 1.2s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4)); /* Blue glow */
+    transition: filter 0.3s ease;
+}
+
+.logo:hover .logo-icon img {
+    filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.7)) drop-shadow(0 0 5px rgba(239, 68, 68, 0.3)); /* Stronger multi-color glow on hover */
+}
+
+.logo:hover .logo-icon img {
+    filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.7)) drop-shadow(0 0 5px rgba(239, 68, 68, 0.3)); /* Stronger multi-color glow on hover */
+}
+
+@keyframes arrive-motion {
+    0% {
+        transform: translateX(-120%) skewX(-20deg);
+        opacity: 0;
+    }
+    60% {
+        transform: translateX(15%) skewX(10deg);
+        opacity: 1;
+    }
+    80% {
+        transform: translateX(-5%) skewX(-5deg);
+    }
+    100% {
+        transform: translateX(0) skewX(0);
+    }
+}
+
+.logo:hover .logo-icon {
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 .logo-text {
