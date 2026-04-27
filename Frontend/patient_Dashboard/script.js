@@ -1,6 +1,26 @@
 var API_BASE = (window.RapidCareConfig && RapidCareConfig.API_BASE) || 'http://localhost:5000/api/v1';
 window.API_BASE = API_BASE; // Make accessible to global functions
 
+// --- Tab Switching Logic (Global) ---
+window.switchPaymentTab = (btn) => {
+    const tabId = btn.getAttribute('data-tab');
+    const section = btn.closest('.tabs-container') || document.querySelector('#payment-view');
+    
+    if (!section) return;
+
+    // Remove active classes within this context
+    section.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    section.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    // Add active classes
+    btn.classList.add('active');
+    const targetContent = document.getElementById(`${tabId}-content`);
+    if (targetContent) targetContent.classList.add('active');
+
+    // Recalculate pricing (to update streak discount if switching to/from cash)
+    if (window.recalculatePricing) window.recalculatePricing();
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     let selectedHabits = [];
     // =============================================
@@ -868,9 +888,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.hospital-item').forEach(el => el.classList.remove('active-hospital'));
                 item.classList.add('active-hospital');
                 overviewMap.setView([h.lat, h.lng], 15);
+
+                // Update distance calculation for payment automatically
+                const distInput = document.getElementById('distance-input');
+                if (distInput) {
+                    distInput.value = h.distance;
+                    // Trigger the 'input' event to fire recalculatePricing()
+                    distInput.dispatchEvent(new Event('input'));
+                }
+                // Store selected hospital name for receipt
+                localStorage.setItem('rapidcare_selected_hospital', h.name);
+
+                // Automatically highlight the nearest hospital on the map
+                if (hospitalsWithDistance.length > 0 && hospitalMarkers.length > 0) {
+                    const nearest = hospitalsWithDistance[0];
+                    // Find the marker that matches the nearest hospital by name or coords
+                    const marker = hospitalMarkers.find(m => {
+                        const ll = m.getLatLng();
+                        return Math.abs(ll.lat - nearest.lat) < 0.0001 && Math.abs(ll.lng - nearest.lng) < 0.0001;
+                    });
+                    if (marker) {
+                        marker.openPopup();
+                        overviewMap.setView(marker.getLatLng(), 14);
+                    }
+                }
             });
             container.appendChild(item);
         });
+
+        // Automatically highlight the nearest hospital on the map
+        if (hospitalsWithDistance.length > 0 && hospitalMarkers.length > 0) {
+            const nearest = hospitalsWithDistance[0];
+            // Find the marker that matches the nearest hospital by name or coords
+            const marker = hospitalMarkers.find(m => {
+                const ll = m.getLatLng();
+                return Math.abs(ll.lat - nearest.lat) < 0.0001 && Math.abs(ll.lng - nearest.lng) < 0.0001;
+            });
+            if (marker) {
+                marker.openPopup();
+                overviewMap.setView(marker.getLatLng(), 14);
+            }
+        }
     }
 
     // =============================================
@@ -1750,7 +1808,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedBankOfferPayment = 'none';
 
     let cashRideCountPayment = parseInt(localStorage.getItem('rapidcare_cash_rides') || '0');
-    let isCashRewardActivePayment = (cashRideCountPayment >= 5);
+    let isCashRewardActivePayment = (cashRideCountPayment >= 10);
 
     const detailsBtnPay = document.getElementById('detailsBtnPayment');
     const detailsPanelPay = document.getElementById('detailsPanelIntegrated');
@@ -2713,10 +2771,9 @@ window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
         detailPane.classList.remove('mobile-active');
     }
-});
-
-// Resizer Logic
-document.addEventListener('DOMContentLoaded', () => {
+    // =============================================
+    // RESIZER & PAYMENT LOGIC (Consolidated)
+    // =============================================
     const resizer = document.getElementById('dragMe');
     if (!resizer) return;
     
@@ -2780,8 +2837,13 @@ document.addEventListener('DOMContentLoaded', () => {
         "Punjab National Bank", "Canara Bank", "Bank of Baroda", "Union Bank of India",
         "IDFC FIRST Bank", "IndusInd Bank", "Yes Bank", "Federal Bank", "RBL Bank",
         "Indian Bank", "UCO Bank", "Bank of India", "Central Bank of India",
-        "South Indian Bank", "Karnataka Bank", "City Union Bank", "Saraswat Bank"
-    ];
+        "South Indian Bank", "Karnataka Bank", "City Union Bank", "Saraswat Bank",
+        "Bandhan Bank", "IDBI Bank", "Indian Overseas Bank", "Punjab & Sind Bank",
+        "Bank of Maharashtra", "DBS Bank India", "Karur Vysya Bank", "Tamilnad Mercantile Bank",
+        "Catholic Syrian Bank", "Dhanlaxmi Bank", "Jammu & Kashmir Bank", "Nainital Bank",
+        "DCB Bank", "HSBC India", "Standard Chartered India", "Deutsche Bank India",
+        "Barclays India", "JP Morgan Chase India", "Bank of America India"
+    ].sort();
 
     const popularBanks = [
         { name: "SBI", icon: "assets/logos/sbi_logo.png" },
@@ -2799,8 +2861,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DOM Elements ---
     
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+    const tabBtns = document.querySelectorAll('#payment-view .tab-btn');
+    const tabContents = document.querySelectorAll('#payment-view .tab-content');
     const cardBankSearch = document.getElementById('card-bank-search');
     const cardBankList = document.getElementById('card-bank-list');
     const netBankSearch = document.getElementById('net-bank-search');
@@ -2814,12 +2876,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const ambulanceOptions = document.querySelectorAll('input[name="ambulance-type"]');
     const payBtn = document.querySelector('.pay-btn');
 
-    // --- Initialize ---
+    // --- Bank Logic ---
     populateBankLists();
-    recalculatePricing();
+    // (recalculatePricing will be called at the end of script)
     
     // --- Pricing Logic ---
-    async function recalculatePricing() {
+    window.recalculatePricing = async function() {
         const selectedType = document.querySelector('input[name="ambulance-type"]:checked').value;
         const distance = parseFloat(distanceInput.value) || 0;
         const couponCode = couponInput.value.toUpperCase();
@@ -2871,7 +2933,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // Note: index.html might need placeholders for these if we want to show them dynamically
             
             if (totalAmountDisplay) {
-                totalAmountDisplay.textContent = `₹${data.total.toLocaleString()}`;
+                let finalTotal = data.total;
+                
+                // Local Streak Reward Logic - Scoped to Payment View to prevent crashes
+                const activePaymentTab = document.querySelector('#payment-view .tab-btn.active');
+                const tabId = activePaymentTab ? activePaymentTab.getAttribute('data-tab') : 'upi';
+                
+                const streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
+                if (tabId === 'cash' && streak >= 3) {
+                    finalTotal = Math.max(0, finalTotal - 40);
+                }
+
+                totalAmountDisplay.textContent = `₹${finalTotal.toLocaleString()}`;
             }
         } catch (err) {
             console.error('Fare calculation error:', err);
@@ -2882,20 +2955,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ambulanceOptions.forEach(opt => opt.addEventListener('change', recalculatePricing));
     distanceInput.addEventListener('input', recalculatePricing);
 
-    // --- Tab Switching Logic ---
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tabId = btn.getAttribute('data-tab');
-            
-            // Remove active classes
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-            
-            // Add active classes
-            btn.classList.add('active');
-            document.getElementById(`${tabId}-content`).classList.add('active');
-        });
-    });
+    // --- Tab Switching Logic (Global) ---
+    // (switchPaymentTab moved to top level)
 
     // --- Bank Logic ---
     function populateBankLists() {
@@ -3007,41 +3068,102 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Coupon Logic ---
     applyCouponBtn.addEventListener('click', () => {
         const code = couponInput.value.toUpperCase();
-        if (code === 'RAPID20') {
-            couponMsg.textContent = 'Coupon applied! 20% off';
-            couponMsg.className = 'coupon-status success';
-        } else if (code === 'FIRSTCARE') {
-            couponMsg.textContent = 'Coupon applied! ₹100 off';
+        const feedback = {
+            'RAPID20': 'Coupon applied! ₹20 off your ride.',
+            'RIDEMASTER': 'Coupon applied! ₹40 premium discount.',
+            'FIRSTRAPIDCARE50': 'Welcome! ₹50 off your first ride.',
+            'FIRSTCARE': 'Coupon applied! ₹100 off'
+        };
+
+        if (feedback[code]) {
+            couponMsg.textContent = feedback[code];
             couponMsg.className = 'coupon-status success';
         } else {
-            couponMsg.textContent = 'Invalid coupon code';
+            couponMsg.textContent = 'Invalid or expired coupon code';
             couponMsg.className = 'coupon-status error';
         }
         recalculatePricing();
     });
 
-    // --- Payment Feedback ---
-    document.querySelector('.pay-btn').addEventListener('click', async () => {
-        const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
-        let method = activeTab.toUpperCase();
-        
-        const btn = document.querySelector('.pay-btn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Processing...';
-        if (window.lucide) lucide.createIcons();
-        
-        try {
-            const token = localStorage.getItem('rapidcare_token');
-            const tripId = localStorage.getItem('rapidcare_last_trip_id');
-            const amountText = totalAmountDisplay.textContent.replace('₹', '').replace(',', '');
-            const amount = parseInt(amountText);
+    // --- Ride Streak Logic ---
+    function updateRideStreak() {
+        let streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
+        const dots = document.querySelectorAll('#streak-dots .streak-dot');
+        const msg = document.getElementById('streak-msg');
 
-            if (!tripId) {
-                alert('No active trip found to pay for.');
-                btn.innerHTML = originalText;
-                return;
+        dots.forEach((dot, index) => {
+            if (index < streak) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
+
+        if (streak >= 3) {
+            msg.innerHTML = '<span style="color: #10b981;">Next ride Platform Fee: ₹0! (Streak Reward)</span>';
+        } else {
+            msg.textContent = `${3 - streak} more cash payments to unlock your ₹40 discount!`;
+        }
+    }
+
+    // --- Stepper Controller ---
+    const overlay = document.getElementById('payment-overlay');
+    const stages = ['review', 'processing', 'success'];
+    let currentStage = 1;
+
+    window.closePaymentOverlay = () => {
+        overlay.classList.remove('active');
+    };
+
+    window.proceedToPayment = async () => {
+        setStage(2);
+        
+        // Artificial delay for "Connecting to Bank"
+        setTimeout(async () => {
+            const success = await finalizePayment();
+            if (success) {
+                setStage(3);
+                // Trigger auto-print after 1 second
+                setTimeout(() => window.printReceipt(), 1000);
+            } else {
+                alert('Payment verification failed. Please try again.');
+                setStage(1);
             }
+        }, 3000);
+    };
 
+    function setStage(stepNum) {
+        currentStage = stepNum;
+        
+        // Update Stepper UI
+        document.querySelectorAll('.step').forEach((step, idx) => {
+            if (idx + 1 < stepNum) {
+                step.classList.add('completed');
+                step.classList.remove('active');
+            } else if (idx + 1 === stepNum) {
+                step.classList.add('active');
+                step.classList.remove('completed');
+            } else {
+                step.classList.remove('active', 'completed');
+            }
+        });
+
+        const progress = document.getElementById('stepper-progress');
+        progress.style.width = `${(stepNum - 1) * 40}%`;
+
+        // Update Stage Content
+        document.querySelectorAll('.stage-content').forEach((content, idx) => {
+            content.classList.toggle('active', idx + 1 === stepNum);
+        });
+    }
+
+    async function finalizePayment() {
+        const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+        const method = activeTab.toUpperCase();
+        const token = localStorage.getItem('rapidcare_token');
+        const tripId = localStorage.getItem('rapidcare_last_trip_id');
+        const amount = parseInt(totalAmountDisplay.textContent.replace('₹', '').replace(',', ''));
+
+        if (!tripId) return false;
+
+        try {
             const response = await fetch(API_BASE + '/payments', {
                 method: 'POST',
                 headers: {
@@ -3052,23 +3174,71 @@ document.addEventListener('DOMContentLoaded', () => {
                     trip_id: tripId,
                     amount: amount,
                     payment_method: method.toLowerCase(),
-                    transaction_id: 'TXN-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+                    transaction_id: 'RC-' + Math.random().toString(36).substr(2, 9).toUpperCase()
                 })
             });
 
             if (response.ok) {
-                alert(`Payment of ₹${amount} via ${method} was successful!`);
-                localStorage.removeItem('rapidcare_last_trip_id'); // Clear after payment
-                window.location.href = '/dashboard';
-            } else {
-                const error = await response.json();
-                throw new Error(error.error || 'Payment failed');
+                const data = await response.json();
+                populateReceipt(method, data.transaction_id || ('RC-' + Math.random().toString(36).substr(2, 9).toUpperCase()), amount);
+                
+                // If cash, update streak
+                if (method === 'CASH') {
+                    let streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
+                    streak = (streak + 1) % 4; // Reset after 4
+                    localStorage.setItem('rapidcare_cash_streak', streak);
+                    updateRideStreak();
+                }
+
+                localStorage.removeItem('rapidcare_last_trip_id');
+                return true;
             }
+            return false;
         } catch (err) {
-            console.error('Payment error:', err);
-            alert(`Payment failed: ${err.message}`);
-            btn.innerHTML = originalText;
+            console.error('Payment Error:', err);
+            return false;
         }
+    }
+
+    function populateReceipt(method, txnId, amount) {
+        document.getElementById('receipt-patient').textContent = localStorage.getItem('rapidcare_user_name') || 'Valued Patient';
+        document.getElementById('receipt-method').textContent = method;
+        document.getElementById('receipt-txn').textContent = txnId;
+        document.getElementById('receipt-date').textContent = new Date().toLocaleDateString('en-IN');
+        document.getElementById('receipt-total').textContent = `₹${amount.toLocaleString()}`;
+
+        const quotes = [
+            "Your health is an investment, not an expense.",
+            "A healthy outside starts from the inside.",
+            "The greatest wealth is health.",
+            "Take care of your body. It’s the only place you have to live.",
+            "Health is not valued till sickness comes."
+        ];
+        document.getElementById('health-quote').textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+    }
+
+    window.printReceipt = () => {
+        window.print();
+    };
+
+    // --- Payment Feedback (Updated for Stepper) ---
+    payBtn.addEventListener('click', () => {
+        const hospitalName = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Available';
+        const ambulanceType = document.querySelector('input[name="ambulance-type"]:checked').nextElementSibling.querySelector('h3').textContent;
+        const distance = document.getElementById('distance-input').value;
+        const total = totalAmountDisplay.textContent;
+
+        document.getElementById('review-ambulance').textContent = ambulanceType;
+        document.getElementById('review-hospital').textContent = hospitalName;
+        document.getElementById('review-distance').textContent = `${distance} KM`;
+        document.getElementById('review-total').textContent = total;
+
+        overlay.classList.add('active');
+        setStage(1);
     });
+
+    // Initialize
+    updateRideStreak();
+    recalculatePricing();
 
 });
