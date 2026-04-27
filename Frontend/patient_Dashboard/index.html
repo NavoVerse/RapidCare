@@ -1903,11 +1903,38 @@
                             </div>
                             <div class="form-group">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Select Bank</label>
-                                <div class="bank-select-wrapper" style="position: relative;">
-                                    <input type="text" id="card-bank-search" placeholder="Search your bank..." class="bank-search-input" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
-                                    <div class="bank-dropdown" id="card-bank-list" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
-                                        <!-- Populated by JS -->
-                                    </div>
+                                <div class="bank-select-wrapper">
+                                    <select name="bank" id="card-bank-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text); font-size: 14px; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px;">
+                                        <option value="" disabled selected>Search your bank...</option>
+                                        <optgroup label="Public Sector Banks" style="background: var(--surface-color); color: var(--primary-text);">
+                                            <option value="sbi">State Bank of India (SBI)</option>
+                                            <option value="pnb">Punjab National Bank (PNB)</option>
+                                            <option value="bob">Bank of Baroda</option>
+                                            <option value="boi">Bank of India</option>
+                                            <option value="union">Union Bank of India</option>
+                                            <option value="canara">Canara Bank</option>
+                                            <option value="bom">Bank of Maharashtra</option>
+                                            <option value="cbi">Central Bank of India</option>
+                                            <option value="iob">Indian Overseas Bank</option>
+                                            <option value="indian">Indian Bank</option>
+                                            <option value="uco">UCO Bank</option>
+                                            <option value="psb">Punjab & Sind Bank</option>
+                                        </optgroup>
+                                        <optgroup label="Private Sector Banks" style="background: var(--surface-color); color: var(--primary-text);">
+                                            <option value="hdfc">HDFC Bank Ltd.</option>
+                                            <option value="icici">ICICI Bank Ltd.</option>
+                                            <option value="axis">Axis Bank Ltd.</option>
+                                            <option value="kotak">Kotak Mahindra Bank Ltd.</option>
+                                            <option value="indusind">IndusInd Bank Ltd.</option>
+                                            <option value="yes">Yes Bank Ltd.</option>
+                                            <option value="idfc">IDFC FIRST Bank Ltd.</option>
+                                            <option value="federal">Federal Bank Ltd.</option>
+                                            <option value="bandhan">Bandhan Bank</option>
+                                            <option value="rbl">RBL Bank</option>
+                                            <option value="sib">South Indian Bank</option>
+                                            <option value="cub">City Union Bank Ltd.</option>
+                                        </optgroup>
+                                    </select>
                                 </div>
                             </div>
                             <div class="checkbox-group" style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
@@ -1919,23 +1946,66 @@
 
                     <div class="tab-content" id="netbanking-content">
                         <h3 style="margin-bottom: 20px; color: var(--primary-color);">Net Banking</h3>
+                        
+                        <!-- Bank Selection -->
                         <div style="margin-bottom: 24px;">
                             <label style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Popular Banks</label>
                             <div class="bank-grid" id="popular-banks" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px;">
                                 <!-- Populated by JS -->
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">All Other Banks</label>
-                            <div class="bank-select-wrapper" style="position: relative;">
-                                <input type="text" id="net-bank-search" placeholder="Search your bank..." class="bank-search-input" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
-                                <div class="bank-dropdown" id="net-bank-list" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
-                                    <!-- Populated by JS -->
-                                </div>
+
+                        <div class="form-group" style="margin-bottom: 24px;">
+                            <label style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Choose your Bank</label>
+                            <div class="bank-select-wrapper">
+                                <select name="bank" id="net-bank-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text); font-size: 14px; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px;">
+                                    <option value="" disabled selected>Search your bank...</option>
+                                    <optgroup label="Public Sector Banks" style="background: var(--surface-color); color: var(--primary-text);">
+                                        <option value="sbi">State Bank of India (SBI)</option>
+                                        <option value="pnb">Punjab National Bank (PNB)</option>
+                                        <option value="bob">Bank of Baroda</option>
+                                        <option value="boi">Bank of India</option>
+                                        <option value="union">Union Bank of India</option>
+                                        <option value="canara">Canara Bank</option>
+                                        <option value="bom">Bank of Maharashtra</option>
+                                        <option value="cbi">Central Bank of India</option>
+                                        <option value="iob">Indian Overseas Bank</option>
+                                        <option value="indian">Indian Bank</option>
+                                        <option value="uco">UCO Bank</option>
+                                        <option value="psb">Punjab & Sind Bank</option>
+                                    </optgroup>
+                                    <optgroup label="Private Sector Banks" style="background: var(--surface-color); color: var(--primary-text);">
+                                        <option value="hdfc">HDFC Bank Ltd.</option>
+                                        <option value="icici">ICICI Bank Ltd.</option>
+                                        <option value="axis">Axis Bank Ltd.</option>
+                                        <option value="kotak">Kotak Mahindra Bank Ltd.</option>
+                                        <option value="indusind">IndusInd Bank Ltd.</option>
+                                        <option value="yes">Yes Bank Ltd.</option>
+                                        <option value="idfc">IDFC FIRST Bank Ltd.</option>
+                                        <option value="federal">Federal Bank Ltd.</option>
+                                        <option value="bandhan">Bandhan Bank</option>
+                                        <option value="rbl">RBL Bank</option>
+                                        <option value="sib">South Indian Bank</option>
+                                        <option value="cub">City Union Bank Ltd.</option>
+                                    </optgroup>
+                                </select>
                             </div>
                         </div>
+
+                        <!-- Credentials -->
+                        <div class="credentials-form" style="display: flex; flex-direction: column; gap: 16px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Net banking User ID</label>
+                                <input type="text" placeholder="Enter your user ID" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
+                            </div>
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Password</label>
+                                <input type="password" placeholder="••••••••" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
+                            </div>
+                        </div>
+
                         <div style="margin-top: 30px; padding: 16px; border-radius: 16px; background: rgba(6, 182, 212, 0.05); border: 1px dashed rgba(6, 182, 212, 0.2); text-align: center;">
-                            <p style="font-size: 13px; opacity: 0.7;">You will be redirected to your bank's secure website to complete the transaction.</p>
+                            <p style="font-size: 13px; opacity: 0.7;">You will be redirected to your bank's secure website for two-factor authentication.</p>
                         </div>
                     </div>
 
