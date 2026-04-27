@@ -996,6 +996,75 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
     }
 });
 
+
+// =============================================================================
+// DRIVER MODULE APIs
+// =============================================================================
+
+// Get current driver profile
+app.get('/api/v1/drivers/me', authenticateToken, authorize('driver'), async (req, res) => {
+    try {
+        const driver = await knex('users as u')
+            .join('drivers as d', 'u.id', 'd.user_id')
+            .where('u.id', req.user.id)
+            .select(
+                'u.id', 'u.name', 'u.email', 'u.phone',
+                'd.status', 'd.license_number', 'd.vehicle_number', 'd.vehicle_type',
+                'd.dob', 'd.alt_phone', 'd.address', 'd.city', 'd.state', 'd.pincode',
+                'd.aadhaar_number', 'd.pan_number', 'd.documents'
+            )
+            .first();
+
+        if (!driver) {
+            return res.status(404).json({ error: 'Driver profile not found' });
+        }
+
+        res.json(driver);
+    } catch (err) {
+        logger.error('Error fetching driver profile:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Update driver availability status
+app.put('/api/v1/drivers/status', authenticateToken, authorize('driver'), async (req, res) => {
+    const { status } = req.body;
+    const allowedStatuses = ['available', 'busy', 'offline'];
+
+    if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    try {
+        await knex('drivers').where({ user_id: req.user.id }).update({ status });
+        res.json({ message: `Status updated to ${status}` });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Get driver trip history
+app.get('/api/v1/drivers/trips', authenticateToken, authorize('driver'), async (req, res) => {
+    try {
+        const trips = await knex('trips as t')
+            .join('users as up', 't.patient_id', 'up.id')
+            .join('hospitals as h', 't.hospital_id', 'h.user_id')
+            .join('users as uh', 'h.user_id', 'uh.id')
+            .where('t.driver_id', req.user.id)
+            .select(
+                't.*',
+                'up.name as patient_name',
+                'uh.name as hospital_name'
+            )
+            .orderBy('t.created_at', 'desc')
+            .limit(20);
+
+        res.json(trips);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Accept a trip (Driver)
 app.post('/api/v1/trips/:id/accept', authenticateToken, authorize('driver'), async (req, res) => {
     try {
