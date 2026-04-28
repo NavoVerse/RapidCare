@@ -1573,6 +1573,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             body: JSON.stringify(payload)
                         });
                         if (!response.ok) throw new Error('Failed to update profile');
+                        
+                        // Re-geocode coordinates for the new address
+                        if (payload.home_location) {
+                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(payload.home_location)}`)
+                                .then(res => res.json())
+                                .then(geoData => {
+                                    if (geoData && geoData.length > 0) {
+                                        const lat = geoData[0].lat;
+                                        const lng = geoData[0].lon;
+                                        localStorage.setItem('userLat', lat);
+                                        localStorage.setItem('userLng', lng);
+                                        console.log(`[Geocoding] Coordinates updated for home address: ${lat}, ${lng}`);
+                                    }
+                                })
+                                .catch(err => console.error('[Geocoding Error]', err));
+                        }
                     }
                 } catch (error) {
                     console.error('Update error:', error);
