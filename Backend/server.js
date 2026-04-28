@@ -558,7 +558,7 @@ app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
             // ── Patients table: only update fields that were sent ─────────
             const patientUpdate = {};
             if (gender !== undefined) patientUpdate.gender = gender;
-            if (date_of_birth !== undefined) patientUpdate.date_of_birth = date_of_birth;
+            if (date_of_birth !== undefined) patientUpdate.date_of_birth = (date_of_birth === '' || date_of_birth === '--') ? null : date_of_birth;
             if (height !== undefined) patientUpdate.height = height;
             if (weight !== undefined) patientUpdate.weight = weight;
             if (blood_type !== undefined) patientUpdate.blood_group = blood_type;
