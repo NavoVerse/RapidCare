@@ -321,6 +321,30 @@ app.post('/api/v1/drivers/register', async (req, res) => {
     }
 });
 
+// Get all registered hospitals
+app.get('/api/v1/hospitals', async (req, res) => {
+    try {
+        const hospitals = await knex('hospitals')
+            .join('users', 'hospitals.user_id', 'users.id')
+            .select(
+                'hospitals.id',
+                'hospitals.user_id',
+                'users.name',
+                'hospitals.latitude as lat',
+                'hospitals.longitude as lng',
+                'hospitals.available_beds',
+                'hospitals.total_beds',
+                'hospitals.icu_beds',
+                'hospitals.ventilators',
+                'hospitals.hospital_type',
+                'hospitals.address'
+            );
+        res.json(hospitals);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // 1c. Register Hospital (5-step form)
 app.post('/api/v1/hospitals/register', async (req, res) => {
     const data = req.body;
