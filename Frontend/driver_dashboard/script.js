@@ -99,6 +99,71 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Handle Incoming Trip Requests
     let activeTripData = null;
 
+    // --- Leaflet Map Initialization ---
+    let driverMap = null;
+    let driverMarker = null;
+    let pickupMarker = null;
+    let hospitalMarker = null;
+    let mapRouteLine = null;
+
+    function initDriverMap(lat, lng) {
+        const mapContainer = document.getElementById('driver-live-map');
+        if (!mapContainer || driverMap) return;
+
+        driverMap = L.map('driver-live-map').setView([lat, lng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(driverMap);
+
+        const driverIcon = L.divIcon({
+            className: 'driver-marker',
+            html: `<div style="background: #2563eb; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.4);"></div>`,
+            iconSize: [16, 16]
+        });
+
+        driverMarker = L.marker([lat, lng], { icon: driverIcon }).addTo(driverMap);
+    }
+
+    function drawTripRoute(trip) {
+        if (!driverMap || !trip) return;
+
+        if (pickupMarker) driverMap.removeLayer(pickupMarker);
+        if (hospitalMarker) driverMap.removeLayer(hospitalMarker);
+        if (mapRouteLine) driverMap.removeLayer(mapRouteLine);
+
+        const bounds = [];
+        if (driverMarker) bounds.push(driverMarker.getLatLng());
+
+        if (trip.pickup_lat && trip.pickup_lng) {
+            const pickupIcon = L.divIcon({
+                className: 'pickup-marker',
+                html: `<div style="background: #ef4444; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.4);"></div>`,
+                iconSize: [16, 16]
+            });
+            pickupMarker = L.marker([trip.pickup_lat, trip.pickup_lng], { icon: pickupIcon })
+                .bindPopup('Pickup: ' + (trip.patient_name || 'Patient'))
+                .addTo(driverMap);
+            bounds.push([trip.pickup_lat, trip.pickup_lng]);
+        }
+
+        if (trip.hospital_lat && trip.hospital_lng) {
+            const hospitalIcon = L.divIcon({
+                className: 'hospital-marker',
+                html: `<div style="background: #10b981; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.4);"></div>`,
+                iconSize: [16, 16]
+            });
+            hospitalMarker = L.marker([trip.hospital_lat, trip.hospital_lng], { icon: hospitalIcon })
+                .bindPopup('Drop-off: ' + (trip.hospital_name || 'Hospital'))
+                .addTo(driverMap);
+            bounds.push([trip.hospital_lat, trip.hospital_lng]);
+        }
+
+        if (bounds.length >= 2) {
+            mapRouteLine = L.polyline(bounds, { color: '#2563eb', weight: 4, opacity: 0.7 }).addTo(driverMap);
+            driverMap.fitBounds(bounds, { padding: [50, 50] });
+        }
+    }
+
     socket.on('trip:new_request', (data) => {
         console.log('New trip request received:', data);
         showIncomingAlert(data);
@@ -131,6 +196,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         navigator.geolocation.getCurrentPosition((position) => {
             const { latitude, longitude } = position.coords;
             console.log(`Sending location: ${latitude}, ${longitude}`);
+            
+            if (!driverMap) {
+                initDriverMap(latitude, longitude);
+            } else if (driverMarker) {
+                driverMarker.setLatLng([latitude, longitude]);
+            }
+
             socket.emit('driver:location_update', {
                 userId: user.id,
                 lat: latitude,
@@ -383,6 +455,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (distEl) distEl.textContent = '2.1 km remaining';
             if (activePatientIdEl) activePatientIdEl.textContent = `Patient ID #${activeTripData.patient_id}`;
             if (activeConditionEl) activeConditionEl.textContent = activeTripData.complaint || 'Emergency Response';
+            drawTripRoute(activeTripData);
         } else {
             if (etaEl) etaEl.textContent = '--';
             if (distEl) distEl.textContent = 'No active trip';

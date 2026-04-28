@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../shared_assets/css/theme.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
@@ -172,14 +173,15 @@
                                         <h3>Live navigation</h3>
                                         <span class="nav-status">Open</span>
                                     </div>
-                                    <div class="map-placeholder">
+                                    <div id="driver-live-map" style="height: 300px; width: 100%; border-radius: 12px; margin-bottom: 15px; z-index: 1;"></div>
+                                    <!-- <div class="map-placeholder"> -->
                                         <!-- Simplified Map Visual -->
                                         <div class="map-grid"></div>
                                         <div class="route-line">
                                             <div class="car-marker"></div>
                                             <div class="destination-marker"></div>
                                         </div>
-                                    </div>
+                                    <!-- </div> -->
                                     <div class="nav-stats">
                                         <div class="nav-stat">
                                             <span class="val">2.1 km</span>
@@ -597,6 +599,7 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
