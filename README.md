@@ -215,41 +215,15 @@ In the Render dashboard → **Environment** tab:
 
 > **Note:** Render assigns port via `PORT` env var — the server reads `process.env.PORT || 5000` automatically.
 
-#### Step 5 — Deploy & Verify
+#### Step 5 — Deploy & Verify   DONE
 Click **Create Web Service** — Render builds and deploys automatically. Once live, verify:
 - `https://rapidcare-c2jt.onrender.com/health` → health check
 - `https://rapidcare-c2jt.onrender.com/` → Choose User page
 - `https://rapidcare-c2jt.onrender.com/login` → Patient login
 - `https://rapidcare-c2jt.onrender.com/dev` → Developer dashboard
 
-#### Step 6 — Prevent Cold Starts
+#### Step 6 — Prevent Cold Starts   DONE
 Use [UptimeRobot](https://uptimerobot.com) (free) to ping `/health` every 14 minutes to keep the service warm.
-
-### Option B: Deploy on Railway
-
-1. Go to [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub**
-2. Add a **PostgreSQL** plugin (click **+ New** → **Database** → **PostgreSQL**)
-3. Railway auto-injects `DATABASE_URL` — add these env vars:
-
-| Key | Value |
-|---|---|
-| `DB_TYPE` | `postgresql` |
-| `JWT_SECRET` | *(your secret)* |
-| `ENCRYPTION_KEY` | *(your key)* |
-| `NODE_ENV` | `production` |
-
-4. Set **Root Directory** to `Backend`, **Start Command** to `node server.js`
-
-> ⚠️ Railway's $5/month credit covers ~15–20 days of continuous uptime for one service + database.
-
-### Option C: Deploy on Koyeb
-
-1. Go to [koyeb.com](https://www.koyeb.com) → **Create App** → **GitHub**
-2. Set **Root Directory** to `Backend`, **Run command** to `node server.js`
-3. Add env vars (same as Render)
-4. For the database, use a free external PostgreSQL provider (see below)
-
-> Koyeb's free nano instance is always-on (no cold starts), but you need an external database.
 
 ### Free PostgreSQL Providers
 
@@ -270,7 +244,7 @@ If your platform doesn't include a free database, or Render's 90-day limit is a 
 - [ ] Driver dashboard loads at `/driver`
 - [ ] Developer dashboard loads at `/dev`
 - [ ] Socket.IO connects (check browser console)
-- [ ] OTP email sends (requires valid email credentials)
+- [x] OTP email sends (requires valid email credentials)
 - [ ] Leaflet.js map tiles load
 - [ ] HTTPS works (provided by platform automatically)
 
@@ -287,3 +261,79 @@ If your platform doesn't include a free database, or Render's 90-day limit is a 
 ---
 
 **Last Updated**: 2026-04-28 (v3.2.0 — Free Deployment Guide & Pre-Deploy Hardening)
+
+---
+
+## 🗺️ Feature Roadmap
+
+Mapped against the **9-Step Emergency Cycle** and **System Architecture** diagrams.
+
+### Emergency Cycle Coverage
+
+| Step | Feature | Status | Notes |
+|------|---------|--------|-------|
+| **Step 1** | Patient SOS / Book Ambulance | ✅ **Done** | Frontend UI + `POST /api/v1/trips/request` |
+| **Step 2** | Node.js API receives request | ✅ **Done** | Unified Express 5 backend on port 5000 |
+| **Step 3** | Gemini AI — Triage & Prioritize | ❌ **Not Started** | No AI integration yet — see Phase 3 below |
+| **Step 4** | GPS Search — Nearest Driver Found | ⚠️ **Partial** | Socket.IO tracks drivers, but no auto-dispatch algorithm |
+| **Step 5** | OTP Dispatched & Verified | ✅ **Done** | Nodemailer OTP flow + `POST /api/v1/auth/verify-otp` |
+| **Step 6** | GPS Tracking — Live Map / Patient ETA | ✅ **Done** | Socket.IO `driver:location_update` → Leaflet.js patient map |
+| **Step 7** | Hospital Notified — Pre-ER Ready | ❌ **Not Started** | No hospital notification system yet |
+| **Step 8** | Insurance — Claim Auto-Linked | ⚠️ **Partial** | Insurance API exists but not auto-linked to trips on completion |
+| **Step 9** | Analytics — Admin Dashboard Updated | ✅ **Done** | `/dev` dashboard + `/api/v1/patients/:id/analytics` |
+
+### Architecture Layer Coverage
+
+| Layer | Component | Status |
+|-------|-----------|--------|
+| **Frontend** | HTML5/CSS3/Vanilla JS, 5 Portals | ✅ Done |
+| **Frontend** | Leaflet.js + OpenStreetMap | ✅ Done |
+| **API Gateway** | Node.js + Express.js REST API | ✅ Done |
+| **API Gateway** | JWT Authentication + RBAC | ✅ Done |
+| **API Gateway** | OTP Service (Dispatch Auth) | ✅ Done |
+| **Backend** | Express.js Controllers | ✅ Done |
+| **Backend** | WebSocket Real-time (Socket.IO) | ✅ Done |
+| **Backend** | Ambulance Dispatch Engine | ⚠️ Partial — manual accept/reject only |
+| **Backend** | Business Logic & Triage | ❌ Not Started — no AI scoring |
+| **Database** | PostgreSQL via Knex.js | ✅ Done |
+| **Database** | Patient Records, Drivers, Hospitals | ✅ Done |
+| **Database** | Emergency Logs (trips table) | ✅ Done |
+| **AI / Cloud** | Google Gemini AI Triage | ❌ Not Started |
+| **AI / Cloud** | Google Cloud Run | ❌ Not Started (deployed on Render instead) |
+| **AI / Cloud** | Firebase Integration | ⚠️ Package installed, not configured |
+| **AI / Cloud** | Nominatim API (geocoding) | ❌ Not Started |
+
+---
+
+### 🚧 Phase 3 — Intelligent Dispatch (Next Steps)
+
+#### Priority 1 — Nearest Driver Auto-Dispatch
+- [ ] Implement Haversine distance formula to find the geographically closest available driver when a trip is requested
+- [ ] Auto-assign driver instead of broadcasting to all and waiting for manual accept
+- [ ] Endpoint: `POST /api/v1/trips/request` → auto-selects and notifies nearest driver via Socket.IO
+
+#### Priority 2 — Gemini AI Triage Engine
+- [ ] Integrate Google Gemini API (`@google/generative-ai`)
+- [ ] On trip request, pass patient vitals + urgency category to Gemini for priority scoring
+- [ ] Return triage level: `CRITICAL` / `URGENT` / `STANDARD` and factor into driver dispatch priority
+- [ ] Endpoint: `POST /api/v1/triage` → returns AI triage assessment
+
+#### Priority 3 — Hospital Pre-ER Notification
+- [ ] When a trip is accepted, notify the destination hospital via Socket.IO room `hospital_{id}`
+- [ ] Send patient name, blood type, urgency level, and ETA
+- [ ] Hospital dashboard shows incoming patient queue in real-time
+
+#### Priority 4 — Insurance Auto-Link on Trip Completion
+- [ ] When `PUT /api/v1/trips/:id/status` → `completed`, auto-query patient's active insurance policies
+- [ ] Auto-generate a draft insurance claim linked to the trip and total fare
+- [ ] Endpoint: `POST /api/v1/insurance/claims/auto` triggered internally on trip completion
+
+#### Priority 5 — Firebase Push Notifications
+- [ ] Configure Firebase Admin SDK with a service account key
+- [ ] Send push notifications to patient's mobile app when: driver is dispatched, driver arrives, trip is completed
+- [ ] Replace SMS simulation with real Firebase Cloud Messaging (FCM) delivery
+
+#### Priority 6 — Nominatim / Google Maps Geocoding
+- [ ] Replace manual lat/lng entry with address-to-coordinates lookup
+- [ ] Use Nominatim (free) or Google Maps API for forward/reverse geocoding
+- [ ] Auto-populate pickup location from patient's home address in profile
