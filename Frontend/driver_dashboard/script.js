@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Handle Incoming Trip Requests
     let activeTripData = null;
+    let allDriverTrips = [];
 
     // --- Leaflet Map Initialization ---
     let driverMap = null;
@@ -374,6 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderTripHistory(trips) {
+        allDriverTrips = trips;
         const tripList = document.querySelector('.list-body'); // Profile tab list
         const dashboardTripList = document.getElementById('profile-trip-list'); // Main dashboard list
         const queueList = document.querySelector('.queue-list'); // Dashboard incoming queue
@@ -630,6 +632,92 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     });
+
+    // --- Invoices & Trip Subtab Toggling ---
+    const tabRecentTrips = document.getElementById('tab-recent-trips');
+    const tabInvoices = document.getElementById('tab-invoices');
+
+    if (tabRecentTrips && tabInvoices) {
+        tabRecentTrips.addEventListener('click', () => {
+            tabRecentTrips.classList.add('active');
+            tabInvoices.classList.remove('active');
+            renderSubTab('recent');
+        });
+
+        tabInvoices.addEventListener('click', () => {
+            tabInvoices.classList.add('active');
+            tabRecentTrips.classList.remove('active');
+            renderSubTab('invoices');
+        });
+    }
+
+    function renderSubTab(type) {
+        const listBody = document.querySelector('.list-body');
+        if (!listBody) return;
+
+        if (type === 'recent') {
+            if (allDriverTrips.length === 0) {
+                listBody.innerHTML = '<div class="list-item" style="justify-content: center; opacity: 0.5;">No recent trips found</div>';
+            } else {
+                listBody.innerHTML = allDriverTrips.map(trip => {
+                    const date = new Date(trip.created_at);
+                    const day = date.getDate();
+                    const month = date.toLocaleString('default', { month: 'short' });
+                    
+                    let statusClass = 'booked';
+                    if (trip.status === 'completed') statusClass = 'done';
+                    if (trip.status === 'cancelled') statusClass = 'cancelled';
+
+                    return `
+                        <div class="list-item">
+                            <div class="item-date">
+                                <span class="day">${day}</span>
+                                <span class="month">${month}</span>
+                            </div>
+                            <div class="item-info">
+                                <span class="task">${trip.patient_name || 'Emergency'}'s Request</span>
+                                <span class="time">${new Date(trip.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <span class="status-badge ${statusClass}">${trip.status.charAt(0).toUpperCase() + trip.status.slice(1)}</span>
+                            <div class="item-price">
+                                <span class="total">₹${trip.total_fare || 0}</span>
+                                <span class="rate">₹70/km</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        } else if (type === 'invoices') {
+            const completedTrips = allDriverTrips.filter(t => t.status === 'completed');
+            if (completedTrips.length === 0) {
+                listBody.innerHTML = '<div class="list-item" style="justify-content: center; opacity: 0.5;">No invoices generated yet</div>';
+            } else {
+                listBody.innerHTML = completedTrips.map(trip => {
+                    const date = new Date(trip.created_at);
+                    const day = date.getDate();
+                    const month = date.toLocaleString('default', { month: 'short' });
+
+                    return `
+                        <div class="list-item">
+                            <div class="item-date">
+                                <span class="day">${day}</span>
+                                <span class="month">${month}</span>
+                            </div>
+                            <div class="item-info">
+                                <span class="task">Invoice #${trip.id.toString().padStart(5, '0')}</span>
+                                <span class="time">${trip.hospital_name || 'Emergency Drop-off'}</span>
+                            </div>
+                            <span class="status-badge done">Paid</span>
+                            <div class="item-price">
+                                <span class="total">₹${trip.total_fare || 0}</span>
+                                <span class="rate">₹70/km</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+    }
 
     // Status Workflow Handlers
     function updateActionButtons(trip) {
