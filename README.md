@@ -173,12 +173,12 @@ node -e "console.log(require('crypto').randomBytes(16).toString('hex'))"
 
 ### Option A: Deploy on Render (Recommended)
 
-#### Step 1 — Push to GitHub
+#### Step 1 — Push to GitHub    DONE
 ```bash
 git add -A && git commit -m "Prepare for deployment" && git push origin main
 ```
 
-#### Step 2 — Create Free PostgreSQL Database
+#### Step 2 — Create Free PostgreSQL Database   DONE
 1. Go to [render.com](https://render.com) → **New** → **PostgreSQL**
 2. Name: `rapidcare-db` · Plan: **Free** · Region: closest to your users
 3. Click **Create Database**
