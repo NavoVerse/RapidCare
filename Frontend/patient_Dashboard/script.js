@@ -126,6 +126,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             setVal('displayProfileBlood', data.blood_type);
             setVal('displayProfileLocation', data.home_location);
+
+            // Auto-populate pickup location from patient's home address using Nominatim
+            if (data.home_location) {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(data.home_location)}`)
+                    .then(res => res.json())
+                    .then(geoData => {
+                        if (geoData && geoData.length > 0) {
+                            const lat = geoData[0].lat;
+                            const lng = geoData[0].lon;
+                            localStorage.setItem('userLat', lat);
+                            localStorage.setItem('userLng', lng);
+                            console.log(`[Geocoding] Auto-populated GPS coordinates for home address: ${lat}, ${lng}`);
+                        }
+                    })
+                    .catch(err => console.error('[Geocoding Error]', err));
+            }
             setVal('displayProfileBP', data.blood_pressure);
             setVal('displayProfileAllergies', data.allergies);
             setVal('displayProfileChronic', data.chronic_conditions);
