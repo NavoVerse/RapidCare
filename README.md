@@ -131,7 +131,7 @@ This section tracks the progress of connecting the newly designed Driver Dashboa
 - [ ] **Emergency SOS**: Connect the SOS button to a high-priority backend alert system.
 
 ### Phase 4: Analytics & Insights
-- [ ] **Performance Stats**: Dynamically calculate "Completed Trips" and "Efficiency" for the stat cards.
+- [x] **Performance Stats**: Dynamically calculate "Completed Trips" and "Efficiency" for the stat cards.
 - [x] **Trip History**: Fetch and render the "Recent Trips" list from the database.
 - [ ] **Invoice Generation**: (Bonus) Implement the "Invoices" tab to show billing data for completed trips.
 
