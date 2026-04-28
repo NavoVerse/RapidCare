@@ -1347,6 +1347,30 @@ app.put('/api/v1/trips/:id/status', authenticateToken, authorize('driver'), asyn
         const updateData = { status };
         if (status === 'completed') {
             updateData.end_time = knex.fn.now();
+            
+            // Auto-query patient's active insurance policies and generate draft claim
+            try {
+                const policy = await knex('insurance_policies').where({ patient_id: trip.patient_id, status: 'active' }).first();
+                if (policy) {
+                    const hospitalRecord = await knex('hospitals').where({ user_id: trip.hospital_id }).first();
+                    const hospId = hospitalRecord ? hospitalRecord.id : null;
+                    
+                    const claimData = {
+                        patient_id: trip.patient_id,
+                        policy_id: policy.id,
+                        amount: trip.total_fare || 500,
+                        claim_type: 'Inpatient',
+                        status: 'pending',
+                        reference_number: 'CLM-' + Date.now(),
+                        hospital_id: hospId
+                    };
+                    
+                    await knex('insurance_claims').insert(claimData);
+                    logger.info(`[Auto-Claim] Created auto insurance claim for trip ${trip.id}, patient ${trip.patient_id}`);
+                }
+            } catch (claimErr) {
+                logger.error(`[Auto-Claim Error] ${claimErr.message}`);
+            }
         }
 
         await knex('trips').where({ id: req.params.id }).update(updateData);
@@ -1397,6 +1421,36 @@ app.post('/api/v1/insurance/policies', authenticateToken, async (req, res) => {
         const policyId = typeof id === 'object' ? id.id : id;
         res.status(201).json({ id: policyId, message: 'Policy added successfully' });
     } catch (err) { res.status(500).json({ error: 'Database error creating policy' }); }
+});
+
+app.post('/api/v1/insurance/claims/auto', authenticateToken, async (req, res) => {
+    const { trip_id } = req.body;
+    try {
+        const trip = await knex('trips').where({ id: trip_id }).first();
+        if (!trip) return res.status(404).json({ error: 'Trip not found' });
+        
+        const policy = await knex('insurance_policies').where({ patient_id: trip.patient_id, status: 'active' }).first();
+        if (!policy) return res.status(400).json({ error: 'No active insurance policy found' });
+        
+        const hospitalRecord = await knex('hospitals').where({ user_id: trip.hospital_id }).first();
+        const hospId = hospitalRecord ? hospitalRecord.id : null;
+        
+        const claimData = {
+            patient_id: trip.patient_id,
+            policy_id: policy.id,
+            amount: trip.total_fare || 500,
+            claim_type: 'Inpatient',
+            status: 'pending',
+            reference_number: 'CLM-' + Date.now(),
+            hospital_id: hospId
+        };
+        
+        const [claimId] = await knex('insurance_claims').insert(claimData).returning('id');
+        const cId = typeof claimId === 'object' ? claimId.id : claimId;
+        res.json({ message: 'Claim auto-generated successfully', claim_id: cId });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get('/api/v1/insurance/claims', authenticateToken, async (req, res) => {
