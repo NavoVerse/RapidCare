@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="../shared_assets/js/theme-manager.js"></script>
     <script src="../shared_assets/js/config.js"></script>
-    <!-- Lucide Icons (via CDN) -->
+    <!-- External Libraries -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -1330,7 +1330,7 @@
         
         <div id="analytics-view" style="display: none;">
             <div style="padding: 20px; display: flex; justify-content: flex-end;">
-                <button class="primary-btn" onclick="document.getElementById('simModal').classList.add('active')">Simulate Data Entry</button>
+                <button class="primary-btn" onclick="window.openSimModal()">Simulate Data Entry</button>
             </div>
             <div class="analytics-container">
             <!-- Top Metrics Row -->
@@ -1572,7 +1572,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Simulate Data Edit</h2>
-                <button class="close-btn" onclick="closeSimModal()">&times;</button>
+                <button class="close-btn" onclick="window.closeSimModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <p>Edit vitals to see how the intelligence dashboard reacts in real-time.</p>
@@ -1588,7 +1588,7 @@
                     <label>Safety Score (0-100)</label>
                     <input type="range" id="input-safety" min="0" max="100" value="88">
                 </div>
-                <button class="primary-btn" onclick="applySimulation()" style="width: 100%; margin-top: 20px;">
+                <button class="primary-btn" onclick="window.applySimulation()" style="width: 100%; margin-top: 20px;">
                     Apply & Update Analytics
                 </button>
             </div>
@@ -1815,19 +1815,19 @@
                 
                 <div class="tabs-container">
                     <div class="tabs-list">
-                        <button class="tab-btn active" data-tab="upi">
+                        <button class="tab-btn active" data-tab="upi" onclick="window.switchPaymentTab(this)">
                             <i data-lucide="smartphone"></i>
                             <span>UPI</span>
                         </button>
-                        <button class="tab-btn" data-tab="card">
+                        <button class="tab-btn" data-tab="card" onclick="window.switchPaymentTab(this)">
                             <i data-lucide="credit-card"></i>
                             <span>Cards</span>
                         </button>
-                        <button class="tab-btn" data-tab="netbanking">
+                        <button class="tab-btn" data-tab="netbanking" onclick="window.switchPaymentTab(this)">
                             <i data-lucide="landmark"></i>
                             <span>Net Banking</span>
                         </button>
-                        <button class="tab-btn" data-tab="cash">
+                        <button class="tab-btn" data-tab="cash" onclick="window.switchPaymentTab(this)">
                             <i data-lucide="banknote"></i>
                             <span>Cash</span>
                         </button>
@@ -1875,71 +1875,166 @@
                     </div>
 
                     <div class="tab-content" id="card-content">
-                        <h3>Credit / Debit Card</h3>
-                        <form class="card-form">
+                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">Credit / Debit Card</h3>
+                        <form class="card-form" style="display: flex; flex-direction: column; gap: 16px;">
                             <div class="form-group">
-                                <label>Card Number</label>
-                                <input type="text" placeholder="0000 0000 0000 0000">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Card Number</label>
+                                <input type="text" placeholder="0000 0000 0000 0000" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
                             </div>
-                            <div class="form-row">
+                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                                 <div class="form-group">
-                                    <label>Expiry Date</label>
-                                    <input type="text" placeholder="MM/YY">
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Cardholder Name</label>
+                                    <input type="text" placeholder="Full Name" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
                                 </div>
                                 <div class="form-group">
-                                    <label>CVV</label>
-                                    <input type="password" placeholder="***">
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Name on Card</label>
+                                    <input type="text" placeholder="Name as printed" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
+                                </div>
+                            </div>
+                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Expiry Date</label>
+                                    <input type="text" placeholder="MM / YY" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
+                                </div>
+                                <div class="form-group">
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">CVV</label>
+                                    <input type="password" placeholder="•••" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Select Bank</label>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Select Bank</label>
                                 <div class="bank-select-wrapper">
-                                    <input type="text" id="card-bank-search" placeholder="Search your bank..." class="bank-search-input">
-                                    <div class="bank-dropdown" id="card-bank-list">
-                                        <!-- Populated by JS -->
-                                    </div>
+                                    <select name="bank" id="card-bank-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text); font-size: 14px; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px;">
+                                        <option value="" disabled selected>Search your bank...</option>
+                                        <optgroup label="Public Sector Banks" style="background: var(--surface-color); color: var(--primary-text);">
+                                            <option value="sbi">State Bank of India (SBI)</option>
+                                            <option value="pnb">Punjab National Bank (PNB)</option>
+                                            <option value="bob">Bank of Baroda</option>
+                                            <option value="boi">Bank of India</option>
+                                            <option value="union">Union Bank of India</option>
+                                            <option value="canara">Canara Bank</option>
+                                            <option value="bom">Bank of Maharashtra</option>
+                                            <option value="cbi">Central Bank of India</option>
+                                            <option value="iob">Indian Overseas Bank</option>
+                                            <option value="indian">Indian Bank</option>
+                                            <option value="uco">UCO Bank</option>
+                                            <option value="psb">Punjab & Sind Bank</option>
+                                        </optgroup>
+                                        <optgroup label="Private Sector Banks" style="background: var(--surface-color); color: var(--primary-text);">
+                                            <option value="hdfc">HDFC Bank Ltd.</option>
+                                            <option value="icici">ICICI Bank Ltd.</option>
+                                            <option value="axis">Axis Bank Ltd.</option>
+                                            <option value="kotak">Kotak Mahindra Bank Ltd.</option>
+                                            <option value="indusind">IndusInd Bank Ltd.</option>
+                                            <option value="yes">Yes Bank Ltd.</option>
+                                            <option value="idfc">IDFC FIRST Bank Ltd.</option>
+                                            <option value="federal">Federal Bank Ltd.</option>
+                                            <option value="bandhan">Bandhan Bank</option>
+                                            <option value="rbl">RBL Bank</option>
+                                            <option value="sib">South Indian Bank</option>
+                                            <option value="cub">City Union Bank Ltd.</option>
+                                        </optgroup>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="save-card">
-                                <label for="save-card">Save card details securely</label>
+                            <div class="checkbox-group" style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                                <input type="checkbox" id="save-card" style="cursor: pointer;">
+                                <label for="save-card" style="font-size: 0.85rem; opacity: 0.7; cursor: pointer;">Save card details securely</label>
                             </div>
                         </form>
                     </div>
 
                     <div class="tab-content" id="netbanking-content">
-                        <h3>Popular Banks</h3>
-                        <div class="bank-grid" id="popular-banks">
-                            <!-- Populated by JS -->
-                        </div>
-                        <div class="form-group mt-20">
-                            <label>All Banks</label>
-                            <div class="bank-select-wrapper">
-                                <input type="text" id="net-bank-search" placeholder="Search your bank..." class="bank-search-input">
-                                <div class="bank-dropdown" id="net-bank-list">
-                                    <!-- Populated by JS -->
-                                </div>
+                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">Net Banking</h3>
+                        
+                        <!-- Bank Selection -->
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Popular Banks</label>
+                            <div class="bank-grid" id="popular-banks" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px;">
+                                <!-- Populated by JS -->
                             </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 24px;">
+                            <label style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Choose your Bank</label>
+                            <div class="bank-select-wrapper">
+                                <select name="bank" id="bankSelect" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text); font-size: 14px; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px;">
+                                    <option value="" disabled selected>Search your bank...</option>
+                                    <optgroup label="Public Sector Banks" style="background: var(--surface-color); color: var(--primary-text);">
+                                        <option value="sbi">State Bank of India (SBI)</option>
+                                        <option value="pnb">Punjab National Bank (PNB)</option>
+                                        <option value="bob">Bank of Baroda</option>
+                                        <option value="boi">Bank of India</option>
+                                        <option value="union">Union Bank of India</option>
+                                        <option value="canara">Canara Bank</option>
+                                        <option value="bom">Bank of Maharashtra</option>
+                                        <option value="cbi">Central Bank of India</option>
+                                        <option value="iob">Indian Overseas Bank</option>
+                                        <option value="indian">Indian Bank</option>
+                                        <option value="uco">UCO Bank</option>
+                                        <option value="psb">Punjab & Sind Bank</option>
+                                    </optgroup>
+                                    <optgroup label="Private Sector Banks" style="background: var(--surface-color); color: var(--primary-text);">
+                                        <option value="hdfc">HDFC Bank Ltd.</option>
+                                        <option value="icici">ICICI Bank Ltd.</option>
+                                        <option value="axis">Axis Bank Ltd.</option>
+                                        <option value="kotak">Kotak Mahindra Bank Ltd.</option>
+                                        <option value="indusind">IndusInd Bank Ltd.</option>
+                                        <option value="yes">Yes Bank Ltd.</option>
+                                        <option value="idfc">IDFC FIRST Bank Ltd.</option>
+                                        <option value="federal">Federal Bank Ltd.</option>
+                                        <option value="bandhan">Bandhan Bank</option>
+                                        <option value="rbl">RBL Bank</option>
+                                        <option value="sib">South Indian Bank</option>
+                                        <option value="cub">City Union Bank Ltd.</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Credentials -->
+                        <div class="credentials-form" style="display: flex; flex-direction: column; gap: 16px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Net banking User ID</label>
+                                <input type="text" placeholder="Enter your user ID" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
+                            </div>
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; opacity: 0.8;">Password</label>
+                                <input type="password" placeholder="••••••••" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-color); color: var(--primary-text);">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 30px; text-align: center;">
+                            <button type="button" class="verify-details-btn" style="width: 100%; padding: 16px; border-radius: 16px; background: rgba(6, 182, 212, 0.1); border: 1.5px solid rgba(6, 182, 212, 0.3); color: var(--primary-color); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i>
+                                Verify & Proceed to Secure Login
+                            </button>
+                            <p style="font-size: 11px; opacity: 0.5; margin-top: 10px;">You will be redirected to your bank's secure page for 2FA</p>
                         </div>
                     </div>
 
                     <div class="tab-content" id="cash-content">
-                        <div class="offer-banner">
-                            <i data-lucide="gift"></i>
+                        <div class="offer-banner" style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 16px; padding: 16px; display: flex; gap: 12px; margin-bottom: 20px;">
+                            <i data-lucide="sparkles" style="color: #06b6d4;"></i>
                             <div class="offer-text">
-                                <h4>Special Cash Offer!</h4>
-                                <p>After 5th payment in cash, the 6th platform charge (₹40) will be discounted.</p>
+                                <h4 style="color: #06b6d4; margin-bottom: 4px;">RapidCare Loyalty Rewards</h4>
+                                <p style="font-size: 13px; opacity: 0.8;">Every 4th ride has a <strong>₹0 Platform Fee</strong>! Pay in cash to build your streak.</p>
                             </div>
                         </div>
-                        <div class="cash-instructions">
-                            <p>Pay directly to the driver upon arrival. Please ensure you have the exact change if possible.</p>
-                            <div class="progress-container">
-                                <label>Cash Payment Streak: 3/5</label>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 60%;"></div>
+                        <div class="streak-container">
+                            <div class="streak-header">
+                                <span class="streak-title">Your Ride Streak</span>
+                                <div class="streak-dots" id="streak-dots">
+                                    <div class="streak-dot active"></div>
+                                    <div class="streak-dot"></div>
+                                    <div class="streak-dot"></div>
+                                    <div class="streak-dot reward"><i data-lucide="gift" style="width: 8px; height: 8px; color: white;"></i></div>
                                 </div>
-                                <small>2 more payments to unlock your reward!</small>
                             </div>
+                            <p class="streak-msg" id="streak-msg">3 more cash payments to unlock your ₹40 discount!</p>
+                        </div>
+                        <div class="cash-instructions" style="margin-top: 20px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.03);">
+                            <p style="font-size: 13px; opacity: 0.7;">Pay directly to the driver. The platform fee discount will be automatically applied to your 4th ride.</p>
                         </div>
                     </div>
                 </div>
@@ -2124,6 +2219,7 @@
     <!-- Skeleton Loading Script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
             const boxes = document.querySelectorAll('.stat-card, .card, .profile-panel, .info-card, .metric-card, .driver-profile-card, .vehicle-card, .emergency-details-card, .form-section');
             boxes.forEach(box => box.classList.add('skeleton-box'));
             
@@ -2131,10 +2227,108 @@
                 boxes.forEach(box => box.classList.add('loaded'));
                 setTimeout(() => {
                     boxes.forEach(box => box.classList.remove('skeleton-box', 'loaded'));
-                }, 600); // Match transition duration
+                }, 600);
             }, 1500);
         });
     </script>
-</body>
 
+    <!-- Payment Overlay -->
+    <div class="payment-overlay" id="payment-overlay">
+        <div class="payment-modal">
+            <div class="modal-header">
+                <h3>Finalize Payment</h3>
+                <button class="close-modal-btn" onclick="window.closePaymentOverlay()">&times;</button>
+            </div>
+            
+            <div class="payment-stepper">
+                <div class="step active" data-step="1">
+                    <div class="step-icon">1</div>
+                    <span>Review</span>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-icon">2</div>
+                    <span>Processing</span>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-icon">3</div>
+                    <span>Success</span>
+                </div>
+                <div class="stepper-line">
+                    <div class="line-progress" id="stepper-progress"></div>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <!-- Stage 1: Review -->
+                <div class="stage-content active" id="stage-review">
+                    <div class="order-summary-box">
+                        <div class="summary-item">
+                            <span>Ambulance Type</span>
+                            <strong id="review-ambulance">Advanced Life Support</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Destination</span>
+                            <strong id="review-hospital">Apollo Gleneagles</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Total Distance</span>
+                            <strong id="review-distance">12.4 KM</strong>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-item total">
+                            <span>Grand Total</span>
+                            <strong id="review-total">₹1,740</strong>
+                        </div>
+                    </div>
+                    <p style="font-size: 12px; opacity: 0.6; margin-top: 15px; text-align: center;">By clicking proceed, you agree to our terms of service.</p>
+                    <button class="proceed-btn" onclick="window.proceedToPayment()" style="width: 100%; margin-top: 20px; padding: 14px; border-radius: 12px; background: var(--primary-color); color: white; border: none; font-weight: 700; cursor: pointer;">
+                        Proceed to Payment
+                    </button>
+                </div>
+
+                <!-- Stage 2: Processing -->
+                <div class="stage-content" id="stage-processing">
+                    <div class="processing-view">
+                        <div class="loader-ring"></div>
+                        <h4>Connecting to Bank...</h4>
+                        <p>Please do not refresh or close this window.</p>
+                        <div class="security-badges" style="margin-top: 30px; display: flex; justify-content: center; gap: 20px; opacity: 0.5;">
+                            <i data-lucide="shield-check"></i>
+                            <i data-lucide="lock"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stage 3: Success -->
+                <div class="stage-content" id="stage-success">
+                    <div class="success-view">
+                        <div class="success-icon-wrapper">
+                            <i data-lucide="check-circle-2"></i>
+                        </div>
+                        <h2>Payment Successful!</h2>
+                        <p>Your ambulance is on the way.</p>
+                        
+                        <div class="txn-details">
+                            <div class="txn-row">
+                                <span>Transaction ID</span>
+                                <strong id="success-txn-id">TXN826401XY</strong>
+                            </div>
+                            <div class="txn-row">
+                                <span>Date & Time</span>
+                                <strong id="success-datetime">27 Apr 2026, 14:30</strong>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn-receipt" onclick="window.viewHistoryReceipt()">
+                                <i data-lucide="file-text"></i> View Receipt
+                            </button>
+                            <button class="btn-done" onclick="window.closePaymentOverlay()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
 </html>

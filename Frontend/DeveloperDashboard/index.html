@@ -356,10 +356,40 @@
                 <td><strong contenteditable="true" data-original="${d.name}" onblur="updateField('driver', ${d.id}, 'name', this)">${d.name}</strong></td>
                 <td><span contenteditable="true" data-original="${d.email}" onblur="updateField('driver', ${d.id}, 'email', this)">${d.email}</span></td>
                 <td>
-                    <small>Lic: <span contenteditable="true" data-original="${d.license_number || ''}" onblur="updateField('driver', ${d.id}, 'license_number', this)">${d.license_number || '-'}</span></small><br>
-                    <small>Veh: <span contenteditable="true" data-original="${d.vehicle_number || ''}" onblur="updateField('driver', ${d.id}, 'vehicle_number', this)">${d.vehicle_number || '-'}</span></small>
+                    <details class="dev-details-collapsible">
+                        <summary>View Driver Details</summary>
+                        <div class="collapsible-content">
+                            <div class="detail-group">
+                                <h4 class="group-title">Licensing & Vehicle</h4>
+                                <div class="detail-row"><span class="detail-label">License:</span> <span contenteditable="true" data-original="${d.license_number || ''}" onblur="updateField('driver', ${d.id}, 'license_number', this)">${d.license_number || '-'}</span></div>
+                                <div class="detail-row"><span class="detail-label">Vehicle #:</span> <span contenteditable="true" data-original="${d.vehicle_number || ''}" onblur="updateField('driver', ${d.id}, 'vehicle_number', this)">${d.vehicle_number || '-'}</span></div>
+                                <div class="detail-row"><span class="detail-label">Vehicle Type:</span> <span contenteditable="true" data-original="${d.vehicle_type || ''}" onblur="updateField('driver', ${d.id}, 'vehicle_type', this)">${d.vehicle_type || '-'}</span></div>
+                            </div>
+
+                            <div class="detail-group">
+                                <h4 class="group-title">Personal Info</h4>
+                                <div class="detail-row"><span class="detail-label">Phone:</span> <span contenteditable="true" data-original="${d.phone || ''}" onblur="updateField('driver', ${d.id}, 'phone', this)">${d.phone || '-'}</span></div>
+                                <div class="detail-row"><span class="detail-label">Alt Phone:</span> <span contenteditable="true" data-original="${d.alt_phone || ''}" onblur="updateField('driver', ${d.id}, 'alt_phone', this)">${d.alt_phone || '-'}</span></div>
+                                <div class="detail-row"><span class="detail-label">DOB:</span> <span contenteditable="true" data-original="${d.dob || ''}" onblur="updateField('driver', ${d.id}, 'dob', this)">${d.dob || '-'}</span></div>
+                            </div>
+
+                            <div class="detail-group">
+                                <h4 class="group-title">Identity & Government</h4>
+                                <div class="detail-row"><span class="detail-label">Aadhaar:</span> <span contenteditable="true" data-original="${d.aadhaar_number || ''}" onblur="updateField('driver', ${d.id}, 'aadhaar_number', this)">${d.aadhaar_number || '-'}</span></div>
+                                <div class="detail-row"><span class="detail-label">PAN:</span> <span contenteditable="true" data-original="${d.pan_number || ''}" onblur="updateField('driver', ${d.id}, 'pan_number', this)">${d.pan_number || '-'}</span></div>
+                            </div>
+
+                            <div class="detail-group">
+                                <h4 class="group-title">Address Details</h4>
+                                <div class="detail-row"><span class="detail-label">Address:</span> <span contenteditable="true" data-original="${d.address || ''}" onblur="updateField('driver', ${d.id}, 'address', this)">${d.address || '-'}</span></div>
+                                <div class="detail-row"><span class="detail-label">City:</span> <span contenteditable="true" data-original="${d.city || ''}" onblur="updateField('driver', ${d.id}, 'city', this)">${d.city || '-'}</span></div>
+                                <div class="detail-row"><span class="detail-label">State:</span> <span contenteditable="true" data-original="${d.state || ''}" onblur="updateField('driver', ${d.id}, 'state', this)">${d.state || '-'}</span></div>
+                                <div class="detail-row"><span class="detail-label">Pincode:</span> <span contenteditable="true" data-original="${d.pincode || ''}" onblur="updateField('driver', ${d.id}, 'pincode', this)">${d.pincode || '-'}</span></div>
+                            </div>
+                        </div>
+                    </details>
                 </td>
-                <td><span class="badge" contenteditable="true" data-original="${d.status}" onblur="updateField('driver', ${d.id}, 'status', this)">${d.status}</span></td>
+                <td><span class="badge badge-driver" contenteditable="true" data-original="${d.status}" onblur="updateField('driver', ${d.id}, 'status', this)">${d.status}</span></td>
                 <td class="action-cell">
                     <button class="btn-delete" onclick="deleteRecord('driver', ${d.id})" title="Delete Account">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
