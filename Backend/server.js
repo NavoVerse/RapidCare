@@ -251,7 +251,7 @@ app.post('/api/v1/drivers/register', async (req, res) => {
                 status: 'available',
                 license_number,
                 vehicle_number,
-                dob,
+                dob: (dob === '' || dob === '--') ? null : dob,
                 alt_phone,
                 address,
                 city,
