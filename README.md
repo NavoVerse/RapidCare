@@ -184,7 +184,7 @@ git add -A && git commit -m "Prepare for deployment" && git push origin main
 3. Click **Create Database**
 4. Copy the **Internal Database URL** (`postgres://...`)
 
-#### Step 3 — Create Web Service
+#### Step 3 — Create Web Service    DONE
 1. Go to **New** → **Web Service** → Connect your GitHub repo
 2. Configure:
 
@@ -198,7 +198,7 @@ git add -A && git commit -m "Prepare for deployment" && git push origin main
 | **Start Command** | `node server.js` |
 | **Plan** | Free |
 
-#### Step 4 — Set Environment Variables
+#### Step 4 — Set Environment Variables DONE
 In the Render dashboard → **Environment** tab:
 
 | Key | Value |
@@ -217,10 +217,10 @@ In the Render dashboard → **Environment** tab:
 
 #### Step 5 — Deploy & Verify
 Click **Create Web Service** — Render builds and deploys automatically. Once live, verify:
-- `https://rapidcare.onrender.com/health` → health check
-- `https://rapidcare.onrender.com/` → Choose User page
-- `https://rapidcare.onrender.com/login` → Patient login
-- `https://rapidcare.onrender.com/dev` → Developer dashboard
+- `https://rapidcare-c2jt.onrender.com/health` → health check
+- `https://rapidcare-c2jt.onrender.com/` → Choose User page
+- `https://rapidcare-c2jt.onrender.com/login` → Patient login
+- `https://rapidcare-c2jt.onrender.com/dev` → Developer dashboard
 
 #### Step 6 — Prevent Cold Starts
 Use [UptimeRobot](https://uptimerobot.com) (free) to ping `/health` every 14 minutes to keep the service warm.
