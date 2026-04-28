@@ -345,6 +345,67 @@ app.get('/api/v1/hospitals', async (req, res) => {
     }
 });
 
+// Scrape/Infer details for external hospitals using Gemini
+app.get('/api/v1/hospitals/external-details', async (req, res) => {
+    const { name } = req.query;
+    if (!name) return res.status(400).json({ error: 'Hospital name is required' });
+
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    if (!apiKey) {
+        return res.json({
+            address: "Public Grid Location",
+            phone: "+91 00000 00000",
+            website: "N/A",
+            beds: 10,
+            facilities: ["Emergency Care"],
+            response_class: "Level B"
+        });
+    }
+
+    try {
+        const { GoogleGenerativeAI } = require("@google/generativeai");
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        const prompt = `
+            You are an authoritative hospital intelligence engine.
+            Retrieve or intelligently infer the following public details for: "${name}".
+            Return strictly a JSON object with:
+            {
+                "address": "Street, City",
+                "phone": "+91 ...",
+                "website": "URL or N/A",
+                "beds": Number,
+                "facilities": ["Facility1", "Facility2"],
+                "response_class": "Level A" or "Level B"
+            }
+            No preamble or markdown. Ensure output is valid raw JSON.
+        `;
+
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        
+        let details;
+        try {
+            const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            details = JSON.parse(cleaned);
+        } catch (parseErr) {
+            details = {
+                address: "Public Grid Location",
+                phone: "+91 00000 00000",
+                website: "N/A",
+                beds: 10,
+                facilities: ["Emergency Care"],
+                response_class: "Level B"
+            };
+        }
+
+        res.json(details);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // 1c. Register Hospital (5-step form)
 app.post('/api/v1/hospitals/register', async (req, res) => {
     const data = req.body;

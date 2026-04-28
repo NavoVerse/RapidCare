@@ -868,44 +868,70 @@ document.addEventListener('DOMContentLoaded', () => {
             title.textContent = "Hospital Status - " + h.name.split(',')[0];
             badges.style.display = 'none';
             const isExt = typeof h.id === 'string' && h.id.startsWith('osm-');
-            statusPanel.innerHTML = `
-                <div class="status-content">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 1.5rem; color: var(--text-main); font-family: 'Outfit', sans-serif;">${h.name}</h2>
-                        <span class="h-status" style="background: ${h.status === 'Available' ? '#f0fdf4' : (h.status === 'Busy' ? '#fef2f2' : '#fefce8')}; color: ${h.status === 'Available' ? '#15803d' : (h.status === 'Busy' ? '#dc2626' : '#eab308')};">${h.status}</span>
-                    </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                        <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border);">
-                            <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Available Beds</label>
-                            <div style="font-size: 2rem; font-weight: 800; color: var(--primary-green); margin-top: 5px;">${h.beds}</div>
+            if (isExt) {
+                // Fetch live details from online
+                statusPanel.innerHTML = `<div style="text-align: center; padding: 40px;"><p style="color: var(--text-muted);">Querying live infrastructure details via Gemini AI...</p></div>`;
+                fetch(API_BASE + `/hospitals/external-details?name=${encodeURIComponent(h.name)}`)
+                    .then(res => res.json())
+                    .then(extData => {
+                        h.beds = extData.beds || "N/A";
+                        h.address = extData.address || h.address;
+                        h.phone = extData.phone || h.phone;
+                        h.website = extData.website || h.website;
+                        h.facilities = extData.facilities || h.facilities;
+                        h.response_class = extData.response_class || "External";
+
+                        renderStatusPanel(h, true);
+                    })
+                    .catch(err => {
+                        console.error('[External Detail Error]', err);
+                        renderStatusPanel(h, true);
+                    });
+            } else {
+                renderStatusPanel(h, false);
+            }
+
+            function renderStatusPanel(hospitalObj, isExternal) {
+                statusPanel.innerHTML = `
+                    <div class="status-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                            <h2 style="font-size: 1.5rem; color: var(--text-main); font-family: 'Outfit', sans-serif;">${hospitalObj.name}</h2>
+                            <span class="h-status" style="background: ${hospitalObj.status === 'Available' ? '#f0fdf4' : (hospitalObj.status === 'Busy' ? '#fef2f2' : '#fefce8')}; color: ${hospitalObj.status === 'Available' ? '#15803d' : (hospitalObj.status === 'Busy' ? '#dc2626' : '#eab308')};">${hospitalObj.status}</span>
                         </div>
-                        <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border);">
-                            <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Response Class</label>
-                            <div style="font-size: 1.5rem; font-weight: 800; color: var(--acc-yellow); margin-top: 5px;">${isExt ? 'External' : (h.beds > 10 ? 'Level A' : 'Level B')}</div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                            <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border);">
+                                <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Available Beds</label>
+                                <div style="font-size: 2rem; font-weight: 800; color: var(--primary-green); margin-top: 5px;">${hospitalObj.beds}</div>
+                            </div>
+                            <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border);">
+                                <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Response Class</label>
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--acc-yellow); margin-top: 5px;">${isExternal ? (hospitalObj.response_class || 'External') : (hospitalObj.beds > 10 ? 'Level A' : 'Level B')}</div>
+                            </div>
                         </div>
-                    </div>
 
-                    ${isExt ? `
-                    <h4 style="margin-bottom: 12px; font-weight: 700;">Facility Metadata (OSM Grid)</h4>
-                    <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border); margin-bottom: 30px;">
-                        <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-main);"><strong>Address:</strong> ${h.address || "Public Grid Address"}</p>
-                        <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-main);"><strong>Contact:</strong> ${h.phone || "Not Listed"}</p>
-                        <p style="margin: 0; font-size: 0.9rem; color: var(--text-main);"><strong>Website:</strong> ${h.website && h.website !== "N/A" ? `<a href="${h.website.startsWith('http') ? h.website : 'https://' + h.website}" target="_blank" style="color: var(--primary-green);">${h.website}</a>` : "Not Listed"}</p>
-                    </div>
-                    ` : ''}
+                        ${isExternal ? `
+                        <h4 style="margin-bottom: 12px; font-weight: 700;">Facility Metadata (AI Scraped)</h4>
+                        <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border); margin-bottom: 30px;">
+                            <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-main);"><strong>Address:</strong> ${hospitalObj.address || "Public Grid Address"}</p>
+                            <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-main);"><strong>Contact:</strong> ${hospitalObj.phone || "Not Listed"}</p>
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--text-main);"><strong>Website:</strong> ${hospitalObj.website && hospitalObj.website !== "N/A" ? `<a href="${hospitalObj.website.startsWith('http') ? hospitalObj.website : 'https://' + hospitalObj.website}" target="_blank" style="color: var(--primary-green);">${hospitalObj.website}</a>` : "Not Listed"}</p>
+                        </div>
+                        ` : ''}
 
-                    <h4 style="margin-bottom: 12px; font-weight: 700;">Key Facilities</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px;">
-                        ${h.facilities.map(f => `<span style="padding: 6px 14px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-weight: 500;">${f}</span>`).join('')}
-                    </div>
+                        <h4 style="margin-bottom: 12px; font-weight: 700;">Key Facilities</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px;">
+                            ${hospitalObj.facilities.map(f => `<span style="padding: 6px 14px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-weight: 500;">${f}</span>`).join('')}
+                        </div>
 
-                    <button onclick="window.bookAmbulance('${h.id}', '${h.name.replace(/'/g, "\\'")}')" style="width: 100%; padding: 16px; background: var(--primary-green); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem;">
-                        🚑 Book RapidCare for this Hospital
-                    </button>
-                    <p style="margin-top: 15px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">${isExt ? 'Transit dispatch provided natively through local public network routing profiles.' : 'Note: Bed counts are updated every 15 minutes by hospital staff.'}</p>
-                </div>
-            `;
+                        <button onclick="window.bookAmbulance('${hospitalObj.id}', '${hospitalObj.name.replace(/'/g, "\\'")}')" style="width: 100%; padding: 16px; background: var(--primary-green); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem;">
+                            🚑 Book RapidCare for this Hospital
+                        </button>
+                        <p style="margin-top: 15px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">${isExternal ? 'Transit dispatch provided natively through local public network routing profiles.' : 'Note: Bed counts are updated every 15 minutes by hospital staff.'}</p>
+                    </div>
+                `;
+            }
         }
     };
 
