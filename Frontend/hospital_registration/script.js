@@ -135,8 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 
                 if (response.ok) {
+                    localStorage.setItem('rapidcare_token', data.token);
+                    localStorage.setItem('rapidcare_user', JSON.stringify(data.user));
                     alert('Hospital Registration Submitted successfully!');
-                    window.location.href = '../patient_login/index.html';
+                    window.location.href = '../hospital_Dashboard/index.html';
                 } else {
                     alert('Registration failed: ' + (data.error || 'Unknown error'));
                 }
