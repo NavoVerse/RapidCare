@@ -288,11 +288,11 @@ Mapped against the **9-Step Emergency Cycle** and **System Architecture** diagra
 | **Backend** | Express.js Controllers | ✅ Done |
 | **Backend** | WebSocket Real-time (Socket.IO) | ✅ Done |
 | **Backend** | Ambulance Dispatch Engine | ✅ Done |
-| **Backend** | Business Logic & Triage | ❌ Not Started — no AI scoring |
+| **Backend** | Business Logic & Triage | ✅ Done |
 | **Database** | PostgreSQL via Knex.js | ✅ Done |
 | **Database** | Patient Records, Drivers, Hospitals | ✅ Done |
 | **Database** | Emergency Logs (trips table) | ✅ Done |
-| **AI / Cloud** | Google Gemini AI Triage | ❌ Not Started |
+| **AI / Cloud** | Google Gemini AI Triage | ✅ Done |
 | **AI / Cloud** | Google Cloud Run | ❌ Not Started (deployed on Render instead) |
 | **AI / Cloud** | Firebase Integration | ⚠️ Package installed, not configured |
 | **AI / Cloud** | Nominatim API (geocoding) | ❌ Not Started |
@@ -307,10 +307,10 @@ Mapped against the **9-Step Emergency Cycle** and **System Architecture** diagra
 - [x] Endpoint: `POST /api/v1/trips/request` → auto-selects and notifies nearest driver via Socket.IO
 
 #### Priority 2 — Gemini AI Triage Engine
-- [ ] Integrate Google Gemini API (`@google/generative-ai`)
-- [ ] On trip request, pass patient vitals + urgency category to Gemini for priority scoring
-- [ ] Return triage level: `CRITICAL` / `URGENT` / `STANDARD` and factor into driver dispatch priority
-- [ ] Endpoint: `POST /api/v1/triage` → returns AI triage assessment
+- [x] Integrate Google Gemini API (`@google/generative-ai`)
+- [x] On trip request, pass patient vitals + urgency category to Gemini for priority scoring
+- [x] Return triage level: `CRITICAL` / `URGENT` / `STANDARD` and factor into driver dispatch priority
+- [x] Endpoint: `POST /api/v1/triage` → returns AI triage assessment
 
 #### Priority 3 — Hospital Pre-ER Notification
 - [ ] When a trip is accepted, notify the destination hospital via Socket.IO room `hospital_{id}`
