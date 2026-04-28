@@ -426,6 +426,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (completedEl) completedEl.textContent = completedBookings;
         if (cancelledEl) cancelledEl.textContent = cancelledBookings;
 
+        const efficiencyEl = document.getElementById('stat-efficiency');
+        const efficiencyDescEl = document.getElementById('stat-efficiency-desc');
+        const efficiency = totalBookings > 0 ? Math.round((completedBookings / totalBookings) * 100) : 100;
+        
+        if (efficiencyEl) efficiencyEl.textContent = `${efficiency}%`;
+        if (efficiencyDescEl) {
+            if (efficiency >= 85) efficiencyDescEl.textContent = 'Excellent performance';
+            else if (efficiency >= 70) efficiencyDescEl.textContent = 'Acceptable performance';
+            else efficiencyDescEl.textContent = 'Action Required';
+        }
+
         const totalCountFilterEl = document.getElementById('stat-total-count-filter');
         if (totalCountFilterEl) totalCountFilterEl.textContent = `All Time (${totalBookings})`;
 
