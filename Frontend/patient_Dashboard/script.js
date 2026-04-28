@@ -636,18 +636,36 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!forced && storedHospitals) {
             hospitals = JSON.parse(storedHospitals);
         } else {
-            if (window.MapAPI) {
-                hospitals = await window.MapAPI.getHospitals();
-            } else {
+            try {
+                const response = await fetch(API_BASE + '/hospitals');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        hospitals = data.map(h => ({
+                            id: h.user_id,
+                            name: h.name,
+                            lat: parseFloat(h.lat) || 22.5,
+                            lng: parseFloat(h.lng) || 88.4,
+                            status: h.available_beds > 0 ? "Available" : "Busy",
+                            beds: h.available_beds || 0,
+                            facilities: [h.hospital_type || "Emergency Care"]
+                        }));
+                    }
+                }
+            } catch (fetchErr) {
+                console.error('[Hospital Fetch Error] Falling back to dummy array.', fetchErr);
+            }
+
+            if (!hospitals || hospitals.length === 0) {
                 // Inline fallback
                 hospitals = [
-                    { name: "AMRI Hospital, Dhakuria", lat: 22.5135, lng: 88.3629, status: "Available", beds: 12, facilities: ["ICU", "Emergency", "Cardiology"] },
-                    { name: "Apollo Gleneagles Hospitals", lat: 22.5710, lng: 88.4055, status: "Limited", beds: 3, facilities: ["Neurology", "Trauma Care", "Oxygen Support"] },
-                    { name: "Fortis Hospital, Anandapur", lat: 22.5165, lng: 88.4042, status: "Available", beds: 21, facilities: ["General Surgery", "Pediatrics", "Diagnostic Lab"] },
-                    { name: "Medica Superspecialty Hospital", lat: 22.4939, lng: 88.3980, status: "Busy", beds: 0, facilities: ["Organ Transplant", "Advanced Imaging", "Reentry Care"] },
-                    { name: "NRS Medical College and Hospital", lat: 22.5645, lng: 88.3685, status: "Available", beds: 45, facilities: ["Government Funded", "Free Pharmacy", "Maternity"] },
-                    { name: "Peerless Hospital", lat: 22.4770, lng: 88.3900, status: "Available", beds: 18, facilities: ["Orthopedic", "Oncology", "Dialysis"] },
-                    { name: "SSKM Hospital", lat: 22.5392, lng: 88.3444, status: "Busy", beds: 1, facilities: ["Cardiac Surgery", "Burn Ward", "Medical Research"] }
+                    { id: 1, name: "AMRI Hospital, Dhakuria", lat: 22.5135, lng: 88.3629, status: "Available", beds: 12, facilities: ["ICU", "Emergency", "Cardiology"] },
+                    { id: 2, name: "Apollo Gleneagles Hospitals", lat: 22.5710, lng: 88.4055, status: "Limited", beds: 3, facilities: ["Neurology", "Trauma Care", "Oxygen Support"] },
+                    { id: 3, name: "Fortis Hospital, Anandapur", lat: 22.5165, lng: 88.4042, status: "Available", beds: 21, facilities: ["General Surgery", "Pediatrics", "Diagnostic Lab"] },
+                    { id: 4, name: "Medica Superspecialty Hospital", lat: 22.4939, lng: 88.3980, status: "Busy", beds: 0, facilities: ["Organ Transplant", "Advanced Imaging", "Reentry Care"] },
+                    { id: 5, name: "NRS Medical College and Hospital", lat: 22.5645, lng: 88.3685, status: "Available", beds: 45, facilities: ["Government Funded", "Free Pharmacy", "Maternity"] },
+                    { id: 6, name: "Peerless Hospital", lat: 22.4770, lng: 88.3900, status: "Available", beds: 18, facilities: ["Orthopedic", "Oncology", "Dialysis"] },
+                    { id: 7, name: "SSKM Hospital", lat: 22.5392, lng: 88.3444, status: "Busy", beds: 1, facilities: ["Cardiac Surgery", "Burn Ward", "Medical Research"] }
                 ];
             }
             localStorage.setItem('hospitalData', JSON.stringify(hospitals));
