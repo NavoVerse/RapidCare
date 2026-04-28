@@ -21,6 +21,50 @@ const { initializeDB, knex } = require('./db');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const logger = require('./services/logger.service');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const admin = require('firebase-admin');
+
+// In-memory store for simulation or live FCM routing
+const fcmTokens = {};
+
+// ── Firebase Admin SDK Initialization ─────────────────────────────────────────
+try {
+    const fs = require('fs');
+    const serviceAccountPath = path.resolve(__dirname, 'firebase-service-account.json');
+    if (fs.existsSync(serviceAccountPath)) {
+        const serviceAccount = require(serviceAccountPath);
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+        });
+        logger.info('[Firebase] Admin SDK initialized successfully with service account key.');
+    } else {
+        logger.warn('[Firebase] Service account key not found. Running in simulation mode.');
+    }
+} catch (fbInitErr) {
+    logger.error(`[Firebase Init Error] ${fbInitErr.message}`);
+}
+
+/**
+ * Send Push Notification (Firebase Cloud Messaging)
+ */
+async function sendPushNotification(patientId, title, body) {
+    try {
+        const fcmToken = fcmTokens[patientId];
+
+        if (fcmToken && admin.apps.length > 0) {
+            const message = {
+                notification: { title, body },
+                token: fcmToken
+            };
+            await admin.messaging().send(message);
+            logger.info(`[FCM] Push Notification sent to patient ${patientId}: ${title}`);
+        } else {
+            // Simulation fallback (replaces SMS simulation)
+            logger.info(`[FCM Simulation] Push Notification for patient ${patientId} → ${title}: ${body}`);
+        }
+    } catch (fcmErr) {
+        logger.error(`[FCM Error] Failed sending push notification: ${fcmErr.message}`);
+    }
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -1277,6 +1321,9 @@ app.post('/api/v1/trips/:id/accept', authenticateToken, authorize('driver'), asy
                 driver_id: req.user.id
             });
 
+            // Trigger FCM push notification to patient
+            sendPushNotification(trip.patient_id, 'Ambulance Dispatched', 'An ambulance has accepted your request and is on the way!');
+
             // Notify the targeted hospital about the incoming ambulance with rich payload
             io.to(`hospital_${trip.hospital_id}`).emit('hospital:incoming_alert', {
                 trip_id: trip.id,
@@ -1387,6 +1434,13 @@ app.put('/api/v1/trips/:id/status', authenticateToken, authorize('driver'), asyn
                 trip_id: trip.id,
                 status
             });
+
+            // Trigger FCM push notification to patient on milestones
+            if (status === 'arrived') {
+                sendPushNotification(trip.patient_id, 'Driver Arrived', 'Your ambulance has arrived at your location.');
+            } else if (status === 'completed') {
+                sendPushNotification(trip.patient_id, 'Trip Completed', 'You have arrived safely at the hospital. Get well soon!');
+            }
             // Notify hospital
             io.to(`hospital_${trip.hospital_id}`).emit('hospital:trip_update', {
                 trip_id: trip.id,
@@ -1448,6 +1502,17 @@ app.post('/api/v1/insurance/claims/auto', authenticateToken, async (req, res) =>
         const [claimId] = await knex('insurance_claims').insert(claimData).returning('id');
         const cId = typeof claimId === 'object' ? claimId.id : claimId;
         res.json({ message: 'Claim auto-generated successfully', claim_id: cId });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/v1/users/fcm-token', authenticateToken, async (req, res) => {
+    const { fcm_token } = req.body;
+    try {
+        if (!fcm_token) return res.status(400).json({ error: 'FCM Token required' });
+        fcmTokens[req.user.id] = fcm_token;
+        res.json({ message: 'FCM Token registered successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
