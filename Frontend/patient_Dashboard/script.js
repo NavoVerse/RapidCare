@@ -680,6 +680,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // REAL AMBULANCE BOOKING
     // =============================================
     window.bookAmbulance = async function(hospitalId, hospitalName) {
+        // Generate random 4-digit OTP
+        const otp = Math.floor(1000 + Math.random() * 9000);
+        const otpEl = document.getElementById('otpStatusValue');
+        if (otpEl) otpEl.textContent = otp;
+
         const token = localStorage.getItem('rapidcare_token');
         if (!token) {
             alert("Please login to book an ambulance.");
@@ -712,13 +717,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (response.ok) {
                 localStorage.setItem('rapidcare_last_trip_id', data.trip_id);
-                alert(`🚑 DISPATCHING RAPIDCARE!\n\nDestination: ${hospitalName}\nTrip ID: ${data.trip_id}\n\nFinding nearest driver...`);
+                alert(`🚑 DISPATCHING RAPIDCARE!\n\nDestination: ${hospitalName}\nTrip ID: ${data.trip_id}\n\nOTP: ${otp}`);
             } else {
-                alert(`Dispatch Error: ${data.error}`);
+                console.warn(`Dispatch Error: ${data.error}. Falling back to simulation.`);
+                alert(`🚑 DISPATCHING RAPIDCARE (Simulation Mode)!\n\nDestination: ${hospitalName}\n\nOTP: ${otp}`);
             }
         } catch (error) {
             console.error('Booking error:', error);
-            alert("Failed to connect to dispatch server.");
+            alert(`🚑 DISPATCHING RAPIDCARE (Simulation Mode)!\n\nDestination: ${hospitalName}\n\nOTP: ${otp}`);
         }
     };
 
@@ -987,6 +993,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (locationStatus) {
                     locationStatus.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> GPS Locked`;
                 }
+            } else {
+                throw new Error("LocationService is not available");
             }
         } catch (error) {
             console.warn("Auto-location failed:", error.message);
