@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,9 @@
     <link rel="stylesheet" href="style.css">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../shared_assets/js/config.js"></script>
 </head>
+
 <body>
     <div class="app-container">
         <!-- Sidebar -->
@@ -24,22 +27,6 @@
                 <a href="#" class="nav-item active" onclick="switchSection('dashboard')" data-section="dashboard">
                     <i data-lucide="layout-dashboard"></i>
                     <span>Dashboard</span>
-                </a>
-                <a href="#" class="nav-item" onclick="switchSection('patient-queue')" data-section="patient-queue">
-                    <i data-lucide="users"></i>
-                    <span>Patient Queue</span>
-                </a>
-                <a href="#" class="nav-item" onclick="switchSection('bed-management')" data-section="bed-management">
-                    <i data-lucide="bed"></i>
-                    <span>Bed Management</span>
-                </a>
-                <a href="#" class="nav-item" onclick="switchSection('medical-staff')" data-section="medical-staff">
-                    <i data-lucide="user-cog"></i>
-                    <span>Medical Staff</span>
-                </a>
-                <a href="#" class="nav-item" onclick="switchSection('emergency')" data-section="emergency">
-                    <i data-lucide="siren"></i>
-                    <span>Emergency</span>
                 </a>
                 <a href="#" class="nav-item logout">
                     <i data-lucide="log-out"></i>
@@ -57,6 +44,7 @@
                         <i data-lucide="menu"></i>
                     </button>
                     <div class="hospital-info">
+
                         <h2>City General Hospital</h2>
                         <div class="status-indicator">
                             <span class="pulse-dot"></span>
@@ -84,321 +72,204 @@
                 <div id="dashboard-section" class="content-section active">
                     <!-- Quick Stats -->
                     <section class="stats-container">
-                    <div class="stat-card primary">
-                        <div class="stat-header">
-                            <span class="stat-value">24</span>
-                            <i data-lucide="bed"></i>
+                        <div class="stat-card primary">
+                            <div class="stat-header">
+                                <span class="stat-value">24</span>
+                                <i data-lucide="bed"></i>
+                            </div>
+                            <div class="stat-label">Free Beds</div>
+                            <div class="stat-sub">of 60 total</div>
                         </div>
-                        <div class="stat-label">Free Beds</div>
-                        <div class="stat-sub">of 60 total</div>
-                    </div>
-                    <div class="stat-card warning">
-                        <div class="stat-header">
-                            <span class="stat-value">4</span>
-                            <i data-lucide="activity"></i>
+                        <div class="stat-card warning">
+                            <div class="stat-header">
+                                <span class="stat-value">4</span>
+                                <i data-lucide="activity"></i>
+                            </div>
+                            <div class="stat-label">ICU Occupied</div>
+                            <div class="stat-sub">2 free</div>
                         </div>
-                        <div class="stat-label">ICU Occupied</div>
-                        <div class="stat-sub">2 free</div>
-                    </div>
-                    <div class="stat-card accent">
-                        <div class="stat-header">
-                            <span class="stat-value">5</span>
-                            <i data-lucide="user-plus"></i>
+                        <div class="stat-card accent">
+                            <div class="stat-header">
+                                <span class="stat-value">5</span>
+                                <i data-lucide="user-plus"></i>
+                            </div>
+                            <div class="stat-label">Incoming Patients</div>
+                            <div class="stat-sub">2 critical</div>
                         </div>
-                        <div class="stat-label">Incoming Patients</div>
-                        <div class="stat-sub">2 critical</div>
-                    </div>
-                    <div class="stat-card info">
-                        <div class="stat-header">
-                            <span class="stat-value">3</span>
-                            <i data-lucide="fan"></i>
+                        <div class="stat-card info">
+                            <div class="stat-header">
+                                <span class="stat-value">3</span>
+                                <i data-lucide="fan"></i>
+                            </div>
+                            <div class="stat-label">Ventilators free</div>
+                            <div class="stat-sub">of 5 total</div>
                         </div>
-                        <div class="stat-label">Ventilators free</div>
-                        <div class="stat-sub">of 5 total</div>
-                    </div>
-                    <div class="stat-card success">
-                        <div class="stat-header">
-                            <span class="stat-value">12</span>
-                            <i data-lucide="check-circle"></i>
-                        </div>
-                        <div class="stat-label">Active Admitted</div>
-                        <div class="stat-sub">↑ 2 today</div>
-                    </div>
-                </section>
-
-                <!-- Middle Grid -->
-                <div class="content-grid main-grid">
-                    <!-- Patient Requests -->
-                    <section class="card requests-section">
-                        <div class="card-header">
-                            <h3>Incoming Patient Requests</h3>
-                            <a href="#" class="view-all">View all <i data-lucide="chevron-right"></i></a>
-                        </div>
-                        <div class="table-container">
-                            <table class="data-table">
-                               <thead>
-                                   <tr>
-                                       <th>Patient</th>
-                                       <th>Condition</th>
-                                       <th>Severity</th>
-                                       <th>ETA</th>
-                                       <th>Action</th>
-                                   </tr>
-                               </thead>
-                               <tbody id="incoming-requests">
-                                   <!-- Row 1 -->
-                                   <tr class="request-row" data-id="1">
-                                       <td>
-                                           <div class="patient-cell">
-                                               <div class="avatar bg-red">AK</div>
-                                               <div class="patient-info">
-                                                   <strong>Arjun Khan</strong>
-                                                   <span>52 yrs</span>
-                                               </div>
-                                           </div>
-                                       </td>
-                                       <td>Chest pain / cardiac</td>
-                                       <td><span class="badge critical">Critical</span></td>
-                                       <td>4 min</td>
-                                       <td>
-                                           <div class="action-btns">
-                                               <button class="btn btn-accept" onclick="handleAction(1, 'accept')">Accept</button>
-                                               <button class="btn btn-reject" onclick="handleAction(1, 'reject')">Reject</button>
-                                           </div>
-                                       </td>
-                                   </tr>
-                                   <!-- Row 2 -->
-                                   <tr class="request-row" data-id="2">
-                                       <td>
-                                           <div class="patient-cell">
-                                               <div class="avatar bg-purple">PM</div>
-                                               <div class="patient-info">
-                                                   <strong>Priya Mehta</strong>
-                                                   <span>34 yrs</span>
-                                               </div>
-                                           </div>
-                                       </td>
-                                       <td>Head injury</td>
-                                       <td><span class="badge critical">Critical</span></td>
-                                       <td>7 min</td>
-                                       <td>
-                                           <div class="action-btns">
-                                               <button class="btn btn-accept" onclick="handleAction(2, 'accept')">Accept</button>
-                                               <button class="btn btn-reject" onclick="handleAction(2, 'reject')">Reject</button>
-                                           </div>
-                                       </td>
-                                   </tr>
-                                   <!-- Row 3 -->
-                                   <tr class="request-row" data-id="3">
-                                       <td>
-                                           <div class="patient-cell">
-                                               <div class="avatar bg-orange">SD</div>
-                                               <div class="patient-info">
-                                                   <strong>Suresh Das</strong>
-                                                   <span>61 yrs</span>
-                                               </div>
-                                           </div>
-                                       </td>
-                                       <td>Fractured femur</td>
-                                       <td><span class="badge moderate">Moderate</span></td>
-                                       <td>12 min</td>
-                                       <td>
-                                           <div class="action-btns">
-                                               <button class="btn btn-accept" onclick="handleAction(3, 'accept')">Accept</button>
-                                               <button class="btn btn-reject" onclick="handleAction(3, 'reject')">Reject</button>
-                                           </div>
-                                       </td>
-                                   </tr>
-                               </tbody>
-                            </table>
+                        <div class="stat-card success">
+                            <div class="stat-header">
+                                <span class="stat-value">12</span>
+                                <i data-lucide="check-circle"></i>
+                            </div>
+                            <div class="stat-label">Active Admitted</div>
+                            <div class="stat-sub">↑ 2 today</div>
                         </div>
                     </section>
 
-                    <!-- ICU & Critical Units -->
-                    <section class="card resources-section">
-                        <div class="card-header">
-                            <h3>ICU & Critical Units</h3>
-                        </div>
-                        <div class="resource-list">
-                            <div class="resource-item">
-                                <div class="res-info">
-                                    <span>ICU Beds</span>
-                                    <span class="res-count">4 / 6</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill warning" style="width: 66%"></div>
-                                </div>
+                    <!-- Middle Grid -->
+                    <div class="content-grid main-grid">
+                        <!-- Patient Requests -->
+                        <section class="card requests-section">
+                            <div class="card-header">
+                                <h3>Incoming Patient Requests</h3>
                             </div>
-                            <div class="resource-item">
-                                <div class="res-info">
-                                    <span>Ventilators</span>
-                                    <span class="res-count">2 / 5</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill danger" style="width: 40%"></div>
-                                </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Patient</th>
+                                            <th>Condition</th>
+                                            <th>Severity</th>
+                                            <th>ETA</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="incoming-requests">
+                                        <!-- Row 1 -->
+                                        <tr class="request-row" data-id="1">
+                                            <td>
+                                                <div class="patient-cell">
+                                                    <div class="avatar bg-red">AK</div>
+                                                    <div class="patient-info">
+                                                        <strong>Arjun Khan</strong>
+                                                        <span>52 yrs</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Chest pain / cardiac</td>
+                                            <td><span class="badge critical">Critical</span></td>
+                                            <td>4 min</td>
+                                            <td>
+                                                <div class="action-btns">
+                                                    <button class="btn btn-accept"
+                                                        onclick="handleAction(1, 'accept')">Accept</button>
+                                                    <button class="btn btn-reject"
+                                                        onclick="handleAction(1, 'reject')">Reject</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- Row 2 -->
+                                        <tr class="request-row" data-id="2">
+                                            <td>
+                                                <div class="patient-cell">
+                                                    <div class="avatar bg-purple">PM</div>
+                                                    <div class="patient-info">
+                                                        <strong>Priya Mehta</strong>
+                                                        <span>34 yrs</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Head injury</td>
+                                            <td><span class="badge critical">Critical</span></td>
+                                            <td>7 min</td>
+                                            <td>
+                                                <div class="action-btns">
+                                                    <button class="btn btn-accept"
+                                                        onclick="handleAction(2, 'accept')">Accept</button>
+                                                    <button class="btn btn-reject"
+                                                        onclick="handleAction(2, 'reject')">Reject</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- Row 3 -->
+                                        <tr class="request-row" data-id="3">
+                                            <td>
+                                                <div class="patient-cell">
+                                                    <div class="avatar bg-orange">SD</div>
+                                                    <div class="patient-info">
+                                                        <strong>Suresh Das</strong>
+                                                        <span>61 yrs</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Fractured femur</td>
+                                            <td><span class="badge moderate">Moderate</span></td>
+                                            <td>12 min</td>
+                                            <td>
+                                                <div class="action-btns">
+                                                    <button class="btn btn-accept"
+                                                        onclick="handleAction(3, 'accept')">Accept</button>
+                                                    <button class="btn btn-reject"
+                                                        onclick="handleAction(3, 'reject')">Reject</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="resource-item">
-                                <div class="res-info">
-                                    <span>Operation theatres</span>
-                                    <span class="res-count">1 / 3 <span class="active-status">available</span></span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill success" style="width: 33%"></div>
-                                </div>
-                            </div>
-                        </div>
+                        </section>
 
-                        <div class="alerts-container">
-                            <h4>Live Alerts</h4>
-                            <div class="alert-list">
-                                <div class="alert-item critical">
-                                    <div class="alert-icon"><i data-lucide="alert-circle"></i></div>
-                                    <div class="alert-body">
-                                        <p>Critical patient A. Khan incoming: chest pain, BP 190/110</p>
-                                        <span class="alert-time">2 min ago</span>
+                        <!-- ICU & Critical Units -->
+                        <section class="card resources-section">
+                            <div class="card-header">
+                                <h3>ICU & Critical Units</h3>
+                            </div>
+                            <div class="resource-list">
+                                <div class="resource-item">
+                                    <div class="res-info">
+                                        <span>ICU Beds</span>
+                                        <span class="res-count">4 / 6</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill warning" style="width: 66%"></div>
                                     </div>
                                 </div>
-                                <div class="alert-item warning">
-                                    <div class="alert-icon"><i data-lucide="zap"></i></div>
-                                    <div class="alert-body">
-                                        <p>ICU Bed 3 reserved for incoming P. Das</p>
-                                        <span class="alert-time">8 min ago</span>
+                                <div class="resource-item">
+                                    <div class="res-info">
+                                        <span>Ventilators</span>
+                                        <span class="res-count">2 / 5</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill danger" style="width: 40%"></div>
                                     </div>
                                 </div>
-                                <div class="alert-item info">
-                                    <div class="alert-icon"><i data-lucide="info"></i></div>
-                                    <div class="alert-body">
-                                        <p>Ambulance RC-07 dispatched — 5 min</p>
-                                        <span class="alert-time">11 min ago</span>
+                                <div class="resource-item">
+                                    <div class="res-info">
+                                        <span>Operation theatres</span>
+                                        <span class="res-count">1 / 3 <span
+                                                class="active-status">available</span></span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill success" style="width: 33%"></div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </section>
-                </div>
 
-                <!-- Patient Queue Section -->
-                <div id="patient-queue-section" class="content-section">
-                    <section class="card full-card">
-                        <div class="card-header">
-                            <h3>Live Patient Queue</h3>
-                            <div class="filter-controls">
-                                <select class="styled-select">
-                                    <option>All Wards</option>
-                                    <option>General</option>
-                                    <option>ICU</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Patient ID</th>
-                                        <th>Name</th>
-                                        <th>Assigned Doctor</th>
-                                        <th>Ward/Room</th>
-                                        <th>Status</th>
-                                        <th>Activity</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>#RC-1042</td>
-                                        <td><strong>Zoya Williams</strong></td>
-                                        <td>Dr. Sarah Johnson</td>
-                                        <td>Ward A / 102</td>
-                                        <td><span class="status-badge pulse-blue">Observation</span></td>
-                                        <td><div class="mini-chart"><span class="chart-bar" style="height: 60%"></span><span class="chart-bar" style="height: 80%"></span><span class="chart-bar" style="height: 40%"></span></div></td>
-                                    </tr>
-                                    <tr>
-                                        <td>#RC-1045</td>
-                                        <td><strong>Vikram Singh</strong></td>
-                                        <td>Dr. Amit Patel</td>
-                                        <td>ICU / 04</td>
-                                        <td><span class="status-badge pulse-red">Critical</span></td>
-                                        <td><div class="mini-chart"><span class="chart-bar" style="height: 90%"></span><span class="chart-bar" style="height: 95%"></span><span class="chart-bar" style="height: 85%"></span></div></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                </div>
-
-                <!-- Bed Management Section -->
-                <div id="bed-management-section" class="content-section">
-                    <section class="card full-card">
-                        <div class="card-header">
-                            <h3>Bed Infrastructure</h3>
-                            <div class="tab-controls">
-                                <button class="tab-btn active" onclick="switchTab('general')">General Ward</button>
-                                <button class="tab-btn" onclick="switchTab('icu')">ICU</button>
-                                <button class="tab-btn" onclick="switchTab('emergency')">Emergency</button>
-                            </div>
-                        </div>
-                        <div class="bed-grid-large" id="bed-grid-main">
-                            <!-- Reused from dashboard script -->
-                        </div>
-                    </section>
-                </div>
-
-                <!-- Medical Staff Section -->
-                <div id="medical-staff-section" class="content-section">
-                    <div class="staff-grid">
-                        <div class="staff-card hover-glow">
-                            <div class="staff-avatar">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" alt="Dr. Sarah">
-                                <span class="online-status"></span>
-                            </div>
-                            <div class="staff-info">
-                                <h4>Dr. Sarah Johnson</h4>
-                                <p>Senior Cardiologist</p>
-                                <div class="staff-stats">
-                                    <span><i data-lucide="users"></i> 12 Patients</span>
-                                    <span><i data-lucide="clock"></i> On-Duty</span>
+                            <div class="alerts-container">
+                                <h4>Live Alerts</h4>
+                                <div class="alert-list">
+                                    <div class="alert-item critical">
+                                        <div class="alert-icon"><i data-lucide="alert-circle"></i></div>
+                                        <div class="alert-body">
+                                            <p>Critical patient A. Khan incoming: chest pain, BP 190/110</p>
+                                            <span class="alert-time">2 min ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="alert-item warning">
+                                        <div class="alert-icon"><i data-lucide="zap"></i></div>
+                                        <div class="alert-body">
+                                            <p>ICU Bed 3 reserved for incoming P. Das</p>
+                                            <span class="alert-time">8 min ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="alert-item info">
+                                        <div class="alert-icon"><i data-lucide="info"></i></div>
+                                        <div class="alert-body">
+                                            <p>Ambulance RC-07 dispatched — 5 min</p>
+                                            <span class="alert-time">11 min ago</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="staff-card hover-glow">
-                            <div class="staff-avatar">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Amit" alt="Dr. Amit">
-                                <span class="online-status busy"></span>
-                            </div>
-                            <div class="staff-info">
-                                <h4>Dr. Amit Patel</h4>
-                                <p>Neurosurgeon</p>
-                                <div class="staff-stats">
-                                    <span><i data-lucide="users"></i> 5 Patients</span>
-                                    <span><i data-lucide="scissors"></i> In Surgery</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Emergency Section -->
-                <div id="emergency-section" class="content-section">
-                    <div class="emergency-portal">
-                        <div class="sos-banner">
-                            <i data-lucide="alert-triangle"></i>
-                            <h2>Emergency Command Center</h2>
-                            <p>Critical actions for mass casualty or individual trauma alerts.</p>
-                        </div>
-                        <div class="emergency-actions">
-                            <button class="sos-action-btn red">
-                                <i data-lucide="megaphone"></i>
-                                <span>Broadcast Trauma Alert</span>
-                            </button>
-                            <button class="sos-action-btn orange">
-                                <i data-lucide="ambulance"></i>
-                                <span>Clear Ambulance Lane</span>
-                            </button>
-                            <button class="sos-action-btn blue">
-                                <i data-lucide="droplet"></i>
-                                <span>Request Blood O-</span>
-                            </button>
-                        </div>
+                        </section>
                     </div>
                 </div>
             </div>
@@ -413,4 +284,5 @@
         lucide.createIcons();
     </script>
 </body>
+
 </html>

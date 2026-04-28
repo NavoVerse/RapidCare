@@ -6,8 +6,8 @@ const CONFIG = {
     SOCKET_URL: window.location.origin
 };
 
-// If running locally as file://, fallback to localhost:5000
-if (window.location.protocol === 'file:') {
+// If running locally on localhost, point to backend on port 5000
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     CONFIG.API_BASE = 'http://localhost:5000/api/v1';
     CONFIG.SOCKET_URL = 'http://localhost:5000';
 }
