@@ -120,15 +120,13 @@ This section tracks the progress of connecting the newly designed Driver Dashboa
 ### Phase 1: Authentication & Identity
 - [x] **Session Persistence**: Implement JWT validation on dashboard entry.
 - [x] **Profile API**: Implement `GET /api/v1/drivers/me` to populate the sidebar and profile cards.
-- [ ] **Document Verification**: Fetch status of DL, RC, and Aadhaar for the profile checkmarks.
-
-### Phase 2: Real-Time Coordination
+- [x] **Document Verification**: Fetch status of DL, RC, and Aadhaar for the profile checkmarks.
 - [x] **Availability Sync**: Link the "LIVE" toggle to the `drivers` table `status` field.
 - [x] **Live Tracking**: Implement `driver:location_update` emits via Socket.IO for active ambulance tracking.
 - [x] **Incoming Alert**: Socket.IO listener to trigger the "Active Call" overlay for new emergency requests.
 
 ### Phase 3: Trip Management
-- [ ] **Status Workflow**: Map "Arrived", "Picked Up", and "Hospital Transfer" buttons to `PUT /api/v1/trips/:id/status`.
+- [x] **Status Workflow**: Map "Arrived", "Picked Up", and "Hospital Transfer" buttons to `PUT /api/v1/trips/:id/status`.
 - [ ] **Dynamic Navigation**: Load coordinates for pickup and hospital drop-off onto the Leaflet map.
 - [ ] **Emergency SOS**: Connect the SOS button to a high-priority backend alert system.
 
