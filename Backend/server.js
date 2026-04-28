@@ -1066,7 +1066,9 @@ app.get('/api/v1/drivers/trips', authenticateToken, authorize('driver'), async (
             .select(
                 't.*',
                 'up.name as patient_name',
-                'uh.name as hospital_name'
+                'uh.name as hospital_name',
+                'h.latitude as hospital_lat',
+                'h.longitude as hospital_lng'
             )
             .orderBy('t.created_at', 'desc')
             .limit(20);
