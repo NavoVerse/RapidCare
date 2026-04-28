@@ -978,13 +978,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Store selected hospital name for receipt
                 localStorage.setItem('rapidcare_selected_hospital', h.name);
 
-                // Automatically highlight the nearest hospital on the map
-                if (hospitalsWithDistance.length > 0 && hospitalMarkers.length > 0) {
-                    const nearest = hospitalsWithDistance[0];
-                    // Find the marker that matches the nearest hospital by name or coords
+                // Highlight the selected hospital on the map
+                if (hospitalMarkers.length > 0) {
                     const marker = hospitalMarkers.find(m => {
                         const ll = m.getLatLng();
-                        return Math.abs(ll.lat - nearest.lat) < 0.0001 && Math.abs(ll.lng - nearest.lng) < 0.0001;
+                        return Math.abs(ll.lat - h.lat) < 0.0001 && Math.abs(ll.lng - h.lng) < 0.0001;
                     });
                     if (marker) {
                         marker.openPopup();
