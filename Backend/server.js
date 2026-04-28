@@ -1079,6 +1079,27 @@ app.get('/api/v1/drivers/trips', authenticateToken, authorize('driver'), async (
     }
 });
 
+// Emergency SOS Endpoint
+app.post('/api/v1/sos', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const userRole = req.user.role;
+        console.log(`🚨 SOS ALERT BROADCAST: User #${userId} (${userRole}) is in extreme danger!`);
+
+        const io = req.app.get('io');
+        if (io) {
+            io.emit('sos:broadcast', {
+                userId,
+                role: userRole,
+                timestamp: new Date()
+            });
+        }
+        res.json({ success: true, message: 'High-priority SOS alert broadcasted successfully.' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Accept a trip (Driver)
 app.post('/api/v1/trips/:id/accept', authenticateToken, authorize('driver'), async (req, res) => {
     try {

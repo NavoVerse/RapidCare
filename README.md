@@ -128,7 +128,7 @@ This section tracks the progress of connecting the newly designed Driver Dashboa
 ### Phase 3: Trip Management
 - [x] **Status Workflow**: Map "Arrived", "Picked Up", and "Hospital Transfer" buttons to `PUT /api/v1/trips/:id/status`.
 - [x] **Dynamic Navigation**: Load coordinates for pickup and hospital drop-off onto the Leaflet map.
-- [ ] **Emergency SOS**: Connect the SOS button to a high-priority backend alert system.
+- [x] **Emergency SOS**: Connect the SOS button to a high-priority backend alert system.
 
 ### Phase 4: Analytics & Insights
 - [x] **Performance Stats**: Dynamically calculate "Completed Trips" and "Efficiency" for the stat cards.
