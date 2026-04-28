@@ -668,6 +668,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     { id: 7, name: "SSKM Hospital", lat: 22.5392, lng: 88.3444, status: "Busy", beds: 1, facilities: ["Cardiac Surgery", "Burn Ward", "Medical Research"] }
                 ];
             }
+
+            // --- OSM Overpass API: Fetch Unregistered Nearby Hospitals ---
+            const userLat = localStorage.getItem('userLat') || 22.5726;
+            const userLng = localStorage.getItem('userLng') || 88.3639;
+            try {
+                const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];node(around:30000,${userLat},${userLng})[amenity=hospital];out;`;
+                const osmRes = await fetch(overpassUrl);
+                if (osmRes.ok) {
+                    const osmData = await osmRes.json();
+                    if (osmData && osmData.elements) {
+                        osmData.elements.forEach(el => {
+                            const osmId = 'osm-' + el.id;
+                            if (el.tags.name && !hospitals.some(h => h.name.toLowerCase().includes(el.tags.name.toLowerCase()) || el.tags.name.toLowerCase().includes(h.name.toLowerCase()))) {
+                                hospitals.push({
+                                    id: osmId,
+                                    name: el.tags.name || "General Hospital",
+                                    lat: parseFloat(el.lat),
+                                    lng: parseFloat(el.lon),
+                                    status: "External",
+                                    beds: "N/A",
+                                    facilities: ["Emergency Services"],
+                                    unregistered: true
+                                });
+                            }
+                        });
+                    }
+                }
+            } catch (osmErr) {
+                console.error('[Overpass API Error]', osmErr);
+            }
+
             localStorage.setItem('hospitalData', JSON.stringify(hospitals));
         }
 
