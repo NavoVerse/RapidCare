@@ -318,9 +318,9 @@ Mapped against the **9-Step Emergency Cycle** and **System Architecture** diagra
 - [x] Hospital dashboard shows incoming patient queue in real-time
 
 #### Priority 4 — Insurance Auto-Link on Trip Completion
-- [ ] When `PUT /api/v1/trips/:id/status` → `completed`, auto-query patient's active insurance policies
-- [ ] Auto-generate a draft insurance claim linked to the trip and total fare
-- [ ] Endpoint: `POST /api/v1/insurance/claims/auto` triggered internally on trip completion
+- [x] When `PUT /api/v1/trips/:id/status` → `completed`, auto-query patient's active insurance policies
+- [x] Auto-generate a draft insurance claim linked to the trip and total fare
+- [x] Endpoint: `POST /api/v1/insurance/claims/auto` triggered internally on trip completion
 
 #### Priority 5 — Firebase Push Notifications
 - [ ] Configure Firebase Admin SDK with a service account key
