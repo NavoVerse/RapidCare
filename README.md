@@ -323,9 +323,9 @@ Mapped against the **9-Step Emergency Cycle** and **System Architecture** diagra
 - [x] Endpoint: `POST /api/v1/insurance/claims/auto` triggered internally on trip completion
 
 #### Priority 5 — Firebase Push Notifications
-- [ ] Configure Firebase Admin SDK with a service account key
-- [ ] Send push notifications to patient's mobile app when: driver is dispatched, driver arrives, trip is completed
-- [ ] Replace SMS simulation with real Firebase Cloud Messaging (FCM) delivery
+- [x] Configure Firebase Admin SDK with a service account key
+- [x] Send push notifications to patient's mobile app when: driver is dispatched, driver arrives, trip is completed
+- [x] Replace SMS simulation with real Firebase Cloud Messaging (FCM) delivery
 
 #### Priority 6 — Nominatim / Google Maps Geocoding
 - [ ] Replace manual lat/lng entry with address-to-coordinates lookup
