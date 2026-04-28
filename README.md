@@ -258,10 +258,6 @@ If your platform doesn't include a free database, or Render's 90-day limit is a 
 
 ---
 
-**Last Updated**: 2026-04-28 (v3.2.0 — Free Deployment Guide & Pre-Deploy Hardening)
-
----
-
 ## 🗺️ Feature Roadmap
 
 Mapped against the **9-Step Emergency Cycle** and **System Architecture** diagrams.
@@ -291,7 +287,7 @@ Mapped against the **9-Step Emergency Cycle** and **System Architecture** diagra
 | **API Gateway** | OTP Service (Dispatch Auth) | ✅ Done |
 | **Backend** | Express.js Controllers | ✅ Done |
 | **Backend** | WebSocket Real-time (Socket.IO) | ✅ Done |
-| **Backend** | Ambulance Dispatch Engine | ⚠️ Partial — manual accept/reject only |
+| **Backend** | Ambulance Dispatch Engine | ✅ Done |
 | **Backend** | Business Logic & Triage | ❌ Not Started — no AI scoring |
 | **Database** | PostgreSQL via Knex.js | ✅ Done |
 | **Database** | Patient Records, Drivers, Hospitals | ✅ Done |
@@ -306,9 +302,9 @@ Mapped against the **9-Step Emergency Cycle** and **System Architecture** diagra
 ### 🚧 Phase 3 — Intelligent Dispatch (Next Steps)
 
 #### Priority 1 — Nearest Driver Auto-Dispatch
-- [ ] Implement Haversine distance formula to find the geographically closest available driver when a trip is requested
-- [ ] Auto-assign driver instead of broadcasting to all and waiting for manual accept
-- [ ] Endpoint: `POST /api/v1/trips/request` → auto-selects and notifies nearest driver via Socket.IO
+- [x] Implement Haversine distance formula to find the geographically closest available driver when a trip is requested
+- [x] Auto-assign driver instead of broadcasting to all and waiting for manual accept
+- [x] Endpoint: `POST /api/v1/trips/request` → auto-selects and notifies nearest driver via Socket.IO
 
 #### Priority 2 — Gemini AI Triage Engine
 - [ ] Integrate Google Gemini API (`@google/generative-ai`)
@@ -334,4 +330,8 @@ Mapped against the **9-Step Emergency Cycle** and **System Architecture** diagra
 #### Priority 6 — Nominatim / Google Maps Geocoding
 - [ ] Replace manual lat/lng entry with address-to-coordinates lookup
 - [ ] Use Nominatim (free) or Google Maps API for forward/reverse geocoding
-- [ ] Auto-populate pickup location from patient's home address in profile
+- [ ] Auto-populate pickup location from patient's home address in profile
+
+---
+
+**Last Updated**: 2026-04-28 (v3.3.0)

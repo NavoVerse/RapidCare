@@ -904,6 +904,19 @@ app.put('/api/v1/appointments/:id', authenticateToken, async (req, res) => {
 const tripTimeouts = new Map();
 
 // Request a new trip (Patient)
+// Haversine distance helper function (km)
+function haversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
 app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async (req, res) => {
     const { pickup_lat, pickup_lng, hospital_id } = req.body;
 
@@ -919,16 +932,15 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
             return res.status(404).json({ error: 'No available drivers found nearby' });
         }
 
-        // Simple Euclidean distance for simulation (or Haversine if preferred)
+        // Use Haversine distance formula
         let nearestDriver = null;
         let minDistance = Infinity;
 
         availableDrivers.forEach(driver => {
             if (driver.current_lat && driver.current_lng) {
-                // Approximate distance calculation
-                const dist = Math.sqrt(
-                    Math.pow(driver.current_lat - pickup_lat, 2) +
-                    Math.pow(driver.current_lng - pickup_lng, 2)
+                const dist = haversineDistance(
+                    pickup_lat, pickup_lng,
+                    driver.current_lat, driver.current_lng
                 );
                 if (dist < minDistance) {
                     minDistance = dist;
