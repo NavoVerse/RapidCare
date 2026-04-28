@@ -24,7 +24,7 @@ const logger = require('./services/logger.service');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: { origin: '*' }
+    cors: { origin: process.env.CORS_ORIGIN || '*' }
 });
 
 // Structured Logging Middleware
@@ -196,13 +196,14 @@ app.post('/api/v1/auth/register', validate(registerSchema), async (req, res) => 
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const userId = await knex.transaction(async (trx) => {
-            const [id] = await trx('users').insert({
+            const inserted = await trx('users').insert({
                 name,
                 email: mappedEmail,
                 password: hashedPassword,
                 role,
                 phone: finalPhone
-            });
+            }).returning('id');
+            const id = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
 
             // Initialize role-specific tables
             if (role === 'patient') {
@@ -236,13 +237,14 @@ app.post('/api/v1/drivers/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const userId = await knex.transaction(async (trx) => {
-            const [id] = await trx('users').insert({
+            const inserted = await trx('users').insert({
                 name,
                 email,
                 password: hashedPassword,
                 role: 'driver',
                 phone
-            });
+            }).returning('id');
+            const id = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
 
             await trx('drivers').insert({
                 user_id: id,
@@ -282,13 +284,14 @@ app.post('/api/v1/hospitals/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(data.password, 10);
 
         const userId = await knex.transaction(async (trx) => {
-            const [id] = await trx('users').insert({
+            const inserted = await trx('users').insert({
                 name: data.hospital_name,
                 email: data.email,
                 password: hashedPassword,
                 role: 'hospital',
                 phone: data.reception_number
-            });
+            }).returning('id');
+            const id = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
 
             await trx('hospitals').insert({
                 user_id: id,
