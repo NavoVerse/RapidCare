@@ -30,11 +30,24 @@ const fcmTokens = {};
 try {
     const fs = require('fs');
     const serviceAccountPath = path.resolve(__dirname, 'firebase-service-account.json');
+    let serviceAccount;
+    
     if (fs.existsSync(serviceAccountPath)) {
-        const serviceAccount = require(serviceAccountPath);
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
-        });
+        serviceAccount = require(serviceAccountPath);
+    } else {
+        const files = fs.readdirSync(__dirname);
+        const fbFile = files.find(f => f.toLowerCase().includes('firebase') && f.endsWith('.json') && f !== 'package.json');
+        if (fbFile) {
+            serviceAccount = require(path.resolve(__dirname, fbFile));
+        }
+    }
+
+    if (serviceAccount) {
+        if (admin.apps.length === 0) {
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount)
+            });
+        }
         logger.info('[Firebase] Admin SDK initialized successfully with service account key.');
     } else {
         logger.warn('[Firebase] Service account key not found. Running in simulation mode.');
