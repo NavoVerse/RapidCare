@@ -3282,6 +3282,14 @@ window.addEventListener('resize', () => {
         });
     }
 
+    // Support landing on specific views via query parameter (e.g., ?view=payment)
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialView = urlParams.get('view');
+    if (initialView && views[initialView]) {
+        const targetNav = document.querySelector(`.nav-item[data-view="${initialView}"]`);
+        if (targetNav) targetNav.click();
+    }
+
     // Initialize
     updateRideStreak();
     recalculatePricing();
