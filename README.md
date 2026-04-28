@@ -313,9 +313,9 @@ Mapped against the **9-Step Emergency Cycle** and **System Architecture** diagra
 - [x] Endpoint: `POST /api/v1/triage` → returns AI triage assessment
 
 #### Priority 3 — Hospital Pre-ER Notification
-- [ ] When a trip is accepted, notify the destination hospital via Socket.IO room `hospital_{id}`
-- [ ] Send patient name, blood type, urgency level, and ETA
-- [ ] Hospital dashboard shows incoming patient queue in real-time
+- [x] When a trip is accepted, notify the destination hospital via Socket.IO room `hospital_{id}`
+- [x] Send patient name, blood type, urgency level, and ETA
+- [x] Hospital dashboard shows incoming patient queue in real-time
 
 #### Priority 4 — Insurance Auto-Link on Trip Completion
 - [ ] When `PUT /api/v1/trips/:id/status` → `completed`, auto-query patient's active insurance policies
