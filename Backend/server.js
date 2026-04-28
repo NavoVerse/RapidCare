@@ -20,6 +20,7 @@ const { Server } = require('socket.io');
 const { initializeDB, knex } = require('./db');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const logger = require('./services/logger.service');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
 const server = http.createServer(app);
@@ -901,6 +902,65 @@ app.put('/api/v1/appointments/:id', authenticateToken, async (req, res) => {
 // TRIPS & REAL-TIME DISPATCH API (/api/v1/trips)
 // =============================================================================
 
+// POST /api/v1/triage — AI Triage assessment
+app.post('/api/v1/triage', authenticateToken, async (req, res) => {
+    const { heart_rate, blood_pressure, spo2, complaint } = req.body;
+    
+    let triageLevel = 'STANDARD';
+    let rationale = 'Rule-based evaluation applied.';
+    
+    // BP Parsing e.g. "140/90"
+    let systolic = 120;
+    if (blood_pressure && blood_pressure.toString().includes('/')) {
+        systolic = parseInt(blood_pressure.split('/')[0]);
+    }
+
+    if (spo2 && spo2 < 90 || (heart_rate > 130 || heart_rate < 45) || systolic > 180) {
+        triageLevel = 'CRITICAL';
+        rationale = 'Vitals indicate an immediate life-threatening emergency.';
+    } else if (spo2 && spo2 <= 94 || (heart_rate >= 110 || heart_rate <= 55) || systolic >= 140) {
+        triageLevel = 'URGENT';
+        rationale = 'Vitals suggest an urgent condition requiring fast intervention.';
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    if (apiKey) {
+        try {
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            
+            const prompt = `
+                You are an expert emergency medical triage AI.
+                Evaluate the following patient condition and vital signs:
+                - Complaint/Symptoms: ${complaint || 'Emergency assessment requested'}
+                - Heart Rate: ${heart_rate || 'Unknown'} bpm
+                - Blood Pressure: ${blood_pressure || 'Unknown'}
+                - SpO2: ${spo2 || 'Unknown'}%
+                
+                Respond with a JSON object ONLY containing:
+                1. "triage_level": strictly either "CRITICAL", "URGENT", or "STANDARD"
+                2. "rationale": a 1-sentence medical explanation
+                
+                Ensure the response is valid parsable JSON.
+            `;
+
+            const result = await model.generateContent(prompt);
+            const text = result.response.text();
+            
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (parsed.triage_level) triageLevel = parsed.triage_level.toUpperCase();
+                if (parsed.rationale) rationale = parsed.rationale;
+            }
+        } catch (err) {
+            console.error('Gemini API Triage Error:', err.message);
+        }
+    }
+
+    res.json({ triage_level: triageLevel, rationale });
+});
+
 const tripTimeouts = new Map();
 
 // Request a new trip (Patient)
@@ -918,10 +978,50 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 }
 
 app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async (req, res) => {
-    const { pickup_lat, pickup_lng, hospital_id } = req.body;
+    const { pickup_lat, pickup_lng, hospital_id, heart_rate, blood_pressure, spo2, complaint } = req.body;
 
     if (!pickup_lat || !pickup_lng || !hospital_id) {
         return res.status(400).json({ error: 'pickup_lat, pickup_lng, and hospital_id are required' });
+    }
+
+    // AI Triage Assessment factored into priority
+    let triageLevel = 'STANDARD';
+    let triageRationale = 'Standard deployment priority.';
+
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    if (apiKey && (heart_rate || blood_pressure || spo2 || complaint)) {
+        try {
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const prompt = `
+                You are an expert emergency medical triage AI.
+                Evaluate the patient condition:
+                - Complaint: ${complaint || 'N/A'}
+                - HR: ${heart_rate || 'N/A'}
+                - BP: ${blood_pressure || 'N/A'}
+                - SpO2: ${spo2 || 'N/A'}%
+                
+                Strict JSON ONLY response: {"triage_level": "CRITICAL" | "URGENT" | "STANDARD", "rationale": "one sentence"}.
+            `;
+            const result = await model.generateContent(prompt);
+            const text = result.response.text();
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (parsed.triage_level) triageLevel = parsed.triage_level.toUpperCase();
+                if (parsed.rationale) triageRationale = parsed.rationale;
+            }
+        } catch (err) {
+            console.error('In-flight Triage AI Error:', err.message);
+        }
+    } else {
+        // Simple rules fallback
+        let systolic = 120;
+        if (blood_pressure && blood_pressure.toString().includes('/')) {
+            systolic = parseInt(blood_pressure.split('/')[0]);
+        }
+        if (spo2 && spo2 < 90 || (heart_rate > 130 || heart_rate < 45) || systolic > 180) triageLevel = 'CRITICAL';
+        else if (spo2 && spo2 <= 94 || (heart_rate >= 110 || heart_rate <= 55) || systolic >= 140) triageLevel = 'URGENT';
     }
 
     try {
@@ -980,7 +1080,10 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
                 hospital_id,
                 hospital_name: hospitalUser ? hospitalUser.name : 'Unknown Hospital',
                 patient_id: req.user.id,
-                patient_name: patientUser ? patientUser.name : 'Emergency Patient'
+                patient_name: patientUser ? patientUser.name : 'Emergency Patient',
+                triage_level: triageLevel,
+                triage_rationale: triageRationale,
+                complaint: complaint || 'Emergency Response'
             });
         }
 
