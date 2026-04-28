@@ -537,6 +537,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Emergency SOS click handler
+    const sosBtn = document.getElementById('btn-driver-sos');
+    if (sosBtn) {
+        sosBtn.addEventListener('click', async () => {
+            if (!confirm('Are you absolutely sure you want to trigger a critical Emergency SOS alert?')) return;
+
+            try {
+                const response = await fetch('/api/v1/sos', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    alert('SOS Alert Dispatched. Support units are being dispatched immediately.');
+                } else {
+                    const err = await response.json();
+                    alert(`Failed to trigger SOS: ${err.error}`);
+                }
+            } catch (err) {
+                console.error('SOS error:', err);
+                alert('Network error while broadcasting SOS.');
+            }
+        });
+    }
+
 
     // Button Hover Effects and Click Ripple (Simple)
     const buttons = document.querySelectorAll('.btn, .emergency-sos-btn');
