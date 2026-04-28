@@ -328,9 +328,9 @@ Mapped against the **9-Step Emergency Cycle** and **System Architecture** diagra
 - [x] Replace SMS simulation with real Firebase Cloud Messaging (FCM) delivery
 
 #### Priority 6 — Nominatim / Google Maps Geocoding
-- [ ] Replace manual lat/lng entry with address-to-coordinates lookup
-- [ ] Use Nominatim (free) or Google Maps API for forward/reverse geocoding
-- [ ] Auto-populate pickup location from patient's home address in profile
+- [x] Replace manual lat/lng entry with address-to-coordinates lookup
+- [x] Use Nominatim (free) or Google Maps API for forward/reverse geocoding
+- [x] Auto-populate pickup location from patient's home address in profile
 
 ---
 
