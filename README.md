@@ -139,4 +139,151 @@ This section tracks the progress of connecting the newly designed Driver Dashboa
 
 ---
 
-**Last Updated**: 2026-04-27 (v3.1.0 — UI/UX Hardening & Integration Roadmap)
+## ☁️ Free Deployment Guide
+
+Deploy RapidCare to the internet at **$0/month** using free-tier cloud services.
+
+### Platform Comparison
+
+| Feature | **Render** ⭐ Recommended | **Railway** | **Koyeb** |
+|---|---|---|---|
+| Free compute | 750 hrs/month (sleeps after inactivity) | $5 credit/month | 1 nano instance (always-on) |
+| Free PostgreSQL | ✅ 256 MB (90-day expiry) | ✅ 500 MB (within credit) | ❌ (use external) |
+| WebSocket support | ✅ Native | ✅ Native | ✅ Native |
+| Custom domain | ✅ Free | ✅ Free | ✅ Free |
+| Auto-deploy from GitHub | ✅ | ✅ | ✅ |
+| Cold start | ~30–50s | ~5–10s | ~5s (always-on) |
+
+### Pre-Deployment Checklist
+
+Before deploying to any platform, complete these steps:
+
+**1. Generate secrets:**
+```bash
+# JWT_SECRET (64 random characters)
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+
+# ENCRYPTION_KEY (32 characters for AES-256)
+node -e "console.log(require('crypto').randomBytes(16).toString('hex'))"
+```
+
+**2. Prepare email credentials** — You need `EMAIL_USER` and `EMAIL_PASS` for OTP delivery. Use a Gmail App Password or a transactional email service.
+
+**3. Verify PostgreSQL compatibility** — The Knex config already supports PG via `DB_TYPE=postgresql`. SQLite **will not work** on cloud platforms (ephemeral filesystems wipe data on each deploy).
+
+### Option A: Deploy on Render (Recommended)
+
+#### Step 1 — Push to GitHub    DONE
+```bash
+git add -A && git commit -m "Prepare for deployment" && git push origin main
+```
+
+#### Step 2 — Create Free PostgreSQL Database   DONE
+1. Go to [render.com](https://render.com) → **New** → **PostgreSQL**
+2. Name: `rapidcare-db` · Plan: **Free** · Region: closest to your users
+3. Click **Create Database**
+4. Copy the **Internal Database URL** (`postgres://...`)
+
+#### Step 3 — Create Web Service    DONE
+1. Go to **New** → **Web Service** → Connect your GitHub repo
+2. Configure:
+
+| Setting | Value |
+|---|---|
+| **Name** | `rapidcare` |
+| **Region** | Same as your database |
+| **Runtime** | Node |
+| **Root Directory** | `Backend` |
+| **Build Command** | `npm install` |
+| **Start Command** | `node server.js` |
+| **Plan** | Free |
+
+#### Step 4 — Set Environment Variables DONE
+In the Render dashboard → **Environment** tab:
+
+| Key | Value |
+|---|---|
+| `PORT` | `10000` |
+| `NODE_ENV` | `production` |
+| `DB_TYPE` | `postgresql` |
+| `DATABASE_URL` | *(Internal DB URL from Step 2)* |
+| `JWT_SECRET` | *(your generated secret)* |
+| `ENCRYPTION_KEY` | *(your 32-char key)* |
+| `EMAIL_USER` | *(your email for OTP)* |
+| `EMAIL_PASS` | *(your email app password)* |
+| `CORS_ORIGIN` | `https://rapidcare.onrender.com` |
+
+> **Note:** Render assigns port via `PORT` env var — the server reads `process.env.PORT || 5000` automatically.
+
+#### Step 5 — Deploy & Verify
+Click **Create Web Service** — Render builds and deploys automatically. Once live, verify:
+- `https://rapidcare-c2jt.onrender.com/health` → health check
+- `https://rapidcare-c2jt.onrender.com/` → Choose User page
+- `https://rapidcare-c2jt.onrender.com/login` → Patient login
+- `https://rapidcare-c2jt.onrender.com/dev` → Developer dashboard
+
+#### Step 6 — Prevent Cold Starts
+Use [UptimeRobot](https://uptimerobot.com) (free) to ping `/health` every 14 minutes to keep the service warm.
+
+### Option B: Deploy on Railway
+
+1. Go to [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub**
+2. Add a **PostgreSQL** plugin (click **+ New** → **Database** → **PostgreSQL**)
+3. Railway auto-injects `DATABASE_URL` — add these env vars:
+
+| Key | Value |
+|---|---|
+| `DB_TYPE` | `postgresql` |
+| `JWT_SECRET` | *(your secret)* |
+| `ENCRYPTION_KEY` | *(your key)* |
+| `NODE_ENV` | `production` |
+
+4. Set **Root Directory** to `Backend`, **Start Command** to `node server.js`
+
+> ⚠️ Railway's $5/month credit covers ~15–20 days of continuous uptime for one service + database.
+
+### Option C: Deploy on Koyeb
+
+1. Go to [koyeb.com](https://www.koyeb.com) → **Create App** → **GitHub**
+2. Set **Root Directory** to `Backend`, **Run command** to `node server.js`
+3. Add env vars (same as Render)
+4. For the database, use a free external PostgreSQL provider (see below)
+
+> Koyeb's free nano instance is always-on (no cold starts), but you need an external database.
+
+### Free PostgreSQL Providers
+
+If your platform doesn't include a free database, or Render's 90-day limit is a concern:
+
+| Provider | Free Tier | Notes |
+|---|---|---|
+| [**Neon**](https://neon.tech) | 0.5 GB, serverless, always-on | Best free PG option overall |
+| [**Supabase**](https://supabase.com) | 500 MB, 2 free projects | Also includes auth, storage, realtime |
+| [**Aiven**](https://aiven.io) | 5 GB, 1 free service | Most generous storage |
+
+### Post-Deployment Verification
+
+- [ ] `GET /health` returns 200
+- [ ] User registration via `POST /api/v1/auth/register`
+- [ ] Login returns a JWT via `POST /api/v1/auth/login`
+- [ ] Patient dashboard loads at `/dashboard`
+- [ ] Driver dashboard loads at `/driver`
+- [ ] Developer dashboard loads at `/dev`
+- [ ] Socket.IO connects (check browser console)
+- [ ] OTP email sends (requires valid email credentials)
+- [ ] Leaflet.js map tiles load
+- [ ] HTTPS works (provided by platform automatically)
+
+### Known Gotchas
+
+| Issue | Solution |
+|---|---|
+| Cold starts on Render | Use UptimeRobot to ping `/health` every 14 min |
+| `bcrypt` native build fails | Switch to `bcryptjs`: `npm uninstall bcrypt && npm install bcryptjs`, then replace `require('bcrypt')` → `require('bcryptjs')` in server.js |
+| SQLite data lost on deploy | Cloud filesystems are ephemeral — always use PostgreSQL |
+| Render 90-day DB expiry | Set a reminder; recreate DB and update `DATABASE_URL`, or use Neon |
+| Socket.IO falls back to polling | All three platforms support WebSocket upgrade natively |
+
+---
+
+**Last Updated**: 2026-04-28 (v3.2.0 — Free Deployment Guide & Pre-Deploy Hardening)
