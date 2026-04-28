@@ -1,6 +1,26 @@
 var API_BASE = (window.RapidCareConfig && RapidCareConfig.API_BASE) || 'http://localhost:5000/api/v1';
 window.API_BASE = API_BASE; // Make accessible to global functions
 
+// --- Tab Switching Logic (Global) ---
+window.switchPaymentTab = (btn) => {
+    const tabId = btn.getAttribute('data-tab');
+    const section = btn.closest('.tabs-container') || document.querySelector('#payment-view');
+    
+    if (!section) return;
+
+    // Remove active classes within this context
+    section.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    section.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    // Add active classes
+    btn.classList.add('active');
+    const targetContent = document.getElementById(`${tabId}-content`);
+    if (targetContent) targetContent.classList.add('active');
+
+    // Recalculate pricing (to update streak discount if switching to/from cash)
+    if (window.recalculatePricing) window.recalculatePricing();
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     let selectedHabits = [];
     // =============================================
@@ -438,6 +458,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         setTimeout(() => trackingMap.invalidateSize(), 150);
                     }
+                } else if (viewKey === 'payment') {
+                    // Standard select used now
                 }
             } else {
                 // Fallback
@@ -868,9 +890,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.hospital-item').forEach(el => el.classList.remove('active-hospital'));
                 item.classList.add('active-hospital');
                 overviewMap.setView([h.lat, h.lng], 15);
+
+                // Update distance calculation for payment automatically
+                const distInput = document.getElementById('distance-input');
+                if (distInput) {
+                    distInput.value = h.distance;
+                    // Trigger the 'input' event to fire recalculatePricing()
+                    distInput.dispatchEvent(new Event('input'));
+                }
+                // Store selected hospital name for receipt
+                localStorage.setItem('rapidcare_selected_hospital', h.name);
+
+                // Automatically highlight the nearest hospital on the map
+                if (hospitalsWithDistance.length > 0 && hospitalMarkers.length > 0) {
+                    const nearest = hospitalsWithDistance[0];
+                    // Find the marker that matches the nearest hospital by name or coords
+                    const marker = hospitalMarkers.find(m => {
+                        const ll = m.getLatLng();
+                        return Math.abs(ll.lat - nearest.lat) < 0.0001 && Math.abs(ll.lng - nearest.lng) < 0.0001;
+                    });
+                    if (marker) {
+                        marker.openPopup();
+                        overviewMap.setView(marker.getLatLng(), 14);
+                    }
+                }
             });
             container.appendChild(item);
         });
+
+        // Automatically highlight the nearest hospital on the map
+        if (hospitalsWithDistance.length > 0 && hospitalMarkers.length > 0) {
+            const nearest = hospitalsWithDistance[0];
+            // Find the marker that matches the nearest hospital by name or coords
+            const marker = hospitalMarkers.find(m => {
+                const ll = m.getLatLng();
+                return Math.abs(ll.lat - nearest.lat) < 0.0001 && Math.abs(ll.lng - nearest.lng) < 0.0001;
+            });
+            if (marker) {
+                marker.openPopup();
+                overviewMap.setView(marker.getLatLng(), 14);
+            }
+        }
     }
 
     // =============================================
@@ -1750,7 +1810,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedBankOfferPayment = 'none';
 
     let cashRideCountPayment = parseInt(localStorage.getItem('rapidcare_cash_rides') || '0');
-    let isCashRewardActivePayment = (cashRideCountPayment >= 5);
+    let isCashRewardActivePayment = (cashRideCountPayment >= 10);
 
     const detailsBtnPay = document.getElementById('detailsBtnPayment');
     const detailsPanelPay = document.getElementById('detailsPanelIntegrated');
@@ -2713,10 +2773,9 @@ window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
         detailPane.classList.remove('mobile-active');
     }
-});
-
-// Resizer Logic
-document.addEventListener('DOMContentLoaded', () => {
+    // =============================================
+    // RESIZER & PAYMENT LOGIC (Consolidated)
+    // =============================================
     const resizer = document.getElementById('dragMe');
     if (!resizer) return;
     
@@ -2775,19 +2834,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* --- IMPORTED PAYMENT JS --- */
     // --- Data ---
-    const indianBanks = [
-        "State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak Mahindra Bank",
-        "Punjab National Bank", "Canara Bank", "Bank of Baroda", "Union Bank of India",
-        "IDFC FIRST Bank", "IndusInd Bank", "Yes Bank", "Federal Bank", "RBL Bank",
-        "Indian Bank", "UCO Bank", "Bank of India", "Central Bank of India",
-        "South Indian Bank", "Karnataka Bank", "City Union Bank", "Saraswat Bank"
-    ];
-
     const popularBanks = [
-        { name: "SBI", icon: "assets/logos/sbi_logo.png" },
-        { name: "HDFC", icon: "assets/logos/hdfc_logo.png" },
-        { name: "ICICI", icon: "assets/logos/icici_logo.png" },
-        { name: "Axis", icon: "assets/logos/axis_logo.png" }
+        { name: "State Bank of India (SBI)", icon: "https://img.icons8.com/color/512/sbi.png" },
+        { name: "HDFC Bank Ltd.", icon: "https://img.icons8.com/color/512/hdfc-bank.png" },
+        { name: "ICICI Bank Ltd.", icon: "https://img.icons8.com/color/512/icici-bank.png" },
+        { name: "Axis Bank Ltd.", icon: "https://img.icons8.com/color/512/axis-bank.png" }
     ];
 
     const pricingConfig = {
@@ -2799,8 +2850,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DOM Elements ---
     
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+    const tabBtns = document.querySelectorAll('#payment-view .tab-btn');
+    const tabContents = document.querySelectorAll('#payment-view .tab-content');
     const cardBankSearch = document.getElementById('card-bank-search');
     const cardBankList = document.getElementById('card-bank-list');
     const netBankSearch = document.getElementById('net-bank-search');
@@ -2812,27 +2863,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalAmountDisplay = document.getElementById('total-amount');
     const distanceInput = document.getElementById('distance-input');
     const ambulanceOptions = document.querySelectorAll('input[name="ambulance-type"]');
-    const payBtn = document.querySelector('.pay-btn');
+    const payBtnElement = document.querySelector('.pay-btn');
 
-    // --- Initialize ---
-    populateBankLists();
-    recalculatePricing();
+    // --- Initialization ---
+    try {
+        populateBankLists();
+        
+        // Setup select bank global handler
+        window.selectBank = (bankName) => {
+            const select = document.getElementById('bankSelect');
+            if (select) {
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].text.toLowerCase().includes(bankName.toLowerCase())) {
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        };
+
+    } catch (e) {
+        console.error('Payment Initialization Error:', e);
+    }
+
+    function populateBankLists() {
+        if (!popularBanksGrid) return;
+        popularBanksGrid.innerHTML = popularBanks.map(bank => `
+            <div class="bank-card" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 12px; cursor: pointer; transition: all 0.2s; background: var(--bg-color);" onclick="window.selectBank('${bank.name}')">
+                <img src="${bank.icon}" alt="${bank.name}" style="width: 32px; height: 32px; object-fit: contain;">
+                <span style="font-size: 11px; font-weight: 600; text-align: center; opacity: 0.8;">${bank.name}</span>
+            </div>
+        `).join('');
+    }
     
     // --- Pricing Logic ---
-    async function recalculatePricing() {
-        const selectedType = document.querySelector('input[name="ambulance-type"]:checked').value;
-        const distance = parseFloat(distanceInput.value) || 0;
-        const couponCode = couponInput.value.toUpperCase();
+    window.recalculatePricing = async function() {
+        const typeEl = document.querySelector('input[name="ambulance-type"]:checked');
+        const distEl = document.getElementById('distance-input');
+        const coupEl = document.getElementById('coupon-code');
+        const totalEl = document.getElementById('total-amount');
+
+        if (!typeEl || !distEl || !totalEl || !payBtnElement) return;
+
+        const selectedType = typeEl.value;
+        const distance = parseFloat(distEl.value) || 0;
+        const couponCode = coupEl ? coupEl.value.toUpperCase() : '';
         
         if (distance <= 0) {
-            payBtn.disabled = true;
-            payBtn.style.opacity = '0.5';
-            payBtn.style.cursor = 'not-allowed';
+            payBtnElement.disabled = true;
+            payBtnElement.style.opacity = '0.5';
+            payBtnElement.style.cursor = 'not-allowed';
             return;
         } else {
-            payBtn.disabled = false;
-            payBtn.style.opacity = '1';
-            payBtn.style.cursor = 'pointer';
+            payBtnElement.disabled = false;
+            payBtnElement.style.opacity = '1';
+            payBtnElement.style.cursor = 'pointer';
         }
 
         try {
@@ -2870,8 +2955,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fixed charges display (if they exist in UI)
             // Note: index.html might need placeholders for these if we want to show them dynamically
             
-            if (totalAmountDisplay) {
-                totalAmountDisplay.textContent = `₹${data.total.toLocaleString()}`;
+            if (totalEl) {
+                let finalTotal = data.total;
+                
+                // Local Streak Reward Logic - Scoped to Payment View to prevent crashes
+                const activePaymentTab = document.querySelector('#payment-view .tab-btn.active');
+                const tabId = activePaymentTab ? activePaymentTab.getAttribute('data-tab') : 'upi';
+                
+                const streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
+                if (tabId === 'cash' && streak >= 3) {
+                    finalTotal = Math.max(0, finalTotal - 40);
+                }
+
+                totalEl.textContent = `₹${finalTotal.toLocaleString()}`;
             }
         } catch (err) {
             console.error('Fare calculation error:', err);
@@ -2882,166 +2978,119 @@ document.addEventListener('DOMContentLoaded', () => {
     ambulanceOptions.forEach(opt => opt.addEventListener('change', recalculatePricing));
     distanceInput.addEventListener('input', recalculatePricing);
 
-    // --- Tab Switching Logic ---
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tabId = btn.getAttribute('data-tab');
-            
-            // Remove active classes
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-            
-            // Add active classes
-            btn.classList.add('active');
-            document.getElementById(`${tabId}-content`).classList.add('active');
-        });
-    });
+    // --- Tab Switching Logic (Global) ---
+    // (switchPaymentTab moved to top level)
 
-    // --- Bank Logic ---
-    function populateBankLists() {
-        indianBanks.sort().forEach(bank => {
-            // Populate Cards search list
-            const cardItem = createBankItem(bank, cardBankSearch, cardBankList);
-            cardBankList.appendChild(cardItem);
-            
-            // Populate Net Banking search list
-            const netItem = createBankItem(bank, netBankSearch, netBankList);
-            netBankList.appendChild(netItem);
-        });
-
-        // Popular banks grid
-        popularBanks.forEach(bank => {
-            const card = document.createElement('div');
-            card.className = 'upi-card'; 
-            card.innerHTML = `<img src="${bank.icon}" alt="${bank.name}" style="filter: none;"><span>${bank.name}</span>`;
-            card.onclick = () => {
-                const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
-                if (activeTab === 'card') {
-                    selectBank(bank.name, cardBankSearch, cardBankList);
-                } else if (activeTab === 'netbanking') {
-                    selectBank(bank.name, netBankSearch, netBankList);
-                }
-            };
-            popularBanksGrid.appendChild(card);
-        });
-    }
-
-    function createBankItem(bankName, input, list) {
-        const item = document.createElement('div');
-        item.className = 'bank-item';
-        item.textContent = bankName;
-        item.onclick = () => selectBank(bankName, input, list);
-        return item;
-    }
-
-    function selectBank(bankName, input, list) {
-        input.value = bankName;
-        list.style.display = 'none';
-    }
-
-    const bankAcronyms = {
-        "SBI": "State Bank of India",
-        "HDFC": "HDFC Bank",
-        "ICICI": "ICICI Bank",
-        "PNB": "Punjab National Bank",
-        "BOB": "Bank of Baroda",
-        "KOTAK": "Kotak Mahindra Bank",
-        "IDFC": "IDFC FIRST Bank",
-    };
-
-    function setupSearch(input, list) {
-        if (!input || !list) return;
-        
-        input.addEventListener('focus', () => {
-            list.style.display = 'block';
-        });
-
-        input.addEventListener('input', (e) => {
-            const term = e.target.value.trim().toLowerCase();
-            const items = list.querySelectorAll('.bank-item:not(.no-results)');
-            let hasResults = false;
-            
-            items.forEach(item => {
-                const bankName = item.textContent;
-                const acronymMatch = Object.entries(bankAcronyms).some(([acr, full]) => 
-                    acr.toLowerCase().includes(term) && full === bankName
-                );
-
-                if (bankName.toLowerCase().includes(term) || acronymMatch) {
-                    item.style.display = 'block';
-                    hasResults = true;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-
-            // Show "Not Available" if no results
-            const existingNoRes = list.querySelector('.no-results');
-            if (!hasResults && term.length > 0) {
-                list.style.display = 'block'; // Ensure list is visible
-                if (!existingNoRes) {
-                    const noRes = document.createElement('div');
-                    noRes.className = 'bank-item no-results';
-                    noRes.style.color = 'var(--accent-color)';
-                    noRes.style.fontWeight = '600';
-                    noRes.style.textAlign = 'center';
-                    noRes.innerHTML = '<i data-lucide="alert-circle" style="width:16px; vertical-align:middle; margin-right:5px;"></i> Bank not available';
-                    list.appendChild(noRes);
-                    lucide.createIcons();
-                }
-            } else if (existingNoRes) {
-                existingNoRes.remove();
-            }
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!input.contains(e.target) && !list.contains(e.target)) {
-                list.style.display = 'none';
-            }
-        });
-    }
-
-    setupSearch(cardBankSearch, cardBankList);
-    setupSearch(netBankSearch, netBankList);
+    // (Standard select components used in HTML)
 
     // --- Coupon Logic ---
     applyCouponBtn.addEventListener('click', () => {
         const code = couponInput.value.toUpperCase();
-        if (code === 'RAPID20') {
-            couponMsg.textContent = 'Coupon applied! 20% off';
-            couponMsg.className = 'coupon-status success';
-        } else if (code === 'FIRSTCARE') {
-            couponMsg.textContent = 'Coupon applied! ₹100 off';
+        const feedback = {
+            'RAPID20': 'Coupon applied! ₹20 off your ride.',
+            'RIDEMASTER': 'Coupon applied! ₹40 premium discount.',
+            'FIRSTRAPIDCARE50': 'Welcome! ₹50 off your first ride.',
+            'FIRSTCARE': 'Coupon applied! ₹100 off'
+        };
+
+        if (feedback[code]) {
+            couponMsg.textContent = feedback[code];
             couponMsg.className = 'coupon-status success';
         } else {
-            couponMsg.textContent = 'Invalid coupon code';
+            couponMsg.textContent = 'Invalid or expired coupon code';
             couponMsg.className = 'coupon-status error';
         }
         recalculatePricing();
     });
 
-    // --- Payment Feedback ---
-    document.querySelector('.pay-btn').addEventListener('click', async () => {
-        const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
-        let method = activeTab.toUpperCase();
-        
-        const btn = document.querySelector('.pay-btn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Processing...';
-        if (window.lucide) lucide.createIcons();
-        
-        try {
-            const token = localStorage.getItem('rapidcare_token');
-            const tripId = localStorage.getItem('rapidcare_last_trip_id');
-            const amountText = totalAmountDisplay.textContent.replace('₹', '').replace(',', '');
-            const amount = parseInt(amountText);
+    // --- Ride Streak Logic ---
+    function updateRideStreak() {
+        let streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
+        const dots = document.querySelectorAll('#streak-dots .streak-dot');
+        const msg = document.getElementById('streak-msg');
 
-            if (!tripId) {
-                alert('No active trip found to pay for.');
-                btn.innerHTML = originalText;
-                return;
+        dots.forEach((dot, index) => {
+            if (index < streak) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
+
+        if (streak >= 3) {
+            msg.innerHTML = '<span style="color: #10b981;">Next ride Platform Fee: ₹0! (Streak Reward)</span>';
+        } else {
+            msg.textContent = `${3 - streak} more cash payments to unlock your ₹40 discount!`;
+        }
+    }
+
+    // --- Stepper Controller ---
+    const overlay = document.getElementById('payment-overlay');
+    const stages = ['review', 'processing', 'success'];
+    let currentStage = 1;
+
+    window.closePaymentOverlay = () => {
+        overlay.classList.remove('active');
+    };
+
+    window.proceedToPayment = async () => {
+        setStage(2);
+        
+        // Artificial delay for "Connecting to Bank" (set to 2 seconds as requested)
+        setTimeout(async () => {
+            const success = await finalizePayment();
+            if (success) {
+                // Generate Dynamic Data for Success Stage
+                const txnId = 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
+                const now = new Date();
+                const dateTimeStr = now.toLocaleDateString('en-IN') + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+                const successTxnElem = document.getElementById('success-txn-id');
+                const successDateElem = document.getElementById('success-datetime');
+                if (successTxnElem) successTxnElem.textContent = txnId;
+                if (successDateElem) successDateElem.textContent = dateTimeStr;
+
+                setStage(3);
+                // (Auto-print removed per new manual download request)
+            } else {
+                alert('Payment verification failed. Please try again.');
+                setStage(1);
             }
+        }, 2000);
+    };
 
+    function setStage(stepNum) {
+        currentStage = stepNum;
+        
+        // Update Stepper UI
+        document.querySelectorAll('.step').forEach((step, idx) => {
+            if (idx + 1 < stepNum) {
+                step.classList.add('completed');
+                step.classList.remove('active');
+            } else if (idx + 1 === stepNum) {
+                step.classList.add('active');
+                step.classList.remove('completed');
+            } else {
+                step.classList.remove('active', 'completed');
+            }
+        });
+
+        const progress = document.getElementById('stepper-progress');
+        progress.style.width = `${(stepNum - 1) * 40}%`;
+
+        // Update Stage Content
+        document.querySelectorAll('.stage-content').forEach((content, idx) => {
+            content.classList.toggle('active', idx + 1 === stepNum);
+        });
+    }
+
+    async function finalizePayment() {
+        const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+        const method = activeTab.toUpperCase();
+        const token = localStorage.getItem('rapidcare_token');
+        const tripId = localStorage.getItem('rapidcare_last_trip_id');
+        const amount = parseInt(totalAmountDisplay.textContent.replace('₹', '').replace(',', ''));
+
+        if (!tripId) return false;
+
+        try {
             const response = await fetch(API_BASE + '/payments', {
                 method: 'POST',
                 headers: {
@@ -3052,23 +3101,166 @@ document.addEventListener('DOMContentLoaded', () => {
                     trip_id: tripId,
                     amount: amount,
                     payment_method: method.toLowerCase(),
-                    transaction_id: 'TXN-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+                    transaction_id: 'RC-' + Math.random().toString(36).substr(2, 9).toUpperCase()
                 })
             });
 
             if (response.ok) {
-                alert(`Payment of ₹${amount} via ${method} was successful!`);
-                localStorage.removeItem('rapidcare_last_trip_id'); // Clear after payment
-                window.location.href = '/dashboard';
-            } else {
-                const error = await response.json();
-                throw new Error(error.error || 'Payment failed');
-            }
-        } catch (err) {
-            console.error('Payment error:', err);
-            alert(`Payment failed: ${err.message}`);
-            btn.innerHTML = originalText;
-        }
-    });
+                const data = await response.json();
+                populateReceipt(method, data.transaction_id || ('RC-' + Math.random().toString(36).substr(2, 9).toUpperCase()), amount);
+                
+                // If cash, update streak
+                if (method === 'CASH') {
+                    let streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
+                    streak = (streak + 1) % 4; // Reset after 4
+                    localStorage.setItem('rapidcare_cash_streak', streak);
+                    updateRideStreak();
+                }
 
+                localStorage.removeItem('rapidcare_last_trip_id');
+                return true;
+            }
+            return false;
+        } catch (err) {
+            console.error('Payment Error:', err);
+            return false;
+        }
+    }
+
+    function populateReceipt(method, txnId, amount) {
+        const patientEl = document.getElementById('receipt-patient');
+        const methodEl = document.getElementById('receipt-method');
+        const txnEl = document.getElementById('receipt-txn');
+        const dateEl = document.getElementById('receipt-date');
+        const totalEl = document.getElementById('receipt-total');
+        const quoteEl = document.getElementById('health-quote');
+
+        if (patientEl) patientEl.textContent = localStorage.getItem('rapidcare_user_name') || 'Valued Patient';
+        if (methodEl) methodEl.textContent = method;
+        if (txnEl) txnEl.textContent = txnId;
+        if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN');
+        if (totalEl) totalEl.textContent = `₹${amount.toLocaleString()}`;
+
+        const quotes = [
+            "Your health is an investment, not an expense.",
+            "A healthy outside starts from the inside.",
+            "The greatest wealth is health.",
+            "Take care of your body. It’s the only place you have to live.",
+            "Health is not valued till sickness comes."
+        ];
+        if (quoteEl) quoteEl.textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+    }
+
+    window.printReceipt = () => {
+        window.print();
+    };
+
+    window.viewHistoryReceipt = () => {
+        // Add to history table
+        const tbody = document.getElementById('payment-history-body');
+        if (tbody) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            const txnId = document.getElementById('success-txn-id').textContent;
+            const amt = document.getElementById('review-total').textContent;
+            const service = localStorage.getItem('rapidcare_selected_ambulance') || 'Emergency Ambulance';
+            const provider = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Hospital';
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${dateStr}</td>
+                <td>${service}</td>
+                <td>${provider}</td>
+                <td class="amt" style="font-weight: 700;">${amt}</td>
+                <td><span class="badge-insurance approved">Paid</span></td>
+                <td><a href="javascript:void(0)" onclick="window.downloadReceipt()" style="color: var(--primary-green); text-decoration: none; font-weight: 600;">Download</a></td>
+            `;
+            tbody.insertBefore(newRow, tbody.firstChild);
+        }
+
+        // Navigate to History view
+        window.closePaymentOverlay();
+        const historyBtn = document.querySelector('[data-view="history"]');
+        if (historyBtn) historyBtn.click();
+    };
+
+    window.downloadReceipt = () => {
+        const txnId = document.getElementById('success-txn-id') ? document.getElementById('success-txn-id').textContent : 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
+        const now = new Date();
+        const dateStr = now.toLocaleString('en-IN');
+        const amount = document.getElementById('review-total') ? document.getElementById('review-total').textContent : '₹1,740';
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>RapidCare Receipt - ${txnId}</title>
+                    <style>
+                        body { font-family: 'Inter', sans-serif; padding: 40px; color: #1a1a2e; }
+                        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #06b6d4; padding-bottom: 20px; margin-bottom: 30px; }
+                        .logo { font-size: 24px; font-weight: 800; color: #06b6d4; }
+                        .receipt-info { margin-bottom: 30px; }
+                        .details-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                        .details-table th, .details-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+                        .total-row { font-size: 20px; font-weight: 800; color: #10b981; }
+                        .footer { margin-top: 50px; text-align: center; font-size: 14px; opacity: 0.6; }
+                        @media print { .no-print { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="logo">RapidCare</div>
+                        <div>Official Transaction Receipt</div>
+                    </div>
+                    <div class="receipt-info">
+                        <p><strong>Transaction ID:</strong> ${txnId}</p>
+                        <p><strong>Date & Time:</strong> ${dateStr}</p>
+                        <p><strong>Status:</strong> <span style="color: #10b981;">Payment Successful</span></p>
+                    </div>
+                    <table class="details-table">
+                        <thead>
+                            <tr><th>Description</th><th>Details</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Service Type</td><td>${localStorage.getItem('rapidcare_selected_ambulance') || 'Emergency Ambulance'}</td></tr>
+                            <tr><td>Provider</td><td>${localStorage.getItem('rapidcare_selected_hospital') || 'City General Hospital'}</td></tr>
+                            <tr><td>Patient Name</td><td>${localStorage.getItem('rapidcare_user_name') || 'Valued Patient'}</td></tr>
+                            <tr><td>Payment Method</td><td>Online Banking / Card</td></tr>
+                            <tr class="total-row"><td>Amount Paid</td><td>${amount}</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="footer">
+                        <p>Thank you for using RapidCare. Your health is our priority.</p>
+                        <p>&copy; 2026 RapidCare Medical Services</p>
+                    </div>
+                    <script>window.print(); setTimeout(() => window.close(), 500);</script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+    };
+
+    // --- Payment Feedback (Updated for Stepper) ---
+    if (payBtnElement) {
+        payBtnElement.addEventListener('click', () => {
+            const hospitalName = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Available';
+            const ambulanceTypeElem = document.querySelector('input[name="ambulance-type"]:checked');
+            const ambulanceType = ambulanceTypeElem ? ambulanceTypeElem.nextElementSibling.querySelector('h3').textContent : 'Standard';
+            const distance = document.getElementById('distance-input').value;
+            const total = totalAmountDisplay.textContent;
+
+            document.getElementById('review-ambulance').textContent = ambulanceType;
+            document.getElementById('review-hospital').textContent = hospitalName;
+            document.getElementById('review-distance').textContent = `${distance} KM`;
+            document.getElementById('review-total').textContent = total;
+
+            overlay.classList.add('active');
+        });
+    }
+
+    // Initialize
+    updateRideStreak();
+    recalculatePricing();
+    if (window.lucide) lucide.createIcons();
 });
