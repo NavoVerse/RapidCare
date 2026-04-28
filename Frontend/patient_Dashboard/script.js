@@ -857,6 +857,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const tripTimeStat = document.querySelectorAll('.stat-card .value')[3];
 
         if (!container) return;
+        
+        if (isNaN(userLat) || isNaN(userLng)) {
+            container.innerHTML = '<p style="text-align: center; color: var(--text-muted); margin-top: 40px;">Invalid location coordinates.</p>';
+            return;
+        }
+        
         container.innerHTML = '';
 
         const hospitalsWithDistance = hospitals.map(h => {
@@ -967,12 +973,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedName = localStorage.getItem('userLocationName');
 
         if (!forced && savedLat && savedLng) {
-            if (locationText) locationText.textContent = savedName || "Saved Location";
-            if (locationStatus) {
-                locationStatus.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Stored`;
+            const latNum = parseFloat(savedLat);
+            const lngNum = parseFloat(savedLng);
+            
+            if (!isNaN(latNum) && !isNaN(lngNum)) {
+                if (locationText) locationText.textContent = savedName || "Saved Location";
+                if (locationStatus) {
+                    locationStatus.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Stored`;
+                }
+                updateUserLocation(latNum, lngNum);
+                return;
+            } else {
+                // Clear invalid data
+                localStorage.removeItem('userLat');
+                localStorage.removeItem('userLng');
             }
-            updateUserLocation(parseFloat(savedLat), parseFloat(savedLng));
-            return;
         }
 
         try {
