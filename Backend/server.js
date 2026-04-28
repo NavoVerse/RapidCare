@@ -332,7 +332,10 @@ app.post('/api/v1/hospitals/register', async (req, res) => {
             return id;
         });
 
-        res.status(201).json({ message: 'Hospital registered successfully', userId });
+        const token = jwt.sign({ id: userId, email: data.email, role: 'hospital' }, JWT_SECRET, { expiresIn: '1d' });
+        const user = { id: userId, name: data.hospital_name, email: data.email, role: 'hospital' };
+
+        res.status(201).json({ message: 'Hospital registered successfully', token, user });
     } catch (err) {
         if (err.message.includes('UNIQUE constraint failed') || err.message.includes('duplicate key value')) {
             return res.status(400).json({ error: 'Email or Contact already exists' });
@@ -1395,6 +1398,30 @@ app.delete('/api/admin/data', express.json(), async (req, res) => {
 // =============================================================================
 // HOSPITAL MODULE APIs
 // =============================================================================
+
+app.get('/api/v1/hospital/me', authenticateToken, authorize('hospital'), async (req, res) => {
+    try {
+        const hospital = await knex('users as u')
+            .join('hospitals as h', 'u.id', 'h.user_id')
+            .where('u.id', req.user.id)
+            .select('u.name', 'u.email', 'u.phone', 'h.*')
+            .first();
+        
+        if (!hospital) return res.status(404).json({ error: 'Hospital profile not found' });
+        
+        if (hospital.departments && typeof hospital.departments === 'string') {
+            try {
+                hospital.departments = JSON.parse(hospital.departments);
+            } catch (e) {
+                hospital.departments = [];
+            }
+        }
+        
+        res.json(hospital);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 app.get('/api/v1/hospital/status', authenticateToken, authorize('hospital'), async (req, res) => {
     try {

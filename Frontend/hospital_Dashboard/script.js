@@ -6,9 +6,148 @@
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initClock();
-    initBedMap();
     initMobileSidebar();
+    checkAuth();
+    loadHospitalData();
+    loadIncomingRequests();
+    
+    // Logout logic
+    const logoutBtn = document.querySelector('.nav-item.logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('rapidcare_token');
+            localStorage.removeItem('rapidcare_user');
+            window.location.href = '../hospital_registration/index.html';
+        });
+    }
 });
+
+/**
+ * Authentication Check
+ */
+function checkAuth() {
+    const token = localStorage.getItem('rapidcare_token');
+    if (!token) {
+        alert('Please login or register first.');
+        window.location.href = '../hospital_registration/index.html';
+    }
+}
+
+/**
+ * Load Hospital Data
+ */
+async function loadHospitalData() {
+    const token = localStorage.getItem('rapidcare_token');
+    try {
+        const response = await fetch(RapidCareConfig.API_BASE + '/hospital/me', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            updateDashboardUI(data);
+        } else {
+            console.error('Failed to fetch hospital data');
+        }
+    } catch (err) {
+        console.error('Error loading hospital data:', err);
+    }
+}
+
+/**
+ * Update UI with Hospital Data
+ */
+function updateDashboardUI(hospital) {
+    const nameEl = document.querySelector('.hospital-info h2');
+    if (nameEl) nameEl.textContent = hospital.name || hospital.hospital_name;
+
+    const freeBedsVal = document.querySelector('.stat-card.primary .stat-value');
+    const freeBedsSub = document.querySelector('.stat-card.primary .stat-sub');
+    if (freeBedsVal) freeBedsVal.textContent = hospital.available_beds || 0;
+    if (freeBedsSub) freeBedsSub.textContent = `of ${hospital.total_beds || 0} total`;
+
+    const icuVal = document.querySelector('.stat-card.warning .stat-value');
+    if (icuVal) icuVal.textContent = hospital.icu_beds || 0;
+
+    const ventVal = document.querySelector('.stat-card.info .stat-value');
+    const ventSub = document.querySelector('.stat-card.info .stat-sub');
+    if (ventVal) ventVal.textContent = hospital.ventilators || 0;
+    if (ventSub) ventSub.textContent = `of ${hospital.ventilators || 0} total`;
+    
+    const resourceItems = document.querySelectorAll('.resource-item');
+    if (resourceItems.length >= 2) {
+        const icuCount = resourceItems[0].querySelector('.res-count');
+        if (icuCount) icuCount.textContent = `${hospital.icu_beds || 0} / ${hospital.icu_beds || 0}`;
+        
+        const ventCount = resourceItems[1].querySelector('.res-count');
+        if (ventCount) ventCount.textContent = `${hospital.ventilators || 0} / ${hospital.ventilators || 0}`;
+    }
+}
+
+/**
+ * Load Incoming Requests
+ */
+async function loadIncomingRequests() {
+    const token = localStorage.getItem('rapidcare_token');
+    try {
+        const response = await fetch(RapidCareConfig.API_BASE + '/hospital/incoming', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            populateIncomingRequests(data);
+        }
+    } catch (err) {
+        console.error('Error loading incoming requests:', err);
+    }
+}
+
+/**
+ * Populate Incoming Requests Table
+ */
+function populateIncomingRequests(requests) {
+    const tbody = document.getElementById('incoming-requests');
+    if (!tbody) return;
+
+    if (!requests || requests.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-secondary);">No active incoming patient requests.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = '';
+    requests.forEach(req => {
+        const tr = document.createElement('tr');
+        tr.className = 'request-row';
+        tr.setAttribute('data-id', req.id);
+        
+        let severityClass = 'moderate';
+        if (req.severity && req.severity.toLowerCase() === 'critical') severityClass = 'critical';
+        
+        const patientInitial = req.patient_name ? req.patient_name.substring(0, 2).toUpperCase() : 'EM';
+
+        tr.innerHTML = `
+            <td>
+                <div class="patient-cell">
+                    <div class="avatar bg-red">${patientInitial}</div>
+                    <div class="patient-info">
+                        <strong>${req.patient_name || 'Emergency Patient'}</strong>
+                        <span>Trip #${req.id}</span>
+                    </div>
+                </div>
+            </td>
+            <td>Ambulance: ${req.driver_name || 'Assigned'}</td>
+            <td><span class="badge ${severityClass}">${req.status.toUpperCase()}</span></td>
+            <td>-- min</td>
+            <td>
+                <div class="action-btns">
+                    <button class="btn btn-accept" onclick="handleAction(${req.id}, 'accept')">Accept</button>
+                    <button class="btn btn-reject" onclick="handleAction(${req.id}, 'reject')">Reject</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
 
 /**
  * Theme Management
@@ -43,10 +182,11 @@ function updateThemeIcon(theme) {
 }
 
 /**
- * Section Navigation
+ * Section Navigation (Simplified for Dashboard Only)
  */
 function switchSection(sectionId) {
-    // Update nav links
+    if (sectionId !== 'dashboard') return;
+
     document.querySelectorAll('.nav-item').forEach(link => {
         if (link.getAttribute('data-section') === sectionId) {
             link.classList.add('active');
@@ -55,7 +195,6 @@ function switchSection(sectionId) {
         }
     });
     
-    // Update content sections
     document.querySelectorAll('.content-section').forEach(section => {
         section.classList.remove('active');
     });
@@ -63,11 +202,6 @@ function switchSection(sectionId) {
     const target = document.getElementById(`${sectionId}-section`);
     if (target) {
         target.classList.add('active');
-    }
-    
-    // Re-initialize specific section components if needed
-    if (sectionId === 'bed-management') {
-        generateBeds('general', 'bed-grid-main');
     }
 }
 
@@ -109,11 +243,10 @@ function initMobileSidebar() {
         });
     }
     
-    // Close sidebar when clicking outside on mobile
     document.addEventListener('click', (e) => {
-        if (sidebar.classList.contains('active') && 
+        if (sidebar && sidebar.classList.contains('active') && 
             !sidebar.contains(e.target) && 
-            !toggleBtn.contains(e.target)) {
+            toggleBtn && !toggleBtn.contains(e.target)) {
             sidebar.classList.remove('active');
         }
     });
@@ -124,6 +257,8 @@ function initMobileSidebar() {
  */
 function handleAction(requestId, action) {
     const row = document.querySelector(`.request-row[data-id="${requestId}"]`);
+    if (!row) return;
+
     const patientName = row.querySelector('.patient-info strong').textContent;
     
     if (action === 'accept') {
@@ -132,7 +267,6 @@ function handleAction(requestId, action) {
         row.style.opacity = '0.5';
         row.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
         
-        // Simulate processing then removal
         setTimeout(() => {
             row.style.transform = 'translateX(50px)';
             row.style.opacity = '0';
@@ -151,76 +285,12 @@ function handleAction(requestId, action) {
 }
 
 /**
- * Bed Map Management
- */
-const bedData = {
-    general: { free: 15, occupied: 20, reserved: 5, total: 40 },
-    icu: { free: 2, occupied: 4, reserved: 2, total: 8 },
-    emergency: { free: 7, occupied: 4, reserved: 1, total: 12 }
-};
-
-function initBedMap() {
-    generateBeds('general', 'bed-grid');
-}
-
-function switchTab(ward) {
-    // Update tab UI
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        if (btn.textContent.toLowerCase().includes(ward)) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
-    });
-    
-    // Update summary text if it exists
-    const stats = bedData[ward];
-    const summaryEl = document.querySelector('.bed-stats-summary');
-    if (summaryEl) {
-        summaryEl.innerHTML = `<span>${stats.free} free</span> • <span>${stats.occupied} occupied</span> • <span>${stats.reserved} reserved</span>`;
-    }
-    
-    // Regenerate grid in active container
-    const activeSection = document.querySelector('.content-section.active');
-    const gridId = activeSection.id === 'dashboard-section' ? 'bed-grid' : 'bed-grid-main';
-    generateBeds(ward, gridId);
-}
-
-function generateBeds(ward, containerId) {
-    const grid = document.getElementById(containerId);
-    if (!grid) return;
-    
-    const stats = bedData[ward];
-    grid.innerHTML = '';
-    
-    // Populate with types based on stats
-    const beds = [];
-    for (let i = 0; i < stats.free; i++) beds.push('free');
-    for (let i = 0; i < stats.occupied; i++) beds.push('occupied');
-    for (let i = 0; i < stats.reserved; i++) beds.push('reserved');
-    
-    // Shuffle for visual interest
-    beds.sort(() => Math.random() - 0.5);
-    
-    beds.forEach((type, index) => {
-        const bed = document.createElement('div');
-        bed.className = `bed-item ${type}`;
-        bed.textContent = `${ward[0].toUpperCase()}${index + 1}`;
-        bed.title = `Bed ${index + 1}: ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-        
-        bed.addEventListener('click', () => {
-            showToast(`Bed ${ward[0].toUpperCase()}${index + 1} details opened`, 'info');
-        });
-        
-        grid.appendChild(bed);
-    });
-}
-
-/**
  * Feedback Toast
  */
 function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
+    if (!container) return;
+
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     
@@ -236,10 +306,9 @@ function showToast(message, type = 'info') {
     container.appendChild(toast);
     lucide.createIcons();
     
-    // Auto remove
     setTimeout(() => {
         toast.style.opacity = '0';
-        toast.style.transform = 'translateX(20px)';
+        toast.style.transform = 'translateX(100%)';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
