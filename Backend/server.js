@@ -1231,6 +1231,45 @@ app.post('/api/v1/trips/:id/accept', authenticateToken, authorize('driver'), asy
             tripTimeouts.delete(trip.id);
         }
 
+        const patientUser = await knex('users').where({ id: trip.patient_id }).first();
+        const patientProfile = await knex('patients').where({ user_id: trip.patient_id }).first();
+
+        let urgencyLevel = 'STANDARD';
+        let eta = req.body.eta || '12 mins';
+
+        const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+        if (apiKey && patientProfile) {
+            try {
+                const genAI = new GoogleGenerativeAI(apiKey);
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                const prompt = `
+                    You are an expert emergency medical triage AI.
+                    Evaluate the patient profile:
+                    - Blood Pressure: ${patientProfile.blood_pressure || 'Unknown'}
+                    - Medical History: ${patientProfile.medical_history || 'N/A'}
+                    
+                    Strict JSON ONLY response: {"urgency_level": "CRITICAL" | "URGENT" | "STANDARD"}.
+                `;
+                const result = await model.generateContent(prompt);
+                const text = result.response.text();
+                const jsonMatch = text.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    if (parsed.urgency_level) urgencyLevel = parsed.urgency_level.toUpperCase();
+                }
+            } catch (err) {
+                console.error('Gemini Trip Accept Triage Error:', err.message);
+            }
+        } else if (patientProfile && patientProfile.blood_pressure) {
+            let systolic = 120;
+            const bpStr = patientProfile.blood_pressure.toString();
+            if (bpStr.includes('/')) {
+                systolic = parseInt(bpStr.split('/')[0]);
+            }
+            if (systolic > 160) urgencyLevel = 'CRITICAL';
+            else if (systolic >= 140) urgencyLevel = 'URGENT';
+        }
+
         const io = req.app.get('io');
         if (io) {
             io.to(`patient_${trip.patient_id}`).emit('trip:accepted', {
@@ -1238,10 +1277,14 @@ app.post('/api/v1/trips/:id/accept', authenticateToken, authorize('driver'), asy
                 driver_id: req.user.id
             });
 
-            // Notify the targeted hospital about the incoming ambulance
+            // Notify the targeted hospital about the incoming ambulance with rich payload
             io.to(`hospital_${trip.hospital_id}`).emit('hospital:incoming_alert', {
                 trip_id: trip.id,
                 patient_id: trip.patient_id,
+                patient_name: patientUser ? patientUser.name : 'Emergency Patient',
+                blood_group: patientProfile ? patientProfile.blood_group : 'Unknown',
+                urgency_level: urgencyLevel,
+                eta: eta,
                 driver_id: req.user.id,
                 status: 'accepted',
                 message: 'An ambulance has accepted a request and is heading to your facility.'
