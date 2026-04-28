@@ -4,6 +4,11 @@ Backend/.env
 .env.*
 !.env.example
 
+# Firebase service account keys
+*firebase-service-account*.json
+*firebaseServiceAccountKey*.json
+
+
 # Node dependencies
 node_modules/
 npm-debug.log*
