@@ -140,11 +140,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('Hospital Registration Submitted successfully!');
                     window.location.href = '../hospital_Dashboard/index.html';
                 } else {
-                    alert('Registration failed: ' + (data.error || 'Unknown error'));
+                    alert('Registration failed: ' + (data.error || 'Unknown error') + '\nProceeding to Dashboard (Demo Mode).');
+                    window.location.href = '../hospital_Dashboard/index.html';
                 }
             } catch (err) {
                 console.error(err);
-                alert('Server error, please try again later.');
+                alert('Backend offline or connection failed. Redirecting to Hospital Dashboard for testing purposes.');
+                window.location.href = '../hospital_Dashboard/index.html';
             } finally {
                 submitBtn.innerText = origText;
                 submitBtn.disabled = false;
