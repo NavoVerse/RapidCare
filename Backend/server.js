@@ -24,7 +24,7 @@ const logger = require('./services/logger.service');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: { origin: '*' }
+    cors: { origin: process.env.CORS_ORIGIN || '*' }
 });
 
 // Structured Logging Middleware
