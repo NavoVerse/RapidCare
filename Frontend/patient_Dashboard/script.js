@@ -2070,7 +2070,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 confirmPayBtn.innerHTML = 'Processing...';
 
                 // 1. Create Order via Backend
-                const orderRes = await fetch('http://localhost:5000/api/v1/payments/create-order', {
+                const orderRes = await fetch(API_BASE + '/payments/create-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ amount, currency: 'INR' })
@@ -2081,7 +2081,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Open Razorpay Checkout
                 const options = {
-                    key: 'rzp_test_placeholder', // Should match backend or be injected dynamically
+                    key: orderData.key_id || 'rzp_test_placeholder', // Injected from backend
                     amount: orderData.order.amount,
                     currency: orderData.order.currency,
                     name: 'RapidCare',
@@ -2090,7 +2090,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     handler: async function (response) {
                         try {
                             // 3. Verify Payment
-                            const verifyRes = await fetch('http://localhost:5000/api/v1/payments/verify-payment', {
+                            const verifyRes = await fetch(API_BASE + '/payments/verify-payment', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
