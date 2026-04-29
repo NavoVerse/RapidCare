@@ -97,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             if (!response.ok) throw new Error('Failed to fetch profile');
             const data = await response.json();
+            localStorage.setItem('rapidcare_user_name', data.name);
 
             // Update details view
             const setVal = (id, val, prefix = '', defaultVal = '--') => {
@@ -680,6 +681,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // REAL AMBULANCE BOOKING
     // =============================================
     window.bookAmbulance = async function(hospitalId, hospitalName) {
+        // Save selected hospital for payment receipt
+        localStorage.setItem('rapidcare_selected_hospital', hospitalName);
+        
         // Generate random 4-digit OTP
         const otp = Math.floor(1000 + Math.random() * 9000);
         const otpEl = document.getElementById('otpStatusValue');
@@ -2999,7 +3003,7 @@ window.addEventListener('resize', () => {
 
 
     ambulanceOptions.forEach(opt => opt.addEventListener('change', recalculatePricing));
-    distanceInput.addEventListener('input', recalculatePricing);
+    if (distanceInput) distanceInput.addEventListener('input', recalculatePricing);
 
     // --- Tab Switching Logic (Global) ---
     // (switchPaymentTab moved to top level)
@@ -3264,21 +3268,39 @@ window.addEventListener('resize', () => {
         printWindow.document.close();
     };
 
-    // --- Payment Feedback (Updated for Stepper) ---
+    // --- Payment Feedback (Splash Screen) ---
     if (payBtnElement) {
         payBtnElement.addEventListener('click', () => {
+            const total = totalAmountDisplay.textContent;
+            const txnId = 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
+
+            // Also populate the stepper overlay data in case receipt needs it
             const hospitalName = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Available';
             const ambulanceTypeElem = document.querySelector('input[name="ambulance-type"]:checked');
             const ambulanceType = ambulanceTypeElem ? ambulanceTypeElem.nextElementSibling.querySelector('h3').textContent : 'Standard';
             const distance = document.getElementById('distance-input').value;
-            const total = totalAmountDisplay.textContent;
 
-            document.getElementById('review-ambulance').textContent = ambulanceType;
-            document.getElementById('review-hospital').textContent = hospitalName;
-            document.getElementById('review-distance').textContent = `${distance} KM`;
-            document.getElementById('review-total').textContent = total;
+            const reviewAmb = document.getElementById('review-ambulance');
+            const reviewHosp = document.getElementById('review-hospital');
+            const reviewDist = document.getElementById('review-distance');
+            const reviewTotal = document.getElementById('review-total');
+            const successTxn = document.getElementById('success-txn-id');
+            const successDate = document.getElementById('success-datetime');
 
-            overlay.classList.add('active');
+            if (reviewAmb) reviewAmb.textContent = ambulanceType;
+            if (reviewHosp) reviewHosp.textContent = hospitalName;
+            if (reviewDist) reviewDist.textContent = `${distance} KM`;
+            if (reviewTotal) reviewTotal.textContent = total;
+            if (successTxn) successTxn.textContent = txnId;
+            if (successDate) {
+                const now = new Date();
+                successDate.textContent = now.toLocaleDateString('en-IN') + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            // Show the fullscreen splash screen
+            if (typeof showPaymentSplash === 'function') {
+                showPaymentSplash(total, txnId);
+            }
         });
     }
 
