@@ -209,3 +209,14 @@ function navigateWithTransition(target) {
         window.location.href = target;
     }
 }
+
+/* ─── BACK BUTTON FIX ─── */
+window.addEventListener('pageshow', function(event) {
+    const trans = document.getElementById('pgTrans');
+    if (trans) {
+        trans.classList.remove('active');
+    }
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
