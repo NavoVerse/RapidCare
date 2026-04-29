@@ -98,6 +98,72 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Handle Incoming Trip Requests
     let activeTripData = null;
+    let allDriverTrips = [];
+
+    // --- Leaflet Map Initialization ---
+    let driverMap = null;
+    let driverMarker = null;
+    let pickupMarker = null;
+    let hospitalMarker = null;
+    let mapRouteLine = null;
+
+    function initDriverMap(lat, lng) {
+        const mapContainer = document.getElementById('driver-live-map');
+        if (!mapContainer || driverMap) return;
+
+        driverMap = L.map('driver-live-map').setView([lat, lng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(driverMap);
+
+        const driverIcon = L.divIcon({
+            className: 'driver-marker',
+            html: `<div style="background: #2563eb; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.4);"></div>`,
+            iconSize: [16, 16]
+        });
+
+        driverMarker = L.marker([lat, lng], { icon: driverIcon }).addTo(driverMap);
+    }
+
+    function drawTripRoute(trip) {
+        if (!driverMap || !trip) return;
+
+        if (pickupMarker) driverMap.removeLayer(pickupMarker);
+        if (hospitalMarker) driverMap.removeLayer(hospitalMarker);
+        if (mapRouteLine) driverMap.removeLayer(mapRouteLine);
+
+        const bounds = [];
+        if (driverMarker) bounds.push(driverMarker.getLatLng());
+
+        if (trip.pickup_lat && trip.pickup_lng) {
+            const pickupIcon = L.divIcon({
+                className: 'pickup-marker',
+                html: `<div style="background: #ef4444; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.4);"></div>`,
+                iconSize: [16, 16]
+            });
+            pickupMarker = L.marker([trip.pickup_lat, trip.pickup_lng], { icon: pickupIcon })
+                .bindPopup('Pickup: ' + (trip.patient_name || 'Patient'))
+                .addTo(driverMap);
+            bounds.push([trip.pickup_lat, trip.pickup_lng]);
+        }
+
+        if (trip.hospital_lat && trip.hospital_lng) {
+            const hospitalIcon = L.divIcon({
+                className: 'hospital-marker',
+                html: `<div style="background: #10b981; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.4);"></div>`,
+                iconSize: [16, 16]
+            });
+            hospitalMarker = L.marker([trip.hospital_lat, trip.hospital_lng], { icon: hospitalIcon })
+                .bindPopup('Drop-off: ' + (trip.hospital_name || 'Hospital'))
+                .addTo(driverMap);
+            bounds.push([trip.hospital_lat, trip.hospital_lng]);
+        }
+
+        if (bounds.length >= 2) {
+            mapRouteLine = L.polyline(bounds, { color: '#2563eb', weight: 4, opacity: 0.7 }).addTo(driverMap);
+            driverMap.fitBounds(bounds, { padding: [50, 50] });
+        }
+    }
 
     socket.on('trip:new_request', (data) => {
         console.log('New trip request received:', data);
@@ -131,6 +197,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         navigator.geolocation.getCurrentPosition((position) => {
             const { latitude, longitude } = position.coords;
             console.log(`Sending location: ${latitude}, ${longitude}`);
+            
+            if (!driverMap) {
+                initDriverMap(latitude, longitude);
+            } else if (driverMarker) {
+                driverMarker.setLatLng([latitude, longitude]);
+            }
+
             socket.emit('driver:location_update', {
                 userId: user.id,
                 lat: latitude,
@@ -302,6 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderTripHistory(trips) {
+        allDriverTrips = trips;
         const tripList = document.querySelector('.list-body'); // Profile tab list
         const dashboardTripList = document.getElementById('profile-trip-list'); // Main dashboard list
         const queueList = document.querySelector('.queue-list'); // Dashboard incoming queue
@@ -354,6 +428,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (completedEl) completedEl.textContent = completedBookings;
         if (cancelledEl) cancelledEl.textContent = cancelledBookings;
 
+        const efficiencyEl = document.getElementById('stat-efficiency');
+        const efficiencyDescEl = document.getElementById('stat-efficiency-desc');
+        const efficiency = totalBookings > 0 ? Math.round((completedBookings / totalBookings) * 100) : 100;
+        
+        if (efficiencyEl) efficiencyEl.textContent = `${efficiency}%`;
+        if (efficiencyDescEl) {
+            if (efficiency >= 85) efficiencyDescEl.textContent = 'Excellent performance';
+            else if (efficiency >= 70) efficiencyDescEl.textContent = 'Acceptable performance';
+            else efficiencyDescEl.textContent = 'Action Required';
+        }
+
         const totalCountFilterEl = document.getElementById('stat-total-count-filter');
         if (totalCountFilterEl) totalCountFilterEl.textContent = `All Time (${totalBookings})`;
 
@@ -383,6 +468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (distEl) distEl.textContent = '2.1 km remaining';
             if (activePatientIdEl) activePatientIdEl.textContent = `Patient ID #${activeTripData.patient_id}`;
             if (activeConditionEl) activeConditionEl.textContent = activeTripData.complaint || 'Emergency Response';
+            drawTripRoute(activeTripData);
         } else {
             if (etaEl) etaEl.textContent = '--';
             if (distEl) distEl.textContent = 'No active trip';
@@ -448,6 +534,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.removeItem('rapidcare_token');
             localStorage.removeItem('rapidcare_user');
             window.location.href = '/driver-login';
+        });
+    }
+
+    // Emergency SOS click handler
+    const sosBtn = document.getElementById('btn-driver-sos');
+    if (sosBtn) {
+        sosBtn.addEventListener('click', async () => {
+            if (!confirm('Are you absolutely sure you want to trigger a critical Emergency SOS alert?')) return;
+
+            try {
+                const response = await fetch('/api/v1/sos', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    alert('SOS Alert Dispatched. Support units are being dispatched immediately.');
+                } else {
+                    const err = await response.json();
+                    alert(`Failed to trigger SOS: ${err.error}`);
+                }
+            } catch (err) {
+                console.error('SOS error:', err);
+                alert('Network error while broadcasting SOS.');
+            }
         });
     }
 
@@ -546,6 +660,92 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     });
+
+    // --- Invoices & Trip Subtab Toggling ---
+    const tabRecentTrips = document.getElementById('tab-recent-trips');
+    const tabInvoices = document.getElementById('tab-invoices');
+
+    if (tabRecentTrips && tabInvoices) {
+        tabRecentTrips.addEventListener('click', () => {
+            tabRecentTrips.classList.add('active');
+            tabInvoices.classList.remove('active');
+            renderSubTab('recent');
+        });
+
+        tabInvoices.addEventListener('click', () => {
+            tabInvoices.classList.add('active');
+            tabRecentTrips.classList.remove('active');
+            renderSubTab('invoices');
+        });
+    }
+
+    function renderSubTab(type) {
+        const listBody = document.querySelector('.list-body');
+        if (!listBody) return;
+
+        if (type === 'recent') {
+            if (allDriverTrips.length === 0) {
+                listBody.innerHTML = '<div class="list-item" style="justify-content: center; opacity: 0.5;">No recent trips found</div>';
+            } else {
+                listBody.innerHTML = allDriverTrips.map(trip => {
+                    const date = new Date(trip.created_at);
+                    const day = date.getDate();
+                    const month = date.toLocaleString('default', { month: 'short' });
+                    
+                    let statusClass = 'booked';
+                    if (trip.status === 'completed') statusClass = 'done';
+                    if (trip.status === 'cancelled') statusClass = 'cancelled';
+
+                    return `
+                        <div class="list-item">
+                            <div class="item-date">
+                                <span class="day">${day}</span>
+                                <span class="month">${month}</span>
+                            </div>
+                            <div class="item-info">
+                                <span class="task">${trip.patient_name || 'Emergency'}'s Request</span>
+                                <span class="time">${new Date(trip.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <span class="status-badge ${statusClass}">${trip.status.charAt(0).toUpperCase() + trip.status.slice(1)}</span>
+                            <div class="item-price">
+                                <span class="total">₹${trip.total_fare || 0}</span>
+                                <span class="rate">₹70/km</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        } else if (type === 'invoices') {
+            const completedTrips = allDriverTrips.filter(t => t.status === 'completed');
+            if (completedTrips.length === 0) {
+                listBody.innerHTML = '<div class="list-item" style="justify-content: center; opacity: 0.5;">No invoices generated yet</div>';
+            } else {
+                listBody.innerHTML = completedTrips.map(trip => {
+                    const date = new Date(trip.created_at);
+                    const day = date.getDate();
+                    const month = date.toLocaleString('default', { month: 'short' });
+
+                    return `
+                        <div class="list-item">
+                            <div class="item-date">
+                                <span class="day">${day}</span>
+                                <span class="month">${month}</span>
+                            </div>
+                            <div class="item-info">
+                                <span class="task">Invoice #${trip.id.toString().padStart(5, '0')}</span>
+                                <span class="time">${trip.hospital_name || 'Emergency Drop-off'}</span>
+                            </div>
+                            <span class="status-badge done">Paid</span>
+                            <div class="item-price">
+                                <span class="total">₹${trip.total_fare || 0}</span>
+                                <span class="rate">₹70/km</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+    }
 
     // Status Workflow Handlers
     function updateActionButtons(trip) {

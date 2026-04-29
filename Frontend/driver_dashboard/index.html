@@ -2,12 +2,15 @@
 <html lang="en">
 
 <head>
+    <link rel="icon" type="image/svg+xml" href="../shared_assets/images/logo.svg">
+    <link rel="alternate icon" type="image/png" href="../shared_assets/images/logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RapidCare | Driver Dashboard</title>
     <link rel="stylesheet" href="../shared_assets/css/theme.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
@@ -34,6 +37,14 @@
                     <label for="availability-toggle" class="toggle-slider"></label>
                 </div>
                 <p class="availability-desc">You are visible to patients and nearby hospitals.</p>
+            </div>
+
+            <!-- Emergency SOS Button -->
+            <div style="padding: 0 20px; margin-bottom: 20px;">
+                <button id="btn-driver-sos" class="btn-sos" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.2s;">
+                    <i class="fa-solid fa-triangle-exclamation pulse-sos"></i>
+                    <span>EMERGENCY SOS</span>
+                </button>
             </div>
 
             <nav class="sidebar-nav">
@@ -105,10 +116,10 @@
                                 </div>
                             </div>
                             <div class="stat-card">
-                                <span class="stat-label">SHIFT REMAINING</span>
+                                <span class="stat-label">DRIVE EFFICIENCY</span>
                                 <div class="stat-value-container">
-                                    <span class="stat-number" id="stat-shift-remaining">8.0h</span>
-                                    <span class="stat-desc" id="stat-shift-end">Started recently</span>
+                                    <span class="stat-number highlight-blue" id="stat-efficiency">100%</span>
+                                    <span class="stat-desc" id="stat-efficiency-desc">Optimal performance</span>
                                 </div>
                             </div>
                         </div>
@@ -170,14 +181,15 @@
                                         <h3>Live navigation</h3>
                                         <span class="nav-status">Open</span>
                                     </div>
-                                    <div class="map-placeholder">
+                                    <div id="driver-live-map" style="height: 300px; width: 100%; border-radius: 12px; margin-bottom: 15px; z-index: 1;"></div>
+                                    <!-- <div class="map-placeholder"> -->
                                         <!-- Simplified Map Visual -->
                                         <div class="map-grid"></div>
                                         <div class="route-line">
                                             <div class="car-marker"></div>
                                             <div class="destination-marker"></div>
                                         </div>
-                                    </div>
+                                    <!-- </div> -->
                                     <div class="nav-stats">
                                         <div class="nav-stat">
                                             <span class="val">2.1 km</span>
@@ -439,8 +451,8 @@
                                 <div class="profile-list-card">
                                     <div class="list-header">
                                         <div class="list-tabs">
-                                            <button class="tab active">Recent Trips</button>
-                                            <button class="tab">Invoices</button>
+                                            <button class="tab active" id="tab-recent-trips">Recent Trips</button>
+                                            <button class="tab" id="tab-invoices">Invoices</button>
                                         </div>
                                         <div class="list-filter">
                                             <span id="stat-total-count-filter">All Time (0)</span>
@@ -595,6 +607,7 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

@@ -20,6 +20,64 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('rapidcare_user');
             window.location.href = '../hospital_registration/index.html';
         });
+    // --- Real-Time Queue (Socket.IO) ---
+    if (typeof io !== 'undefined') {
+        const SOCKET_URL = (window.RapidCareConfig && RapidCareConfig.SOCKET_URL) || window.location.origin;
+        const socket = io(SOCKET_URL);
+        
+        const userStr = localStorage.getItem('rapidcare_user');
+        if (userStr) {
+            const user = JSON.parse(userStr);
+            if (user && user.id) {
+                socket.emit('join', { user_id: user.id });
+                
+                socket.on('hospital:incoming_alert', (data) => {
+                    const tbody = document.getElementById('incoming-requests');
+                    if (!tbody) return;
+                    
+                    // Remove "No active incoming" if present
+                    if (tbody.querySelector('td[colspan]')) {
+                        tbody.innerHTML = '';
+                    }
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = 'request-row';
+                    tr.setAttribute('data-id', data.trip_id);
+                    
+                    let severityClass = 'moderate';
+                    const urgency = data.urgency_level ? data.urgency_level.toLowerCase() : 'standard';
+                    if (urgency === 'critical') severityClass = 'critical';
+                    else if (urgency === 'urgent') severityClass = 'urgent';
+                    
+                    const patientInitial = data.patient_name ? data.patient_name.substring(0, 2).toUpperCase() : 'EM';
+                    
+                    tr.innerHTML = `
+                        <td>
+                            <div class="patient-cell">
+                                <div class="avatar bg-red">${patientInitial}</div>
+                                <div class="patient-info">
+                                    <strong>${data.patient_name || 'Emergency Patient'}</strong>
+                                    <span>Trip #${data.trip_id} (Blood: ${data.blood_group || 'N/A'})</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Ambulance: En Route (${data.eta || 'Calculating'})</td>
+                        <td><span class="badge ${severityClass}">${urgency.toUpperCase()}</span></td>
+                        <td>${data.eta || '-- min'}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-accept" onclick="handleAction(${data.trip_id}, 'accept')">Accept</button>
+                                <button class="btn btn-reject" onclick="handleAction(${data.trip_id}, 'reject')">Reject</button>
+                            </div>
+                        </td>
+                    `;
+                    
+                    // Prepend to show incoming in real-time
+                    tbody.insertBefore(tr, tbody.firstChild);
+                    showToast(`⚠️ High Priority Incoming: ${data.patient_name}`, 'warning');
+                });
+            }
+        }
     }
 });
 
