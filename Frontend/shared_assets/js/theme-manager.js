@@ -44,7 +44,15 @@ class ThemeManager {
     toggleTheme() {
         const newTheme = this.theme === 'light' ? 'dark' : 'light';
         localStorage.setItem('theme', newTheme);
+        
+        // Smooth transition trigger
+        document.documentElement.classList.add('theme-in-transition');
+        
         this.applyTheme(newTheme);
+        
+        setTimeout(() => {
+            document.documentElement.classList.remove('theme-in-transition');
+        }, 400);
     }
 
     setupToggles() {
