@@ -16,6 +16,8 @@
     <script src="../shared_assets/js/config.js"></script>
     <!-- External Libraries -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
 <body>
@@ -1804,9 +1806,15 @@
                     </div>
 
                     <div class="distance-section">
-                        <div class="form-group">
-                            <label>Estimated Distance (KM)</label>
-                            <input type="number" id="distance-input" value="10" min="0" step="0.1">
+                        <input type="hidden" id="distance-input" value="5">
+                        <div class="destination-info-badge" style="display: flex; align-items: center; gap: 16px; padding: 18px 24px; background: rgba(13, 148, 136, 0.05); border: 1.5px solid rgba(13, 148, 136, 0.2); border-radius: 20px; margin-top: 15px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3); backdrop-filter: blur(10px);">
+                            <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(13, 148, 136, 0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 2px 10px rgba(13, 148, 136, 0.2);">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px rgba(13,148,136,0.4));"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            </div>
+                            <div style="flex-grow: 1;">
+                                <p style="font-size: 0.75rem; opacity: 0.5; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #0d9488;">Estimated Distance</p>
+                                <p style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--primary-text); font-family: 'Outfit', sans-serif; letter-spacing: -0.3px;">Your destination is <span style="color: #0d9488; position: relative;">5 km<span style="position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: #0d9488; opacity: 0.3; border-radius: 2px;"></span></span> away</p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -2072,13 +2080,34 @@
                                 <button id="apply-coupon" class="secondary-btn">Apply</button>
                             </div>
                             <p id="coupon-msg" class="coupon-status"></p>
+                            <div class="coupon-suggestions" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+                                <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; opacity: 0.5; margin: 0;">Available Coupons</p>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                    <button type="button" class="coupon-chip" onclick="document.getElementById('coupon-code').value='RAPID20'; document.getElementById('apply-coupon').click();" style="padding: 6px 14px; border-radius: 20px; border: 1.5px dashed rgba(6, 182, 212, 0.4); background: rgba(6, 182, 212, 0.06); color: #06b6d4; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; letter-spacing: 0.5px;" onmouseover="this.style.background='rgba(6,182,212,0.15)'; this.style.borderColor='#06b6d4';" onmouseout="this.style.background='rgba(6,182,212,0.06)'; this.style.borderColor='rgba(6,182,212,0.4)';">
+                                        🎟️ RAPID20 <span style="opacity:0.6; margin-left:4px;">₹20 off</span>
+                                    </button>
+                                    <button type="button" class="coupon-chip" onclick="document.getElementById('coupon-code').value='FIRSTCARE'; document.getElementById('apply-coupon').click();" style="padding: 6px 14px; border-radius: 20px; border: 1.5px dashed rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.06); color: #10b981; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; letter-spacing: 0.5px;" onmouseover="this.style.background='rgba(16,185,129,0.15)'; this.style.borderColor='#10b981';" onmouseout="this.style.background='rgba(16,185,129,0.06)'; this.style.borderColor='rgba(16,185,129,0.4)';">
+                                        🏥 FIRSTCARE <span style="opacity:0.6; margin-left:4px;">₹100 off</span>
+                                    </button>
+                                    <button type="button" class="coupon-chip" onclick="document.getElementById('coupon-code').value='RIDEMASTER'; document.getElementById('apply-coupon').click();" style="padding: 6px 14px; border-radius: 20px; border: 1.5px dashed rgba(234, 179, 8, 0.4); background: rgba(234, 179, 8, 0.06); color: #eab308; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; letter-spacing: 0.5px;" onmouseover="this.style.background='rgba(234,179,8,0.15)'; this.style.borderColor='#eab308';" onmouseout="this.style.background='rgba(234,179,8,0.06)'; this.style.borderColor='rgba(234,179,8,0.4)';">
+                                        ⭐ RIDEMASTER <span style="opacity:0.6; margin-left:4px;">₹40 off</span>
+                                    </button>
+                                    <button type="button" class="coupon-chip" onclick="document.getElementById('coupon-code').value='FIRSTRAPIDCARE50'; document.getElementById('apply-coupon').click();" style="padding: 6px 14px; border-radius: 20px; border: 1.5px dashed rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.06); color: #a855f7; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; letter-spacing: 0.5px;" onmouseover="this.style.background='rgba(168,85,247,0.15)'; this.style.borderColor='#a855f7';" onmouseout="this.style.background='rgba(168,85,247,0.06)'; this.style.borderColor='rgba(168,85,247,0.4)';">
+                                        🎉 FIRSTRAPIDCARE50 <span style="opacity:0.6; margin-left:4px;">₹50 off</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="divider"></div>
                         <div class="summary-row total">
                             <span>Total Amount</span>
                             <span id="total-amount">₹1,740</span>
                         </div>
-                        <button class="pay-btn">
+                        <button class="pay-btn" id="pay-securely-btn" onclick="(function(){
+                            const total = document.getElementById('total-amount').textContent || '₹1,740';
+                            const txnId = 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
+                            showPaymentSplash(total, txnId);
+                        })()">
                             Pay Securely
                             <i data-lucide="shield-check"></i>
                         </button>
@@ -2330,5 +2359,271 @@
             </div>
         </div>
     </div>
+
+    <!-- Payment Success Splash Screen -->
+    <div id="payment-success-splash" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:99999; background: radial-gradient(ellipse at center, #0a1628 0%, #060d1a 100%); justify-content:center; align-items:center; flex-direction:column; overflow:hidden;">
+        <!-- Animated particles background -->
+        <div id="splash-particles" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden;"></div>
+        
+        <!-- Glow rings -->
+        <div style="position:absolute; width:300px; height:300px; border-radius:50%; border:2px solid rgba(16,185,129,0.1); animation: splashRing 3s ease-in-out infinite;"></div>
+        <div style="position:absolute; width:450px; height:450px; border-radius:50%; border:1px solid rgba(6,182,212,0.08); animation: splashRing 3s ease-in-out infinite 0.5s;"></div>
+        <div style="position:absolute; width:600px; height:600px; border-radius:50%; border:1px solid rgba(6,182,212,0.04); animation: splashRing 3s ease-in-out infinite 1s;"></div>
+        
+        <!-- Main content -->
+        <div style="position:relative; z-index:2; text-align:center; animation: splashFadeUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards; opacity:0;">
+            <!-- Animated checkmark -->
+            <div id="splash-check-container" style="width:120px; height:120px; margin:0 auto 30px; position:relative;">
+                <svg viewBox="0 0 120 120" style="width:120px; height:120px;">
+                    <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(16,185,129,0.15)" stroke-width="4"/>
+                    <circle cx="60" cy="60" r="54" fill="none" stroke="#10b981" stroke-width="4" stroke-dasharray="339.292" stroke-dashoffset="339.292" stroke-linecap="round" style="animation: splashCircleDraw 1s 0.3s cubic-bezier(0.65,0,0.35,1) forwards; filter: drop-shadow(0 0 15px rgba(16,185,129,0.5));"/>
+                    <polyline points="40,62 55,77 82,45" fill="none" stroke="#10b981" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="80" stroke-dashoffset="80" style="animation: splashCheckDraw 0.5s 1.1s cubic-bezier(0.65,0,0.35,1) forwards; filter: drop-shadow(0 0 10px rgba(16,185,129,0.6));"/>
+                </svg>
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:80px; height:80px; border-radius:50%; background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%); animation: splashPulseGlow 2s ease-in-out infinite;"></div>
+            </div>
+            
+            <h1 style="font-family:'Outfit',sans-serif; font-size:2.5rem; font-weight:800; background:linear-gradient(135deg, #10b981, #06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin:0 0 10px; letter-spacing:-0.5px;">Payment Successful!</h1>
+            <p style="font-size:1.05rem; color:rgba(255,255,255,0.5); margin:0 0 35px; font-weight:400;">Your ambulance has been dispatched</p>
+            
+            <!-- Transaction details card -->
+            <div style="background:rgba(255,255,255,0.04); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:24px 32px; margin:0 auto 30px; max-width:380px; animation: splashFadeUp 0.6s 0.5s cubic-bezier(0.16,1,0.3,1) forwards; opacity:0;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.06);">
+                    <span style="font-size:0.8rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; font-weight:600;">Amount Paid</span>
+                    <span id="splash-amount" style="font-size:1.6rem; font-weight:800; color:#10b981;">₹1,740</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:0.78rem; color:rgba(255,255,255,0.35);">Transaction ID</span>
+                    <span id="splash-txn" style="font-size:0.78rem; font-weight:600; color:rgba(255,255,255,0.7); font-family:monospace;">TXN826401XY</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:0.78rem; color:rgba(255,255,255,0.35);">Date & Time</span>
+                    <span id="splash-datetime" style="font-size:0.78rem; font-weight:600; color:rgba(255,255,255,0.7);"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.78rem; color:rgba(255,255,255,0.35);">Status</span>
+                    <span style="font-size:0.78rem; font-weight:700; color:#10b981; display:flex; align-items:center; gap:5px;"><span style="width:6px; height:6px; border-radius:50%; background:#10b981; display:inline-block; animation: splashBlink 1.5s infinite;"></span> Confirmed</span>
+                </div>
+            </div>
+            
+            <!-- Action buttons -->
+            <div style="display:flex; gap:12px; justify-content:center; animation: splashFadeUp 0.6s 0.8s cubic-bezier(0.16,1,0.3,1) forwards; opacity:0;">
+                <button onclick="closeSplashScreen()" style="padding:14px 32px; border-radius:14px; border:1.5px solid rgba(6,182,212,0.3); background:rgba(6,182,212,0.08); color:#06b6d4; font-weight:700; font-size:0.9rem; cursor:pointer; transition:all 0.3s ease; backdrop-filter:blur(10px);" onmouseover="this.style.background='rgba(6,182,212,0.2)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='rgba(6,182,212,0.08)'; this.style.transform='translateY(0)';">
+                    🏠 Back to Dashboard
+                </button>
+                <button onclick="closeSplashAndViewReceipt()" style="padding:14px 32px; border-radius:14px; border:none; background:linear-gradient(135deg, #10b981, #06b6d4); color:white; font-weight:700; font-size:0.9rem; cursor:pointer; transition:all 0.3s ease; box-shadow:0 8px 25px rgba(16,185,129,0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 35px rgba(16,185,129,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(16,185,129,0.3)';">
+                    📄 View Receipt
+                </button>
+            </div>
+        </div>
+        
+        <!-- RapidCare branding -->
+        <div style="position:absolute; bottom:30px; text-align:center; z-index:2; animation: splashFadeUp 0.6s 1.2s cubic-bezier(0.16,1,0.3,1) forwards; opacity:0;">
+            <p style="font-size:0.75rem; color:rgba(255,255,255,0.2); margin:0;">Secured by <span style="color:rgba(6,182,212,0.5); font-weight:700;">RapidCare</span> • 256-bit SSL Encryption</p>
+        </div>
+    </div>
+
+    <style>
+        @keyframes splashRing {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.08); opacity: 0.6; }
+        }
+        @keyframes splashFadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes splashCircleDraw {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes splashCheckDraw {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes splashPulseGlow {
+            0%, 100% { opacity: 0.3; transform: translate(-50%,-50%) scale(1); }
+            50% { opacity: 0.7; transform: translate(-50%,-50%) scale(1.3); }
+        }
+        @keyframes splashBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        @keyframes splashParticle {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-20vh) scale(1); opacity: 0; }
+        }
+        @keyframes splashConfetti {
+            0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+    </style>
+
+    <script>
+        // Payment Success Splash Screen Logic
+        function showPaymentSplash(amount, txnId) {
+            const splash = document.getElementById('payment-success-splash');
+            const splashAmount = document.getElementById('splash-amount');
+            const splashTxn = document.getElementById('splash-txn');
+            const splashDatetime = document.getElementById('splash-datetime');
+            
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+            const formattedTime = now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+            const fullDateTime = formattedDate + ', ' + formattedTime;
+
+            if (splashAmount) splashAmount.textContent = amount || '₹1,740';
+            if (splashTxn) splashTxn.textContent = txnId || ('TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY');
+            if (splashDatetime) splashDatetime.textContent = fullDateTime;
+            
+            splash.style.display = 'flex';
+            
+            // Create floating particles
+            createSplashParticles();
+            
+            // Create confetti burst after checkmark
+            setTimeout(() => createConfettiBurst(), 1400);
+
+            // Automatic PDF Download
+            setTimeout(() => {
+                downloadPaymentReceipt(amount, txnId, fullDateTime);
+            }, 2000);
+        }
+
+        async function downloadPaymentReceipt(amount, txnId, dateTime) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const hospitalName = localStorage.getItem('rapidcare_selected_hospital') || 'Apollo Gleneagles, Kolkata';
+            const userName = localStorage.getItem('rapidcare_user_name') || 'Valued Patient';
+            const ambulanceTypeElem = document.querySelector('input[name="ambulance-type"]:checked');
+            const ambulanceType = ambulanceTypeElem ? ambulanceTypeElem.closest('.ambulance-option').querySelector('h3').textContent : 'Standard';
+            
+            // PDF Design
+            doc.setFillColor(13, 148, 136); // Teal color
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.setFont('helvetica', 'bold');
+            doc.text('RapidCare Medical Services', 20, 25);
+            
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(18);
+            doc.text('Payment Receipt', 20, 60);
+            
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 100, 100);
+            doc.text('Transaction Details', 20, 75);
+            
+            doc.setDrawColor(200, 200, 200);
+            doc.line(20, 78, 190, 78);
+            
+            doc.setTextColor(0, 0, 0);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Transaction ID:', 20, 90);
+            doc.setFont('helvetica', 'normal');
+            doc.text(txnId, 70, 90);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Date & Time:', 20, 100);
+            doc.setFont('helvetica', 'normal');
+            doc.text(dateTime, 70, 100);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Patient Name:', 20, 110);
+            doc.setFont('helvetica', 'normal');
+            doc.text(userName, 70, 110);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Hospital:', 20, 120);
+            doc.setFont('helvetica', 'normal');
+            doc.text(hospitalName, 70, 120);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Service Type:', 20, 130);
+            doc.setFont('helvetica', 'normal');
+            doc.text(ambulanceType + ' Ambulance', 70, 130);
+            
+            doc.setDrawColor(13, 148, 136);
+            doc.setLineWidth(1);
+            doc.line(20, 145, 190, 145);
+            
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Total Amount Paid:', 20, 160);
+            doc.setTextColor(13, 148, 136);
+            doc.text(amount, 150, 160);
+            
+            doc.setTextColor(150, 150, 150);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'italic');
+            doc.text('This is a computer-generated receipt and does not require a signature.', 20, 180);
+            doc.text('Emergency Helpline: 108 | Support: support@rapidcare.com', 20, 185);
+            
+            doc.save(`RapidCare_Receipt_${txnId}.pdf`);
+        }
+        
+        function createSplashParticles() {
+            const container = document.getElementById('splash-particles');
+            container.innerHTML = '';
+            const colors = ['#10b981', '#06b6d4', '#a855f7', '#eab308', '#3b82f6'];
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                const size = Math.random() * 4 + 2;
+                particle.style.cssText = `
+                    position:absolute; width:${size}px; height:${size}px; border-radius:50%;
+                    background:${colors[Math.floor(Math.random() * colors.length)]};
+                    left:${Math.random() * 100}%; bottom:-10px;
+                    animation: splashParticle ${Math.random() * 6 + 4}s ${Math.random() * 3}s linear infinite;
+                    opacity:0;
+                `;
+                container.appendChild(particle);
+            }
+        }
+        
+        function createConfettiBurst() {
+            const container = document.getElementById('splash-particles');
+            const colors = ['#10b981', '#06b6d4', '#eab308', '#f43f5e', '#a855f7', '#3b82f6'];
+            for (let i = 0; i < 40; i++) {
+                const confetti = document.createElement('div');
+                const size = Math.random() * 8 + 4;
+                const isCircle = Math.random() > 0.5;
+                confetti.style.cssText = `
+                    position:absolute; width:${size}px; height:${isCircle ? size : size*2.5}px;
+                    border-radius:${isCircle ? '50%' : '2px'};
+                    background:${colors[Math.floor(Math.random() * colors.length)]};
+                    left:${40 + Math.random() * 20}%; top:-10px;
+                    animation: splashConfetti ${Math.random() * 3 + 2}s ${Math.random() * 0.5}s linear forwards;
+                `;
+                container.appendChild(confetti);
+            }
+        }
+        
+        function closeSplashScreen() {
+            const splash = document.getElementById('payment-success-splash');
+            splash.style.opacity = '0';
+            splash.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                splash.style.display = 'none';
+                splash.style.opacity = '';
+                splash.style.transition = '';
+                // Navigate to dashboard
+                const dashNav = document.querySelector('[data-view="dashboard"]');
+                if (dashNav) dashNav.click();
+            }, 500);
+        }
+        
+        function closeSplashAndViewReceipt() {
+            const splash = document.getElementById('payment-success-splash');
+            splash.style.opacity = '0';
+            splash.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                splash.style.display = 'none';
+                splash.style.opacity = '';
+                splash.style.transition = '';
+                if (window.viewHistoryReceipt) window.viewHistoryReceipt();
+            }, 500);
+        }
+    </script>
 </body>
 </html>
