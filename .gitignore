@@ -29,12 +29,8 @@ yarn-error.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
-<<<<<<< HEAD
-
 # API Keys and Service Accounts
 *firebase-adminsdk*.json
 *.pem
 *.key
 Backend/rapidcare-5652c-firebase-adminsdk-fbsvc-882301ae39.json
-=======
->>>>>>> 67792585e05306a5156336cfd947be6797de2be3
