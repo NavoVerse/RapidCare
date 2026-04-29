@@ -29,3 +29,8 @@ yarn-error.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# API Keys and Service Accounts
+*firebase-adminsdk*.json
+*.pem
+*.key
