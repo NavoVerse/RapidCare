@@ -181,6 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
     dots.forEach((d, i) => d.addEventListener('click', () => {
         document.getElementById(secs[i])?.scrollIntoView({ behavior: 'smooth' });
     }));
+
+    /* ─── WATCH THE DEMO ─── */
+    const demoBtn = document.querySelector('.btn-out');
+    if (demoBtn) {
+        demoBtn.addEventListener('click', () => {
+            window.open('https://youtu.be/ubltmM3TzX0?si=h_dWQ1u5lvur2C9D', '_blank');
+        });
+    }
 });
 
 /* ─── ROLE SELECT ─── */
