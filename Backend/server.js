@@ -20,11 +20,69 @@ const { Server } = require('socket.io');
 const { initializeDB, knex } = require('./db');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const logger = require('./services/logger.service');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const admin = require('firebase-admin');
+
+// In-memory store for simulation or live FCM routing
+const fcmTokens = {};
+
+// ── Firebase Admin SDK Initialization ─────────────────────────────────────────
+try {
+    const fs = require('fs');
+    const serviceAccountPath = path.resolve(__dirname, 'firebase-service-account.json');
+    let serviceAccount;
+    
+    if (fs.existsSync(serviceAccountPath)) {
+        serviceAccount = require(serviceAccountPath);
+    } else {
+        const files = fs.readdirSync(__dirname);
+        const fbFile = files.find(f => f.toLowerCase().includes('firebase') && f.endsWith('.json') && f !== 'package.json');
+        if (fbFile) {
+            serviceAccount = require(path.resolve(__dirname, fbFile));
+        }
+    }
+
+    if (serviceAccount) {
+        if (admin.apps.length === 0) {
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount)
+            });
+        }
+        logger.info('[Firebase] Admin SDK initialized successfully with service account key.');
+    } else {
+        logger.warn('[Firebase] Service account key not found. Running in simulation mode.');
+    }
+} catch (fbInitErr) {
+    logger.error(`[Firebase Init Error] ${fbInitErr.message}`);
+}
+
+/**
+ * Send Push Notification (Firebase Cloud Messaging)
+ */
+async function sendPushNotification(patientId, title, body) {
+    try {
+        const fcmToken = fcmTokens[patientId];
+
+        if (fcmToken && admin.apps.length > 0) {
+            const message = {
+                notification: { title, body },
+                token: fcmToken
+            };
+            await admin.messaging().send(message);
+            logger.info(`[FCM] Push Notification sent to patient ${patientId}: ${title}`);
+        } else {
+            // Simulation fallback (replaces SMS simulation)
+            logger.info(`[FCM Simulation] Push Notification for patient ${patientId} → ${title}: ${body}`);
+        }
+    } catch (fcmErr) {
+        logger.error(`[FCM Error] Failed sending push notification: ${fcmErr.message}`);
+    }
+}
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: { origin: '*' }
+    cors: { origin: process.env.CORS_ORIGIN || '*' }
 });
 
 // Structured Logging Middleware
@@ -196,13 +254,14 @@ app.post('/api/v1/auth/register', validate(registerSchema), async (req, res) => 
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const userId = await knex.transaction(async (trx) => {
-            const [id] = await trx('users').insert({
+            const inserted = await trx('users').insert({
                 name,
                 email: mappedEmail,
                 password: hashedPassword,
                 role,
                 phone: finalPhone
-            });
+            }).returning('id');
+            const id = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
 
             // Initialize role-specific tables
             if (role === 'patient') {
@@ -236,20 +295,21 @@ app.post('/api/v1/drivers/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const userId = await knex.transaction(async (trx) => {
-            const [id] = await trx('users').insert({
+            const inserted = await trx('users').insert({
                 name,
                 email,
                 password: hashedPassword,
                 role: 'driver',
                 phone
-            });
+            }).returning('id');
+            const id = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
 
             await trx('drivers').insert({
                 user_id: id,
                 status: 'available',
                 license_number,
                 vehicle_number,
-                dob,
+                dob: (dob === '' || dob === '--') ? null : dob,
                 alt_phone,
                 address,
                 city,
@@ -274,6 +334,91 @@ app.post('/api/v1/drivers/register', async (req, res) => {
     }
 });
 
+// Get all registered hospitals
+app.get('/api/v1/hospitals', async (req, res) => {
+    try {
+        const hospitals = await knex('hospitals')
+            .join('users', 'hospitals.user_id', 'users.id')
+            .select(
+                'hospitals.id',
+                'hospitals.user_id',
+                'users.name',
+                'hospitals.latitude as lat',
+                'hospitals.longitude as lng',
+                'hospitals.available_beds',
+                'hospitals.total_beds',
+                'hospitals.icu_beds',
+                'hospitals.ventilators',
+                'hospitals.hospital_type',
+                'hospitals.address'
+            );
+        res.json(hospitals);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Scrape/Infer details for external hospitals using Gemini
+app.get('/api/v1/hospitals/external-details', async (req, res) => {
+    const { name } = req.query;
+    if (!name) return res.status(400).json({ error: 'Hospital name is required' });
+
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    if (!apiKey) {
+        return res.json({
+            address: "Public Grid Location",
+            phone: "+91 00000 00000",
+            website: "N/A",
+            beds: 10,
+            facilities: ["Emergency Care"],
+            response_class: "Level B"
+        });
+    }
+
+    try {
+        const { GoogleGenerativeAI } = require("@google/generativeai");
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        const prompt = `
+            You are an authoritative hospital intelligence engine.
+            Retrieve or intelligently infer the following public details for: "${name}".
+            Return strictly a JSON object with:
+            {
+                "address": "Street, City",
+                "phone": "+91 ...",
+                "website": "URL or N/A",
+                "beds": Number,
+                "facilities": ["Facility1", "Facility2"],
+                "response_class": "Level A" or "Level B"
+            }
+            No preamble or markdown. Ensure output is valid raw JSON.
+        `;
+
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        
+        let details;
+        try {
+            const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            details = JSON.parse(cleaned);
+        } catch (parseErr) {
+            details = {
+                address: "Public Grid Location",
+                phone: "+91 00000 00000",
+                website: "N/A",
+                beds: 10,
+                facilities: ["Emergency Care"],
+                response_class: "Level B"
+            };
+        }
+
+        res.json(details);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // 1c. Register Hospital (5-step form)
 app.post('/api/v1/hospitals/register', async (req, res) => {
     const data = req.body;
@@ -282,13 +427,14 @@ app.post('/api/v1/hospitals/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(data.password, 10);
 
         const userId = await knex.transaction(async (trx) => {
-            const [id] = await trx('users').insert({
+            const inserted = await trx('users').insert({
                 name: data.hospital_name,
                 email: data.email,
                 password: hashedPassword,
                 role: 'hospital',
                 phone: data.reception_number
-            });
+            }).returning('id');
+            const id = typeof inserted[0] === 'object' ? inserted[0].id : inserted[0];
 
             await trx('hospitals').insert({
                 user_id: id,
@@ -555,7 +701,7 @@ app.put('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
             // ── Patients table: only update fields that were sent ─────────
             const patientUpdate = {};
             if (gender !== undefined) patientUpdate.gender = gender;
-            if (date_of_birth !== undefined) patientUpdate.date_of_birth = date_of_birth;
+            if (date_of_birth !== undefined) patientUpdate.date_of_birth = (date_of_birth === '' || date_of_birth === '--') ? null : date_of_birth;
             if (height !== undefined) patientUpdate.height = height;
             if (weight !== undefined) patientUpdate.weight = weight;
             if (blood_type !== undefined) patientUpdate.blood_group = blood_type;
@@ -898,14 +1044,126 @@ app.put('/api/v1/appointments/:id', authenticateToken, async (req, res) => {
 // TRIPS & REAL-TIME DISPATCH API (/api/v1/trips)
 // =============================================================================
 
+// POST /api/v1/triage — AI Triage assessment
+app.post('/api/v1/triage', authenticateToken, async (req, res) => {
+    const { heart_rate, blood_pressure, spo2, complaint } = req.body;
+    
+    let triageLevel = 'STANDARD';
+    let rationale = 'Rule-based evaluation applied.';
+    
+    // BP Parsing e.g. "140/90"
+    let systolic = 120;
+    if (blood_pressure && blood_pressure.toString().includes('/')) {
+        systolic = parseInt(blood_pressure.split('/')[0]);
+    }
+
+    if (spo2 && spo2 < 90 || (heart_rate > 130 || heart_rate < 45) || systolic > 180) {
+        triageLevel = 'CRITICAL';
+        rationale = 'Vitals indicate an immediate life-threatening emergency.';
+    } else if (spo2 && spo2 <= 94 || (heart_rate >= 110 || heart_rate <= 55) || systolic >= 140) {
+        triageLevel = 'URGENT';
+        rationale = 'Vitals suggest an urgent condition requiring fast intervention.';
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    if (apiKey) {
+        try {
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            
+            const prompt = `
+                You are an expert emergency medical triage AI.
+                Evaluate the following patient condition and vital signs:
+                - Complaint/Symptoms: ${complaint || 'Emergency assessment requested'}
+                - Heart Rate: ${heart_rate || 'Unknown'} bpm
+                - Blood Pressure: ${blood_pressure || 'Unknown'}
+                - SpO2: ${spo2 || 'Unknown'}%
+                
+                Respond with a JSON object ONLY containing:
+                1. "triage_level": strictly either "CRITICAL", "URGENT", or "STANDARD"
+                2. "rationale": a 1-sentence medical explanation
+                
+                Ensure the response is valid parsable JSON.
+            `;
+
+            const result = await model.generateContent(prompt);
+            const text = result.response.text();
+            
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (parsed.triage_level) triageLevel = parsed.triage_level.toUpperCase();
+                if (parsed.rationale) rationale = parsed.rationale;
+            }
+        } catch (err) {
+            console.error('Gemini API Triage Error:', err.message);
+        }
+    }
+
+    res.json({ triage_level: triageLevel, rationale });
+});
+
 const tripTimeouts = new Map();
 
 // Request a new trip (Patient)
+// Haversine distance helper function (km)
+function haversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
 app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async (req, res) => {
-    const { pickup_lat, pickup_lng, hospital_id } = req.body;
+    const { pickup_lat, pickup_lng, hospital_id, heart_rate, blood_pressure, spo2, complaint } = req.body;
 
     if (!pickup_lat || !pickup_lng || !hospital_id) {
         return res.status(400).json({ error: 'pickup_lat, pickup_lng, and hospital_id are required' });
+    }
+
+    // AI Triage Assessment factored into priority
+    let triageLevel = 'STANDARD';
+    let triageRationale = 'Standard deployment priority.';
+
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    if (apiKey && (heart_rate || blood_pressure || spo2 || complaint)) {
+        try {
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const prompt = `
+                You are an expert emergency medical triage AI.
+                Evaluate the patient condition:
+                - Complaint: ${complaint || 'N/A'}
+                - HR: ${heart_rate || 'N/A'}
+                - BP: ${blood_pressure || 'N/A'}
+                - SpO2: ${spo2 || 'N/A'}%
+                
+                Strict JSON ONLY response: {"triage_level": "CRITICAL" | "URGENT" | "STANDARD", "rationale": "one sentence"}.
+            `;
+            const result = await model.generateContent(prompt);
+            const text = result.response.text();
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (parsed.triage_level) triageLevel = parsed.triage_level.toUpperCase();
+                if (parsed.rationale) triageRationale = parsed.rationale;
+            }
+        } catch (err) {
+            console.error('In-flight Triage AI Error:', err.message);
+        }
+    } else {
+        // Simple rules fallback
+        let systolic = 120;
+        if (blood_pressure && blood_pressure.toString().includes('/')) {
+            systolic = parseInt(blood_pressure.split('/')[0]);
+        }
+        if (spo2 && spo2 < 90 || (heart_rate > 130 || heart_rate < 45) || systolic > 180) triageLevel = 'CRITICAL';
+        else if (spo2 && spo2 <= 94 || (heart_rate >= 110 || heart_rate <= 55) || systolic >= 140) triageLevel = 'URGENT';
     }
 
     try {
@@ -916,16 +1174,15 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
             return res.status(404).json({ error: 'No available drivers found nearby' });
         }
 
-        // Simple Euclidean distance for simulation (or Haversine if preferred)
+        // Use Haversine distance formula
         let nearestDriver = null;
         let minDistance = Infinity;
 
         availableDrivers.forEach(driver => {
             if (driver.current_lat && driver.current_lng) {
-                // Approximate distance calculation
-                const dist = Math.sqrt(
-                    Math.pow(driver.current_lat - pickup_lat, 2) +
-                    Math.pow(driver.current_lng - pickup_lng, 2)
+                const dist = haversineDistance(
+                    pickup_lat, pickup_lng,
+                    driver.current_lat, driver.current_lng
                 );
                 if (dist < minDistance) {
                     minDistance = dist;
@@ -965,7 +1222,10 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
                 hospital_id,
                 hospital_name: hospitalUser ? hospitalUser.name : 'Unknown Hospital',
                 patient_id: req.user.id,
-                patient_name: patientUser ? patientUser.name : 'Emergency Patient'
+                patient_name: patientUser ? patientUser.name : 'Emergency Patient',
+                triage_level: triageLevel,
+                triage_rationale: triageRationale,
+                complaint: complaint || 'Emergency Response'
             });
         }
 
@@ -1063,12 +1323,35 @@ app.get('/api/v1/drivers/trips', authenticateToken, authorize('driver'), async (
             .select(
                 't.*',
                 'up.name as patient_name',
-                'uh.name as hospital_name'
+                'uh.name as hospital_name',
+                'h.latitude as hospital_lat',
+                'h.longitude as hospital_lng'
             )
             .orderBy('t.created_at', 'desc')
             .limit(20);
 
         res.json(trips);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Emergency SOS Endpoint
+app.post('/api/v1/sos', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const userRole = req.user.role;
+        console.log(`🚨 SOS ALERT BROADCAST: User #${userId} (${userRole}) is in extreme danger!`);
+
+        const io = req.app.get('io');
+        if (io) {
+            io.emit('sos:broadcast', {
+                userId,
+                role: userRole,
+                timestamp: new Date()
+            });
+        }
+        res.json({ success: true, message: 'High-priority SOS alert broadcasted successfully.' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -1090,6 +1373,45 @@ app.post('/api/v1/trips/:id/accept', authenticateToken, authorize('driver'), asy
             tripTimeouts.delete(trip.id);
         }
 
+        const patientUser = await knex('users').where({ id: trip.patient_id }).first();
+        const patientProfile = await knex('patients').where({ user_id: trip.patient_id }).first();
+
+        let urgencyLevel = 'STANDARD';
+        let eta = req.body.eta || '12 mins';
+
+        const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+        if (apiKey && patientProfile) {
+            try {
+                const genAI = new GoogleGenerativeAI(apiKey);
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                const prompt = `
+                    You are an expert emergency medical triage AI.
+                    Evaluate the patient profile:
+                    - Blood Pressure: ${patientProfile.blood_pressure || 'Unknown'}
+                    - Medical History: ${patientProfile.medical_history || 'N/A'}
+                    
+                    Strict JSON ONLY response: {"urgency_level": "CRITICAL" | "URGENT" | "STANDARD"}.
+                `;
+                const result = await model.generateContent(prompt);
+                const text = result.response.text();
+                const jsonMatch = text.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    if (parsed.urgency_level) urgencyLevel = parsed.urgency_level.toUpperCase();
+                }
+            } catch (err) {
+                console.error('Gemini Trip Accept Triage Error:', err.message);
+            }
+        } else if (patientProfile && patientProfile.blood_pressure) {
+            let systolic = 120;
+            const bpStr = patientProfile.blood_pressure.toString();
+            if (bpStr.includes('/')) {
+                systolic = parseInt(bpStr.split('/')[0]);
+            }
+            if (systolic > 160) urgencyLevel = 'CRITICAL';
+            else if (systolic >= 140) urgencyLevel = 'URGENT';
+        }
+
         const io = req.app.get('io');
         if (io) {
             io.to(`patient_${trip.patient_id}`).emit('trip:accepted', {
@@ -1097,10 +1419,17 @@ app.post('/api/v1/trips/:id/accept', authenticateToken, authorize('driver'), asy
                 driver_id: req.user.id
             });
 
-            // Notify the targeted hospital about the incoming ambulance
+            // Trigger FCM push notification to patient
+            sendPushNotification(trip.patient_id, 'Ambulance Dispatched', 'An ambulance has accepted your request and is on the way!');
+
+            // Notify the targeted hospital about the incoming ambulance with rich payload
             io.to(`hospital_${trip.hospital_id}`).emit('hospital:incoming_alert', {
                 trip_id: trip.id,
                 patient_id: trip.patient_id,
+                patient_name: patientUser ? patientUser.name : 'Emergency Patient',
+                blood_group: patientProfile ? patientProfile.blood_group : 'Unknown',
+                urgency_level: urgencyLevel,
+                eta: eta,
                 driver_id: req.user.id,
                 status: 'accepted',
                 message: 'An ambulance has accepted a request and is heading to your facility.'
@@ -1163,6 +1492,30 @@ app.put('/api/v1/trips/:id/status', authenticateToken, authorize('driver'), asyn
         const updateData = { status };
         if (status === 'completed') {
             updateData.end_time = knex.fn.now();
+            
+            // Auto-query patient's active insurance policies and generate draft claim
+            try {
+                const policy = await knex('insurance_policies').where({ patient_id: trip.patient_id, status: 'active' }).first();
+                if (policy) {
+                    const hospitalRecord = await knex('hospitals').where({ user_id: trip.hospital_id }).first();
+                    const hospId = hospitalRecord ? hospitalRecord.id : null;
+                    
+                    const claimData = {
+                        patient_id: trip.patient_id,
+                        policy_id: policy.id,
+                        amount: trip.total_fare || 500,
+                        claim_type: 'Inpatient',
+                        status: 'pending',
+                        reference_number: 'CLM-' + Date.now(),
+                        hospital_id: hospId
+                    };
+                    
+                    await knex('insurance_claims').insert(claimData);
+                    logger.info(`[Auto-Claim] Created auto insurance claim for trip ${trip.id}, patient ${trip.patient_id}`);
+                }
+            } catch (claimErr) {
+                logger.error(`[Auto-Claim Error] ${claimErr.message}`);
+            }
         }
 
         await knex('trips').where({ id: req.params.id }).update(updateData);
@@ -1179,6 +1532,13 @@ app.put('/api/v1/trips/:id/status', authenticateToken, authorize('driver'), asyn
                 trip_id: trip.id,
                 status
             });
+
+            // Trigger FCM push notification to patient on milestones
+            if (status === 'arrived') {
+                sendPushNotification(trip.patient_id, 'Driver Arrived', 'Your ambulance has arrived at your location.');
+            } else if (status === 'completed') {
+                sendPushNotification(trip.patient_id, 'Trip Completed', 'You have arrived safely at the hospital. Get well soon!');
+            }
             // Notify hospital
             io.to(`hospital_${trip.hospital_id}`).emit('hospital:trip_update', {
                 trip_id: trip.id,
@@ -1213,6 +1573,47 @@ app.post('/api/v1/insurance/policies', authenticateToken, async (req, res) => {
         const policyId = typeof id === 'object' ? id.id : id;
         res.status(201).json({ id: policyId, message: 'Policy added successfully' });
     } catch (err) { res.status(500).json({ error: 'Database error creating policy' }); }
+});
+
+app.post('/api/v1/insurance/claims/auto', authenticateToken, async (req, res) => {
+    const { trip_id } = req.body;
+    try {
+        const trip = await knex('trips').where({ id: trip_id }).first();
+        if (!trip) return res.status(404).json({ error: 'Trip not found' });
+        
+        const policy = await knex('insurance_policies').where({ patient_id: trip.patient_id, status: 'active' }).first();
+        if (!policy) return res.status(400).json({ error: 'No active insurance policy found' });
+        
+        const hospitalRecord = await knex('hospitals').where({ user_id: trip.hospital_id }).first();
+        const hospId = hospitalRecord ? hospitalRecord.id : null;
+        
+        const claimData = {
+            patient_id: trip.patient_id,
+            policy_id: policy.id,
+            amount: trip.total_fare || 500,
+            claim_type: 'Inpatient',
+            status: 'pending',
+            reference_number: 'CLM-' + Date.now(),
+            hospital_id: hospId
+        };
+        
+        const [claimId] = await knex('insurance_claims').insert(claimData).returning('id');
+        const cId = typeof claimId === 'object' ? claimId.id : claimId;
+        res.json({ message: 'Claim auto-generated successfully', claim_id: cId });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/v1/users/fcm-token', authenticateToken, async (req, res) => {
+    const { fcm_token } = req.body;
+    try {
+        if (!fcm_token) return res.status(400).json({ error: 'FCM Token required' });
+        fcmTokens[req.user.id] = fcm_token;
+        res.json({ message: 'FCM Token registered successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get('/api/v1/insurance/claims', authenticateToken, async (req, res) => {

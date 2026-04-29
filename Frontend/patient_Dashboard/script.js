@@ -127,6 +127,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             setVal('displayProfileBlood', data.blood_type);
             setVal('displayProfileLocation', data.home_location);
+
+            // Auto-populate pickup location from patient's home address using Nominatim
+            if (data.home_location) {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(data.home_location)}`)
+                    .then(res => res.json())
+                    .then(geoData => {
+                        if (geoData && geoData.length > 0) {
+                            const lat = geoData[0].lat;
+                            const lng = geoData[0].lon;
+                            localStorage.setItem('userLat', lat);
+                            localStorage.setItem('userLng', lng);
+                            console.log(`[Geocoding] Auto-populated GPS coordinates for home address: ${lat}, ${lng}`);
+                        }
+                    })
+                    .catch(err => console.error('[Geocoding Error]', err));
+            }
             setVal('displayProfileBP', data.blood_pressure);
             setVal('displayProfileAllergies', data.allergies);
             setVal('displayProfileChronic', data.chronic_conditions);
@@ -621,20 +637,69 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!forced && storedHospitals) {
             hospitals = JSON.parse(storedHospitals);
         } else {
-            if (window.MapAPI) {
-                hospitals = await window.MapAPI.getHospitals();
-            } else {
+            try {
+                const response = await fetch(API_BASE + '/hospitals');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        hospitals = data.map(h => ({
+                            id: h.user_id,
+                            name: h.name,
+                            lat: parseFloat(h.lat) || 22.5,
+                            lng: parseFloat(h.lng) || 88.4,
+                            status: h.available_beds > 0 ? "Available" : "Busy",
+                            beds: h.available_beds || 0,
+                            facilities: [h.hospital_type || "Emergency Care"]
+                        }));
+                    }
+                }
+            } catch (fetchErr) {
+                console.error('[Hospital Fetch Error] Falling back to dummy array.', fetchErr);
+            }
+
+            if (!hospitals || hospitals.length === 0) {
                 // Inline fallback
                 hospitals = [
-                    { name: "AMRI Hospital, Dhakuria", lat: 22.5135, lng: 88.3629, status: "Available", beds: 12, facilities: ["ICU", "Emergency", "Cardiology"] },
-                    { name: "Apollo Gleneagles Hospitals", lat: 22.5710, lng: 88.4055, status: "Limited", beds: 3, facilities: ["Neurology", "Trauma Care", "Oxygen Support"] },
-                    { name: "Fortis Hospital, Anandapur", lat: 22.5165, lng: 88.4042, status: "Available", beds: 21, facilities: ["General Surgery", "Pediatrics", "Diagnostic Lab"] },
-                    { name: "Medica Superspecialty Hospital", lat: 22.4939, lng: 88.3980, status: "Busy", beds: 0, facilities: ["Organ Transplant", "Advanced Imaging", "Reentry Care"] },
-                    { name: "NRS Medical College and Hospital", lat: 22.5645, lng: 88.3685, status: "Available", beds: 45, facilities: ["Government Funded", "Free Pharmacy", "Maternity"] },
-                    { name: "Peerless Hospital", lat: 22.4770, lng: 88.3900, status: "Available", beds: 18, facilities: ["Orthopedic", "Oncology", "Dialysis"] },
-                    { name: "SSKM Hospital", lat: 22.5392, lng: 88.3444, status: "Busy", beds: 1, facilities: ["Cardiac Surgery", "Burn Ward", "Medical Research"] }
+                    { id: 1, name: "AMRI Hospital, Dhakuria", lat: 22.5135, lng: 88.3629, status: "Available", beds: 12, facilities: ["ICU", "Emergency", "Cardiology"] },
+                    { id: 2, name: "Apollo Gleneagles Hospitals", lat: 22.5710, lng: 88.4055, status: "Limited", beds: 3, facilities: ["Neurology", "Trauma Care", "Oxygen Support"] },
+                    { id: 3, name: "Fortis Hospital, Anandapur", lat: 22.5165, lng: 88.4042, status: "Available", beds: 21, facilities: ["General Surgery", "Pediatrics", "Diagnostic Lab"] },
+                    { id: 4, name: "Medica Superspecialty Hospital", lat: 22.4939, lng: 88.3980, status: "Busy", beds: 0, facilities: ["Organ Transplant", "Advanced Imaging", "Reentry Care"] },
+                    { id: 5, name: "NRS Medical College and Hospital", lat: 22.5645, lng: 88.3685, status: "Available", beds: 45, facilities: ["Government Funded", "Free Pharmacy", "Maternity"] },
+                    { id: 6, name: "Peerless Hospital", lat: 22.4770, lng: 88.3900, status: "Available", beds: 18, facilities: ["Orthopedic", "Oncology", "Dialysis"] },
+                    { id: 7, name: "SSKM Hospital", lat: 22.5392, lng: 88.3444, status: "Busy", beds: 1, facilities: ["Cardiac Surgery", "Burn Ward", "Medical Research"] }
                 ];
             }
+
+            // --- OSM Overpass API: Fetch Unregistered Nearby Hospitals ---
+            const userLat = localStorage.getItem('userLat') || 22.5726;
+            const userLng = localStorage.getItem('userLng') || 88.3639;
+            try {
+                const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];node(around:30000,${userLat},${userLng})[amenity=hospital];out;`;
+                const osmRes = await fetch(overpassUrl);
+                if (osmRes.ok) {
+                    const osmData = await osmRes.json();
+                    if (osmData && osmData.elements) {
+                        osmData.elements.forEach(el => {
+                            const osmId = 'osm-' + el.id;
+                            if (el.tags.name && !hospitals.some(h => h.name.toLowerCase().includes(el.tags.name.toLowerCase()) || el.tags.name.toLowerCase().includes(h.name.toLowerCase()))) {
+                                hospitals.push({
+                                    id: osmId,
+                                    name: el.tags.name || "General Hospital",
+                                    lat: parseFloat(el.lat),
+                                    lng: parseFloat(el.lon),
+                                    status: "External",
+                                    beds: "N/A",
+                                    facilities: ["Emergency Services"],
+                                    unregistered: true
+                                });
+                            }
+                        });
+                    }
+                }
+            } catch (osmErr) {
+                console.error('[Overpass API Error]', osmErr);
+            }
+
             localStorage.setItem('hospitalData', JSON.stringify(hospitals));
         }
 
@@ -806,36 +871,71 @@ document.addEventListener('DOMContentLoaded', () => {
             backBtn.style.display = 'block';
             title.textContent = "Hospital Status - " + h.name.split(',')[0];
             badges.style.display = 'none';
+            const isExt = typeof h.id === 'string' && h.id.startsWith('osm-');
 
-            statusPanel.innerHTML = `
-                <div class="status-content">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 1.5rem; color: var(--text-main); font-family: 'Outfit', sans-serif;">${h.name}</h2>
-                        <span class="h-status" style="background: ${h.status === 'Available' ? '#f0fdf4' : (h.status === 'Busy' ? '#fef2f2' : '#fefce8')}; color: ${h.status === 'Available' ? '#15803d' : (h.status === 'Busy' ? '#dc2626' : '#eab308')};">${h.status}</span>
-                    </div>
+            if (isExt) {
+                // Fetch live details from online
+                statusPanel.innerHTML = `<div style="text-align: center; padding: 40px;"><p style="color: var(--text-muted);">Querying live infrastructure details via Gemini AI...</p></div>`;
+                fetch(API_BASE + `/hospitals/external-details?name=${encodeURIComponent(h.name)}`)
+                    .then(res => res.json())
+                    .then(extData => {
+                        h.beds = extData.beds || "N/A";
+                        h.address = extData.address || h.address;
+                        h.phone = extData.phone || h.phone;
+                        h.website = extData.website || h.website;
+                        h.facilities = extData.facilities || h.facilities;
+                        h.response_class = extData.response_class || "External";
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                        <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border);">
-                            <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Available Beds</label>
-                            <div style="font-size: 2rem; font-weight: 800; color: var(--primary-green); margin-top: 5px;">${h.beds}</div>
+                        renderStatusPanel(h, true);
+                    })
+                    .catch(err => {
+                        console.error('[External Detail Error]', err);
+                        renderStatusPanel(h, true);
+                    });
+            } else {
+                renderStatusPanel(h, false);
+            }
+
+            function renderStatusPanel(hospitalObj, isExternal) {
+                statusPanel.innerHTML = `
+                    <div class="status-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                            <h2 style="font-size: 1.5rem; color: var(--text-main); font-family: 'Outfit', sans-serif;">${hospitalObj.name}</h2>
+                            <span class="h-status" style="background: ${hospitalObj.status === 'Available' ? '#f0fdf4' : (hospitalObj.status === 'Busy' ? '#fef2f2' : '#fefce8')}; color: ${hospitalObj.status === 'Available' ? '#15803d' : (hospitalObj.status === 'Busy' ? '#dc2626' : '#eab308')};">${hospitalObj.status}</span>
                         </div>
-                        <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border);">
-                            <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Response Class</label>
-                            <div style="font-size: 1.5rem; font-weight: 800; color: var(--acc-yellow); margin-top: 5px;">Level ${h.beds > 10 ? 'A' : 'B'}</div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                            <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border);">
+                                <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Available Beds</label>
+                                <div style="font-size: 2rem; font-weight: 800; color: var(--primary-green); margin-top: 5px;">${hospitalObj.beds}</div>
+                            </div>
+                            <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border);">
+                                <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Response Class</label>
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--acc-yellow); margin-top: 5px;">${isExternal ? (hospitalObj.response_class || 'External') : (hospitalObj.beds > 10 ? 'Level A' : 'Level B')}</div>
+                            </div>
                         </div>
-                    </div>
 
-                    <h4 style="margin-bottom: 12px; font-weight: 700;">Key Facilities</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px;">
-                        ${h.facilities.map(f => `<span style="padding: 6px 14px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-weight: 500;">${f}</span>`).join('')}
-                    </div>
+                        ${isExternal ? `
+                        <h4 style="margin-bottom: 12px; font-weight: 700;">Facility Metadata (AI Scraped)</h4>
+                        <div style="padding: 20px; background: var(--bg-main); border-radius: 12px; border: 1.5px solid var(--border); margin-bottom: 30px;">
+                            <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-main);"><strong>Address:</strong> ${hospitalObj.address || "Public Grid Address"}</p>
+                            <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-main);"><strong>Contact:</strong> ${hospitalObj.phone || "Not Listed"}</p>
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--text-main);"><strong>Website:</strong> ${hospitalObj.website && hospitalObj.website !== "N/A" ? `<a href="${hospitalObj.website.startsWith('http') ? hospitalObj.website : 'https://' + hospitalObj.website}" target="_blank" style="color: var(--primary-green);">${hospitalObj.website}</a>` : "Not Listed"}</p>
+                        </div>
+                        ` : ''}
 
-                    <button onclick="window.bookAmbulance(${h.id}, '${h.name.replace(/'/g, "\\'")}')" style="width: 100%; padding: 16px; background: var(--primary-green); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem;">
-                        🚑 Book RapidCare for this Hospital
-                    </button>
-                    <p style="margin-top: 15px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Note: Bed counts are updated every 15 minutes by hospital staff.</p>
-                </div>
-            `;
+                        <h4 style="margin-bottom: 12px; font-weight: 700;">Key Facilities</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px;">
+                            ${hospitalObj.facilities.map(f => `<span style="padding: 6px 14px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-weight: 500;">${f}</span>`).join('')}
+                        </div>
+
+                        <button onclick="window.bookAmbulance('${hospitalObj.id}', '${hospitalObj.name.replace(/'/g, "\\'")}')" style="width: 100%; padding: 16px; background: var(--primary-green); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem;">
+                            🚑 Book RapidCare for this Hospital
+                        </button>
+                        <p style="margin-top: 15px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">${isExternal ? 'Transit dispatch provided natively through local public network routing profiles.' : 'Note: Bed counts are updated every 15 minutes by hospital staff.'}</p>
+                    </div>
+                `;
+            }
         }
     };
 
@@ -917,13 +1017,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Store selected hospital name for receipt
                 localStorage.setItem('rapidcare_selected_hospital', h.name);
 
-                // Automatically highlight the nearest hospital on the map
-                if (hospitalsWithDistance.length > 0 && hospitalMarkers.length > 0) {
-                    const nearest = hospitalsWithDistance[0];
-                    // Find the marker that matches the nearest hospital by name or coords
+                // Highlight the selected hospital on the map
+                if (hospitalMarkers.length > 0) {
                     const marker = hospitalMarkers.find(m => {
                         const ll = m.getLatLng();
-                        return Math.abs(ll.lat - nearest.lat) < 0.0001 && Math.abs(ll.lng - nearest.lng) < 0.0001;
+                        return Math.abs(ll.lat - h.lat) < 0.0001 && Math.abs(ll.lng - h.lng) < 0.0001;
                     });
                     if (marker) {
                         marker.openPopup();
@@ -1561,6 +1659,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             body: JSON.stringify(payload)
                         });
                         if (!response.ok) throw new Error('Failed to update profile');
+                        
+                        // Re-geocode coordinates for the new address
+                        if (payload.home_location) {
+                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(payload.home_location)}`)
+                                .then(res => res.json())
+                                .then(geoData => {
+                                    if (geoData && geoData.length > 0) {
+                                        const lat = geoData[0].lat;
+                                        const lng = geoData[0].lon;
+                                        localStorage.setItem('userLat', lat);
+                                        localStorage.setItem('userLng', lng);
+                                        console.log(`[Geocoding] Coordinates updated for home address: ${lat}, ${lng}`);
+                                    }
+                                })
+                                .catch(err => console.error('[Geocoding Error]', err));
+                        }
                     }
                 } catch (error) {
                     console.error('Update error:', error);
@@ -1960,7 +2074,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 confirmPayBtn.innerHTML = 'Processing...';
 
                 // 1. Create Order via Backend
-                const orderRes = await fetch('http://localhost:5000/api/v1/payments/create-order', {
+                const orderRes = await fetch(API_BASE + '/payments/create-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ amount, currency: 'INR' })
@@ -1971,7 +2085,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Open Razorpay Checkout
                 const options = {
-                    key: 'rzp_test_placeholder', // Should match backend or be injected dynamically
+                    key: orderData.key_id || 'rzp_test_placeholder', // Injected from backend
                     amount: orderData.order.amount,
                     currency: orderData.order.currency,
                     name: 'RapidCare',
@@ -1980,7 +2094,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     handler: async function (response) {
                         try {
                             // 3. Verify Payment
-                            const verifyRes = await fetch('http://localhost:5000/api/v1/payments/verify-payment', {
+                            const verifyRes = await fetch(API_BASE + '/payments/verify-payment', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
@@ -3302,6 +3416,14 @@ window.addEventListener('resize', () => {
                 showPaymentSplash(total, txnId);
             }
         });
+    }
+
+    // Support landing on specific views via query parameter (e.g., ?view=payment)
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialView = urlParams.get('view');
+    if (initialView && views[initialView]) {
+        const targetNav = document.querySelector(`.nav-item[data-view="${initialView}"]`);
+        if (targetNav) targetNav.click();
     }
 
     // Initialize

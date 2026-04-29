@@ -113,30 +113,48 @@ Then open `choose_User/index.html` in your browser.
 
 ---
 
-## 🛠️ Driver Interface Backend Integration (TODO)
+## 🔍 Architecture Analysis & Refactoring Opportunities
 
-This section tracks the progress of connecting the newly designed Driver Dashboard to the RapidCare backend infrastructure.
+While the current architecture is fully functional, certain subsystems can be optimized for scalability, security, and maintainability.
 
-### Phase 1: Authentication & Identity
-- [x] **Session Persistence**: Implement JWT validation on dashboard entry.
-- [x] **Profile API**: Implement `GET /api/v1/drivers/me` to populate the sidebar and profile cards.
-- [ ] **Document Verification**: Fetch status of DL, RC, and Aadhaar for the profile checkmarks.
+### Logic & Architecture Improvements
 
-### Phase 2: Real-Time Coordination
-- [x] **Availability Sync**: Link the "LIVE" toggle to the `drivers` table `status` field.
-- [x] **Live Tracking**: Implement `driver:location_update` emits via Socket.IO for active ambulance tracking.
-- [x] **Incoming Alert**: Socket.IO listener to trigger the "Active Call" overlay for new emergency requests.
+1. **Payment Processing (Webhooks)**
+   - **Current:** Razorpay payment success is verified purely via client-side requests (`/api/v1/payments/verify-payment`).
+   - **Better:** Implement **Razorpay Webhooks** to asynchronously update payment statuses on the server. This prevents payment loss if the user's browser closes before the client-side verification completes.
 
-### Phase 3: Trip Management
-- [ ] **Status Workflow**: Map "Arrived", "Picked Up", and "Hospital Transfer" buttons to `PUT /api/v1/trips/:id/status`.
-- [ ] **Dynamic Navigation**: Load coordinates for pickup and hospital drop-off onto the Leaflet map.
-- [ ] **Emergency SOS**: Connect the SOS button to a high-priority backend alert system.
+2. **WebSocket State Management**
+   - **Current:** Socket.IO tracks driver locations and connections using an in-memory object (`fcmTokens` / `connectedDrivers`).
+   - **Better:** Integrate a **Redis Adapter** for Socket.IO. This allows the backend to be horizontally scaled across multiple instances without losing track of driver connections.
 
-### Phase 4: Analytics & Insights
-- [ ] **Performance Stats**: Dynamically calculate "Completed Trips" and "Efficiency" for the stat cards.
-- [x] **Trip History**: Fetch and render the "Recent Trips" list from the database.
-- [ ] **Invoice Generation**: (Bonus) Implement the "Invoices" tab to show billing data for completed trips.
+3. **Database Role Architecture**
+   - **Current:** All users (Patients, Drivers, Hospitals) share a single `users` table, which requires complex JOINs.
+   - **Better:** Adopt **Polymorphic Associations** or separate authentication identity from profile data more strictly, allowing isolated tables to grow independently without nullable column bloat.
 
----
+4. **Task Queues & Background Jobs**
+   - **Current:** Sending emails (OTP) and calling the Gemini AI API happens synchronously in the main HTTP request thread.
+   - **Better:** Offload slow, IO-bound operations to a message queue like **BullMQ or RabbitMQ**. This guarantees fast API response times and allows automatic retries if an external API fails.
 
-**Last Updated**: 2026-04-27 (v3.1.0 — UI/UX Hardening & Integration Roadmap)
+5. **Geolocation Polling & Throttling**
+   - **Current:** Drivers broadcast location vectors constantly to the backend, which proxies them directly to patients.
+   - **Better:** Implement **Throttling/Debouncing** on location emits (e.g., max 1 update per 3 seconds), and use PostGIS/Spatial Queries in the database to calculate nearest drivers natively rather than doing array iterations in Node.js.
+
+### 🌐 APIs Integrated
+
+#### Internal Endpoints (RapidCare Core)
+- **Auth:** `/auth/register`, `/auth/login`, `/auth/request-otp`, `/auth/verify-otp`, `/auth/reset-password`
+- **Users:** `/patients/me`, `/patients/:id`, `/drivers/me`, `/hospital/me`
+- **Dispatch:** `/trips/request`, `/trips/:id/accept`, `/trips/:id/status`, `/trips/active`
+- **Payments:** `/payments/create-order`, `/payments/verify-payment`
+- **Admin:** `/admin/data`, `/admin/export`
+
+#### External Third-Party APIs
+- **Google Gemini API (`gemini-1.5-flash`)**: AI-driven emergency triage classification and scraping metadata for external/unregistered hospitals.
+- **Razorpay API**: Secure creation and verification of payment orders for ambulance rides.
+- **Firebase Admin SDK (FCM)**: Delivery of real-time push notifications for dispatch updates.
+- **OpenStreetMap (OSM) / Leaflet.js**: Rendering live interactive maps for tracking drivers and hospitals.
+- **OSM Overpass API**: Live geographical queries to detect unregistered public healthcare facilities dynamically.
+- **OSRM (Open Source Routing Machine)**: Calculating accurate driving ETA and distances for pricing matrices.
+- **Nodemailer (SMTP)**: Dispatching secure One-Time Passwords (OTPs) for 2FA.
+
+**Last Updated**: 2026-04-28 (v3.3.0)

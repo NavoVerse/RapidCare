@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
             alert(alertMsg);
-            window.location.href = '/payments';
+            window.location.href = '../patient_Dashboard/index.html?view=payment';
         }, 300);
     });
 
