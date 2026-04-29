@@ -778,7 +778,7 @@
                 <!-- Header -->
                 <div class="header-section-insurance">
                     <div class="patient-info-insurance">
-                        <h1>Samim Uddin Molla</h1>
+                        <h1 id="insurancePatientName">Samim Uddin Molla</h1>
                         <span class="hospital-id-insurance">ID: RC-89214-KOL</span>
                         <span class="badge-insurance active">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -1276,7 +1276,7 @@
                 <div class="claim-history">
                     <div class="history-header-insurance">
                         <h3>Claim History</h3>
-                        <a href="#" class="view-all-insurance">View all →</a>
+                        <a href="#" class="view-all-insurance" onclick="openClaimHistoryModal(event)">View all →</a>
                     </div>
                     <div class="table-responsive">
                         <table>
@@ -2179,6 +2179,96 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Claim History Modal -->
+        <div id="claim-history-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h3>Full Claim History</h3>
+                    <span class="close-modal" id="closeClaimModal" onclick="closeClaimHistoryModal()" style="font-size: 24px; cursor: pointer; color: var(--secondary-text);">&times;</span>
+                </div>
+                <div class="modal-body" style="padding-top: 15px;">
+                    <div class="table-responsive">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left; font-size: 12px; color: var(--secondary-text); padding: 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap;">Date</th>
+                                    <th style="text-align: left; font-size: 12px; color: var(--secondary-text); padding: 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap;">Scheme</th>
+                                    <th style="text-align: left; font-size: 12px; color: var(--secondary-text); padding: 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap;">Type</th>
+                                    <th style="text-align: left; font-size: 12px; color: var(--secondary-text); padding: 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap;">Amount</th>
+                                    <th style="text-align: left; font-size: 12px; color: var(--secondary-text); padding: 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap;">Status</th>
+                                    <th style="text-align: left; font-size: 12px; color: var(--secondary-text); padding: 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap;">Ref Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">12 Mar 2026</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">Swasthya Sathi</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">OPD Consult</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap; font-weight: 700;">₹1,500</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;"><span class="badge-insurance active">Approved</span></td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">CLM-9821A</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">08 Feb 2026</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">National Insurance</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">Pharmacy</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap; font-weight: 700;">₹4,200</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;"><span class="badge-insurance active">Approved</span></td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">CLM-5490X</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">15 Jan 2026</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">National Insurance</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">Diagnostics</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap; font-weight: 700;">₹1,200</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;"><span class="badge-insurance pending">Pending</span></td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">CLM-2009F</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">03 Nov 2025</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">Ayushman Bharat</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">Inpatient (Minor)</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap; font-weight: 700;">₹12,000</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;"><span class="badge-insurance rejected">Rejected</span></td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">CLM-4112E</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">18 Oct 2025</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">HDFC Ergo</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">OPD Consult</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap; font-weight: 700;">₹2,500</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;"><span class="badge-insurance active">Approved</span></td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">CLM-8871B</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">22 Sep 2025</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">Swasthya Sathi</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">Diagnostics</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap; font-weight: 700;">₹3,100</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;"><span class="badge-insurance active">Approved</span></td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">CLM-1123K</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">05 Aug 2025</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">Niva Bupa</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">Dental Care</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap; font-weight: 700;">₹5,000</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;"><span class="badge-insurance active">Approved</span></td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">CLM-9098H</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">12 Jul 2025</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">National Insurance</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">Pharmacy</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap; font-weight: 700;">₹850</td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;"><span class="badge-insurance active">Approved</span></td>
+                                    <td style="padding: 16px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--primary-text); white-space: nowrap;">CLM-5542D</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
         <!-- Discount Modal (Payment) -->
         <div class="modal-overlay" id="discountModal" style="display: none;">

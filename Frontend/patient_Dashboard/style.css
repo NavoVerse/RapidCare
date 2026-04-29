@@ -2915,22 +2915,98 @@ header {
     text-decoration: none;
 }
 
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 15px;
+    border-radius: 12px;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 10px;
+}
+
+.claim-history table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.claim-history th {
+    text-align: left;
+    font-size: 12px;
+    color: var(--secondary-text);
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.claim-history td {
+    padding: 16px 12px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 13px;
+    color: var(--primary-text);
+    white-space: nowrap;
+}
+
+.claim-history .amt {
+    font-weight: 700;
+    color: var(--primary-text);
+}
+
 @media (max-width: 768px) {
     .header-section-insurance {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
         gap: 16px;
+        text-align: center;
+    }
+
+    .patient-info-insurance {
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
     }
 
     .hospital-id-insurance {
         border-left: none;
         padding-left: 0;
         display: block;
-        margin-top: 8px;
+        margin-top: 4px;
     }
 
     #insurance-view {
         padding: 16px;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .scheme-details {
+        grid-template-columns: 1fr !important;
+    }
+
+    .scheme-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .scheme-actions .btn {
+        width: 100%;
+    }
+
+    .table-responsive table {
+        min-width: 600px;
     }
 }
 
