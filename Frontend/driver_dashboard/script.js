@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (locationInterval) return;
         console.log('Starting location tracking...');
         sendLocation(); // Initial update
-        locationInterval = setInterval(sendLocation, 10000); // Every 10s
+        locationInterval = setInterval(sendLocation, 3000); // Every 3s (smoother real-time tracking)
     }
 
     function stopTracking() {
