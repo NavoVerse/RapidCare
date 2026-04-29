@@ -1,6 +1,99 @@
 var API_BASE = (window.RapidCareConfig && RapidCareConfig.API_BASE) || 'http://localhost:5000/api/v1';
 window.API_BASE = API_BASE; // Make accessible to global functions
 
+window.pricingConfig = {
+    normal: { original: 100, discounted: 70 },
+    oxygen: { original: 150, discounted: 130 },
+    icu: { original: 200, discounted: 180 },
+    ventilator: { original: 300, discounted: 280 }
+};
+
+window.recalculatePricing = function() {
+    const typeEl = document.querySelector('input[name="ambulance-type"]:checked');
+    const distEl = document.getElementById('distance-input');
+    const coupEl = document.getElementById('coupon-code');
+    const totalEl = document.getElementById('total-amount');
+    const couponMsg = document.getElementById('coupon-msg');
+
+    const payBtnElement = document.querySelector('.pay-btn') || document.querySelector('#pay-securely-btn');
+    if (!typeEl || !distEl || !totalEl) return;
+
+    const selectedType = typeEl.value;
+    const distance = parseFloat(distEl.value) || 5;
+    const couponCode = coupEl ? coupEl.value.toUpperCase() : '';
+    
+    if (distance <= 0) {
+        if (payBtnElement) {
+            payBtnElement.disabled = true;
+            payBtnElement.style.opacity = '0.5';
+            payBtnElement.style.cursor = 'not-allowed';
+        }
+        return;
+    } else {
+        if (payBtnElement) {
+            payBtnElement.disabled = false;
+            payBtnElement.style.opacity = '1';
+            payBtnElement.style.cursor = 'pointer';
+        }
+    }
+
+    const rates = window.pricingConfig[selectedType] || window.pricingConfig.normal;
+    const distanceCharge = distance * rates.discounted;
+    const platformCharge = 40;
+    const hospitalReservation = 500;
+    let discount = 0;
+    
+    const validCoupons = {
+        'RAPID20': 20,
+        'RIDEMASTER': 40,
+        'FIRSTCARE': 100,
+        'FIRSTRAPIDCARE50': 50
+    };
+    
+    if (validCoupons[couponCode]) {
+        discount = validCoupons[couponCode];
+        if (couponMsg && !couponMsg.classList.contains('success')) {
+            couponMsg.textContent = `Coupon applied! ₹${discount} off your ride.`;
+            couponMsg.className = 'coupon-status success';
+        }
+    }
+    
+    let finalTotal = Math.max(0, distanceCharge + platformCharge + hospitalReservation - discount);
+
+    try {
+        // Update Summary
+        const distanceRow = document.getElementById('distance-charge-row');
+        if (distanceRow) {
+            const originalEl = distanceRow.querySelector('.original');
+            const discountedEl = distanceRow.querySelector('.discounted');
+            if (originalEl) originalEl.textContent = `₹${(distance * rates.original).toLocaleString()}`;
+            if (discountedEl) discountedEl.textContent = `₹${distanceCharge.toLocaleString()}`;
+        }
+
+        const savingsRow = document.getElementById('savings-row');
+        if (savingsRow) {
+            const originalTotal = distance * rates.original;
+            const totalSavings = originalTotal - distanceCharge + discount;
+            const saveAmountEl = savingsRow.querySelector('.save-amount');
+            if (saveAmountEl) saveAmountEl.textContent = `Saved ₹${totalSavings.toLocaleString()}`;
+        }
+
+        // Local Streak Reward Logic - Scoped to Payment View to prevent crashes
+        const activePaymentTab = document.querySelector('#payment-view .tab-btn.active');
+        const tabId = activePaymentTab ? activePaymentTab.getAttribute('data-tab') : 'upi';
+        
+        const streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
+        if (tabId === 'cash' && streak >= 3) {
+            finalTotal = Math.max(0, finalTotal - 40);
+        }
+
+        totalEl.textContent = `₹${finalTotal.toLocaleString()}`;
+    } catch (err) {
+        console.error('Fare calculation error:', err);
+    }
+};
+
+
 window.openClaimHistoryModal = function(e) {
     if(e) e.preventDefault();
     const modal = document.getElementById('claim-history-modal');
@@ -3049,6 +3142,7 @@ window.addEventListener('resize', () => {
     };
 
     resizer.addEventListener('mousedown', mouseDownHandler);
+});
 
 
     /* --- IMPORTED PAYMENT JS --- */
@@ -3122,41 +3216,52 @@ window.addEventListener('resize', () => {
         const coupEl = document.getElementById('coupon-code');
         const totalEl = document.getElementById('total-amount');
 
-        if (!typeEl || !distEl || !totalEl || !payBtnElement) return;
+        const payBtnElement = document.querySelector('.pay-btn') || document.querySelector('#pay-securely-btn');
+        if (!typeEl || !distEl || !totalEl) return;
 
         const selectedType = typeEl.value;
         const distance = parseFloat(distEl.value) || 0;
         const couponCode = coupEl ? coupEl.value.toUpperCase() : '';
         
         if (distance <= 0) {
-            payBtnElement.disabled = true;
-            payBtnElement.style.opacity = '0.5';
-            payBtnElement.style.cursor = 'not-allowed';
+            if (payBtnElement) {
+                payBtnElement.disabled = true;
+                payBtnElement.style.opacity = '0.5';
+                payBtnElement.style.cursor = 'not-allowed';
+            }
             return;
         } else {
-            payBtnElement.disabled = false;
-            payBtnElement.style.opacity = '1';
-            payBtnElement.style.cursor = 'pointer';
+            if (payBtnElement) {
+                payBtnElement.disabled = false;
+                payBtnElement.style.opacity = '1';
+                payBtnElement.style.cursor = 'pointer';
+            }
+        }
+
+        let data = null;
+        // Bypass API to allow client-side dynamic updates without API latency or static payload constraints
+        if (!data) {
+            const rates = pricingConfig[selectedType];
+            const distanceCharge = distance * rates.discounted;
+            const platformCharge = 40;
+            const hospitalReservation = 500;
+            let discount = 0;
+            
+            if (couponMsg && couponMsg.classList.contains('success')) {
+                if (couponCode === 'RAPID20') discount = 20;
+                else if (couponCode === 'RIDEMASTER') discount = 40;
+                else if (couponCode === 'FIRSTCARE') discount = 100;
+                else if (couponCode === 'FIRSTRAPIDCARE50') discount = 50;
+            }
+            
+            data = {
+                distanceCharge: distanceCharge,
+                discount: discount,
+                total: Math.max(0, distanceCharge + platformCharge + hospitalReservation - discount)
+            };
         }
 
         try {
-            const token = localStorage.getItem('rapidcare_token');
-            const response = await fetch(API_BASE + '/payments/calculate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    distance,
-                    ambulanceType: selectedType,
-                    couponCode: couponMsg.classList.contains('success') ? couponCode : null
-                })
-            });
-
-            if (!response.ok) throw new Error('Calculation failed');
-            const data = await response.json();
-
             // Update Summary
             const distanceRow = document.getElementById('distance-charge-row');
             if (distanceRow) {
@@ -3177,6 +3282,19 @@ window.addEventListener('resize', () => {
             if (totalEl) {
                 let finalTotal = data.total;
                 
+                // Force apply frontend coupon discount if the backend missed it or offline!
+                let couponDiscount = 0;
+                if (couponMsg && couponMsg.classList.contains('success')) {
+                    if (couponCode === 'RAPID20') couponDiscount = 20;
+                    else if (couponCode === 'RIDEMASTER') couponDiscount = 40;
+                    else if (couponCode === 'FIRSTCARE') couponDiscount = 100;
+                    else if (couponCode === 'FIRSTRAPIDCARE50') couponDiscount = 50;
+                }
+                
+                if (couponDiscount > 0 && (!data.discount || data.discount < couponDiscount)) {
+                    finalTotal = Math.max(0, (data.total + (data.discount || 0)) - couponDiscount);
+                }
+
                 // Local Streak Reward Logic - Scoped to Payment View to prevent crashes
                 const activePaymentTab = document.querySelector('#payment-view .tab-btn.active');
                 const tabId = activePaymentTab ? activePaymentTab.getAttribute('data-tab') : 'upi';
@@ -3194,8 +3312,40 @@ window.addEventListener('resize', () => {
     }
 
 
-    ambulanceOptions.forEach(opt => opt.addEventListener('change', recalculatePricing));
-    if (distanceInput) distanceInput.addEventListener('input', recalculatePricing);
+    // Bulletproof Event Delegation
+    document.addEventListener('click', (e) => {
+        const card = e.target.closest('.ambulance-card');
+        if (card) {
+            const option = card.closest('.ambulance-option');
+            const radio = option ? option.querySelector('input[name="ambulance-type"]') : null;
+            if (radio) {
+                radio.checked = true;
+                radio.dispatchEvent(new Event('change'));
+                if (typeof window.recalculatePricing === 'function') {
+                    window.recalculatePricing();
+                }
+            }
+        }
+    });
+
+    document.addEventListener('change', (e) => {
+        if (e.target && e.target.name === 'ambulance-type') {
+            if (typeof window.recalculatePricing === 'function') {
+                window.recalculatePricing();
+            }
+        }
+    });
+
+    if (distanceInput) {
+        distanceInput.addEventListener('input', () => {
+            if (typeof window.recalculatePricing === 'function') {
+                window.recalculatePricing();
+            }
+        });
+    }
+    
+    // Initial call on start
+    recalculatePricing();
 
     // --- Tab Switching Logic (Global) ---
     // (switchPaymentTab moved to top level)
@@ -3221,6 +3371,14 @@ window.addEventListener('resize', () => {
         }
         recalculatePricing();
     });
+    
+    if (couponInput) {
+        couponInput.addEventListener('input', () => {
+            if (typeof window.recalculatePricing === 'function') {
+                window.recalculatePricing();
+            }
+        });
+    }
 
     // --- Ride Streak Logic ---
     function updateRideStreak() {
@@ -3508,4 +3666,3 @@ window.addEventListener('resize', () => {
     updateRideStreak();
     recalculatePricing();
     if (window.lucide) lucide.createIcons();
-});
