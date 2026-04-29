@@ -111,12 +111,25 @@ body {
     transition: background-color var(--transition-speed), color var(--transition-speed);
 }
 
-.theme-transition {
-    transition: all var(--transition-speed) ease !important;
-}
-
-.theme-transition {
-    transition: all var(--transition-speed) ease !important;
+.theme-in-transition,
+.theme-in-transition body,
+.theme-in-transition .sidebar,
+.theme-in-transition .main-content,
+.theme-in-transition .stat-card,
+.theme-in-transition .card,
+.theme-in-transition .modal-content,
+.theme-in-transition header,
+.theme-in-transition input,
+.theme-in-transition select,
+.theme-in-transition button,
+.theme-in-transition a,
+.theme-in-transition span,
+.theme-in-transition p,
+.theme-in-transition h1,
+.theme-in-transition h2,
+.theme-in-transition h3,
+.theme-in-transition h4 {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 /* Skeleton Loader */
