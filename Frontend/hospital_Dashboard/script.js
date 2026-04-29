@@ -1,372 +1,302 @@
-/**
- * Hospital Dashboard Logic
- * RapidCare - Medical Intelligence Platform
- */
+/* ── RapidCare Hospital Dashboard Script ── */
 
-document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-    initClock();
-    initMobileSidebar();
-    checkAuth();
-    loadHospitalData();
-    loadIncomingRequests();
-    
-    // Logout logic
-    const logoutBtn = document.querySelector('.nav-item.logout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.removeItem('rapidcare_token');
-            localStorage.removeItem('rapidcare_user');
-            window.location.href = '../hospital_registration/index.html';
-        });
-    // --- Real-Time Queue (Socket.IO) ---
-    if (typeof io !== 'undefined') {
-        const SOCKET_URL = (window.RapidCareConfig && RapidCareConfig.SOCKET_URL) || window.location.origin;
-        const socket = io(SOCKET_URL);
-        
-        const userStr = localStorage.getItem('rapidcare_user');
-        if (userStr) {
-            const user = JSON.parse(userStr);
-            if (user && user.id) {
-                socket.emit('join', { user_id: user.id });
-                
-                socket.on('hospital:incoming_alert', (data) => {
-                    const tbody = document.getElementById('incoming-requests');
-                    if (!tbody) return;
-                    
-                    // Remove "No active incoming" if present
-                    if (tbody.querySelector('td[colspan]')) {
-                        tbody.innerHTML = '';
-                    }
-                    
-                    const tr = document.createElement('tr');
-                    tr.className = 'request-row';
-                    tr.setAttribute('data-id', data.trip_id);
-                    
-                    let severityClass = 'moderate';
-                    const urgency = data.urgency_level ? data.urgency_level.toLowerCase() : 'standard';
-                    if (urgency === 'critical') severityClass = 'critical';
-                    else if (urgency === 'urgent') severityClass = 'urgent';
-                    
-                    const patientInitial = data.patient_name ? data.patient_name.substring(0, 2).toUpperCase() : 'EM';
-                    
-                    tr.innerHTML = `
-                        <td>
-                            <div class="patient-cell">
-                                <div class="avatar bg-red">${patientInitial}</div>
-                                <div class="patient-info">
-                                    <strong>${data.patient_name || 'Emergency Patient'}</strong>
-                                    <span>Trip #${data.trip_id} (Blood: ${data.blood_group || 'N/A'})</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>Ambulance: En Route (${data.eta || 'Calculating'})</td>
-                        <td><span class="badge ${severityClass}">${urgency.toUpperCase()}</span></td>
-                        <td>${data.eta || '-- min'}</td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn btn-accept" onclick="handleAction(${data.trip_id}, 'accept')">Accept</button>
-                                <button class="btn btn-reject" onclick="handleAction(${data.trip_id}, 'reject')">Reject</button>
-                            </div>
-                        </td>
-                    `;
-                    
-                    // Prepend to show incoming in real-time
-                    tbody.insertBefore(tr, tbody.firstChild);
-                    showToast(`⚠️ High Priority Incoming: ${data.patient_name}`, 'warning');
-                });
-            }
-        }
-    }
+// ── Custom Cursor ──
+const dot = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+  spawnTrail(mx, my);
+});
+(function animRing() {
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+})();
+
+document.querySelectorAll('a,button,.stat-card,.amb-card,.tr-row').forEach(el => {
+  el.addEventListener('mouseenter', () => { dot.classList.add('hover'); ring.classList.add('hover'); });
+  el.addEventListener('mouseleave', () => { dot.classList.remove('hover'); ring.classList.remove('hover'); });
 });
 
-/**
- * Authentication Check
- */
-function checkAuth() {
-    const token = localStorage.getItem('rapidcare_token');
-    if (!token) {
-        alert('Please login or register first.');
-        window.location.href = '../hospital_registration/index.html';
-    }
+// ── Luna palette ──
+const LUNA = ['#A7EBF2','#54ACBF','#26658C','#A7EBF2','#ffffff'];
+
+// ── Cursor Trail ──
+let lastTrail = 0;
+function spawnTrail(x, y) {
+  const now = Date.now();
+  if (now - lastTrail < 35) return;
+  lastTrail = now;
+  const el = document.createElement('div');
+  el.className = 'cursor-trail';
+  const size = Math.random() * 6 + 4;
+  el.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:${LUNA[Math.floor(Math.random()*LUNA.length)]};`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 500);
 }
 
-/**
- * Load Hospital Data
- */
-async function loadHospitalData() {
-    const token = localStorage.getItem('rapidcare_token');
-    try {
-        const response = await fetch(RapidCareConfig.API_BASE + '/hospital/me', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (response.ok) {
-            const data = await response.json();
-            updateDashboardUI(data);
-        } else {
-            console.error('Failed to fetch hospital data');
-        }
-    } catch (err) {
-        console.error('Error loading hospital data:', err);
-    }
+// ── Click / Touch Splash ──
+function spawnSplash(x, y) {
+  const count = 14;
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'splash-particle';
+    const angle = (i / count) * Math.PI * 2;
+    const dist  = Math.random() * 55 + 25;
+    const tx = Math.cos(angle) * dist;
+    const ty = Math.sin(angle) * dist;
+    const size = Math.random() * 7 + 3;
+    const dur  = (Math.random() * 0.4 + 0.45).toFixed(2);
+    const color = LUNA[Math.floor(Math.random() * LUNA.length)];
+    el.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:${color};box-shadow:0 0 ${size*2}px ${color};--tx:${tx}px;--ty:${ty}px;--dur:${dur}s;`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), dur * 1000 + 50);
+  }
+  // ring burst
+  const rb = document.createElement('div');
+  rb.style.cssText = `position:fixed;pointer-events:none;z-index:9996;left:${x}px;top:${y}px;width:6px;height:6px;border-radius:50%;border:1.5px solid #A7EBF2;transform:translate(-50%,-50%) scale(1);animation:splashRingOut .55s ease-out forwards;`;
+  document.body.appendChild(rb);
+  setTimeout(() => rb.remove(), 600);
 }
 
-/**
- * Update UI with Hospital Data
- */
-function updateDashboardUI(hospital) {
-    const nameEl = document.querySelector('.hospital-info h2');
-    if (nameEl) nameEl.textContent = hospital.name || hospital.hospital_name;
+// inject ring keyframe
+const _ks = document.createElement('style');
+_ks.textContent = `@keyframes splashRingOut{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(6)}}`;
+document.head.appendChild(_ks);
 
-    const freeBedsVal = document.querySelector('.stat-card.primary .stat-value');
-    const freeBedsSub = document.querySelector('.stat-card.primary .stat-sub');
-    if (freeBedsVal) freeBedsVal.textContent = hospital.available_beds || 0;
-    if (freeBedsSub) freeBedsSub.textContent = `of ${hospital.total_beds || 0} total`;
+document.addEventListener('click', e => spawnSplash(e.clientX, e.clientY));
 
-    const icuVal = document.querySelector('.stat-card.warning .stat-value');
-    if (icuVal) icuVal.textContent = hospital.icu_beds || 0;
+// ── Touch Ripple ──
+const ripple = document.getElementById('touchRipple');
+document.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  ripple.style.left = t.clientX + 'px';
+  ripple.style.top  = t.clientY + 'px';
+  ripple.classList.remove('active');
+  void ripple.offsetWidth;
+  ripple.classList.add('active');
+}, { passive: true });
 
-    const ventVal = document.querySelector('.stat-card.info .stat-value');
-    const ventSub = document.querySelector('.stat-card.info .stat-sub');
-    if (ventVal) ventVal.textContent = hospital.ventilators || 0;
-    if (ventSub) ventSub.textContent = `of ${hospital.ventilators || 0} total`;
-    
-    const resourceItems = document.querySelectorAll('.resource-item');
-    if (resourceItems.length >= 2) {
-        const icuCount = resourceItems[0].querySelector('.res-count');
-        if (icuCount) icuCount.textContent = `${hospital.icu_beds || 0} / ${hospital.icu_beds || 0}`;
-        
-        const ventCount = resourceItems[1].querySelector('.res-count');
-        if (ventCount) ventCount.textContent = `${hospital.ventilators || 0} / ${hospital.ventilators || 0}`;
-    }
+// ── Live Clock ──
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  const el = document.getElementById('liveClock');
+  if (el) el.textContent = `${h}:${m}:${s}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ── Count-Up Animation ──
+function countUp(el, target, duration = 1400) {
+  let start = 0;
+  const step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) { start = target; clearInterval(timer); }
+    el.textContent = Math.floor(start);
+  }, 16);
 }
 
-/**
- * Load Incoming Requests
- */
-async function loadIncomingRequests() {
-    const token = localStorage.getItem('rapidcare_token');
-    try {
-        const response = await fetch(RapidCareConfig.API_BASE + '/hospital/incoming', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (response.ok) {
-            const data = await response.json();
-            populateIncomingRequests(data);
-        }
-    } catch (err) {
-        console.error('Error loading incoming requests:', err);
-    }
-}
-
-/**
- * Populate Incoming Requests Table
- */
-function populateIncomingRequests(requests) {
-    const tbody = document.getElementById('incoming-requests');
-    if (!tbody) return;
-
-    if (!requests || requests.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-secondary);">No active incoming patient requests.</td></tr>`;
-        return;
-    }
-
-    tbody.innerHTML = '';
-    requests.forEach(req => {
-        const tr = document.createElement('tr');
-        tr.className = 'request-row';
-        tr.setAttribute('data-id', req.id);
-        
-        let severityClass = 'moderate';
-        if (req.severity && req.severity.toLowerCase() === 'critical') severityClass = 'critical';
-        
-        const patientInitial = req.patient_name ? req.patient_name.substring(0, 2).toUpperCase() : 'EM';
-
-        tr.innerHTML = `
-            <td>
-                <div class="patient-cell">
-                    <div class="avatar bg-red">${patientInitial}</div>
-                    <div class="patient-info">
-                        <strong>${req.patient_name || 'Emergency Patient'}</strong>
-                        <span>Trip #${req.id}</span>
-                    </div>
-                </div>
-            </td>
-            <td>Ambulance: ${req.driver_name || 'Assigned'}</td>
-            <td><span class="badge ${severityClass}">${req.status.toUpperCase()}</span></td>
-            <td>-- min</td>
-            <td>
-                <div class="action-btns">
-                    <button class="btn btn-accept" onclick="handleAction(${req.id}, 'accept')">Accept</button>
-                    <button class="btn btn-reject" onclick="handleAction(${req.id}, 'reject')">Reject</button>
-                </div>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-/**
- * Theme Management
- */
-function initTheme() {
-    const savedTheme = localStorage.getItem('hospital-theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-}
-
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('hospital-theme', newTheme);
-    updateThemeIcon(newTheme);
-    
-    showToast(`Switched to ${newTheme} mode`, 'info');
-}
-
-function updateThemeIcon(theme) {
-    const icon = document.getElementById('theme-icon');
-    if (!icon) return;
-    
-    if (theme === 'light') {
-        icon.setAttribute('data-lucide', 'sun');
-    } else {
-        icon.setAttribute('data-lucide', 'moon');
-    }
-    lucide.createIcons();
-}
-
-/**
- * Section Navigation (Simplified for Dashboard Only)
- */
-function switchSection(sectionId) {
-    if (sectionId !== 'dashboard') return;
-
-    document.querySelectorAll('.nav-item').forEach(link => {
-        if (link.getAttribute('data-section') === sectionId) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
-    });
-    
-    document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.remove('active');
-    });
-    
-    const target = document.getElementById(`${sectionId}-section`);
-    if (target) {
-        target.classList.add('active');
-    }
-}
-
-/**
- * Real-time Clock
- */
-function initClock() {
-    const clockEl = document.getElementById('live-clock');
-    
-    function updateTime() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        clockEl.textContent = `${hours}:${minutes}:${seconds}`;
-    }
-    
-    updateTime();
-    setInterval(updateTime, 1000);
-}
-
-/**
- * Mobile Sidebar Toggle
- */
-function initMobileSidebar() {
-    const toggleBtn = document.getElementById('mobile-toggle');
-    const closeBtn = document.getElementById('sidebar-close');
-    const sidebar = document.querySelector('.sidebar');
-    
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-        });
-    }
-
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-        });
-    }
-    
-    document.addEventListener('click', (e) => {
-        if (sidebar && sidebar.classList.contains('active') && 
-            !sidebar.contains(e.target) && 
-            toggleBtn && !toggleBtn.contains(e.target)) {
-            sidebar.classList.remove('active');
-        }
-    });
-}
-
-/**
- * Patient Request Actions
- */
-function handleAction(requestId, action) {
-    const row = document.querySelector(`.request-row[data-id="${requestId}"]`);
-    if (!row) return;
-
-    const patientName = row.querySelector('.patient-info strong').textContent;
-    
-    if (action === 'accept') {
-        showToast(`Request accepted for ${patientName}`, 'success');
-        row.style.transition = 'all 0.5s ease';
-        row.style.opacity = '0.5';
-        row.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
-        
+// ── IntersectionObserver: stagger cards ──
+const statCards = document.querySelectorAll('.stat-card');
+const cardObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const cards = [...statCards];
+      cards.forEach((card, i) => {
         setTimeout(() => {
-            row.style.transform = 'translateX(50px)';
-            row.style.opacity = '0';
-            setTimeout(() => row.remove(), 500);
-        }, 1000);
-        
-    } else {
-        if (confirm(`Are you sure you want to REJECT ${patientName}'s request?`)) {
-            showToast(`Request rejected for ${patientName}`, 'error');
-            row.style.transition = 'all 0.5s ease';
-            row.style.transform = 'translateX(-20px)';
-            row.style.opacity = '0';
-            setTimeout(() => row.remove(), 500);
-        }
+          card.classList.add('visible');
+          const numEl = card.querySelector('.sc-num');
+          const target = parseInt(numEl.dataset.count) || 0;
+          countUp(numEl, target);
+        }, i * 100);
+      });
+      cardObs.disconnect();
     }
+  });
+}, { threshold: 0.1 });
+if (statCards[0]) cardObs.observe(statCards[0]);
+
+// ── IntersectionObserver: slide-up ──
+const slideEls = document.querySelectorAll('.slide-up, .amb-card, .alert-item');
+const slideObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      slideObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+slideEls.forEach(el => slideObs.observe(el));
+
+// ── Progress bars animate on view ──
+const progFills = document.querySelectorAll('.prog-fill');
+const progObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const w = e.target.dataset.width || '0';
+      e.target.style.width = w + '%';
+      progObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+progFills.forEach(el => progObs.observe(el));
+
+// ── ETA Count-Up (ambulance numbers) ──
+const etaNums = document.querySelectorAll('.amb-eta-num[data-live-eta]');
+const etaObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const target = parseInt(e.target.dataset.liveEta) || 0;
+      countUp(e.target, target, 1000);
+      etaObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+etaNums.forEach(el => etaObs.observe(el));
+
+// ── Live ETA countdown ──
+function startEtaCountdown() {
+  const etaEls = document.querySelectorAll('.eta-count');
+  setInterval(() => {
+    etaEls.forEach(el => {
+      let val = parseInt(el.textContent);
+      if (val > 1) el.textContent = val - 1;
+    });
+  }, 60000);
+}
+startEtaCountdown();
+
+// ── Sidebar mobile toggle ──
+const sidebar = document.getElementById('sidebar');
+const hamburger = document.getElementById('hamburger');
+const overlay = document.getElementById('sbOverlay');
+
+hamburger.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+});
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  overlay.style.display = 'none';
+});
+
+// ── Nav active state ──
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', function(e) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    this.classList.add('active');
+    if (window.innerWidth < 768) {
+      sidebar.classList.remove('open');
+      overlay.style.display = 'none';
+    }
+  });
+});
+
+// ── Emergency Modal ──
+const emergencyBtn = document.getElementById('emergencyBtn');
+const emergencyModal = document.getElementById('emergencyModal');
+const modalClose = document.getElementById('modalClose');
+
+emergencyBtn.addEventListener('click', () => {
+  emergencyModal.classList.add('open');
+});
+modalClose.addEventListener('click', () => {
+  emergencyModal.classList.remove('open');
+});
+emergencyModal.addEventListener('click', e => {
+  if (e.target === emergencyModal) emergencyModal.classList.remove('open');
+});
+
+// ── Toast ──
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity .4s';
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
 }
 
-/**
- * Feedback Toast
- */
-function showToast(message, type = 'info') {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
-
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    
-    let icon = 'info';
-    if (type === 'success') icon = 'check-circle';
-    if (type === 'error') icon = 'alert-octagon';
-    
-    toast.innerHTML = `
-        <i data-lucide="${icon}"></i>
-        <span>${message}</span>
-    `;
-    
-    container.appendChild(toast);
-    lucide.createIcons();
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+// ── Handle Patient Accept / Reject ──
+function handleReq(id, action) {
+  const row = document.querySelector(`.tr-row[data-id="${id}"]`);
+  if (!row) return;
+  if (action === 'accept') {
+    row.style.transition = 'opacity .5s, transform .5s';
+    row.style.opacity = '0';
+    row.style.transform = 'translateX(30px)';
+    showToast(`Patient accepted & bed assigned.`, 'success');
+    setTimeout(() => row.remove(), 500);
+    // update badge
+    const badge = document.querySelector('.panel-badge');
+    if (badge) {
+      const cur = parseInt(badge.textContent) || 1;
+      badge.textContent = `${Math.max(0, cur - 1)} pending`;
+    }
+  } else {
+    row.style.transition = 'opacity .5s, transform .5s';
+    row.style.opacity = '0';
+    row.style.transform = 'translateX(-30px)';
+    showToast(`Request rejected & logged.`, 'error');
+    setTimeout(() => row.remove(), 500);
+  }
 }
+
+// ── 3D Tilt on stat cards (desktop) ──
+document.querySelectorAll('.stat-card,.panel,.amb-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `translateY(-4px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+// ── Search filter ──
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.tr-row').forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(q) ? '' : 'none';
+  });
+});
+
+// ── Simulated live alert feed ──
+const liveAlerts = [
+  { msg: 'Blood pressure critical — ICU Bed 2', type: 'critical' },
+  { msg: 'Ambulance RC-12 en route — 7 min ETA', type: 'info' },
+  { msg: 'OR-1 now available for emergency use', type: 'info' },
+  { msg: 'Low oxygen supply — stock replenishment needed', type: 'warning' },
+];
+let alertIndex = 0;
+setInterval(() => {
+  const a = liveAlerts[alertIndex % liveAlerts.length];
+  showToast(`🔔 ${a.msg}`, a.type === 'critical' ? 'error' : 'info');
+  alertIndex++;
+}, 25000);
+
+// ── Mouse glow effect on ocean bg ──
+document.addEventListener('mousemove', e => {
+  const orb = document.querySelector('.orb1');
+  if (!orb) return;
+  const xPct = e.clientX / window.innerWidth;
+  const yPct = e.clientY / window.innerHeight;
+  orb.style.transform = `translate(${xPct * 40}px, ${yPct * 40}px)`;
+});
+
+console.log('%c RapidCare Hospital Hub ', 'background:#023859;color:#A7EBF2;font-size:14px;padding:6px 12px;border-radius:6px;font-weight:bold');
