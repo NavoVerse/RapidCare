@@ -135,7 +135,7 @@ While the current architecture is fully functional, certain subsystems can be op
    - **Current:** Sending emails (OTP) and calling the Gemini AI API happens synchronously in the main HTTP request thread.
    - **Better:** Offload slow, IO-bound operations to a message queue like **BullMQ or RabbitMQ**. This guarantees fast API response times and allows automatic retries if an external API fails.
 
-5. **Geolocation Polling & Throttling**
+5. **Geolocation Polling & Throttling** DONE
    - **Current:** Drivers broadcast location vectors constantly to the backend, which proxies them directly to patients.
    - **Better:** Implement **Throttling/Debouncing** on location emits (e.g., max 1 update per 3 seconds), and use PostGIS/Spatial Queries in the database to calculate nearest drivers natively rather than doing array iterations in Node.js.
 
