@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('rapidcare_user');
             window.location.href = '../hospital_registration/index.html';
         });
-    }
     // --- Real-Time Queue (Socket.IO) ---
     if (typeof io !== 'undefined') {
         const SOCKET_URL = (window.RapidCareConfig && RapidCareConfig.SOCKET_URL) || window.location.origin;
