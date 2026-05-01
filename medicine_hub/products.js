@@ -115,7 +115,29 @@ medicineData.forEach(item => {
       'zerodol': 'images/zerodol.jpg',
       'nucoxia': 'images/nucoxia.jpg',
       'electral': 'images/electral.png',
-      'montair': 'images/montair.png'
+      'montair': 'images/montair.png',
+      'hifenac': 'images/hifenac.jpg',
+      'mox': 'images/mox.jpg',
+      'novamox': 'images/novamox.jpg',
+      'moxclav': 'images/moxclav.jpg',
+      'azee': 'images/azee.jpg',
+      'zithrocin': 'images/zithrocin.jpg',
+      'ceftum': 'images/ceftum.jpg',
+      'oflomac': 'images/oflomac.jpg',
+      'zanocin': 'images/zanocin.jpg',
+      'ciplox': 'images/ciplox.jpg',
+      'cifran': 'images/cifran.jpg',
+      'levoflox': 'images/levoflox.jpg',
+      'obimet': 'images/obimet.jpg',
+      'amaryl': 'images/amaryl.jpg',
+      'januvia': 'images/januvia.jpg',
+      'galvus': 'images/galvus.jpg',
+      'actrapid': 'images/actrapid.jpg',
+      'mixtard': 'images/mixtard.jpg',
+      'amlong': 'images/amlong.jpg',
+      'aten': 'images/aten.jpg',
+      'stamlo': 'images/stamlo.jpg',
+      'losar': 'images/losar.jpg'
     };
     
     let imgPath = specificImages[brandLower] || null;
