@@ -85,26 +85,20 @@ const medicineData = [
 // Generate products based on brands
 let allProducts = [];
 
-// Image sets based on form/category
-const imgMap = {
-  "tablets": ["images/tablets.png"],
-  "syrup": ["images/syrup.png"],
-  "cream": ["images/cream.png"],
-  "inhaler": ["images/inhaler.png"]
-};
-
 medicineData.forEach(item => {
   item.brands.forEach(brand => {
     // Generate a mock price between 20 and 400
     const price = Math.floor(Math.random() * 380) + 20;
     const mrp = Math.floor(price * 1.15); // 15% markup for MRP
     
-    let imgList = imgMap.tablets;
-    if(item.category === "Dermatology") imgList = imgMap.cream;
-    else if(item.category === "Respiratory") imgList = imgMap.inhaler;
-    else if(item.category === "Digestion") imgList = imgMap.syrup;
-    
-    const randomImg = imgList[Math.floor(Math.random() * imgList.length)];
+    // Assign a unique local image based on brand name hash
+    const str = brand.toLowerCase();
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const imgIndex = Math.abs(hash) % 20;
+    const randomImg = `images/med_${imgIndex}.jpg`;
     
     allProducts.push({
       id: brand.toLowerCase().replace(/\\s+/g, '-'),
