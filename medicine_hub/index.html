@@ -28,8 +28,8 @@
   --headline:'Bebas Neue',sans-serif;
   --body:'Atkinson Hyperlegible',sans-serif;
 }
-html{scroll-behavior:smooth}
-body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:14px;min-width:320px}
+html{scroll-behavior:smooth;overflow-x:hidden;max-width:100vw;}
+body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:14px;min-width:320px;overflow-x:hidden;max-width:100vw;}
 
 /* ── TOPBAR ── */
 .topbar{
@@ -375,6 +375,66 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
   .footer-bottom { flex-direction: column; align-items: flex-start; gap: 15px; }
 }
   
+
+/* ── CART SIDEBAR ── */
+.cart-overlay { position: fixed; inset: 0; background: rgba(0,70,67,0.6); z-index: 99999; backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.cart-overlay.active { opacity: 1; pointer-events: auto; }
+.cart-sidebar { position: fixed; right: -400px; top: 0; bottom: 0; width: 400px; max-width: 100vw; background: var(--sand); z-index: 100000; box-shadow: -10px 0 30px rgba(0,0,0,0.15); transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
+.cart-sidebar.active { right: 0; }
+.cart-header { padding: 24px; border-bottom: 1px solid var(--sand-border); display: flex; align-items: center; justify-content: space-between; background: var(--white); }
+.cart-title { font-family: var(--headline); font-size: 28px; color: var(--cyprus); letter-spacing: 0.03em; }
+.cart-close { background: var(--cyprus-dim); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--cyprus); font-size: 18px; transition: background 0.2s; }
+.cart-close:hover { background: rgba(0,70,67,0.15); }
+.cart-body { flex: 1; overflow-y: auto; padding: 24px; }
+.cart-empty { text-align: center; color: var(--ink-faint); margin-top: 50px; font-size: 15px; font-weight: 700; }
+.cart-item { background: var(--white); border-radius: 12px; padding: 14px; margin-bottom: 12px; display: flex; gap: 14px; align-items: center; border: 1px solid var(--sand-border); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+.cart-item-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+.cart-item-info { flex: 1; }
+.cart-item-name { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.cart-item-price { font-family: var(--headline); font-size: 20px; color: var(--cyprus); }
+.cart-item-qty { display: flex; align-items: center; gap: 10px; background: var(--sand); border-radius: 8px; padding: 4px 8px; }
+.qty-btn { background: transparent; border: none; cursor: pointer; color: var(--cyprus); font-weight: bold; font-size: 16px; width: 20px; text-align: center; }
+.qty-num { font-size: 13px; font-weight: 700; width: 15px; text-align: center; }
+.cart-footer { padding: 24px; background: var(--white); border-top: 1px solid var(--sand-border); }
+.cart-summary-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--ink-mid); margin-bottom: 8px; font-weight: 700; }
+.cart-total-row { display: flex; justify-content: space-between; font-size: 18px; color: var(--cyprus); margin-bottom: 16px; font-family: var(--headline); font-size: 26px; border-top: 1px dashed var(--sand-border); padding-top: 12px; margin-top: 4px; }
+.checkout-btn { width: 100%; background: var(--amber); color: var(--ink); border: none; border-radius: 12px; padding: 16px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: var(--body); box-shadow: 0 6px 20px rgba(245,166,35,0.3); transition: all 0.2s; position: relative; overflow: hidden; }
+.checkout-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(245,166,35,0.4); }
+
+/* ── PRODUCT MODAL ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,70,67,0.7); z-index: 100000; backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 20px; }
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.prod-modal { background: var(--white); border-radius: 24px; max-width: 800px; width: 100%; display: flex; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); transform: scale(0.95) translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; }
+.modal-overlay.active .prod-modal { transform: scale(1) translateY(0); }
+.pm-close { position: absolute; top: 16px; right: 16px; background: var(--sand); border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 16px; cursor: pointer; color: var(--cyprus); transition: background 0.2s; z-index: 10; display:flex; align-items:center; justify-content:center;}
+.pm-close:hover { background: var(--sand-dark); }
+.pm-img-sec { flex: 1; background: var(--sand); display: flex; align-items: center; justify-content: center; padding: 40px; }
+.pm-img { width: 100%; max-width: 300px; height: auto; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); object-fit:cover; aspect-ratio: 1/1; }
+.pm-info-sec { flex: 1.2; padding: 40px; display: flex; flex-direction: column; }
+.pm-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: var(--cyprus); text-transform: uppercase; margin-bottom: 8px; }
+.pm-name { font-family: var(--headline); font-size: 42px; color: var(--ink); line-height: 1; margin-bottom: 6px; }
+.pm-mol { font-size: 15px; color: var(--ink-mid); margin-bottom: 16px; font-weight: 700;}
+.pm-desc { font-size: 14px; color: var(--ink-faint); line-height: 1.6; margin-bottom: 24px; }
+.pm-price-wrap { display: flex; align-items: baseline; gap: 10px; margin-bottom: 30px; }
+.pm-price { font-family: var(--headline); font-size: 38px; color: var(--cyprus); }
+.pm-mrp { font-size: 16px; color: var(--ink-faint); text-decoration: line-through; }
+.pm-actions { display: flex; gap: 14px; margin-top: auto; }
+.pm-btn-cart { flex: 1; background: var(--cyprus); color: var(--white); border: none; border-radius: 12px; padding: 16px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; position: relative; overflow: hidden; }
+.pm-btn-cart:hover { background: var(--cyprus-hover); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,70,67,0.2); }
+.pm-btn-book { flex: 1; background: var(--amber); color: var(--ink); border: none; border-radius: 12px; padding: 16px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; position: relative; overflow: hidden;}
+.pm-btn-book:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245,166,35,0.3); }
+
+/* Ripple effect */
+.ripple { position: absolute; border-radius: 50%; transform: scale(0); animation: ripple 0.6s linear; background-color: rgba(255, 255, 255, 0.4); }
+@keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+@media (max-width: 768px) {
+  .prod-modal { flex-direction: column; max-height: 90vh; overflow-y: auto;}
+  .pm-img-sec { padding: 30px; height: 250px; }
+  .pm-img { max-height: 100%; width: auto; }
+  .pm-actions { flex-direction: column; }
+}
+
 </style>
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
@@ -565,7 +625,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Paracetamol -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-teal">
-          <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&q=80" alt="Paracetamol" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_0.jpg" alt="Paracetamol" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-teal" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg></div>
         </div>
         <div class="prod-badge">30 min</div>
@@ -584,7 +644,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Amoxicillin -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-sand">
-          <img src="https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&q=80" alt="Amoxicillin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_1.jpg" alt="Amoxicillin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-sand" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
         </div>
         <div class="prod-badge rx">Rx</div>
@@ -603,7 +663,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Aspirin -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-red">
-          <img src="https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&q=80" alt="Aspirin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_2.jpg" alt="Aspirin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-red" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
         </div>
         <div class="prod-badge">30 min</div>
@@ -622,7 +682,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Omeprazole -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-sand">
-          <img src="https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&q=80" alt="Omeprazole" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_3.jpg" alt="Omeprazole" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-sand" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
         </div>
         <div class="prod-badge">30 min</div>
@@ -641,7 +701,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Cetirizine -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-teal">
-          <img src="https://images.unsplash.com/photo-1576671081837-49000212a370?w=400&q=80" alt="Cetirizine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_4.jpg" alt="Cetirizine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-teal" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg></div>
         </div>
         <div class="prod-badge">30 min</div>
@@ -660,7 +720,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Metformin -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-sand">
-          <img src="https://images.unsplash.com/photo-1563213126-a4273aed2016?w=400&q=80" alt="Metformin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_5.jpg" alt="Metformin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-sand" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
         </div>
         <div class="prod-badge rx">Rx</div>
@@ -679,7 +739,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Azithromycin -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-blue">
-          <img src="https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&q=80" alt="Azithromycin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_6.jpg" alt="Azithromycin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-blue" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg></div>
         </div>
         <div class="prod-badge rx">Rx</div>
@@ -698,7 +758,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Atorvastatin -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-amber">
-          <img src="https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?w=400&q=80" alt="Atorvastatin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_7.jpg" alt="Atorvastatin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-amber" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#854F0B" stroke-width="1.4" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
         </div>
         <div class="prod-badge rx">Rx</div>
@@ -717,7 +777,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Amlodipine -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-teal">
-          <img src="https://images.unsplash.com/photo-1460467820054-c87ab43e9b59?w=400&q=80" alt="Amlodipine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_8.jpg" alt="Amlodipine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-teal" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg></div>
         </div>
         <div class="prod-badge rx">Rx</div>
@@ -745,7 +805,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- ORS Sachet -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-blue">
-          <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&q=80" alt="ORS" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_9.jpg" alt="ORS" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-blue" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
         </div>
         <div class="prod-badge">30 min</div>
@@ -764,7 +824,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Dolo 650 -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-sand">
-          <img src="https://images.unsplash.com/photo-1602046596820-c91e92f41a19?w=400&q=80" alt="Dolo 650" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_10.jpg" alt="Dolo 650" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-sand" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg></div>
         </div>
         <div class="prod-badge">30 min</div>
@@ -783,7 +843,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Pantoprazole -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-teal">
-          <img src="https://images.unsplash.com/photo-1619895862022-09114b41f16f?w=400&q=80" alt="Pantoprazole" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_11.jpg" alt="Pantoprazole" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-teal" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg></div>
         </div>
         <div class="prod-badge rx">Rx</div>
@@ -802,7 +862,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Ibuprofen -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-amber">
-          <img src="https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=400&q=80" alt="Ibuprofen" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_12.jpg" alt="Ibuprofen" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-amber" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#854F0B" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/></svg></div>
         </div>
         <div class="prod-badge">30 min</div>
@@ -821,7 +881,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Montelukast -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-blue">
-          <img src="https://images.unsplash.com/photo-1600456899121-68eda5706b6e?w=400&q=80" alt="Montelukast" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_13.jpg" alt="Montelukast" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-blue" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"><path d="M17 8C8 10 5.9 16.17 3.82 19.82"/></svg></div>
         </div>
         <div class="prod-badge rx">Rx</div>
@@ -840,7 +900,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Clopidogrel -->
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-red">
-          <img src="https://images.unsplash.com/photo-1583947582774-d1c55a4e4d89?w=400&q=80" alt="Clopidogrel" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_14.jpg" alt="Clopidogrel" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-red" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg></div>
         </div>
         <div class="prod-badge rx">Rx</div>
@@ -884,7 +944,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- First Aid Kit -->
       <div class="kit-card" data-aos="fade-up">
         <div class="kit-img">
-          <img src="https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=600&q=80" alt="First Aid Kit">
+          <img src="images/med_9.jpg?w=600&q=80" alt="First Aid Kit">
           <div class="kit-img-overlay"></div>
           <div class="kit-img-label">FIRST AID</div>
         </div>
@@ -902,7 +962,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Trauma Kit -->
       <div class="kit-card" data-aos="fade-up">
         <div class="kit-img">
-          <img src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?w=600&q=80" alt="Trauma Kit">
+          <img src="images/med_10.jpg?w=600&q=80" alt="Trauma Kit">
           <div class="kit-img-overlay"></div>
           <div class="kit-img-label">TRAUMA RESPONSE</div>
         </div>
@@ -920,7 +980,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Burn Care Kit -->
       <div class="kit-card" data-aos="fade-up">
         <div class="kit-img">
-          <img src="https://images.unsplash.com/photo-1599045118108-bf9954418b76?w=600&q=80" alt="Burn Care Kit">
+          <img src="images/med_11.jpg?w=600&q=80" alt="Burn Care Kit">
           <div class="kit-img-overlay"></div>
           <div class="kit-img-label">BURN CARE</div>
         </div>
@@ -938,7 +998,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Cardiac Kit -->
       <div class="kit-card" data-aos="fade-up">
         <div class="kit-img">
-          <img src="https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=600&q=80" alt="Cardiac Kit">
+          <img src="images/med_12.jpg?w=600&q=80" alt="Cardiac Kit">
           <div class="kit-img-overlay"></div>
           <div class="kit-img-label">CARDIAC EMERGENCY</div>
         </div>
@@ -956,7 +1016,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Snake Bite Kit -->
       <div class="kit-card" data-aos="fade-up">
         <div class="kit-img">
-          <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&q=80" alt="Snake Bite Kit">
+          <img src="images/med_13.jpg?w=600&q=80" alt="Snake Bite Kit">
           <div class="kit-img-overlay"></div>
           <div class="kit-img-label">SNAKE BITE</div>
         </div>
@@ -974,7 +1034,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <!-- Diabetic Emergency Kit -->
       <div class="kit-card" data-aos="fade-up">
         <div class="kit-img">
-          <img src="https://images.unsplash.com/photo-1576671081837-49000212a370?w=600&q=80" alt="Diabetic Kit">
+          <img src="images/med_14.jpg?w=600&q=80" alt="Diabetic Kit">
           <div class="kit-img-overlay"></div>
           <div class="kit-img-label">DIABETIC EMERGENCY</div>
         </div>
@@ -1001,7 +1061,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="herbal-card" data-aos="fade-up">
         <div class="herbal-img">
-          <img src="https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&q=80" alt="Ashwagandha">
+          <img src="images/med_15.jpg" alt="Ashwagandha">
         </div>
         <div class="herbal-body">
           <div class="herbal-tag">🌿 Adaptogen</div>
@@ -1013,7 +1073,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="herbal-card" data-aos="fade-up">
         <div class="herbal-img">
-          <img src="https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&q=80" alt="Triphala">
+          <img src="images/med_16.jpg" alt="Triphala">
         </div>
         <div class="herbal-body">
           <div class="herbal-tag">🌿 Digestive</div>
@@ -1025,7 +1085,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="herbal-card" data-aos="fade-up">
         <div class="herbal-img">
-          <img src="https://images.unsplash.com/photo-1602576669728-35645cca3cae?w=400&q=80" alt="Giloy">
+          <img src="images/med_17.jpg" alt="Giloy">
         </div>
         <div class="herbal-body">
           <div class="herbal-tag">🌿 Immunity</div>
@@ -1037,7 +1097,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="herbal-card" data-aos="fade-up">
         <div class="herbal-img">
-          <img src="https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=400&q=80" alt="Chyawanprash">
+          <img src="images/med_18.jpg" alt="Chyawanprash">
         </div>
         <div class="herbal-body">
           <div class="herbal-tag">🌿 Tonic</div>
@@ -1049,7 +1109,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="herbal-card" data-aos="fade-up">
         <div class="herbal-img">
-          <img src="https://images.unsplash.com/photo-1636207543865-acf3ad382295?w=400&q=80" alt="Neem">
+          <img src="images/med_19.jpg" alt="Neem">
         </div>
         <div class="herbal-body">
           <div class="herbal-tag">🌿 Skin / Blood</div>
@@ -1061,7 +1121,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="herbal-card" data-aos="fade-up">
         <div class="herbal-img">
-          <img src="https://images.unsplash.com/photo-1599598425947-5202edd56bdb?w=400&q=80" alt="Tulsi">
+          <img src="images/med_0.jpg" alt="Tulsi">
         </div>
         <div class="herbal-body">
           <div class="herbal-tag">🌿 Respiratory</div>
@@ -1083,7 +1143,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-amber">
-          <img src="https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&q=80" alt="Vitamin C" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_1.jpg" alt="Vitamin C" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-amber" style="display:none"></div>
         </div>
         <div class="prod-badge">30 min</div>
@@ -1098,7 +1158,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-teal">
-          <img src="https://images.unsplash.com/photo-1631549916768-4119b4c3c0d5?w=400&q=80" alt="Vitamin D3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_2.jpg" alt="Vitamin D3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-teal" style="display:none"></div>
         </div>
         <div class="prod-badge">30 min</div>
@@ -1113,7 +1173,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="prod-card" data-aos="fade-up">
         <div class="prod-img bg-sand">
-          <img src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=400&q=80" alt="Omega 3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/med_3.jpg" alt="Omega 3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="prod-img-fallback bg-sand" style="display:none"></div>
         </div>
         <div class="prod-badge">30 min</div>
@@ -1148,14 +1208,14 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
           </div>
         </div>
         <div class="oxy-img-block">
-          <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&q=80" alt="Oxygen Cylinder">
+          <img src="images/med_15.jpg?w=300&q=80" alt="Oxygen Cylinder">
         </div>
       </div>
 
       <div class="oxy-side" data-aos="fade-left">
         <div class="oxy-side-eyebrow">HOME THERAPY</div>
         <div class="oxy-side-title">OXYGEN<br>CONCENTRATOR</div>
-        <img src="https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&q=80" alt="Concentrator" class="oxy-side-img">
+        <img src="images/med_4.jpg" alt="Concentrator" class="oxy-side-img">
         <div class="oxy-side-sub">Continuous flow, no refills needed. Ideal for long-term home oxygen therapy, COPD, sleep apnea recovery.</div>
         <div class="oxy-side-price">₹18,500</div>
         <div class="oxy-side-pack">5L/min · 24hr operation · ISI mark · 1yr warranty</div>
@@ -1173,7 +1233,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="device-card" data-aos="fade-up">
         <div class="device-img">
-          <img src="https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=400&q=80" alt="BP Monitor">
+          <img src="images/med_5.jpg" alt="BP Monitor">
         </div>
         <div class="device-body">
           <div class="prod-tag">Cardiac</div>
@@ -1186,7 +1246,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="device-card" data-aos="fade-up">
         <div class="device-img">
-          <img src="https://images.unsplash.com/photo-1583947582774-d1c55a4e4d89?w=400&q=80" alt="Glucometer">
+          <img src="images/med_6.jpg" alt="Glucometer">
         </div>
         <div class="device-body">
           <div class="prod-tag">Diabetes</div>
@@ -1199,7 +1259,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="device-card" data-aos="fade-up">
         <div class="device-img">
-          <img src="https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=400&q=80" alt="Pulse Oximeter">
+          <img src="images/med_7.jpg" alt="Pulse Oximeter">
         </div>
         <div class="device-body">
           <div class="prod-tag">Respiratory</div>
@@ -1212,7 +1272,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
       <div class="device-card" data-aos="fade-up">
         <div class="device-img">
-          <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&q=80" alt="Nebulizer">
+          <img src="images/med_8.jpg" alt="Nebulizer">
         </div>
         <div class="device-body">
           <div class="prod-tag">Respiratory</div>
@@ -1267,6 +1327,49 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
   </div><!-- end main -->
 </div><!-- end content -->
+
+
+<!-- CART SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <div class="cart-title">YOUR CART</div>
+    <button class="cart-close" id="closeCart">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty">Your cart is empty.</div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-summary-row"><span>Subtotal</span><span id="cartSub">₹0</span></div>
+    <div class="cart-summary-row"><span>Delivery Fee</span><span style="color:var(--green)">FREE</span></div>
+    <div class="cart-total-row"><span>Total</span><span id="cartTotal">₹0</span></div>
+    <button class="checkout-btn ripple-btn">Checkout securely →</button>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="prod-modal" id="prodModal">
+    <button class="pm-close" id="closeModal">✕</button>
+    <div class="pm-img-sec">
+      <img src="" alt="Product" class="pm-img" id="pmImg">
+    </div>
+    <div class="pm-info-sec">
+      <div class="pm-tag" id="pmTag">Category</div>
+      <div class="pm-name" id="pmName">Product Name</div>
+      <div class="pm-mol" id="pmMol">Molecule Name</div>
+      <div class="pm-desc" id="pmDesc">This is a high quality essential medicine verified by CDSCO. Sourced directly from verified manufacturers and partner pharmacies to ensure 100% genuine quality.</div>
+      <div class="pm-price-wrap">
+        <div class="pm-price" id="pmPrice">₹0</div>
+        <div class="pm-mrp" id="pmMrp">₹0</div>
+      </div>
+      <div class="pm-actions">
+        <button class="pm-btn-cart ripple-btn" id="pmAddToCart">🛒 Add to Cart</button>
+        <button class="pm-btn-book ripple-btn" id="pmBookNow">⚡ Immediate Book</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <div class="footer">
