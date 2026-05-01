@@ -92,13 +92,18 @@ medicineData.forEach(item => {
     const mrp = Math.floor(price * 1.15); // 15% markup for MRP
     
     // Assign a unique local image based on brand name hash
+    const goodImages = [
+      "images/med_1.jpg", "images/med_2.jpg", "images/med_3.jpg", 
+      "images/tablets.png", "images/syrup.png", "images/cream.png", "images/inhaler.png",
+      "images/med_6.jpg", "images/med_7.jpg", "images/med_8.jpg"
+    ];
     const str = brand.toLowerCase();
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
-    const imgIndex = Math.abs(hash) % 20;
-    const randomImg = `images/med_${imgIndex}.jpg`;
+    const imgIndex = Math.abs(hash) % goodImages.length;
+    const randomImg = goodImages[imgIndex];
     
     allProducts.push({
       id: brand.toLowerCase().replace(/\\s+/g, '-'),
