@@ -13,21 +13,17 @@
     --input-border: var(--border-color);
     --shadow: var(--card-shadow);
 
-    /* Login-specific light theme */
-    --primary-blue: #191970;
-    --acc-blue: #121250;
-    --card-bg: #F5F7F8;
-    --form-bg: #F5F7F8;
+    /* Patient-specific colors */
+    --primary-blue: var(--primary-color);
+    --acc-blue: var(--accent-color);
+    --card-bg: var(--surface-color);
+    --form-bg: var(--surface-color);
 }
 
 [data-theme="dark"] {
     --primary-yellow: #ca8a04;
     --acc-yellow: #eab308;
     --pure-white: #ffffff;
-    --primary-blue: #21aaff;
-    --acc-blue: #0099ff;
-    --card-bg: #1E1E1E;
-    --form-bg: #1E1E1E;
 }
 
 * {

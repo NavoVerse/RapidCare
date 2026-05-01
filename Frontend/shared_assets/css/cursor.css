@@ -1,0 +1,138 @@
+:root {
+  /* Default (Dark Mode colors) */
+  --cursor-l1: #A7EBF2;
+  --cursor-l2: #54ACBF;
+  --cursor-blend: screen;
+}
+
+[data-theme="light"] {
+  --cursor-l1: #191970; /* Midnight Blue from theme.css */
+  --cursor-l2: #2563EB; /* Primary Blue */
+  --cursor-blend: multiply;
+}
+
+body {
+  cursor: none !important;
+}
+
+/* Hide cursor on interactive elements as well */
+a, button, input, select, textarea, .stat-card, .amb-card, .tr-row {
+  cursor: none !important;
+}
+
+/* ── CURSOR ── */
+.cursor-dot {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: var(--cursor-l1);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform .1s, width .2s, height .2s;
+  mix-blend-mode: var(--cursor-blend);
+}
+
+.cursor-ring {
+  position: fixed;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--cursor-l1);
+  opacity: 0.4;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform .12s ease, width .3s, height .3s;
+}
+
+.cursor-dot.hover {
+  width: 16px;
+  height: 16px;
+  background: var(--cursor-l2);
+}
+
+.cursor-ring.hover {
+  width: 48px;
+  height: 48px;
+  border-color: var(--cursor-l2);
+  opacity: 0.6;
+}
+
+/* ── TRAIL ── */
+.cursor-trail {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9995;
+  border-radius: 50%;
+  background: var(--cursor-l2);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  animation: trailFade .5s ease-out forwards;
+}
+
+@keyframes trailFade {
+  0%   { opacity: .55; transform: translate(-50%,-50%) scale(1); }
+  100% { opacity: 0;   transform: translate(-50%,-50%) scale(0); }
+}
+
+/* ── SPLASH ── */
+.splash-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9996;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  animation: splashFly var(--dur, .7s) ease-out forwards;
+}
+
+@keyframes splashFly {
+  0%   { opacity: 1; transform: translate(-50%,-50%) translate(0,0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%,-50%) translate(var(--tx),var(--ty)) scale(0); }
+}
+
+.splash-ring {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9996;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--cursor-l1);
+  transform: translate(-50%, -50%) scale(1);
+  animation: splashRingOut .55s ease-out forwards;
+}
+
+@keyframes splashRingOut {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(6); }
+}
+
+/* ── TOUCH RIPPLE ── */
+.touch-ripple {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9997;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  border: 2px solid var(--cursor-l2);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  transition: none;
+}
+
+.touch-ripple.active {
+  animation: rippleAnim .6s ease-out forwards;
+}
+
+@keyframes rippleAnim {
+  0%   { opacity: .8; transform: translate(-50%, -50%) scale(0); }
+  100% { opacity: 0;  transform: translate(-50%, -50%) scale(2.5); }
+}
+
+/* Hide on mobile if needed, or keep for premium touch feel */
+@media (max-width: 768px) {
+  /* Some devs prefer hiding custom cursors on mobile, but this one has ripple effects */
+}

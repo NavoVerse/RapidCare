@@ -40,35 +40,6 @@ body {
     cursor: none;
 }
 
-/* CUSTOM CURSOR */
-.cursor {
-    position: fixed;
-    width: 12px;
-    height: 12px;
-    background: var(--blue-glow);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: transform .1s, width .2s, height .2s, opacity .2s;
-    mix-blend-mode: screen;
-}
-
-.cursor-ring {
-    position: fixed;
-    width: 36px;
-    height: 36px;
-    border: 1px solid rgba(96, 165, 250, .4);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate(-50%, -50%);
-    transition: transform .12s ease, width .3s, height .3s;
-}
-
-body:hover .cursor {
-    opacity: 1;
-}
 
 /* ─── SPLASH ─── */
 #splash {

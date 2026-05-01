@@ -1,5 +1,7 @@
 :root {
     --primary-blue: var(--primary-color);
+    --shadow: var(--card-shadow);
+    --border-color: var(--border-color);
 }
 
 * {
@@ -15,13 +17,8 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 5px; /* Extremely small margin to use "more little space" */
-    transition: all 0.4s ease;
-}
-
-[data-theme="dark"] body {
-    background: var(--bg-color);
-    color: var(--primary-text);
+    padding: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .registration-container {
