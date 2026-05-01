@@ -108,7 +108,58 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    initUploadBoxes();
 });
+
+function initUploadBoxes() {
+    const uploadBoxes = document.querySelectorAll('.upload-box');
+    uploadBoxes.forEach(box => {
+        // Create hidden input
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.className = 'hidden-upload-input';
+        input.style.display = 'none';
+        
+        // Set accept types based on description
+        const desc = box.querySelector('.upload-desc')?.innerText || '';
+        if (desc.includes('PDF')) {
+            input.accept = 'image/*,application/pdf';
+        } else {
+            input.accept = 'image/*';
+        }
+
+        box.appendChild(input);
+
+        box.addEventListener('click', () => {
+            input.click();
+        });
+
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const title = box.querySelector('.upload-title');
+                if (title) {
+                    title.innerText = file.name;
+                    box.style.borderColor = 'var(--primary-color)';
+                    box.style.background = 'rgba(59, 130, 246, 0.05)';
+                    box.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.1)';
+                }
+                const icon = box.querySelector('.upload-icon');
+                if (icon) {
+                    icon.innerHTML = '✓';
+                    icon.style.color = 'var(--primary-color)';
+                    icon.classList.add('uploaded');
+                }
+                const descElem = box.querySelector('.upload-desc');
+                if (descElem) {
+                    descElem.innerText = 'File selected successfully';
+                    descElem.style.color = 'var(--primary-color)';
+                }
+            }
+        });
+    });
+}
 
 function nextStep(currentStep) {
     let form;
