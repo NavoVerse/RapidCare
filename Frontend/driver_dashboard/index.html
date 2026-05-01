@@ -19,6 +19,8 @@
 
 <body>
     <div class="app-container">
+        <!-- Mobile sidebar backdrop -->
+        <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -78,6 +80,9 @@
         <main class="main-content">
             <header class="main-header">
                 <div class="header-left">
+                    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
                     <h1>Dashboard</h1>
                 </div>
                 <div class="header-right">
@@ -620,6 +625,36 @@
                     boxes.forEach(box => box.classList.remove('skeleton-box', 'loaded'));
                 }, 500);
             }, 1000);
+
+            // Mobile sidebar toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.querySelector('.sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+
+            function toggleMobileSidebar() {
+                sidebar.classList.toggle('active');
+                backdrop.classList.toggle('active');
+            }
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
+            }
+            if (backdrop) {
+                backdrop.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                    backdrop.classList.remove('active');
+                });
+            }
+
+            // Close sidebar when nav item clicked on mobile
+            document.querySelectorAll('.sidebar .nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                        backdrop.classList.remove('active');
+                    }
+                });
+            });
         });
     </script>
 </body>
