@@ -87,23 +87,10 @@ let allProducts = [];
 
 // Image sets based on form/category
 const imgMap = {
-  "tablets": [
-    "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&q=80",
-    "https://images.unsplash.com/photo-1550572017-edb7df08b493?w=400&q=80",
-    "https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=400&q=80",
-    "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&q=80"
-  ],
-  "syrup": [
-    "https://images.unsplash.com/photo-1585435557343-3b092031a831?w=400&q=80",
-    "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&q=80"
-  ],
-  "cream": [
-    "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=400&q=80",
-    "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&q=80"
-  ],
-  "inhaler": [
-    "https://images.unsplash.com/photo-1576602976047-174e57a47881?w=400&q=80"
-  ]
+  "tablets": ["images/tablets.png"],
+  "syrup": ["images/syrup.png"],
+  "cream": ["images/cream.png"],
+  "inhaler": ["images/inhaler.png"]
 };
 
 medicineData.forEach(item => {
