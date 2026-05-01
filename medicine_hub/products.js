@@ -91,22 +91,49 @@ medicineData.forEach(item => {
     const price = Math.floor(Math.random() * 380) + 20;
     const mrp = Math.floor(price * 1.15); // 15% markup for MRP
     
-    // Assign a unique local image based on brand name hash
-    const goodImages = [
-      "images/med_1.jpg", "images/med_2.jpg", "images/med_3.jpg", 
-      "images/tablets.png", "images/syrup.png", "images/cream.png", "images/inhaler.png",
-      "images/med_6.jpg", "images/med_7.jpg", "images/med_8.jpg"
-    ];
-    const str = brand.toLowerCase();
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    // Assign a specific image if it exists, else fallback to category defaults
+    const brandLower = brand.toLowerCase().replace(/\s+/g, '-');
+    const specificImages = {
+      'crocin': 'images/crocin.png',
+      'calpol': 'images/calpol.jpg',
+      'dolo-650': 'images/dolo-650.png',
+      'metacin': 'images/metacin.jpg',
+      'pacimol': 'images/pacimol.png',
+      'brufen': 'images/brufen.png',
+      'augmentin': 'images/augmentin.png',
+      'zifi': 'images/zifi.png',
+      'glycomet': 'images/glycomet.png',
+      'telma': 'images/telma.png',
+      'taxim-o': 'images/taxim-o.jpg',
+      'omez': 'images/omez.jpg',
+      'allegra': 'images/allegra.jpg',
+      'pantocid': 'images/pantocid.jpg',
+      'becosules': 'images/becosules.jpg',
+      'shelcal': 'images/shelcal.jpg',
+      'revital': 'images/revital.jpg',
+      'voveran': 'images/voveran.jpg',
+      'zerodol': 'images/zerodol.jpg',
+      'nucoxia': 'images/nucoxia.jpg',
+      'electral': 'images/electral.png',
+      'montair': 'images/montair.png'
+    };
+    
+    let imgPath = specificImages[brandLower] || null;
+    
+    if (!imgPath) {
+      // Fallback to category based generic images
+      const cat = item.category;
+      if (cat === "Antibiotics") imgPath = "images/tablets.png";
+      else if (cat === "Cardiac Care") imgPath = "images/tablets.png";
+      else if (cat === "Diabetes") imgPath = "images/tablets.png";
+      else if (cat === "Respiratory") imgPath = item.molecule.includes("Inhaler") ? "images/inhaler.png" : "images/syrup.png";
+      else if (cat === "Dermatology") imgPath = "images/cream.png";
+      else if (cat === "Supplements") imgPath = "images/tablets.png";
+      else imgPath = "images/tablets.png";
     }
-    const imgIndex = Math.abs(hash) % goodImages.length;
-    const randomImg = goodImages[imgIndex];
     
     allProducts.push({
-      id: brand.toLowerCase().replace(/\\s+/g, '-'),
+      id: brandLower,
       name: brand,
       molecule: item.molecule,
       category: item.category,
@@ -116,7 +143,7 @@ medicineData.forEach(item => {
       price: price,
       mrp: mrp,
       pack: "Strip of 10 tablets",
-      img: randomImg
+      img: imgPath
     });
   });
 });
