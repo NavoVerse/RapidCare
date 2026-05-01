@@ -1,5 +1,5 @@
 // animations.ts
-
+export {};
 // 1. Custom Trailing Cursor
 const cursorDot = document.createElement("div");
 const cursorOutline = document.createElement("div");
