@@ -88,95 +88,77 @@ body {
 /* Named Stepper (Premium Horizontal) */
 .named-stepper {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 50px;
-    padding: 10px;
     background: var(--bg-color);
-    border-radius: 20px;
+    border-radius: 15px;
+    overflow: hidden;
     border: 1.5px solid var(--border-color);
-    position: relative;
+    margin-bottom: 30px;
     counter-reset: step-counter;
 }
 
 .step-item {
     flex: 1;
     text-align: center;
-    padding: 15px 10px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
+    padding: 20px 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--secondary-text);
+    background: transparent;
+    border-right: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    position: relative;
 }
 
-.step-item:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 1px;
-    height: 30px;
-    background: var(--border-color);
+.step-item:hover:not(.active) {
+    background: var(--surface-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.step-item:last-child {
+    border-right: none;
+}
+
+.step-item.active {
+    background: var(--primary-bg-active);
+    color: var(--primary-color);
 }
 
 .step-label {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--secondary-text);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    text-transform: capitalize;
+    font-family: var(--font-body);
 }
 
 .step-label::before {
     counter-increment: step-counter;
-    content: counter(step-counter);
-    width: 24px;
-    height: 24px;
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
+    content: counter(step-counter) ". ";
+}
+
+.step-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 4px;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.step-item.active::after {
+    width: 100%;
 }
 
 .step-indicator {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 3px;
-    background: var(--primary-color);
-    transform: translateX(-50%);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border-radius: 10px;
-}
-
-.step-item.active .step-label {
-    color: var(--primary-color);
-}
-
-.step-item.active .step-label::before {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 10px rgba(33, 170, 255, 0.3);
-}
-
-.step-item.active .step-indicator {
-    width: 60%;
-}
-
-.step-item:hover .step-label {
-    color: var(--primary-text);
-    transform: translateY(-2px);
+    display: none;
 }
 
 /* Premium Container */
