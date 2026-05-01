@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RapidCare — Medicine Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cyprus:#004643;
+  --cyprus-hover:#005c58;
+  --cyprus-dim:rgba(0,70,67,0.07);
+  --cyprus-border:rgba(0,70,67,0.2);
+  --sand:#F0EDE5;
+  --sand-dark:#e4e0d6;
+  --sand-border:rgba(0,70,67,0.12);
+  --ink:#1c1c1a;
+  --ink-mid:#4e4e48;
+  --ink-faint:#9a9a90;
+  --white:#ffffff;
+  --amber:#F5A623;
+  --red:#C0392B;
+  --blue:#185FA5;
+  --green:#1a7a4a;
+  --purple:#7B4EA6;
+  --headline:'Bebas Neue',sans-serif;
+  --body:'Atkinson Hyperlegible',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:14px;min-width:320px}
+
+/* ── TOPBAR ── */
+.topbar{
+  background:var(--cyprus);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:62px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 20px rgba(0,0,0,0.18);
+}
+.topbar-brand{display:flex;align-items:baseline;gap:10px;cursor:pointer}
+.topbar-rc{font-family:var(--headline);font-size:30px;color:var(--sand);letter-spacing:0.04em}
+.topbar-sep{width:1px;height:18px;background:rgba(240,237,229,0.2);align-self:center}
+.topbar-sub{font-size:11px;color:rgba(240,237,229,0.55);letter-spacing:0.1em;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:22px}
+.topbar-nav{font-size:13px;color:rgba(240,237,229,0.6);cursor:pointer;font-weight:700;transition:color 0.15s}
+.topbar-nav:hover,.topbar-nav.active{color:var(--sand)}
+.cart-btn{
+  display:flex;align-items:center;gap:7px;
+  background:var(--sand);color:var(--cyprus);
+  border:none;border-radius:8px;padding:8px 18px;
+  font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);
+  transition:opacity 0.15s;
+}
+.cart-btn:hover{opacity:0.88}
+.cart-badge{
+  background:var(--amber);color:var(--ink);
+  border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:2px;
+}
+
+/* ── HERO ── */
+.hero{
+  background:var(--cyprus);
+  padding:44px 40px 48px;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+}
+.hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.14em;color:rgba(240,237,229,0.45);margin-bottom:10px}
+.hero-title{font-family:var(--headline);font-size:72px;color:var(--sand);line-height:0.9;letter-spacing:0.02em}
+.hero-title span{color:var(--amber)}
+.hero-desc{font-size:14px;color:rgba(240,237,229,0.6);margin-top:16px;max-width:400px;line-height:1.7}
+.hero-actions{display:flex;gap:10px;margin-top:24px;align-items:center}
+.btn-primary{background:var(--sand);color:var(--cyprus);border:none;border-radius:8px;padding:13px 26px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);transition:opacity 0.15s}
+.btn-primary:hover{opacity:0.88}
+.btn-outline{background:transparent;color:var(--sand);border:1px solid rgba(240,237,229,0.35);border-radius:8px;padding:13px 26px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);transition:all 0.15s}
+.btn-outline:hover{background:rgba(240,237,229,0.07)}
+.hero-stats{display:flex;gap:36px;flex-shrink:0}
+.hstat{text-align:right}
+.hstat-num{font-family:var(--headline);font-size:40px;color:var(--sand);letter-spacing:0.02em}
+.hstat-label{font-size:11px;color:rgba(240,237,229,0.42);font-weight:700;letter-spacing:0.07em;margin-top:2px}
+
+/* ── TRUST STRIP ── */
+.trust-strip{
+  background:var(--amber);
+  display:flex;align-items:center;justify-content:center;gap:40px;
+  padding:10px 40px;flex-wrap:wrap;
+}
+.trust-item{font-size:12px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px}
+
+/* ── FILTER ROW ── */
+.filter-row{
+  display:flex;align-items:center;gap:12px;
+  padding:20px 40px;background:var(--white);
+  border-bottom:1px solid var(--sand-border);
+  flex-wrap:wrap;
+}
+.search-wrap{
+  flex:1;max-width:380px;
+  display:flex;align-items:center;gap:10px;
+  background:var(--sand);border:1px solid var(--sand-border);
+  border-radius:8px;padding:10px 14px;
+}
+.search-input{background:transparent;border:none;outline:none;font-family:var(--body);font-size:13px;color:var(--ink);width:100%}
+.search-input::placeholder{color:var(--ink-faint)}
+.cats{display:flex;gap:8px;flex-wrap:wrap}
+.cat{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--body);border:1px solid transparent;transition:all 0.15s}
+.cat.on{background:var(--cyprus);color:var(--sand)}
+.cat.off{background:transparent;color:var(--ink-mid);border-color:var(--sand-border)}
+.cat.off:hover{border-color:var(--cyprus-border);color:var(--cyprus)}
+.sort-wrap{margin-left:auto;display:flex;align-items:center;gap:8px}
+.sort-label{font-size:12px;color:var(--ink-faint);font-weight:700}
+.sort-sel{background:var(--sand);border:1px solid var(--sand-border);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--ink);font-family:var(--body);font-weight:700;outline:none;cursor:pointer}
+
+/* ── LAYOUT ── */
+.hub{max-width:100%;margin:0 auto}
+.content{padding:32px 40px;display:flex;gap:28px}
+.sidebar{width:210px;flex-shrink:0}
+.main{flex:1;min-width:0}
+
+/* ── SIDEBAR ── */
+.sb-section{margin-bottom:28px}
+.sb-title{font-family:var(--headline);font-size:20px;color:var(--cyprus);letter-spacing:0.04em;margin-bottom:12px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;margin-bottom:3px;transition:background 0.12s}
+.sb-item:hover{background:var(--cyprus-dim)}
+.sb-item.active{background:var(--cyprus-dim)}
+.sb-item-dot{width:7px;height:7px;border-radius:50%;background:var(--cyprus);flex-shrink:0}
+.sb-item-dot.off{background:var(--sand-border)}
+.sb-item.active .sb-item-dot{background:var(--cyprus)}
+.sb-item-text{font-size:13px;color:var(--ink-mid);font-weight:700}
+.sb-item.active .sb-item-text{color:var(--cyprus)}
+.sb-count{margin-left:auto;font-size:11px;color:var(--ink-faint);font-weight:700;background:var(--sand-dark);border-radius:10px;padding:2px 7px}
+
+.sb-promo{background:var(--cyprus);border-radius:14px;padding:20px;margin-top:4px}
+.sb-promo-label{font-size:10px;color:rgba(240,237,229,0.5);letter-spacing:0.1em;font-weight:700;margin-bottom:6px}
+.sb-promo-title{font-family:var(--headline);font-size:26px;color:var(--sand);line-height:1;margin-bottom:6px}
+.sb-promo-sub{font-size:12px;color:rgba(240,237,229,0.6);line-height:1.55}
+.sb-promo-btn{margin-top:14px;width:100%;background:var(--sand);color:var(--cyprus);border:none;border-radius:8px;padding:10px 0;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--body);transition:opacity 0.15s}
+.sb-promo-btn:hover{opacity:0.88}
+
+.sb-offers{margin-top:16px;border:1px solid var(--sand-border);border-radius:14px;overflow:hidden}
+.sb-offer{padding:14px;border-bottom:1px solid var(--sand-border);cursor:pointer;transition:background 0.12s}
+.sb-offer:last-child{border-bottom:none}
+.sb-offer:hover{background:var(--cyprus-dim)}
+.sb-offer-tag{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--amber);margin-bottom:3px}
+.sb-offer-title{font-size:13px;font-weight:700;color:var(--ink)}
+.sb-offer-sub{font-size:11px;color:var(--ink-faint);margin-top:2px}
+
+/* ── SECTION HEADERS ── */
+.sec-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px}
+.sec-title{font-family:var(--headline);font-size:32px;color:var(--ink);letter-spacing:0.03em}
+.sec-link{font-size:12px;font-weight:700;color:var(--cyprus);cursor:pointer}
+.sec-link:hover{text-decoration:underline}
+
+/* ── EMERGENCY BANNER ── */
+.emerg{
+  background:var(--cyprus);border-radius:16px;
+  padding:24px 28px;display:flex;align-items:center;gap:24px;
+  margin-bottom:30px;
+}
+.emerg-icon{width:54px;height:54px;border-radius:13px;background:rgba(240,237,229,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.emerg-body{flex:1}
+.emerg-tag{font-size:10px;font-weight:700;letter-spacing:0.14em;color:var(--amber);margin-bottom:4px}
+.emerg-title{font-family:var(--headline);font-size:28px;color:var(--sand);letter-spacing:0.02em;line-height:1}
+.emerg-sub{font-size:13px;color:rgba(240,237,229,0.6);margin-top:4px}
+.emerg-right{display:flex;gap:10px;align-items:center}
+.emerg-timer{background:rgba(240,237,229,0.1);border:1px solid rgba(240,237,229,0.2);border-radius:11px;padding:12px 18px;text-align:center}
+.emerg-timer-num{font-family:var(--headline);font-size:30px;color:var(--amber);letter-spacing:0.04em;line-height:1}
+.emerg-timer-label{font-size:10px;color:rgba(240,237,229,0.5);font-weight:700;letter-spacing:0.06em;margin-top:2px}
+.emerg-btn{background:var(--sand);color:var(--cyprus);border:none;border-radius:10px;padding:15px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);white-space:nowrap;transition:opacity 0.15s}
+.emerg-btn:hover{opacity:0.88}
+
+/* ── PRODUCT CARDS ── */
+.prod-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:32px}
+.prod-card{background:var(--white);border-radius:14px;border:1px solid var(--sand-border);overflow:hidden;cursor:pointer;transition:all 0.18s;position:relative}
+.prod-card:hover{border-color:var(--cyprus-border);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,70,67,0.1)}
+.prod-img{height:120px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.prod-img img{width:100%;height:100%;object-fit:cover}
+.prod-img-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.bg-teal{background:var(--cyprus-dim)}
+.bg-sand{background:var(--sand-dark)}
+.bg-amber{background:rgba(245,166,35,0.1)}
+.bg-blue{background:rgba(24,95,165,0.07)}
+.bg-red{background:rgba(192,57,43,0.07)}
+.bg-green{background:rgba(26,122,74,0.07)}
+.bg-purple{background:rgba(123,78,166,0.07)}
+.prod-badge{position:absolute;top:8px;left:8px;background:var(--cyprus);color:var(--sand);font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:0.06em}
+.prod-badge.rx{background:var(--amber);color:var(--ink)}
+.prod-body{padding:14px}
+.prod-tag{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--cyprus);margin-bottom:5px;text-transform:uppercase}
+.prod-name{font-size:14px;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:3px}
+.prod-mfr{font-size:11px;color:var(--ink-faint);margin-bottom:4px}
+.prod-pack{font-size:11px;color:var(--ink-faint);margin-bottom:12px}
+.prod-foot{display:flex;align-items:center;justify-content:space-between}
+.prod-price-wrap{display:flex;align-items:baseline;gap:6px}
+.prod-price{font-family:var(--headline);font-size:23px;color:var(--cyprus);letter-spacing:0.02em}
+.prod-mrp{font-size:11px;color:var(--ink-faint);text-decoration:line-through}
+.add-btn{display:flex;align-items:center;gap:6px;background:var(--cyprus);color:var(--sand);border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--body);transition:background 0.15s}
+.add-btn:hover{background:var(--cyprus-hover)}
+
+/* ── KIT CARDS ── */
+.kit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:32px}
+.kit-card{background:var(--white);border-radius:14px;border:1px solid var(--sand-border);overflow:hidden;cursor:pointer;transition:all 0.18s}
+.kit-card:hover{border-color:var(--cyprus-border);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,70,67,0.1)}
+.kit-img{height:140px;overflow:hidden;position:relative}
+.kit-img img{width:100%;height:100%;object-fit:cover}
+.kit-img-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.5))}
+.kit-img-label{position:absolute;bottom:10px;left:12px;font-size:10px;font-weight:700;letter-spacing:0.12em;color:rgba(255,255,255,0.8)}
+.kit-body{padding:16px}
+.kit-tag{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--cyprus);margin-bottom:4px;text-transform:uppercase}
+.kit-name{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:5px}
+.kit-sub{font-size:12px;color:var(--ink-faint);line-height:1.55;margin-bottom:14px}
+.kit-items{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px}
+.kit-item-tag{font-size:10px;background:var(--cyprus-dim);color:var(--cyprus);font-weight:700;padding:2px 8px;border-radius:10px}
+.kit-foot{display:flex;align-items:center;justify-content:space-between}
+.kit-price{font-family:var(--headline);font-size:26px;color:var(--cyprus);letter-spacing:0.02em}
+.kit-add{background:var(--cyprus);color:var(--sand);border:none;border-radius:8px;padding:10px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--body);transition:background 0.15s}
+.kit-add:hover{background:var(--cyprus-hover)}
+
+/* ── OXYGEN SECTION ── */
+.oxy-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:32px}
+.oxy-main{grid-column:1/3;background:var(--cyprus);border-radius:14px;padding:28px;display:flex;gap:24px;align-items:center}
+.oxy-text{flex:1}
+.oxy-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.14em;color:rgba(240,237,229,0.5);margin-bottom:8px}
+.oxy-title{font-family:var(--headline);font-size:36px;color:var(--sand);letter-spacing:0.02em;line-height:1}
+.oxy-desc{font-size:12px;color:rgba(240,237,229,0.6);margin-top:10px;line-height:1.65}
+.oxy-vars{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.oxy-var{background:rgba(240,237,229,0.08);border:1px solid rgba(240,237,229,0.15);border-radius:10px;padding:12px 16px;cursor:pointer;transition:background 0.15s}
+.oxy-var:hover{background:rgba(240,237,229,0.13)}
+.oxy-var-name{font-size:11px;color:rgba(240,237,229,0.55);margin-bottom:4px;font-weight:700}
+.oxy-var-price{font-family:var(--headline);font-size:22px;color:var(--sand);letter-spacing:0.02em}
+.oxy-var-sub{font-size:10px;color:rgba(240,237,229,0.4);margin-top:2px}
+.oxy-img-block{width:110px;height:110px;border-radius:16px;overflow:hidden;flex-shrink:0}
+.oxy-img-block img{width:100%;height:100%;object-fit:cover}
+.oxy-side{background:var(--white);border-radius:14px;border:1px solid var(--sand-border);padding:22px;display:flex;flex-direction:column}
+.oxy-side-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--cyprus);margin-bottom:6px}
+.oxy-side-title{font-family:var(--headline);font-size:22px;color:var(--ink);letter-spacing:0.03em;margin-bottom:5px}
+.oxy-side-sub{font-size:12px;color:var(--ink-faint);margin-bottom:18px;line-height:1.55;flex:1}
+.oxy-side-img{width:100%;height:80px;object-fit:cover;border-radius:10px;margin-bottom:14px}
+.oxy-side-price{font-family:var(--headline);font-size:30px;color:var(--cyprus);letter-spacing:0.02em}
+.oxy-side-pack{font-size:11px;color:var(--ink-faint);margin-top:2px;margin-bottom:18px}
+.oxy-side-btn{background:var(--cyprus);color:var(--sand);border:none;border-radius:8px;padding:12px 0;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);width:100%;transition:background 0.15s}
+.oxy-side-btn:hover{background:var(--cyprus-hover)}
+
+/* ── DEVICES SECTION ── */
+.devices-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:32px}
+.device-card{background:var(--white);border-radius:14px;border:1px solid var(--sand-border);overflow:hidden;cursor:pointer;transition:all 0.18s}
+.device-card:hover{border-color:var(--cyprus-border);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,70,67,0.1)}
+.device-img{height:100px;overflow:hidden}
+.device-img img{width:100%;height:100%;object-fit:cover}
+.device-body{padding:12px}
+.device-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.device-sub{font-size:11px;color:var(--ink-faint);margin-bottom:10px}
+.device-price{font-family:var(--headline);font-size:20px;color:var(--cyprus)}
+
+/* ── SUPPLEMENTS ── */
+.supp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:32px}
+
+/* ── PROMO BANNER ── */
+.promo-banner{
+  border-radius:16px;background:linear-gradient(135deg,var(--cyprus) 0%,#002d2b 100%);
+  padding:28px 32px;display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:32px;gap:20px;
+}
+.promo-left{}
+.promo-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.14em;color:rgba(240,237,229,0.45);margin-bottom:6px}
+.promo-title{font-family:var(--headline);font-size:38px;color:var(--sand);letter-spacing:0.02em;line-height:1}
+.promo-title span{color:var(--amber)}
+.promo-sub{font-size:13px;color:rgba(240,237,229,0.6);margin-top:8px;max-width:320px;line-height:1.6}
+.promo-right{display:flex;gap:12px;align-items:center;flex-shrink:0}
+.promo-stat{background:rgba(240,237,229,0.08);border:1px solid rgba(240,237,229,0.15);border-radius:12px;padding:14px 20px;text-align:center}
+.promo-stat-num{font-family:var(--headline);font-size:30px;color:var(--amber);letter-spacing:0.02em;line-height:1}
+.promo-stat-label{font-size:10px;color:rgba(240,237,229,0.5);font-weight:700;letter-spacing:0.07em;margin-top:2px}
+.promo-btn{background:var(--sand);color:var(--cyprus);border:none;border-radius:10px;padding:14px 26px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--body);white-space:nowrap;transition:opacity 0.15s}
+.promo-btn:hover{opacity:0.88}
+
+/* ── AYURVEDA / HERBAL ── */
+.herbal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:32px}
+.herbal-card{background:var(--white);border-radius:14px;border:1px solid var(--sand-border);overflow:hidden;cursor:pointer;transition:all 0.18s}
+.herbal-card:hover{border-color:var(--cyprus-border);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,70,67,0.1)}
+.herbal-img{height:110px;overflow:hidden}
+.herbal-img img{width:100%;height:100%;object-fit:cover}
+.herbal-body{padding:14px}
+.herbal-tag{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--green);margin-bottom:4px;text-transform:uppercase}
+.herbal-name{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.herbal-sub{font-size:11px;color:var(--ink-faint);margin-bottom:12px}
+.herbal-foot{display:flex;align-items:center;justify-content:space-between}
+.herbal-price{font-family:var(--headline);font-size:22px;color:var(--green)}
+
+/* ── DELIVERY BAR ── */
+.del-bar{background:var(--white);border:1px solid var(--sand-border);border-radius:14px;padding:20px 28px;display:flex;gap:0;margin-bottom:32px}
+.del-item{flex:1;display:flex;align-items:center;gap:14px;padding:0 22px}
+.del-item:not(:last-child){border-right:1px solid var(--sand-border)}
+.del-item:first-child{padding-left:0}
+.del-icon{width:42px;height:42px;border-radius:11px;background:var(--cyprus-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.del-title{font-size:13px;font-weight:700;color:var(--ink)}
+.del-sub{font-size:11px;color:var(--ink-faint);margin-top:2px}
+
+/* ── FOOTER ── */
+.footer{background:var(--cyprus);padding:40px;margin-top:0}
+.footer-inner{max-width:100%;padding:0 40px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px}
+.footer-brand-name{font-family:var(--headline);font-size:32px;color:var(--sand);letter-spacing:0.04em;margin-bottom:8px}
+.footer-brand-desc{font-size:12px;color:rgba(240,237,229,0.55);line-height:1.65;max-width:220px}
+.footer-col-title{font-size:11px;font-weight:700;letter-spacing:0.12em;color:rgba(240,237,229,0.45);margin-bottom:14px}
+.footer-link{font-size:13px;color:rgba(240,237,229,0.65);cursor:pointer;margin-bottom:8px;transition:color 0.12s}
+.footer-link:hover{color:var(--sand)}
+.footer-bottom{max-width:100%;padding:0 40px;margin:32px auto 0;padding-top:24px;border-top:1px solid rgba(240,237,229,0.1);display:flex;align-items:center;justify-content:space-between}
+.footer-copy{font-size:12px;color:rgba(240,237,229,0.4)}
+.footer-badges{display:flex;gap:8px}
+.footer-badge{font-size:10px;font-weight:700;background:rgba(240,237,229,0.1);color:rgba(240,237,229,0.6);padding:4px 10px;border-radius:6px}
+
+/* ── CATEGORY PILLS (scrollable row) ── */
+.cat-scroll{display:flex;gap:10px;overflow-x:auto;padding:20px 40px;background:var(--white);border-bottom:1px solid var(--sand-border);scrollbar-width:none}
+.cat-scroll::-webkit-scrollbar{display:none}
+.cat-pill{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px;cursor:pointer;border:1px solid var(--sand-border);background:var(--white);transition:all 0.15s;font-family:var(--body)}
+.cat-pill:hover,.cat-pill.on{background:var(--cyprus);border-color:var(--cyprus)}
+.cat-pill:hover .cp-label,.cat-pill.on .cp-label{color:var(--sand)}
+.cp-icon{font-size:18px}
+.cp-label{font-size:12px;font-weight:700;color:var(--ink-mid)}
+
+/* ── ANIMATIONS ── */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:pulse 2s infinite;display:inline-block;margin-right:6px}
+
+/* ── RESPONSIVE STYLES ── */
+@media (max-width: 1024px) {
+  .hero { flex-direction: column; align-items: flex-start; padding: 40px 30px; }
+  .hero-stats { flex-wrap: wrap; justify-content: flex-start; margin-top: 24px; }
+  .content { flex-direction: column; padding: 30px; }
+  .sidebar { display: none; }
+  .prod-grid, .herbal-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .devices-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .kit-grid { grid-template-columns: 1fr; }
+  .oxy-row { grid-template-columns: 1fr; }
+  .oxy-main { grid-column: 1 / 2; flex-direction: column; align-items: flex-start; }
+  .oxy-img-block { width: 100%; height: 200px; }
+  .promo-banner { flex-direction: column; align-items: flex-start; }
+  .footer-inner { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .topbar { padding: 0 20px; }
+  .topbar-nav { display: none; }
+  .hero { padding: 30px 20px; }
+  .hero-title { font-size: 42px; }
+  .hero-actions { flex-direction: column; width: 100%; align-items: stretch; }
+  .btn-primary, .btn-outline { width: 100%; text-align: center; }
+  .filter-row { padding: 15px 20px; }
+  .search-wrap { max-width: 100%; flex: 1 1 100%; order: -1; margin-bottom: 10px; }
+  .cats { flex: 1 1 100%; }
+  .sort-wrap { flex: 1 1 100%; margin-left: 0; margin-top: 10px; }
+  .content { padding: 20px; }
+  .prod-grid, .herbal-grid { grid-template-columns: 1fr; }
+  .devices-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .emerg { flex-direction: column; align-items: flex-start; gap: 15px; padding: 20px; }
+  .emerg-right { width: 100%; flex-direction: column; align-items: stretch; }
+  .emerg-btn { width: 100%; }
+  .del-bar { flex-direction: column; padding: 15px; gap: 10px; }
+  .del-item { border-right: none !important; border-bottom: 1px solid var(--sand-border); padding: 10px 0 !important; }
+  .del-item:last-child { border-bottom: none; }
+  .footer { padding: 30px 20px; }
+  .cat-scroll { padding: 15px 20px; }
+}
+
+@media (max-width: 480px) {
+  .topbar-brand { flex-direction: column; align-items: flex-start; gap: 0; }
+  .topbar-sep { display: none; }
+  .topbar-sub { font-size: 10px; margin-top: 2px; }
+  .hero-title { font-size: 32px; }
+  .hero-stats { flex-direction: column; gap: 15px; }
+  .hstat { text-align: left; }
+  .devices-grid { grid-template-columns: 1fr; }
+  .promo-right { flex-direction: column; width: 100%; align-items: stretch; }
+  .promo-stat { width: 100%; }
+  .promo-btn { width: 100%; }
+  .footer-inner { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 15px; }
+}
+  
+</style>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="hub">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-rc">RAPIDCARE</div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-sub">MEDICINE HUB</div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-nav active">Shop</div>
+    <div class="topbar-nav">Orders</div>
+    <div class="topbar-nav">Prescriptions</div>
+    <div class="topbar-nav">Lab Tests</div>
+    <div class="topbar-nav">Doctors</div>
+    <button class="cart-btn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Cart <span class="cart-badge">3</span>
+    </button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left" data-aos="fade-right">
+    <div class="hero-eyebrow">RAPIDCARE / PATIENT PORTAL</div>
+    <div class="hero-title">MEDICINE<br><span>HUB</span></div>
+    <div class="hero-desc">India's most trusted online pharmacy — medicines, emergency kits, medical-grade oxygen, Ayurvedic products and devices delivered to your door within 30 minutes.</div>
+    <div class="hero-actions">
+      <button class="btn-primary">Shop now</button>
+      <button class="btn-outline">🚨 Emergency order</button>
+    </div>
+  </div>
+  <div class="hero-stats" data-aos="fade-left">
+    <div class="hstat"><div class="hstat-num">5,200+</div><div class="hstat-label">PRODUCTS</div></div>
+    <div class="hstat"><div class="hstat-num">30 min</div><div class="hstat-label">EXPRESS DELIVERY</div></div>
+    <div class="hstat"><div class="hstat-num">24/7</div><div class="hstat-label">AVAILABLE</div></div>
+    <div class="hstat"><div class="hstat-num">₹0</div><div class="hstat-label">DELIVERY FEE*</div></div>
+  </div>
+</div>
+
+<!-- TRUST STRIP -->
+<div class="trust-strip">
+  <div class="trust-item"><span>✅</span> CDSCO Approved</div>
+  <div class="trust-item"><span>🏥</span> 2,000+ Partner Pharmacies</div>
+  <div class="trust-item"><span>🌿</span> Genuine Ayurvedic Products</div>
+  <div class="trust-item"><span>💊</span> WHO-GMP Certified</div>
+  <div class="trust-item"><span>🔒</span> 100% Secure Payments</div>
+  <div class="trust-item"><span class="live-dot"></span> Live Order Tracking</div>
+</div>
+
+<!-- CATEGORY PILLS -->
+<div class="cat-scroll">
+  <div class="cat-pill on"><span class="cp-icon">🏠</span><span class="cp-label">All</span></div>
+  <div class="cat-pill"><span class="cp-icon">💊</span><span class="cp-label">Pain Relief</span></div>
+  <div class="cat-pill"><span class="cp-icon">🦠</span><span class="cp-label">Antibiotics</span></div>
+  <div class="cat-pill"><span class="cp-icon">❤️</span><span class="cp-label">Cardiac Care</span></div>
+  <div class="cat-pill"><span class="cp-icon">🩺</span><span class="cp-label">Diabetes</span></div>
+  <div class="cat-pill"><span class="cp-icon">🫁</span><span class="cp-label">Respiratory</span></div>
+  <div class="cat-pill"><span class="cp-icon">🧠</span><span class="cp-label">Neurological</span></div>
+  <div class="cat-pill"><span class="cp-icon">🌿</span><span class="cp-label">Ayurveda</span></div>
+  <div class="cat-pill"><span class="cp-icon">🧴</span><span class="cp-label">Dermatology</span></div>
+  <div class="cat-pill"><span class="cp-icon">👁️</span><span class="cp-label">Eye Care</span></div>
+  <div class="cat-pill"><span class="cp-icon">🦷</span><span class="cp-label">Dental</span></div>
+  <div class="cat-pill"><span class="cp-icon">🤰</span><span class="cp-label">Mother & Baby</span></div>
+  <div class="cat-pill"><span class="cp-icon">🧪</span><span class="cp-label">Supplements</span></div>
+  <div class="cat-pill"><span class="cp-icon">🩹</span><span class="cp-label">First Aid Kits</span></div>
+  <div class="cat-pill"><span class="cp-icon">🫧</span><span class="cp-label">Oxygen</span></div>
+  <div class="cat-pill"><span class="cp-icon">🩻</span><span class="cp-label">Devices</span></div>
+  <div class="cat-pill"><span class="cp-icon">💉</span><span class="cp-label">Vaccines</span></div>
+</div>
+
+<!-- FILTER ROW -->
+<div class="filter-row">
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9a9a90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="search-input" type="text" placeholder="Search medicines, brands, compositions…">
+  </div>
+  <div class="cats">
+    <div class="cat on">All</div>
+    <div class="cat off">Medicines</div>
+    <div class="cat off">First Aid</div>
+    <div class="cat off">Oxygen</div>
+    <div class="cat off">Devices</div>
+    <div class="cat off">Ayurveda</div>
+    <div class="cat off">Supplements</div>
+  </div>
+  <div class="sort-wrap">
+    <div class="sort-label">Sort</div>
+    <select class="sort-sel">
+      <option>Popular</option>
+      <option>Price: Low–High</option>
+      <option>Price: High–Low</option>
+      <option>Fastest delivery</option>
+      <option>Best rated</option>
+    </select>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-title">CATEGORIES</div>
+      <div class="sb-item active"><div class="sb-item-dot"></div><div class="sb-item-text">All Products</div><div class="sb-count">5,200</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Pain Relief</div><div class="sb-count">310</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Antibiotics</div><div class="sb-count">180</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Cardiac Care</div><div class="sb-count">95</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Diabetes</div><div class="sb-count">140</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Respiratory</div><div class="sb-count">88</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Gastroenterology</div><div class="sb-count">120</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Neurological</div><div class="sb-count">75</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Dermatology</div><div class="sb-count">200</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Eye Care</div><div class="sb-count">60</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Ayurveda / Herbal</div><div class="sb-count">380</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Supplements</div><div class="sb-count">420</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">First Aid Kits</div><div class="sb-count">48</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Oxygen Supply</div><div class="sb-count">24</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Medical Devices</div><div class="sb-count">130</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Mother & Baby</div><div class="sb-count">160</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Dental Care</div><div class="sb-count">90</div></div>
+      <div class="sb-item"><div class="sb-item-dot off"></div><div class="sb-item-text">Vaccines</div><div class="sb-count">35</div></div>
+    </div>
+
+    <div class="sb-promo">
+      <div class="sb-promo-label">PRESCRIPTION</div>
+      <div class="sb-promo-title">UPLOAD &amp; ORDER</div>
+      <div class="sb-promo-sub">Upload your doctor's prescription and we'll dispense and deliver within 30 minutes.</div>
+      <button class="sb-promo-btn">📷 Upload Rx</button>
+    </div>
+
+    <div style="margin-top:16px">
+      <div class="sb-title">OFFERS</div>
+      <div class="sb-offers">
+        <div class="sb-offer">
+          <div class="sb-offer-tag">FLAT 20% OFF</div>
+          <div class="sb-offer-title">First Order</div>
+          <div class="sb-offer-sub">Use code: RC20FIRST</div>
+        </div>
+        <div class="sb-offer">
+          <div class="sb-offer-tag">FREE DELIVERY</div>
+          <div class="sb-offer-title">Orders above ₹299</div>
+          <div class="sb-offer-sub">All pin codes covered</div>
+        </div>
+        <div class="sb-offer">
+          <div class="sb-offer-tag">15% OFF</div>
+          <div class="sb-offer-title">Ayurvedic Range</div>
+          <div class="sb-offer-sub">Use code: AYUR15</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- EMERGENCY BANNER -->
+    <div class="emerg" data-aos="zoom-in">
+      <div class="emerg-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      </div>
+      <div class="emerg-body">
+        <div class="emerg-tag"><span class="live-dot"></span>EMERGENCY DELIVERY ACTIVE — ALL INDIA</div>
+        <div class="emerg-title">NEED IT IN 30 MINUTES?</div>
+        <div class="emerg-sub">Express dispatch from nearest partner pharmacy — 2,000+ cities covered, available 24/7, 365 days.</div>
+      </div>
+      <div class="emerg-right">
+        <div class="emerg-timer"><div class="emerg-timer-num">30</div><div class="emerg-timer-label">MIN ETA</div></div>
+        <button class="emerg-btn">Order now →</button>
+      </div>
+    </div>
+
+    <!-- ESSENTIAL MEDICINES -->
+    <div class="sec-hd" data-aos="fade-up">
+      <div class="sec-title">ESSENTIAL MEDICINES</div>
+      <div class="sec-link">View all 310 →</div>
+    </div>
+
+    <div class="prod-grid">
+
+      <!-- Paracetamol -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-teal">
+          <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&q=80" alt="Paracetamol" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-teal" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg></div>
+        </div>
+        <div class="prod-badge">30 min</div>
+        <div class="prod-body">
+          <div class="prod-tag">Pain Relief</div>
+          <div class="prod-name">Paracetamol 500mg</div>
+          <div class="prod-mfr">Cipla / GSK</div>
+          <div class="prod-pack">Strip of 10 tablets</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹48</div><div class="prod-mrp">₹58</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amoxicillin -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-sand">
+          <img src="https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&q=80" alt="Amoxicillin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-sand" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        </div>
+        <div class="prod-badge rx">Rx</div>
+        <div class="prod-body">
+          <div class="prod-tag">Antibiotic</div>
+          <div class="prod-name">Amoxicillin 250mg</div>
+          <div class="prod-mfr">Alkem / Sun Pharma</div>
+          <div class="prod-pack">Bottle of 30 capsules · Rx required</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹120</div><div class="prod-mrp">₹145</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aspirin -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-red">
+          <img src="https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&q=80" alt="Aspirin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-red" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        </div>
+        <div class="prod-badge">30 min</div>
+        <div class="prod-body">
+          <div class="prod-tag">Cardiac</div>
+          <div class="prod-name">Aspirin 75mg (Ecosprin)</div>
+          <div class="prod-mfr">USV Pharma</div>
+          <div class="prod-pack">Strip of 14 tablets</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹32</div><div class="prod-mrp">₹38</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Omeprazole -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-sand">
+          <img src="https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&q=80" alt="Omeprazole" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-sand" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        </div>
+        <div class="prod-badge">30 min</div>
+        <div class="prod-body">
+          <div class="prod-tag">Antacid / PPI</div>
+          <div class="prod-name">Omeprazole 20mg</div>
+          <div class="prod-mfr">Dr. Reddy's / Cipla</div>
+          <div class="prod-pack">Strip of 10 capsules</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹85</div><div class="prod-mrp">₹100</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cetirizine -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-teal">
+          <img src="https://images.unsplash.com/photo-1576671081837-49000212a370?w=400&q=80" alt="Cetirizine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-teal" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg></div>
+        </div>
+        <div class="prod-badge">30 min</div>
+        <div class="prod-body">
+          <div class="prod-tag">Antihistamine</div>
+          <div class="prod-name">Cetirizine 10mg (Cetzine)</div>
+          <div class="prod-mfr">GSK India</div>
+          <div class="prod-pack">Strip of 10 tablets</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹55</div><div class="prod-mrp">₹65</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metformin -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-sand">
+          <img src="https://images.unsplash.com/photo-1563213126-a4273aed2016?w=400&q=80" alt="Metformin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-sand" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        </div>
+        <div class="prod-badge rx">Rx</div>
+        <div class="prod-body">
+          <div class="prod-tag">Antidiabetic</div>
+          <div class="prod-name">Metformin 500mg (Glycomet)</div>
+          <div class="prod-mfr">USV Pharma</div>
+          <div class="prod-pack">Strip of 15 tablets · Rx required</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹68</div><div class="prod-mrp">₹82</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Azithromycin -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-blue">
+          <img src="https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&q=80" alt="Azithromycin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-blue" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg></div>
+        </div>
+        <div class="prod-badge rx">Rx</div>
+        <div class="prod-body">
+          <div class="prod-tag">Antibiotic</div>
+          <div class="prod-name">Azithromycin 500mg (Zithromax)</div>
+          <div class="prod-mfr">Cipla / Pfizer India</div>
+          <div class="prod-pack">Strip of 3 tablets · Rx required</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹145</div><div class="prod-mrp">₹175</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Atorvastatin -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-amber">
+          <img src="https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?w=400&q=80" alt="Atorvastatin" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-amber" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#854F0B" stroke-width="1.4" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        </div>
+        <div class="prod-badge rx">Rx</div>
+        <div class="prod-body">
+          <div class="prod-tag">Cardiac / Statin</div>
+          <div class="prod-name">Atorvastatin 10mg (Lipitor)</div>
+          <div class="prod-mfr">Pfizer / Ranbaxy</div>
+          <div class="prod-pack">Strip of 10 tablets · Rx required</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹110</div><div class="prod-mrp">₹130</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amlodipine -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-teal">
+          <img src="https://images.unsplash.com/photo-1460467820054-c87ab43e9b59?w=400&q=80" alt="Amlodipine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-teal" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg></div>
+        </div>
+        <div class="prod-badge rx">Rx</div>
+        <div class="prod-body">
+          <div class="prod-tag">Antihypertensive</div>
+          <div class="prod-name">Amlodipine 5mg (Amlovas)</div>
+          <div class="prod-mfr">Macleods Pharma</div>
+          <div class="prod-pack">Strip of 10 tablets · Rx required</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹72</div><div class="prod-mrp">₹88</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MORE MEDICINES ROW 2 -->
+    <div class="sec-hd" data-aos="fade-up">
+      <div class="sec-title">MORE ESSENTIAL MEDICINES</div>
+      <div class="sec-link">View all →</div>
+    </div>
+    <div class="prod-grid">
+
+      <!-- ORS Sachet -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-blue">
+          <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&q=80" alt="ORS" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-blue" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+        </div>
+        <div class="prod-badge">30 min</div>
+        <div class="prod-body">
+          <div class="prod-tag">Dehydration</div>
+          <div class="prod-name">ORS Sachet (Electral)</div>
+          <div class="prod-mfr">Franco-Indian Pharma</div>
+          <div class="prod-pack">Pack of 10 sachets</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹60</div><div class="prod-mrp">₹75</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dolo 650 -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-sand">
+          <img src="https://images.unsplash.com/photo-1602046596820-c91e92f41a19?w=400&q=80" alt="Dolo 650" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-sand" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg></div>
+        </div>
+        <div class="prod-badge">30 min</div>
+        <div class="prod-body">
+          <div class="prod-tag">Fever / Pain</div>
+          <div class="prod-name">Paracetamol 650mg (Dolo 650)</div>
+          <div class="prod-mfr">Micro Labs</div>
+          <div class="prod-pack">Strip of 15 tablets</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹35</div><div class="prod-mrp">₹42</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pantoprazole -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-teal">
+          <img src="https://images.unsplash.com/photo-1619895862022-09114b41f16f?w=400&q=80" alt="Pantoprazole" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-teal" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg></div>
+        </div>
+        <div class="prod-badge rx">Rx</div>
+        <div class="prod-body">
+          <div class="prod-tag">Antacid / PPI</div>
+          <div class="prod-name">Pantoprazole 40mg (Pan-D)</div>
+          <div class="prod-mfr">Alkem Laboratories</div>
+          <div class="prod-pack">Strip of 10 tablets · Rx required</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹95</div><div class="prod-mrp">₹115</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ibuprofen -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-amber">
+          <img src="https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=400&q=80" alt="Ibuprofen" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-amber" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#854F0B" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/></svg></div>
+        </div>
+        <div class="prod-badge">30 min</div>
+        <div class="prod-body">
+          <div class="prod-tag">NSAID / Pain</div>
+          <div class="prod-name">Ibuprofen 400mg (Brufen)</div>
+          <div class="prod-mfr">Abbott India</div>
+          <div class="prod-pack">Strip of 10 tablets</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹42</div><div class="prod-mrp">₹52</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Montelukast -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-blue">
+          <img src="https://images.unsplash.com/photo-1600456899121-68eda5706b6e?w=400&q=80" alt="Montelukast" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-blue" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"><path d="M17 8C8 10 5.9 16.17 3.82 19.82"/></svg></div>
+        </div>
+        <div class="prod-badge rx">Rx</div>
+        <div class="prod-body">
+          <div class="prod-tag">Respiratory</div>
+          <div class="prod-name">Montelukast 10mg (Montair)</div>
+          <div class="prod-mfr">Cipla</div>
+          <div class="prod-pack">Strip of 10 tablets · Rx required</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹138</div><div class="prod-mrp">₹165</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clopidogrel -->
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-red">
+          <img src="https://images.unsplash.com/photo-1583947582774-d1c55a4e4d89?w=400&q=80" alt="Clopidogrel" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-red" style="display:none"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg></div>
+        </div>
+        <div class="prod-badge rx">Rx</div>
+        <div class="prod-body">
+          <div class="prod-tag">Blood Thinner</div>
+          <div class="prod-name">Clopidogrel 75mg (Clopilet)</div>
+          <div class="prod-mfr">Sun Pharma</div>
+          <div class="prod-pack">Strip of 10 tablets · Rx required</div>
+          <div class="prod-foot">
+            <div class="prod-price-wrap"><div class="prod-price">₹95</div><div class="prod-mrp">₹115</div></div>
+            <button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PROMO BANNER -->
+    <div class="promo-banner" data-aos="fade-up">
+      <div class="promo-left">
+        <div class="promo-eyebrow">LIMITED TIME OFFER</div>
+        <div class="promo-title">FLAT <span>20% OFF</span><br>DIABETES RANGE</div>
+        <div class="promo-sub">On Metformin, Glipizide, Sitagliptin, Glimepiride, insulin and all antidiabetic medicines. Use code RC20DIAB at checkout.</div>
+        <button class="btn-primary" style="margin-top:18px">Shop Diabetes Range →</button>
+      </div>
+      <div class="promo-right">
+        <div class="promo-stat"><div class="promo-stat-num">40+</div><div class="promo-stat-label">BRANDS</div></div>
+        <div class="promo-stat"><div class="promo-stat-num">₹0</div><div class="promo-stat-label">DELIVERY</div></div>
+        <div class="promo-stat"><div class="promo-stat-num">30m</div><div class="promo-stat-label">EXPRESS ETA</div></div>
+      </div>
+    </div>
+
+    <!-- EMERGENCY KITS -->
+    <div class="sec-hd" data-aos="fade-up">
+      <div class="sec-title">EMERGENCY KITS</div>
+      <div class="sec-link">View all 48 →</div>
+    </div>
+
+    <div class="kit-grid">
+
+      <!-- First Aid Kit -->
+      <div class="kit-card" data-aos="fade-up">
+        <div class="kit-img">
+          <img src="https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=600&q=80" alt="First Aid Kit">
+          <div class="kit-img-overlay"></div>
+          <div class="kit-img-label">FIRST AID</div>
+        </div>
+        <div class="kit-body">
+          <div class="kit-tag">First Aid</div>
+          <div class="kit-name">First Aid Kit Pro (42-item)</div>
+          <div class="kit-sub">Bandages, antiseptic, sterile gloves, CPR guide, scissors, gauze pads, adhesive plasters and more. ISI certified.</div>
+          <div class="kit-items">
+            <span class="kit-item-tag">Bandages</span><span class="kit-item-tag">Antiseptic</span><span class="kit-item-tag">Gloves</span><span class="kit-item-tag">Scissors</span><span class="kit-item-tag">CPR guide</span>
+          </div>
+          <div class="kit-foot"><div class="kit-price">₹650</div><button class="kit-add">Add to cart</button></div>
+        </div>
+      </div>
+
+      <!-- Trauma Kit -->
+      <div class="kit-card" data-aos="fade-up">
+        <div class="kit-img">
+          <img src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?w=600&q=80" alt="Trauma Kit">
+          <div class="kit-img-overlay"></div>
+          <div class="kit-img-label">TRAUMA RESPONSE</div>
+        </div>
+        <div class="kit-body">
+          <div class="kit-tag">Trauma</div>
+          <div class="kit-name">Trauma Response Kit (Military Grade)</div>
+          <div class="kit-sub">Tourniquet, hemostatic gauze, chest seal, emergency blanket, pressure bandage — battlefield-grade supplies.</div>
+          <div class="kit-items">
+            <span class="kit-item-tag">Tourniquet</span><span class="kit-item-tag">Hemostatic Gauze</span><span class="kit-item-tag">Chest Seal</span><span class="kit-item-tag">Emergency Blanket</span>
+          </div>
+          <div class="kit-foot"><div class="kit-price">₹1,200</div><button class="kit-add">Add to cart</button></div>
+        </div>
+      </div>
+
+      <!-- Burn Care Kit -->
+      <div class="kit-card" data-aos="fade-up">
+        <div class="kit-img">
+          <img src="https://images.unsplash.com/photo-1599045118108-bf9954418b76?w=600&q=80" alt="Burn Care Kit">
+          <div class="kit-img-overlay"></div>
+          <div class="kit-img-label">BURN CARE</div>
+        </div>
+        <div class="kit-body">
+          <div class="kit-tag">Burns</div>
+          <div class="kit-name">Burn Care Emergency Kit</div>
+          <div class="kit-sub">Hydrogel dressings, cooling spray, non-stick pads, burn wrap, sterile saline — covers up to 40% BSA burns.</div>
+          <div class="kit-items">
+            <span class="kit-item-tag">Hydrogel Dressing</span><span class="kit-item-tag">Cooling Spray</span><span class="kit-item-tag">Burn Wrap</span><span class="kit-item-tag">Saline</span>
+          </div>
+          <div class="kit-foot"><div class="kit-price">₹480</div><button class="kit-add">Add to cart</button></div>
+        </div>
+      </div>
+
+      <!-- Cardiac Kit -->
+      <div class="kit-card" data-aos="fade-up">
+        <div class="kit-img">
+          <img src="https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=600&q=80" alt="Cardiac Kit">
+          <div class="kit-img-overlay"></div>
+          <div class="kit-img-label">CARDIAC EMERGENCY</div>
+        </div>
+        <div class="kit-body">
+          <div class="kit-tag">Cardiac</div>
+          <div class="kit-name">Cardiac Emergency Kit</div>
+          <div class="kit-sub">Aspirin 300mg, sublingual nitroglycerin, pulse oximeter, BP cuff, CPR mask — bystander ready, no training required.</div>
+          <div class="kit-items">
+            <span class="kit-item-tag">Aspirin</span><span class="kit-item-tag">Nitroglycerine</span><span class="kit-item-tag">Pulse Oximeter</span><span class="kit-item-tag">BP Cuff</span>
+          </div>
+          <div class="kit-foot"><div class="kit-price">₹920</div><button class="kit-add">Add to cart</button></div>
+        </div>
+      </div>
+
+      <!-- Snake Bite Kit -->
+      <div class="kit-card" data-aos="fade-up">
+        <div class="kit-img">
+          <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&q=80" alt="Snake Bite Kit">
+          <div class="kit-img-overlay"></div>
+          <div class="kit-img-label">SNAKE BITE</div>
+        </div>
+        <div class="kit-body">
+          <div class="kit-tag">Venom First Aid</div>
+          <div class="kit-name">Snake Bite Emergency Kit</div>
+          <div class="kit-sub">Suction device, crepe bandage, antiseptic wipes, emergency guide, immobiliser splint — India specific species guide included.</div>
+          <div class="kit-items">
+            <span class="kit-item-tag">Suction Device</span><span class="kit-item-tag">Crepe Bandage</span><span class="kit-item-tag">Splint</span><span class="kit-item-tag">Guide</span>
+          </div>
+          <div class="kit-foot"><div class="kit-price">₹750</div><button class="kit-add">Add to cart</button></div>
+        </div>
+      </div>
+
+      <!-- Diabetic Emergency Kit -->
+      <div class="kit-card" data-aos="fade-up">
+        <div class="kit-img">
+          <img src="https://images.unsplash.com/photo-1576671081837-49000212a370?w=600&q=80" alt="Diabetic Kit">
+          <div class="kit-img-overlay"></div>
+          <div class="kit-img-label">DIABETIC EMERGENCY</div>
+        </div>
+        <div class="kit-body">
+          <div class="kit-tag">Diabetes</div>
+          <div class="kit-name">Diabetic Emergency Kit</div>
+          <div class="kit-sub">Glucose tablets, glucometer, lancets, test strips, insulin syringe, glucagon emergency kit. Hypoglycemia ready.</div>
+          <div class="kit-items">
+            <span class="kit-item-tag">Glucose Tabs</span><span class="kit-item-tag">Glucometer</span><span class="kit-item-tag">Glucagon</span><span class="kit-item-tag">Insulin Syringe</span>
+          </div>
+          <div class="kit-foot"><div class="kit-price">₹1,400</div><button class="kit-add">Add to cart</button></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- AYURVEDA / HERBAL -->
+    <div class="sec-hd" data-aos="fade-up">
+      <div class="sec-title">AYURVEDA &amp; HERBAL</div>
+      <div class="sec-link">View all 380 →</div>
+    </div>
+
+    <div class="herbal-grid">
+
+      <div class="herbal-card" data-aos="fade-up">
+        <div class="herbal-img">
+          <img src="https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&q=80" alt="Ashwagandha">
+        </div>
+        <div class="herbal-body">
+          <div class="herbal-tag">🌿 Adaptogen</div>
+          <div class="herbal-name">Ashwagandha 500mg (Himalaya)</div>
+          <div class="herbal-sub">60 capsules · Stress relief, immunity, energy</div>
+          <div class="herbal-foot"><div class="herbal-price">₹280</div><button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
+        </div>
+      </div>
+
+      <div class="herbal-card" data-aos="fade-up">
+        <div class="herbal-img">
+          <img src="https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&q=80" alt="Triphala">
+        </div>
+        <div class="herbal-body">
+          <div class="herbal-tag">🌿 Digestive</div>
+          <div class="herbal-name">Triphala Churna (Dabur)</div>
+          <div class="herbal-sub">500g · Digestion, detox, gut health</div>
+          <div class="herbal-foot"><div class="herbal-price">₹195</div><button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
+        </div>
+      </div>
+
+      <div class="herbal-card" data-aos="fade-up">
+        <div class="herbal-img">
+          <img src="https://images.unsplash.com/photo-1602576669728-35645cca3cae?w=400&q=80" alt="Giloy">
+        </div>
+        <div class="herbal-body">
+          <div class="herbal-tag">🌿 Immunity</div>
+          <div class="herbal-name">Giloy Juice (Patanjali)</div>
+          <div class="herbal-sub">1L · Immunity booster, fever, diabetes</div>
+          <div class="herbal-foot"><div class="herbal-price">₹145</div><button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
+        </div>
+      </div>
+
+      <div class="herbal-card" data-aos="fade-up">
+        <div class="herbal-img">
+          <img src="https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=400&q=80" alt="Chyawanprash">
+        </div>
+        <div class="herbal-body">
+          <div class="herbal-tag">🌿 Tonic</div>
+          <div class="herbal-name">Chyawanprash (Dabur)</div>
+          <div class="herbal-sub">900g · Immunity, vitality, respiratory health</div>
+          <div class="herbal-foot"><div class="herbal-price">₹320</div><button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
+        </div>
+      </div>
+
+      <div class="herbal-card" data-aos="fade-up">
+        <div class="herbal-img">
+          <img src="https://images.unsplash.com/photo-1636207543865-acf3ad382295?w=400&q=80" alt="Neem">
+        </div>
+        <div class="herbal-body">
+          <div class="herbal-tag">🌿 Skin / Blood</div>
+          <div class="herbal-name">Neem Capsules (Himalaya)</div>
+          <div class="herbal-sub">60 capsules · Skin health, blood purifier</div>
+          <div class="herbal-foot"><div class="herbal-price">₹175</div><button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
+        </div>
+      </div>
+
+      <div class="herbal-card" data-aos="fade-up">
+        <div class="herbal-img">
+          <img src="https://images.unsplash.com/photo-1599598425947-5202edd56bdb?w=400&q=80" alt="Tulsi">
+        </div>
+        <div class="herbal-body">
+          <div class="herbal-tag">🌿 Respiratory</div>
+          <div class="herbal-name">Tulsi Ark Drops (Himalaya)</div>
+          <div class="herbal-sub">60ml · Cold, cough, respiratory support</div>
+          <div class="herbal-foot"><div class="herbal-price">₹120</div><button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SUPPLEMENTS -->
+    <div class="sec-hd" data-aos="fade-up">
+      <div class="sec-title">VITAMINS &amp; SUPPLEMENTS</div>
+      <div class="sec-link">View all 420 →</div>
+    </div>
+
+    <div class="prod-grid">
+
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-amber">
+          <img src="https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&q=80" alt="Vitamin C" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-amber" style="display:none"></div>
+        </div>
+        <div class="prod-badge">30 min</div>
+        <div class="prod-body">
+          <div class="prod-tag">Vitamins</div>
+          <div class="prod-name">Vitamin C 1000mg (Limcee)</div>
+          <div class="prod-mfr">Abbott India</div>
+          <div class="prod-pack">Strip of 15 chewable tablets</div>
+          <div class="prod-foot"><div class="prod-price-wrap"><div class="prod-price">₹62</div><div class="prod-mrp">₹75</div></div><button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-teal">
+          <img src="https://images.unsplash.com/photo-1631549916768-4119b4c3c0d5?w=400&q=80" alt="Vitamin D3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-teal" style="display:none"></div>
+        </div>
+        <div class="prod-badge">30 min</div>
+        <div class="prod-body">
+          <div class="prod-tag">Vitamins</div>
+          <div class="prod-name">Vitamin D3 60000 IU (Uprise-D3)</div>
+          <div class="prod-mfr">USV Pharma</div>
+          <div class="prod-pack">4 sachets · Monthly dose</div>
+          <div class="prod-foot"><div class="prod-price-wrap"><div class="prod-price">₹185</div><div class="prod-mrp">₹220</div></div><button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
+        </div>
+      </div>
+
+      <div class="prod-card" data-aos="fade-up">
+        <div class="prod-img bg-sand">
+          <img src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=400&q=80" alt="Omega 3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="prod-img-fallback bg-sand" style="display:none"></div>
+        </div>
+        <div class="prod-badge">30 min</div>
+        <div class="prod-body">
+          <div class="prod-tag">Supplements</div>
+          <div class="prod-name">Omega-3 Fish Oil 1000mg</div>
+          <div class="prod-mfr">Himalaya / Now Foods</div>
+          <div class="prod-pack">60 softgel capsules</div>
+          <div class="prod-foot"><div class="prod-price-wrap"><div class="prod-price">₹350</div><div class="prod-mrp">₹420</div></div><button class="add-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- OXYGEN SECTION -->
+    <div class="sec-hd" data-aos="fade-up">
+      <div class="sec-title">EMERGENCY OXYGEN</div>
+      <div class="sec-link">View all 24 →</div>
+    </div>
+
+    <div class="oxy-row">
+      <div class="oxy-main" data-aos="fade-right">
+        <div class="oxy-text">
+          <div class="oxy-eyebrow">MEDICAL GRADE · ISI CERTIFIED · ACROSS INDIA</div>
+          <div class="oxy-title">OXYGEN<br>CYLINDERS &amp;<br>PORTABLE CANS</div>
+          <div class="oxy-desc">Pure medical-grade oxygen delivered to your door. Suitable for home care, post-surgical recovery and emergency use. Refill service available pan-India from 2,000+ partner points.</div>
+          <div class="oxy-vars">
+            <div class="oxy-var"><div class="oxy-var-name">Portable Can</div><div class="oxy-var-price">₹380</div><div class="oxy-var-sub">8L · Single use</div></div>
+            <div class="oxy-var"><div class="oxy-var-name">Small Cylinder</div><div class="oxy-var-price">₹1,800</div><div class="oxy-var-sub">2L · With regulator</div></div>
+            <div class="oxy-var"><div class="oxy-var-name">Standard</div><div class="oxy-var-price">₹3,400</div><div class="oxy-var-sub">10L · With mask &amp; flow</div></div>
+            <div class="oxy-var"><div class="oxy-var-name">Large (B-type)</div><div class="oxy-var-price">₹6,800</div><div class="oxy-var-sub">46L · ICU grade</div></div>
+          </div>
+        </div>
+        <div class="oxy-img-block">
+          <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&q=80" alt="Oxygen Cylinder">
+        </div>
+      </div>
+
+      <div class="oxy-side" data-aos="fade-left">
+        <div class="oxy-side-eyebrow">HOME THERAPY</div>
+        <div class="oxy-side-title">OXYGEN<br>CONCENTRATOR</div>
+        <img src="https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&q=80" alt="Concentrator" class="oxy-side-img">
+        <div class="oxy-side-sub">Continuous flow, no refills needed. Ideal for long-term home oxygen therapy, COPD, sleep apnea recovery.</div>
+        <div class="oxy-side-price">₹18,500</div>
+        <div class="oxy-side-pack">5L/min · 24hr operation · ISI mark · 1yr warranty</div>
+        <button class="oxy-side-btn">Add to cart</button>
+      </div>
+    </div>
+
+    <!-- MEDICAL DEVICES -->
+    <div class="sec-hd" data-aos="fade-up">
+      <div class="sec-title">MEDICAL DEVICES</div>
+      <div class="sec-link">View all 130 →</div>
+    </div>
+
+    <div class="devices-grid">
+
+      <div class="device-card" data-aos="fade-up">
+        <div class="device-img">
+          <img src="https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=400&q=80" alt="BP Monitor">
+        </div>
+        <div class="device-body">
+          <div class="prod-tag">Cardiac</div>
+          <div class="device-name">Digital BP Monitor</div>
+          <div class="device-sub">Omron / Dr Morepen · Auto-inflate</div>
+          <div class="device-price">₹1,850</div>
+          <button class="add-btn" style="margin-top:10px;width:100%;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+        </div>
+      </div>
+
+      <div class="device-card" data-aos="fade-up">
+        <div class="device-img">
+          <img src="https://images.unsplash.com/photo-1583947582774-d1c55a4e4d89?w=400&q=80" alt="Glucometer">
+        </div>
+        <div class="device-body">
+          <div class="prod-tag">Diabetes</div>
+          <div class="device-name">Glucometer Kit (Accu-Chek)</div>
+          <div class="device-sub">Roche India · 10 test strips included</div>
+          <div class="device-price">₹980</div>
+          <button class="add-btn" style="margin-top:10px;width:100%;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+        </div>
+      </div>
+
+      <div class="device-card" data-aos="fade-up">
+        <div class="device-img">
+          <img src="https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=400&q=80" alt="Pulse Oximeter">
+        </div>
+        <div class="device-body">
+          <div class="prod-tag">Respiratory</div>
+          <div class="device-name">Pulse Oximeter (Dr Trust)</div>
+          <div class="device-sub">SpO2, heart rate · OLED display</div>
+          <div class="device-price">₹850</div>
+          <button class="add-btn" style="margin-top:10px;width:100%;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+        </div>
+      </div>
+
+      <div class="device-card" data-aos="fade-up">
+        <div class="device-img">
+          <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&q=80" alt="Nebulizer">
+        </div>
+        <div class="device-body">
+          <div class="prod-tag">Respiratory</div>
+          <div class="device-name">Piston Nebulizer (Omron)</div>
+          <div class="device-sub">For asthma, COPD · 2yr warranty</div>
+          <div class="device-price">₹2,400</div>
+          <button class="add-btn" style="margin-top:10px;width:100%;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F0EDE5" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DELIVERY BAR -->
+    <div class="del-bar">
+      <div class="del-item" data-aos="fade-up">
+        <div class="del-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div>
+          <div class="del-title">30-min express delivery</div>
+          <div class="del-sub">Emergency orders, 24/7, 2000+ cities</div>
+        </div>
+      </div>
+      <div class="del-item" data-aos="fade-up">
+        <div class="del-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div class="del-title">Verified medicines only</div>
+          <div class="del-sub">CDSCO approved · WHO-GMP certified</div>
+        </div>
+      </div>
+      <div class="del-item" data-aos="fade-up">
+        <div class="del-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="11" y2="17"/></svg>
+        </div>
+        <div>
+          <div class="del-title">Prescription handled</div>
+          <div class="del-sub">Upload Rx — verified instantly online</div>
+        </div>
+      </div>
+      <div class="del-item" data-aos="fade-up">
+        <div class="del-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#004643" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.47 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l1.12-1.82a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div>
+          <div class="del-title">24/7 pharmacist support</div>
+          <div class="del-sub">Call 1800-RC-CARE · Chat anytime</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main -->
+</div><!-- end content -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand-name">RAPIDCARE</div>
+      <div class="footer-brand-desc">India's most trusted online pharmacy. CDSCO licensed, WHO-GMP certified, with 2,000+ partner pharmacies across all 28 states and 8 union territories.</div>
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+        <div class="footer-badge">CDSCO Licensed</div>
+        <div class="footer-badge">WHO-GMP</div>
+        <div class="footer-badge">ISO 9001:2015</div>
+        <div class="footer-badge">AYUSH Approved</div>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">SHOP</div>
+      <div class="footer-link">Medicines</div>
+      <div class="footer-link">Emergency Kits</div>
+      <div class="footer-link">Oxygen Supply</div>
+      <div class="footer-link">Medical Devices</div>
+      <div class="footer-link">Ayurveda</div>
+      <div class="footer-link">Supplements</div>
+      <div class="footer-link">Lab Tests</div>
+    </div>
+    <div>
+      <div class="footer-col-title">SUPPORT</div>
+      <div class="footer-link">Track Order</div>
+      <div class="footer-link">Upload Prescription</div>
+      <div class="footer-link">Returns Policy</div>
+      <div class="footer-link">FAQs</div>
+      <div class="footer-link">Pharmacist Chat</div>
+      <div class="footer-link">Emergency Helpline</div>
+    </div>
+    <div>
+      <div class="footer-col-title">COMPANY</div>
+      <div class="footer-link">About RapidCare</div>
+      <div class="footer-link">Partner Pharmacies</div>
+      <div class="footer-link">Careers</div>
+      <div class="footer-link">Press</div>
+      <div class="footer-link">Privacy Policy</div>
+      <div class="footer-link">Terms of Service</div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 RapidCare Medicine Hub. All rights reserved. For medical emergencies, call 112.</div>
+    <div class="footer-badges">
+      <div class="footer-badge">🇮🇳 Made in India</div>
+      <div class="footer-badge">Helpline: 1800-RC-CARE</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end hub -->
+
+<script>
+// Category pills toggle
+document.querySelectorAll('.cat-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('on'));
+    pill.classList.add('on');
+  });
+});
+
+// Category filter toggle
+document.querySelectorAll('.cat').forEach(cat => {
+  cat.addEventListener('click', () => {
+    document.querySelectorAll('.cat').forEach(c => { c.classList.remove('on'); c.classList.add('off'); });
+    cat.classList.add('on'); cat.classList.remove('off');
+  });
+});
+
+// Sidebar items
+document.querySelectorAll('.sb-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.sb-item').forEach(i => {
+      i.classList.remove('active');
+      i.querySelector('.sb-item-dot')?.classList.add('off');
+    });
+    item.classList.add('active');
+    item.querySelector('.sb-item-dot')?.classList.remove('off');
+  });
+});
+
+// Cart counter
+let cartCount = 3;
+document.querySelectorAll('.add-btn, .kit-add, .oxy-side-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    cartCount++;
+    document.querySelector('.cart-badge').textContent = cartCount;
+    const orig = btn.textContent.trim();
+    btn.style.background = '#1a7a4a';
+    setTimeout(() => { btn.style.background = ''; }, 800);
+  });
+});
+</script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({duration: 800, once: true, offset: 50});</script>
+<script src="animations.js"></script>
+</body>
+</html>
