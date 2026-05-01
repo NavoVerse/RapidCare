@@ -384,23 +384,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- ATTACH EVENTS ---
   
-  // Intercept the renderGrid click events to open the modal
-  // We'll delegate clicks from the grid to the product cards
-  grid.addEventListener("click", (e) => {
+  // Intercept all clicks on prod-cards across the whole document
+  document.body.addEventListener("click", (e) => {
     const card = e.target.closest(".prod-card");
     if (!card) return;
     
-    const name = card.querySelector(".prod-name").innerText.split(" Tablet")[0];
-    const product = allProducts.find(p => name.includes(p.name));
-    if (product) {
-      // If clicked exactly on "Add" button, add to cart instead of modal
-      if(e.target.closest(".add-btn")) {
-          addToCart(product);
-          openCart();
-          return;
-      }
-      openModal(product);
+    // If clicked exactly on "Add" button, we handle it separately
+    const isAddBtn = e.target.closest(".add-btn");
+    
+    const nameEl = card.querySelector(".prod-name");
+    if(!nameEl) return;
+    const name = nameEl.innerText.split(" Tablet")[0];
+    
+    let product = allProducts.find(p => name.includes(p.name) || p.name.includes(name));
+    
+    // Fallback for static cards in HTML not present in allProducts array
+    if (!product) {
+      const priceText = card.querySelector(".prod-price") ? card.querySelector(".prod-price").innerText.replace("₹", "") : "100";
+      const mrpText = card.querySelector(".prod-mrp") ? card.querySelector(".prod-mrp").innerText.replace("₹", "") : "120";
+      const imgEl = card.querySelector("img");
+      const tagEl = card.querySelector(".prod-tag");
+      const molEl = card.querySelector(".prod-mfr");
+      
+      product = {
+        id: name.toLowerCase().replace(/\\s+/g, '-'),
+        name: name,
+        molecule: molEl ? molEl.innerText : "Medicine",
+        category: tagEl ? tagEl.innerText : "General",
+        price: parseInt(priceText),
+        mrp: parseInt(mrpText),
+        img: imgEl ? imgEl.src : "images/tablets.png"
+      };
     }
+    
+    if (isAddBtn) {
+        addToCart(product);
+        openCart();
+        return;
+    }
+    openModal(product);
   });
 
   // Modal Buttons
