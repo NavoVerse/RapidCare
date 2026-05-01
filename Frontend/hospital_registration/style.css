@@ -89,27 +89,62 @@ body {
 .named-stepper {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 40px;
-    padding: 0 50px;
+    margin-bottom: 50px;
+    padding: 10px;
+    background: var(--bg-color);
+    border-radius: 20px;
+    border: 1.5px solid var(--border-color);
     position: relative;
+    counter-reset: step-counter;
 }
 
 .step-item {
     flex: 1;
     text-align: center;
-    cursor: pointer;
+    padding: 15px 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    padding-bottom: 15px;
-    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 30px;
+    background: var(--border-color);
 }
 
 .step-label {
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 700;
     color: var(--secondary-text);
     text-transform: uppercase;
     letter-spacing: 1.5px;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.step-label::before {
+    counter-increment: step-counter;
+    content: counter(step-counter);
+    width: 24px;
+    height: 24px;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
 }
 
 .step-indicator {
@@ -118,14 +153,21 @@ body {
     left: 50%;
     width: 0;
     height: 3px;
-    background: var(--accent-emerald);
+    background: var(--primary-color);
     transform: translateX(-50%);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border-radius: 10px;
 }
 
 .step-item.active .step-label {
-    color: var(--accent-emerald);
+    color: var(--primary-color);
+}
+
+.step-item.active .step-label::before {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px rgba(33, 170, 255, 0.3);
 }
 
 .step-item.active .step-indicator {
@@ -143,7 +185,7 @@ body {
     border-radius: 30px;
     padding: 50px;
     box-shadow: var(--card-shadow);
-    border: 1px solid var(--border-color);
+    border: 1.5px solid var(--border-color);
     backdrop-filter: blur(10px);
     animation: scaleIn 0.6s ease-out;
 }
@@ -212,13 +254,20 @@ label {
 input, select, textarea {
     width: 100%;
     padding: 16px 20px;
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    border: 1.5px solid var(--border-color);
     border-radius: 12px;
     color: var(--primary-text);
     font-size: 1rem;
     outline: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input:hover, select:hover, textarea:hover {
+    border-color: var(--primary-color);
+    background: var(--surface-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 input:focus, select:focus, textarea:focus {
@@ -240,14 +289,21 @@ input:focus + label, select:focus + label {
 }
 
 .infra-item {
-    background: var(--surface-color);
+    background: var(--bg-color);
     padding: 20px;
     border-radius: 15px;
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: all 0.3s ease;
+}
+
+.infra-item:hover {
+    border-color: var(--primary-color);
+    transform: translateX(5px);
+    background: var(--surface-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .infra-item:hover {
@@ -337,9 +393,9 @@ input:focus + label, select:focus + label {
 }
 
 .btn-next:hover {
-    background: #059669;
-    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    background: var(--primary-hover);
     transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .btn-prev {

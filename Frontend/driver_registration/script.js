@@ -149,6 +149,12 @@ function goToStep(targetStep) {
         steps[targetStep - 1].classList.add('active');
     }
 
+    // Smooth scroll to the registration container
+    const container = document.querySelector('.registration-container');
+    if (container) {
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     // Auto focus logic
     if (targetStep === 2) { 
         setTimeout(() => {

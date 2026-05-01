@@ -97,7 +97,14 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);overflo
 
 /* ── STATS ROW ── */
 .stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
-.stat-card{position:relative;background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:20px 18px;overflow:hidden;opacity:0;transform:translateY(20px);transition:opacity .5s ease-out,transform .5s ease-out,box-shadow .3s,border-color .3s;transform-style:preserve-3d;cursor:default}
+.stat-card{position:relative;background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:20px 18px;overflow:hidden;opacity:0;transform:translateY(20px);transition:opacity .5s ease-out,transform .5s ease-out,box-shadow .3s,border-color .3s, background .3s;transform-style:preserve-3d;cursor:default}
+
+.stat-card:hover {
+    border-color: var(--l2);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    background: rgba(2, 56, 89, 0.6);
+}
 .stat-card.visible{opacity:1;transform:translateY(0)}
 .stat-card:hover{box-shadow:0 8px 40px rgba(84,172,191,.2);border-color:rgba(84,172,191,.4);transform:translateY(-4px) rotateX(3deg)}
 .stat-card.warn:hover{box-shadow:0 8px 40px rgba(255,184,48,.15);border-color:rgba(255,184,48,.3)}

@@ -299,7 +299,13 @@ body {
     width: 100%; padding: 16px; border: 2px solid var(--input-border);
     border-radius: var(--radius-md); font-size: 15px; font-family: var(--font);
     font-weight: 500; color: var(--text-dark); background: var(--input-bg);
-    outline: none; transition: all 0.25s ease;
+    outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.form-input:hover {
+    border-color: var(--primary-green);
+    background: var(--white);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 .form-input:focus {
     border-color: var(--primary-green); background: var(--white);

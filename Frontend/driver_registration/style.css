@@ -31,7 +31,7 @@ body {
     padding: 40px 60px;
     border-radius: 30px;
     box-shadow: var(--shadow);
-    border: 1px solid rgba(21, 128, 61, 0.1);
+    border: 1.5px solid var(--border-color);
     margin: 5px auto;
 }
 
@@ -105,10 +105,11 @@ body {
 /* Stepper styling */
 .stepper {
     display: flex;
-    background: var(--surface-color);
+    background: var(--bg-color);
     border-radius: 15px;
     overflow: hidden;
-    border: 1px solid var(--border-color);
+    border: 1.5px solid var(--border-color);
+    margin-bottom: 30px;
 }
 
 .step {
@@ -128,7 +129,10 @@ body {
 }
 
 .step:hover:not(.active) {
-    background: #333;
+    background: var(--surface-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .step:last-child {
@@ -136,7 +140,7 @@ body {
 }
 
 .step.active {
-    background: var(--bg-color);
+    background: var(--primary-bg-active);
     color: var(--primary-color);
     position: relative;
 }
@@ -259,13 +263,20 @@ input[type="tel"],
 select {
     width: 100%;
     padding: 14px 18px;
-    background: var(--surface-color);
-    border: 1px solid var(--border-color); /* Thinner, cleaner border */
+    background: var(--bg-color);
+    border: 1.5px solid var(--border-color);
     border-radius: 12px;
     color: var(--primary-text);
     font-size: 1rem;
     outline: none;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input:hover, select:hover {
+    border-color: var(--primary-color);
+    background: var(--surface-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 input::placeholder {
@@ -454,13 +465,16 @@ select option {
     border-radius: 15px;
     padding: 25px;
     margin-bottom: 25px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .document-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: var(--card-shadow);
+    background: var(--surface-color);
 }
+
 
 /* Staggered entrance animation for document cards */
 .form-section.active .document-card {
