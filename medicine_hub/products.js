@@ -147,14 +147,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const digPill = document.createElement("div");
       digPill.className = "cat-pill";
       digPill.setAttribute("data-cat", "Digestion");
-      digPill.innerHTML = \`<span class="cp-icon">🔥</span><span class="cp-label">Digestion</span>\`;
+      digPill.innerHTML = `<span class="cp-icon">🔥</span><span class="cp-label">Digestion</span>`;
       catScroll.appendChild(digPill);
     }
     if(!document.querySelector(".cat-pill[data-cat='Allergy']")) {
       const allPill = document.createElement("div");
       allPill.className = "cat-pill";
       allPill.setAttribute("data-cat", "Allergy");
-      allPill.innerHTML = \`<span class="cp-icon">🤧</span><span class="cp-label">Allergy</span>\`;
+      allPill.innerHTML = `<span class="cp-icon">🤧</span><span class="cp-label">Allergy</span>`;
       catScroll.appendChild(allPill);
     }
   }
@@ -178,28 +178,28 @@ document.addEventListener("DOMContentLoaded", () => {
       card.setAttribute("data-aos", "fade-up");
       
       const badgeHTML = p.rx 
-        ? \`<div class="prod-badge rx">Rx Required</div>\` 
-        : \`<div class="prod-badge">OTC Safe</div>\`;
+        ? `<div class="prod-badge rx">Rx Required</div>` 
+        : `<div class="prod-badge">OTC Safe</div>`;
         
-      card.innerHTML = \`
-        \${badgeHTML}
-        <div class="prod-img \${p.color}">
-          <img src="\${p.img}" alt="\${p.name}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.95;">
+      card.innerHTML = `
+        ${badgeHTML}
+        <div class="prod-img ${p.color}">
+          <img src="${p.img}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.95;">
         </div>
         <div class="prod-body">
-          <div class="prod-tag">\${p.category}</div>
-          <div class="prod-name">\${p.name} \${p.category === 'Supplements' || p.category === 'Dermatology' ? '' : 'Tablet'}</div>
-          <div class="prod-mfr">\${p.molecule}</div>
-          <div class="prod-pack">\${p.category === 'Dermatology' ? '1 Tube / 15g' : p.pack}</div>
+          <div class="prod-tag">${p.category}</div>
+          <div class="prod-name">${p.name} ${p.category === 'Supplements' || p.category === 'Dermatology' ? '' : 'Tablet'}</div>
+          <div class="prod-mfr">${p.molecule}</div>
+          <div class="prod-pack">${p.category === 'Dermatology' ? '1 Tube / 15g' : p.pack}</div>
           <div class="prod-foot">
             <div class="prod-price-wrap">
-              <div class="prod-price">₹\${p.price}</div>
-              <div class="prod-mrp">₹\${p.mrp}</div>
+              <div class="prod-price">₹${p.price}</div>
+              <div class="prod-mrp">₹${p.mrp}</div>
             </div>
             <button class="add-btn">Add</button>
           </div>
         </div>
-      \`;
+      `;
       grid.appendChild(card);
     });
     
@@ -242,28 +242,28 @@ document.addEventListener("DOMContentLoaded", () => {
         card.className = "prod-card";
         
         const badgeHTML = p.rx 
-          ? \`<div class="prod-badge rx">Rx Required</div>\` 
-          : \`<div class="prod-badge">OTC Safe</div>\`;
+          ? `<div class="prod-badge rx">Rx Required</div>` 
+          : `<div class="prod-badge">OTC Safe</div>`;
           
-        card.innerHTML = \`
-          \${badgeHTML}
-          <div class="prod-img \${p.color}">
-            <img src="\${p.img}" alt="\${p.name}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.95;">
+        card.innerHTML = `
+          ${badgeHTML}
+          <div class="prod-img ${p.color}">
+            <img src="${p.img}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.95;">
           </div>
           <div class="prod-body">
-            <div class="prod-tag">\${p.category}</div>
-            <div class="prod-name">\${p.name} \${p.category === 'Supplements' || p.category === 'Dermatology' ? '' : 'Tablet'}</div>
-            <div class="prod-mfr">\${p.molecule}</div>
-            <div class="prod-pack">\${p.category === 'Dermatology' ? '1 Tube / 15g' : p.pack}</div>
+            <div class="prod-tag">${p.category}</div>
+            <div class="prod-name">${p.name} ${p.category === 'Supplements' || p.category === 'Dermatology' ? '' : 'Tablet'}</div>
+            <div class="prod-mfr">${p.molecule}</div>
+            <div class="prod-pack">${p.category === 'Dermatology' ? '1 Tube / 15g' : p.pack}</div>
             <div class="prod-foot">
               <div class="prod-price-wrap">
-                <div class="prod-price">₹\${p.price}</div>
-                <div class="prod-mrp">₹\${p.mrp}</div>
+                <div class="prod-price">₹${p.price}</div>
+                <div class="prod-mrp">₹${p.mrp}</div>
               </div>
               <button class="add-btn">Add</button>
             </div>
           </div>
-        \`;
+        `;
         grid.appendChild(card);
       });
     });
