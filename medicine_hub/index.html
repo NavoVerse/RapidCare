@@ -6,7 +6,9 @@
 <title>RapidCare — Medicine Hub</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="description" content="RapidCare Medicine Hub — India's most trusted online pharmacy. Medicines, emergency kits, oxygen and devices delivered in 30 minutes.">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -27,10 +29,13 @@
   --green:#1a7a4a;
   --purple:#7B4EA6;
   --headline:'Bebas Neue',sans-serif;
-  --body:'Atkinson Hyperlegible',sans-serif;
+  --body:'Inter',system-ui,sans-serif;
+  --radius-sm:8px;
+  --radius-md:12px;
+  --radius-lg:16px;
 }
 html{scroll-behavior:smooth;overflow-x:hidden;max-width:100vw;}
-body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:14px;min-width:320px;overflow-x:hidden;max-width:100vw;}
+body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:15px;line-height:1.6;min-width:320px;overflow-x:hidden;max-width:100vw;}
 
 /* ── TOPBAR ── */
 .topbar{
@@ -90,9 +95,12 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 /* ── FILTER ROW ── */
 .filter-row{
   display:flex;align-items:center;gap:12px;
-  padding:20px 40px;background:var(--white);
+  padding:20px 40px;background:rgba(255,255,255,0.95);
   border-bottom:1px solid var(--sand-border);
   flex-wrap:wrap;
+  position:sticky;top:62px;z-index:90;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
 }
 .search-wrap{
   flex:1;max-width:380px;
@@ -532,45 +540,247 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 }
 
 @media (max-width: 768px) {
-  .topbar { padding: 0 20px; }
+  body { padding-bottom: 64px; }
+  .topbar { padding: 0 16px; }
   .topbar-nav { display: none; }
-  .hero { padding: 20px; flex-direction: column; gap: 10px; }
-  .hero-title { font-size: 36px; line-height: 1; }
-  .hero-desc, .hero-stats, .trust-strip { display: none; }
-  .hero-actions { flex-direction: row; width: 100%; align-items: center; gap: 10px; margin-top: 5px; }
-  .btn-primary, .btn-outline { width: auto; flex: 1; padding: 12px; font-size: 12px; text-align: center; }
-  .filter-row { padding: 15px 20px; }
-  .search-wrap { max-width: 100%; flex: 1 1 100%; order: -1; margin-bottom: 10px; }
-  .cats { flex: 1 1 100%; }
-  .sort-wrap { flex: 1 1 100%; margin-left: 0; margin-top: 10px; }
-  .content { padding: 20px; }
-  .prod-grid, .herbal-grid { grid-template-columns: 1fr; }
+  .hero { padding: 24px 16px 20px; flex-direction: column; gap: 16px; }
+  .hero-title { font-size: 42px; line-height: 0.92; }
+  .hero-desc { display: block !important; font-size: 13px; max-width: 100%; margin-top: 10px; }
+  .hero-stats {
+    display: flex !important;
+    overflow-x: auto;
+    gap: 0;
+    margin-top: 4px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    background: rgba(255,255,255,0.06);
+    border-radius: 12px;
+    width: 100%;
+  }
+  .hero-stats::-webkit-scrollbar { display: none; }
+  .hstat {
+    flex: 1;
+    text-align: center;
+    flex-shrink: 0;
+    padding: 10px 12px;
+    border-right: 1px solid rgba(240,237,229,0.12);
+    animation: none;
+  }
+  .hstat:last-child { border-right: none; }
+  .hstat-num { font-size: 22px; }
+  .hstat-label { font-size: 9px; letter-spacing: 0.06em; }
+  .trust-strip { display: flex !important; padding: 8px 0; }
+  .hero-actions { flex-direction: row; width: 100%; align-items: center; gap: 10px; margin-top: 8px; }
+  .btn-primary, .btn-outline { flex: 1; padding: 14px 12px; font-size: 13px; text-align: center; min-height: 48px; }
+  .filter-row { padding: 10px 16px; top: 56px; gap: 8px; }
+  .search-wrap { max-width: 100%; flex: 1 1 100%; order: -1; margin-bottom: 6px; }
+  .cats { flex: 1 1 100%; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .cats::-webkit-scrollbar { display: none; }
+  .cat { flex-shrink: 0; }
+  .sort-wrap { flex: 1 1 auto; margin-left: 0; margin-top: 6px; }
+  .content { padding: 16px; }
+  .prod-grid, .herbal-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
   .devices-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .emerg { flex-direction: column; align-items: flex-start; gap: 15px; padding: 20px; }
-  .emerg-right { width: 100%; flex-direction: column; align-items: stretch; }
-  .emerg-btn { width: 100%; }
+  .emerg { flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px; }
+  .emerg-right { width: 100%; flex-direction: row; align-items: stretch; gap: 10px; }
+  .emerg-btn { flex: 1; min-height: 48px; }
   .del-bar { flex-direction: column; padding: 15px; gap: 10px; }
   .del-item { border-right: none !important; border-bottom: 1px solid var(--sand-border); padding: 10px 0 !important; }
   .del-item:last-child { border-bottom: none; }
   .footer { padding: 30px 20px; }
-  .cat-scroll { padding: 15px 20px; }
+  .cat-scroll { padding: 12px 16px; }
+  .add-btn, .kit-add { min-height: 44px; }
+  .cart-close { width: 44px; height: 44px; }
+  .cat-pill { padding: 10px 14px; }
+  .kit-grid { grid-template-columns: 1fr; }
+  .prod-img { height: 100px; }
+  .prod-body { padding: 10px; }
+  .prod-name { font-size: 12px; }
+  .prod-price { font-size: 18px; }
 }
 
 @media (max-width: 480px) {
-  .topbar-brand { flex-direction: column; align-items: flex-start; gap: 0; }
+  .topbar-brand { gap: 6px; }
   .topbar-sep { display: none; }
-  .topbar-sub { font-size: 10px; margin-top: 2px; }
-  .hero { padding: 15px 16px; }
-  .hero-title { font-size: 28px; line-height: 1; }
-  .hero-desc, .hero-stats { display: none; }
-  .hero-actions { flex-direction: row; margin-top: 10px; gap: 8px; }
-  .btn-primary, .btn-outline { padding: 10px 6px; font-size: 11px; }
-  .devices-grid { grid-template-columns: 1fr; }
+  .topbar-sub { font-size: 10px; }
+  .topbar-rc { font-size: 24px; }
+  .hero { padding: 16px; }
+  .hero-title { font-size: 36px; }
+  .hero-desc { font-size: 12px; }
+  .devices-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .promo-right { flex-direction: column; width: 100%; align-items: stretch; }
   .promo-stat { width: 100%; }
-  .promo-btn { width: 100%; }
+  .promo-btn { width: 100%; min-height: 48px; }
   .footer-inner { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; align-items: flex-start; gap: 15px; }
+  .prod-grid, .herbal-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .oxy-vars { grid-template-columns: repeat(2,1fr); display:grid; }
+}
+
+/* ── CART SIDEBAR CLAMP ── */
+.cart-sidebar { width: min(400px, 92vw) !important; }
+
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 60px; z-index: 99998;
+  background: var(--white);
+  border-top: 1px solid var(--sand-border);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  align-items: stretch;
+}
+.mn-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600; color: var(--ink-faint);
+  cursor: pointer; gap: 2px; border: none; background: none;
+  transition: color 0.2s, background 0.2s;
+  padding: 6px 0; text-decoration: none;
+  position: relative;
+}
+.mn-item .mn-icon { font-size: 18px; line-height: 1; }
+.mn-item.active { color: var(--cyprus); }
+.mn-item.active::before {
+  content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 2px;
+  background: var(--cyprus); border-radius: 0 0 4px 4px;
+}
+.mn-item:active { background: var(--cyprus-dim); }
+.mn-badge {
+  position: absolute; top: 6px; right: calc(50% - 18px);
+  background: var(--amber); color: var(--ink);
+  border-radius: 10px; padding: 1px 5px; font-size: 9px; font-weight: 700;
+}
+@media (max-width: 768px) {
+  .mobile-nav { display: flex; }
+}
+
+/* ── TOAST NOTIFICATIONS ── */
+.toast-container {
+  position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%);
+  z-index: 999999; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--ink); color: #fff;
+  padding: 10px 20px; border-radius: 24px;
+  font-size: 13px; font-weight: 600;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+  animation: toastIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
+  pointer-events: auto;
+  display: flex; align-items: center; gap: 8px;
+  max-width: 90vw; text-align: center;
+}
+.toast.success { background: var(--cyprus); }
+.toast.warning { background: var(--amber); color: var(--ink); }
+.toast.out {
+  animation: toastOut 0.3s ease forwards;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-10px) scale(0.9); }
+}
+
+/* ── SKELETON LOADERS ── */
+@keyframes skeletonAnim {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-card {
+  background: var(--white);
+  border-radius: 14px; border: 1px solid var(--sand-border);
+  overflow: hidden; height: 220px;
+}
+.skeleton-img {
+  height: 120px;
+  background: linear-gradient(90deg,#e8e5dd 25%,#f5f2ea 50%,#e8e5dd 75%);
+  background-size: 200% 100%;
+  animation: skeletonAnim 1.5s infinite;
+}
+.skeleton-body { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.skeleton-line {
+  height: 10px; border-radius: 6px;
+  background: linear-gradient(90deg,#e8e5dd 25%,#f5f2ea 50%,#e8e5dd 75%);
+  background-size: 200% 100%;
+  animation: skeletonAnim 1.5s infinite;
+}
+.skeleton-line.short { width: 55%; }
+.skeleton-line.long { width: 85%; }
+
+/* ── BACK TO TOP ── */
+.back-to-top {
+  position: fixed; bottom: 76px; right: 20px; z-index: 9000;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--cyprus); color: var(--sand);
+  border: none; cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 18px rgba(0,70,67,0.25);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s;
+  transform: translateY(10px);
+}
+.back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.back-to-top:hover { background: var(--cyprus-hover); transform: translateY(-2px) !important; }
+
+/* ── SCROLL PROGRESS ── */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; height: 3px; z-index: 99999;
+  background: linear-gradient(90deg, var(--amber), var(--cyprus));
+  width: 0%; transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+/* ── RX UPLOAD MODAL ── */
+.rx-overlay {
+  position: fixed; inset: 0; background: rgba(0,70,67,0.7);
+  z-index: 200000; backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 20px;
+}
+.rx-overlay.active { opacity: 1; pointer-events: auto; }
+.rx-modal {
+  background: var(--white); border-radius: 24px;
+  max-width: 480px; width: 100%; padding: 36px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  transform: scale(0.95) translateY(20px);
+  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+}
+.rx-overlay.active .rx-modal { transform: scale(1) translateY(0); }
+.rx-title { font-family: var(--headline); font-size: 36px; color: var(--cyprus); margin-bottom: 6px; }
+.rx-sub { font-size: 13px; color: var(--ink-faint); margin-bottom: 24px; line-height: 1.5; }
+.rx-drop {
+  border: 2px dashed var(--cyprus-border); border-radius: 14px;
+  padding: 32px; text-align: center; cursor: pointer;
+  transition: all 0.2s; margin-bottom: 16px;
+  background: var(--cyprus-dim);
+}
+.rx-drop:hover { border-color: var(--cyprus); background: rgba(0,70,67,0.1); }
+.rx-drop-icon { font-size: 36px; margin-bottom: 10px; }
+.rx-drop-text { font-size: 13px; color: var(--ink-mid); font-weight: 600; }
+.rx-drop-sub { font-size: 11px; color: var(--ink-faint); margin-top: 4px; }
+.rx-preview { max-width: 100%; border-radius: 10px; margin-bottom: 16px; display: none; }
+.rx-submit {
+  width: 100%; background: var(--cyprus); color: var(--sand);
+  border: none; border-radius: 12px; padding: 14px;
+  font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--body);
+  transition: all 0.2s;
+}
+.rx-submit:hover { background: var(--cyprus-hover); transform: translateY(-1px); }
+.rx-close {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--sand); border: none; width: 36px; height: 36px;
+  border-radius: 50%; cursor: pointer; font-size: 16px; color: var(--cyprus);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── SECTION ANCHORS ── */
+#section-medicines, #section-kits, #section-ayurveda,
+#section-oxygen, #section-devices, #section-supplements {
+  scroll-margin-top: 120px;
 }
   
 
@@ -637,6 +847,35 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 <body>
+<div class="scroll-progress" id="scrollProgress"></div>
+<button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- RX UPLOAD MODAL -->
+<div class="rx-overlay" id="rxOverlay">
+  <div class="rx-modal">
+    <button class="rx-close" id="rxClose">✕</button>
+    <div class="rx-title">UPLOAD Rx</div>
+    <div class="rx-sub">Upload your doctor's prescription — we'll verify and dispatch within 30 minutes.</div>
+    <div class="rx-drop" id="rxDrop">
+      <div class="rx-drop-icon">📷</div>
+      <div class="rx-drop-text">Tap to upload or drag & drop</div>
+      <div class="rx-drop-sub">JPG, PNG or PDF · Max 10MB</div>
+      <input type="file" id="rxFileInput" accept="image/*,.pdf" style="display:none">
+    </div>
+    <img class="rx-preview" id="rxPreview" alt="Rx preview">
+    <button class="rx-submit" id="rxSubmit">📤 Submit Prescription</button>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav" role="navigation" aria-label="Mobile navigation">
+  <button class="mn-item active" id="mnShop"><span class="mn-icon">🏠</span>Shop</button>
+  <button class="mn-item" id="mnOrders"><span class="mn-icon">📋</span>Orders</button>
+  <button class="mn-item" id="mnRx"><span class="mn-icon">📷</span>Rx Upload</button>
+  <button class="mn-item" id="mnLab"><span class="mn-icon">🧪</span>Lab Tests</button>
+  <button class="mn-item" id="mnCart"><span class="mn-icon">🛒</span>Cart<span class="mn-badge" id="mnCartBadge">3</span></button>
+</nav>
 
 <div class="hub">
 
@@ -777,7 +1016,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       <div class="sb-promo-label">PRESCRIPTION</div>
       <div class="sb-promo-title">UPLOAD &amp; ORDER</div>
       <div class="sb-promo-sub">Upload your doctor's prescription and we'll dispense and deliver within 30 minutes.</div>
-      <button class="sb-promo-btn">📷 Upload Rx</button>
+      <button class="sb-promo-btn" id="rxUploadBtn">📷 Upload Rx</button>
     </div>
 
     <div style="margin-top:16px">
@@ -786,7 +1025,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
         <div class="sb-offer">
           <div class="sb-offer-tag">FLAT 20% OFF</div>
           <div class="sb-offer-title">First Order</div>
-          <div class="sb-offer-sub">Use code: RC20FIRST</div>
+          <div class="sb-offer-sub" data-coupon="RC20FIRST">Tap to copy: RC20FIRST</div>
         </div>
         <div class="sb-offer">
           <div class="sb-offer-tag">FREE DELIVERY</div>
@@ -796,7 +1035,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
         <div class="sb-offer">
           <div class="sb-offer-tag">15% OFF</div>
           <div class="sb-offer-title">Ayurvedic Range</div>
-          <div class="sb-offer-sub">Use code: AYUR15</div>
+          <div class="sb-offer-sub" data-coupon="AYUR15">Tap to copy: AYUR15</div>
         </div>
       </div>
     </div>
@@ -817,14 +1056,14 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
       </div>
       <div class="emerg-right">
         <div class="emerg-timer"><div class="emerg-timer-num">30</div><div class="emerg-timer-label">MIN ETA</div></div>
-        <button class="emerg-btn">Order now →</button>
+        <button class="emerg-btn" id="emergOrderBtn">Order now →</button>
       </div>
     </div>
 
     <!-- ESSENTIAL MEDICINES -->
-    <div class="sec-hd" data-aos="fade-up">
+    <div id="section-medicines" class="sec-hd" data-aos="fade-up">
       <div class="sec-title">ESSENTIAL MEDICINES</div>
-      <div class="sec-link">View all 310 →</div>
+      <div class="sec-link" data-cat="Pain Relief">View all 310 →</div>
     </div>
 
     <div class="prod-grid">
@@ -1141,9 +1380,9 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
     </div>
 
     <!-- EMERGENCY KITS -->
-    <div class="sec-hd" data-aos="fade-up">
+    <div id="section-kits" class="sec-hd" data-aos="fade-up">
       <div class="sec-title">EMERGENCY KITS</div>
-      <div class="sec-link">View all 48 →</div>
+      <div class="sec-link" data-cat="First Aid">View all 48 →</div>
     </div>
 
     <div class="kit-grid">
@@ -1259,9 +1498,9 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
     </div>
 
     <!-- AYURVEDA / HERBAL -->
-    <div class="sec-hd" data-aos="fade-up">
+    <div id="section-ayurveda" class="sec-hd" data-aos="fade-up">
       <div class="sec-title">AYURVEDA &amp; HERBAL</div>
-      <div class="sec-link">View all 380 →</div>
+      <div class="sec-link" data-cat="Ayurveda">View all 380 →</div>
     </div>
 
     <div class="herbal-grid">
@@ -1660,19 +1899,148 @@ document.querySelectorAll('.sb-item').forEach(item => {
   });
 });
 
-// Cart counter with bounce animation
+// Cart counter with bounce + toast
 let cartCount = 3;
 document.querySelectorAll('.add-btn, .kit-add, .oxy-side-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
+  btn.addEventListener('click', () => {
     cartCount++;
     const badge = document.querySelector('.cart-badge');
+    const mnBadge = document.getElementById('mnCartBadge');
     badge.textContent = cartCount;
+    if (mnBadge) mnBadge.textContent = cartCount;
     badge.classList.remove('bounce');
-    void badge.offsetWidth; // trigger reflow
+    void badge.offsetWidth;
     badge.classList.add('bounce');
     btn.style.background = '#1a7a4a';
     setTimeout(() => { btn.style.background = ''; }, 800);
+    showToast('✓ Added to cart', 'success');
   });
+});
+
+// ── TOAST SYSTEM ──
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => { toast.classList.add('out'); setTimeout(() => toast.remove(), 350); }, 2800);
+}
+
+// ── SCROLL PROGRESS + BACK TO TOP ──
+(function() {
+  const bar = document.getElementById('scrollProgress');
+  const btn = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    const s = window.scrollY;
+    const t = document.documentElement.scrollHeight - window.innerHeight;
+    if (bar) bar.style.width = (s / t * 100) + '%';
+    if (btn) btn.classList.toggle('visible', s > 300);
+  }, { passive: true });
+  if (btn) btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+})();
+
+// ── RX UPLOAD MODAL ──
+(function() {
+  const overlay = document.getElementById('rxOverlay');
+  const closeBtn = document.getElementById('rxClose');
+  const drop = document.getElementById('rxDrop');
+  const fileInput = document.getElementById('rxFileInput');
+  const preview = document.getElementById('rxPreview');
+  const submit = document.getElementById('rxSubmit');
+  function openRx() { if (overlay) overlay.classList.add('active'); }
+  function closeRx() { if (overlay) overlay.classList.remove('active'); }
+  [document.getElementById('rxUploadBtn'), document.getElementById('mnRx')].forEach(b => b && b.addEventListener('click', openRx));
+  if (closeBtn) closeBtn.addEventListener('click', closeRx);
+  if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) closeRx(); });
+  if (drop) drop.addEventListener('click', () => fileInput && fileInput.click());
+  if (fileInput) fileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = ev => { preview.src = ev.target.result; preview.style.display = 'block'; };
+      reader.readAsDataURL(file);
+    } else { if (preview) preview.style.display = 'none'; }
+  });
+  if (submit) submit.addEventListener('click', () => {
+    if (!fileInput || !fileInput.files[0]) { showToast('⚠️ Please select a file first', 'warning'); return; }
+    showToast('📷 Prescription received! Verifying shortly.', 'success');
+    closeRx();
+  });
+})();
+
+// ── MOBILE BOTTOM NAV ──
+(function() {
+  const mnCart = document.getElementById('mnCart');
+  const mnShop = document.getElementById('mnShop');
+  const mnOrders = document.getElementById('mnOrders');
+  const mnLab = document.getElementById('mnLab');
+  if (mnCart) mnCart.addEventListener('click', () => document.querySelector('.cart-btn')?.click());
+  if (mnShop) mnShop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelectorAll('.mn-item').forEach(i => i.classList.remove('active'));
+    mnShop.classList.add('active');
+  });
+  if (mnOrders) mnOrders.addEventListener('click', () => showToast('📋 Order history coming soon!', 'success'));
+  if (mnLab) mnLab.addEventListener('click', () => showToast('🧪 Lab tests coming soon!', 'success'));
+})();
+
+// ── COUPON CLICK TO COPY ──
+document.querySelectorAll('[data-coupon]').forEach(el => {
+  el.style.cursor = 'pointer';
+  el.addEventListener('click', () => {
+    const code = el.getAttribute('data-coupon');
+    navigator.clipboard.writeText(code).then(() => showToast('📋 Code "' + code + '" copied!', 'success'))
+      .catch(() => showToast('📋 Code: ' + code, 'success'));
+  });
+});
+
+// ── VIEW ALL links ──
+document.querySelectorAll('.sec-link[data-cat]').forEach(link => {
+  link.addEventListener('click', () => {
+    const cat = link.getAttribute('data-cat');
+    const pill = Array.from(document.querySelectorAll('.cat-pill')).find(p => p.querySelector('.cp-label')?.textContent.includes(cat));
+    if (pill) { document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('on')); pill.classList.add('on'); pill.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    showToast('Showing ' + cat, 'success');
+  });
+});
+
+// ── FOOTER LINKS ──
+(function() {
+  const map = { 'Medicines': '#section-medicines', 'Emergency Kits': '#section-kits', 'Ayurveda': '#section-ayurveda' };
+  document.querySelectorAll('.footer-link').forEach(link => {
+    link.style.cursor = 'pointer';
+    const text = link.textContent.trim();
+    link.addEventListener('click', () => {
+      if (text === 'Upload Prescription') { document.getElementById('rxOverlay')?.classList.add('active'); return; }
+      const anchor = map[text];
+      if (anchor) document.querySelector(anchor)?.scrollIntoView({ behavior: 'smooth' });
+      else showToast('🔗 ' + text + ' — coming soon!', 'success');
+    });
+  });
+})();
+
+// ── SORT DROPDOWN ──
+(function() {
+  const sel = document.querySelector('.sort-sel');
+  if (!sel) return;
+  sel.addEventListener('change', () => {
+    if (typeof allProducts === 'undefined') return;
+    const val = sel.value;
+    if (val === 'Price: Low–High') allProducts.sort((a, b) => a.price - b.price);
+    else if (val === 'Price: High–Low') allProducts.sort((a, b) => b.price - a.price);
+    else allProducts.sort((a, b) => a.name.localeCompare(b.name));
+    if (typeof renderGrid === 'function') renderGrid('All');
+    showToast('Sorted: ' + val, 'success');
+  });
+})();
+
+// ── EMERGENCY ORDER ──
+const emergBtn = document.getElementById('emergOrderBtn');
+if (emergBtn) emergBtn.addEventListener('click', () => {
+  document.querySelector('.cart-btn')?.click();
+  showToast('🚨 Express order activated!', 'success');
 });
 
 // ── INTERSECTION OBSERVER: Staggered reveal for cards & sections ──
