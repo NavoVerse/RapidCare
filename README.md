@@ -90,7 +90,7 @@ Then open `choose_User/index.html` in your browser.
 ### Endpoints (once running)
 | URL | Description |
 |-----|-------------|
-| `http://localhost:5000/health` | Health check |
+| `http://localhost:5000` | Home Page |
 | `http://localhost:5000/dev` | Developer Dashboard |
 | `http://localhost:5000/api/v1/auth/register` | User registration |
 | `http://localhost:5000/api/v1/auth/login` | User login |
