@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 2. Fetch Driver Profile
     try {
-        const response = await fetch('/api/v1/drivers/me', {
+        const apiBase = (window.RapidCareConfig && RapidCareConfig.API_BASE) ? RapidCareConfig.API_BASE : '/api/v1';
+        const response = await fetch(`${apiBase}/drivers/me`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -90,7 +91,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = JSON.parse(localStorage.getItem('rapidcare_user'));
 
     // 1.5 Real-Time Connection (Socket.IO)
-    const socket = io();
+    const socketUrl = (window.RapidCareConfig && RapidCareConfig.SOCKET_URL) ? RapidCareConfig.SOCKET_URL : window.location.origin;
+    const socket = io(socketUrl);
     
     if (user) {
         socket.emit('join', { userId: user.id, role: 'driver' });
@@ -287,7 +289,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!currentTripId) return;
             
             try {
-                const response = await fetch(`/api/v1/trips/${currentTripId}/accept`, {
+                const apiBase = (window.RapidCareConfig && RapidCareConfig.API_BASE) ? RapidCareConfig.API_BASE : '/api/v1';
+                const response = await fetch(`${apiBase}/trips/${currentTripId}/accept`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -313,7 +316,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!currentTripId) return;
 
             try {
-                const response = await fetch(`/api/v1/trips/${currentTripId}/reject`, {
+                const apiBase = (window.RapidCareConfig && RapidCareConfig.API_BASE) ? RapidCareConfig.API_BASE : '/api/v1';
+                const response = await fetch(`${apiBase}/trips/${currentTripId}/reject`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -342,7 +346,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             else stopTracking();
 
             try {
-                await fetch('/api/v1/drivers/status', {
+                const apiBase = (window.RapidCareConfig && RapidCareConfig.API_BASE) ? RapidCareConfig.API_BASE : '/api/v1';
+                await fetch(`${apiBase}/drivers/status`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -359,7 +364,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3. Fetch Trip History
     async function fetchAndRenderTrips() {
         try {
-            const response = await fetch('/api/v1/drivers/trips', {
+            const apiBase = (window.RapidCareConfig && RapidCareConfig.API_BASE) ? RapidCareConfig.API_BASE : '/api/v1';
+            const response = await fetch(`${apiBase}/drivers/trips`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -468,12 +474,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (distEl) distEl.textContent = '2.1 km remaining';
             if (activePatientIdEl) activePatientIdEl.textContent = `Patient ID #${activeTripData.patient_id}`;
             if (activeConditionEl) activeConditionEl.textContent = activeTripData.complaint || 'Emergency Response';
+            
+            const patientAvatar = document.querySelector('.patient-avatar');
+            if (patientAvatar) patientAvatar.textContent = `P${activeTripData.patient_id}`;
+            
+            const priorityBadge = document.getElementById('active-patient-priority');
+            if (priorityBadge) {
+                priorityBadge.textContent = 'CRITICAL';
+                priorityBadge.className = 'priority-badge critical';
+            }
+            
             drawTripRoute(activeTripData);
         } else {
             if (etaEl) etaEl.textContent = '--';
             if (distEl) distEl.textContent = 'No active trip';
             if (activePatientIdEl) activePatientIdEl.textContent = 'No active call';
             if (activeConditionEl) activeConditionEl.textContent = 'Waiting for request...';
+            
+            const patientAvatar = document.querySelector('.patient-avatar');
+            if (patientAvatar) patientAvatar.textContent = 'P';
+            
+            const priorityBadge = document.getElementById('active-patient-priority');
+            if (priorityBadge) {
+                priorityBadge.textContent = 'NORMAL';
+                priorityBadge.className = 'priority-badge';
+                priorityBadge.style.opacity = '0.5';
+            }
         }
 
         updateActionButtons(activeTripData);
