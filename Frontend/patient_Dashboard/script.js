@@ -169,7 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             socket.on('trip:accepted', (data) => {
-                alert(`🚑 RapidCare Accepted! Trip #${data.trip_id}. Driver is on the way.`);
+                alert(`🚑 RapidCare Accepted!\nDriver ID #${data.driver_id} is on the way to your location.`);
+                // If there's a status text element in the tracking panel, update it
+                const statusTxt = document.getElementById('tracking-status-text');
+                if (statusTxt) statusTxt.textContent = `Driver En Route (ID: ${data.driver_id})`;
             });
 
             socket.on('trip:timeout', (data) => {
@@ -260,8 +263,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
 
-            setVal('sidebarName', data.name, '', 'Unknown User');
-            setVal('displayProfileName', data.name, '', 'Unknown User');
+            const displayNameWithId = data.id ? `${data.name} (ID: P${data.id})` : data.name;
+            setVal('sidebarName', displayNameWithId, '', 'Unknown User');
+            setVal('displayProfileName', displayNameWithId, '', 'Unknown User');
             setVal('insurancePatientName', data.name, '', 'Unknown User');
             setVal('displayProfileGender', data.gender);
             setVal('displayProfileBirth', data.date_of_birth);
@@ -861,7 +865,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="padding: 8px; min-width: 200px;">
                     <h3 style="margin: 0 0 6px 0; color: #14532d; font-size: 1rem;">${h.name}</h3>
                     <p style="margin: 0 0 10px 0; font-size: 0.85rem;">Status: <strong style="color: ${statusColor}">${h.status}</strong></p>
-                    <button onclick="window.bookAmbulance(${h.id}, '${h.name.replace(/'/g, "\\'")}')" style="width: 100%; padding: 8px; background: #15803d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">🚑 Book RapidCare</button>
+                    <button onclick="window.bookAmbulance('${h.id}', '${h.name.replace(/'/g, "\\'")}')" style="width: 100%; padding: 8px; background: #15803d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">🚑 Book RapidCare</button>
                 </div>`;
             const m = L.marker([h.lat, h.lng], { icon: hospitalIcon })
                 .addTo(overviewMap)
@@ -908,13 +912,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Get current location from localStorage
-        const lat = localStorage.getItem('userLat');
-        const lng = localStorage.getItem('userLng');
+        // Get current location from localStorage, or use fallback for testing
+        let lat = localStorage.getItem('userLat');
+        let lng = localStorage.getItem('userLng');
 
         if (!lat || !lng) {
-            alert("Waiting for GPS location...");
-            return;
+            console.warn("GPS location missing. Falling back to default coordinates for testing.");
+            lat = 22.5726; // Default to Kolkata lat
+            lng = 88.3639; // Default to Kolkata lng
         }
 
         try {
@@ -1143,7 +1148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="h-distance" style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem;">${h.distance} km</span>
                     </div>
                     <div class="h-actions-row" style="display: flex; gap: 10px;">
-                        <button class="book-btn uni-btn" onclick="event.stopPropagation(); window.bookAmbulance(${h.id}, '${h.name.replace(/'/g, "\\'")}')">🚑 Book Now</button>
+                        <button class="book-btn uni-btn" onclick="event.stopPropagation(); window.bookAmbulance('${h.id}', '${h.name.replace(/'/g, "\\'")}')">🚑 Book Now</button>
                         <button class="action-btn distance-btn uni-btn" onclick="event.stopPropagation(); window.highlightDistance(${h.lat}, ${h.lng})">📍 Distance</button>
                         <button class="action-btn status-btn uni-btn" onclick="event.stopPropagation(); window.showHospitalStatus('${h.name.replace(/'/g, "\\'")}')" style="color: ${statusColor}; border-color: ${statusColor}">🛡️ ${h.status}</button>
                     </div>
