@@ -997,8 +997,20 @@ canvas#globe {
     pointer-events: all;
 }
 
-/* Mobile Optimizations */
+/* ─── MOBILE OPTIMIZATIONS ─── */
+
+/* Disable custom cursor on touch devices */
+@media (hover: none) and (pointer: coarse) {
+    body { cursor: auto; }
+    .cursor, .cursor-ring, .mouse-glow { display: none !important; }
+}
+
+/* Tablet breakpoint */
 @media (max-width: 768px) {
+    section {
+        padding: 80px 24px;
+    }
+
     .bento {
         grid-template-columns: 1fr;
     }
@@ -1012,8 +1024,14 @@ canvas#globe {
     }
 
     .globe-wrap {
-        width: 300px;
-        height: 300px;
+        width: 280px;
+        height: 280px;
+        margin: 40px auto 30px;
+    }
+
+    canvas#globe {
+        width: 280px;
+        height: 280px;
     }
 
     .globe-stats {
@@ -1023,13 +1041,196 @@ canvas#globe {
     .g-stat {
         border-right: none;
         border-bottom: 1px solid rgba(255, 255, 255, .06);
+        padding: 20px 16px;
     }
 
     .g-stat:last-child {
         border-bottom: none;
     }
 
+    .g-num {
+        font-size: 32px;
+    }
+
     .nav-dots {
         display: none;
+    }
+
+    .roles-grid {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .role-card {
+        width: 100%;
+        max-width: 340px;
+    }
+
+    .card-img-wrap {
+        height: 260px;
+    }
+
+    .step {
+        gap: 20px;
+    }
+
+    .step-num {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        font-size: 18px;
+    }
+
+    .step:not(:last-child)::after {
+        left: 23px;
+        top: 50px;
+    }
+
+    .corner-label {
+        display: none;
+    }
+
+    #splash {
+        min-height: auto;
+        height: 100vh;
+        height: 100svh;
+    }
+
+    .splash-title {
+        font-size: clamp(42px, 12vw, 72px);
+    }
+
+    .splash-tagline {
+        font-size: 10px;
+        letter-spacing: 3px;
+    }
+
+    .btn-prim, .btn-out {
+        padding: 14px 32px;
+        font-size: 12px;
+    }
+
+    .cta-btn {
+        padding: 14px 36px;
+        font-size: 12px;
+    }
+
+    #fcta {
+        padding: 80px 24px;
+    }
+
+    .fcta-sub {
+        font-size: 14px;
+    }
+
+    .btn-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-row .btn-prim,
+    .btn-row .btn-out {
+        width: 100%;
+        max-width: 320px;
+        text-align: center;
+    }
+
+    .how-inner {
+        padding: 0;
+    }
+}
+
+/* Mobile phone breakpoint */
+@media (max-width: 480px) {
+    section {
+        padding: 60px 16px;
+    }
+
+    .splash-title {
+        font-size: clamp(36px, 14vw, 56px);
+    }
+
+    .splash-tagline {
+        font-size: 9px;
+        letter-spacing: 2px;
+    }
+
+    .globe-wrap {
+        width: 220px;
+        height: 220px;
+    }
+
+    canvas#globe {
+        width: 220px;
+        height: 220px;
+    }
+
+    .globe-stats {
+        max-width: 100%;
+    }
+
+    .g-num {
+        font-size: 28px;
+    }
+
+    .g-lbl {
+        font-size: 10px;
+    }
+
+    .role-card {
+        max-width: 100%;
+    }
+
+    .card-img-wrap {
+        height: 220px;
+    }
+
+    .card-role {
+        font-size: 20px;
+    }
+
+    .sec-title {
+        font-size: clamp(28px, 7vw, 48px);
+    }
+
+    .step-body h3 {
+        font-size: 17px;
+    }
+
+    .step-body p {
+        font-size: 13px;
+    }
+
+    .bento-cell {
+        padding: 24px 20px;
+    }
+
+    .cell-stat {
+        font-size: 40px;
+    }
+
+    .scroll-hint {
+        bottom: 20px;
+    }
+
+    .live-pill {
+        font-size: 10px;
+        padding: 5px 12px;
+    }
+
+    #fcta {
+        padding: 60px 16px;
+    }
+
+    .fcta-title {
+        font-size: clamp(28px, 8vw, 48px);
+    }
+
+    .btn-prim, .btn-out {
+        padding: 14px 24px;
+        font-size: 11px;
+        letter-spacing: 1.5px;
     }
 }

@@ -13,7 +13,7 @@ yarn-error.log*
 # Database
 user_Database/*.db
 user_Database/*.sqlite
-
+Backend/user_Database/rapidcare.db
 # Logs
 logs
 *.log
