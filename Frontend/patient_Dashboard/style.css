@@ -83,10 +83,6 @@ body {
     filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.7)) drop-shadow(0 0 5px rgba(239, 68, 68, 0.3)); /* Stronger multi-color glow on hover */
 }
 
-.logo:hover .logo-icon img {
-    filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.7)) drop-shadow(0 0 5px rgba(239, 68, 68, 0.3)); /* Stronger multi-color glow on hover */
-}
-
 @keyframes arrive-motion {
     0% {
         transform: translateX(-120%) skewX(-20deg);
@@ -344,7 +340,6 @@ header {
     top: 0;
     z-index: 1100;
     flex-shrink: 0;
-    margin-bottom: -64px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
 }
 
@@ -467,16 +462,7 @@ header {
     height: 8px;
     background-color: #ef4444;
     border-radius: 50%;
-    border: 1.5px solid var(--bg-sidebar);
-}
-
-.user-avatar-small {
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.user-avatar-small:hover {
-    transform: scale(1.1);
+    border: 1.5px solid var(--surface-color);
 }
 
 .user-avatar-small {
@@ -493,6 +479,11 @@ header {
     cursor: pointer;
     border: 2px solid var(--primary-color);
     margin-left: 4px;
+    transition: transform 0.2s ease;
+}
+
+.user-avatar-small:hover {
+    transform: scale(1.1);
 }
 
 
