@@ -1,0 +1,529 @@
+/* ═══════════════════════════════════════════
+   COMPREHENSIVE MOBILE RESPONSIVENESS
+   ═══════════════════════════════════════════ */
+
+/* Mobile sidebar overlay backdrop */
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-backdrop.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Tablet refinements */
+@media (max-width: 1024px) {
+    .dashboard-container {
+        padding: 24px;
+    }
+
+    .profile-container {
+        padding: 24px;
+    }
+
+    .search-bar {
+        width: 260px;
+    }
+
+    .search-bar:focus-within {
+        width: 300px;
+    }
+
+    #editFields {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile breakpoint - core layout */
+@media (max-width: 768px) {
+    /* Header adjustments */
+    header {
+        padding: 0 16px;
+        height: 56px;
+        margin-bottom: -56px;
+    }
+
+    .search-bar {
+        width: 180px;
+        padding: 8px 14px;
+        border-radius: 10px;
+    }
+
+    .search-bar input {
+        font-size: 13px;
+    }
+
+    .search-bar:focus-within {
+        width: 220px;
+    }
+
+    .header-right {
+        gap: 8px;
+    }
+
+    .icon-btn {
+        width: 34px;
+        height: 34px;
+    }
+
+    /* Dashboard content */
+    .dashboard-container {
+        padding: 20px 16px;
+    }
+
+    .profile-container {
+        padding: 20px 16px;
+    }
+
+    /* Profile main card */
+    .profile-main-card {
+        padding: 20px;
+        border-radius: 14px;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .profile-avatar-wrapper {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+    }
+
+    .name-header {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .name-header h2 {
+        font-size: 20px;
+    }
+
+    .demographics {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .vitals-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .vital-item:nth-child(5),
+    .vital-item:nth-child(6) {
+        grid-column: auto;
+    }
+
+    .diagnosis-section {
+        align-items: center;
+    }
+
+    .diag-group label {
+        text-align: center;
+    }
+
+    .tags {
+        justify-content: center;
+    }
+
+    /* Profile grid */
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Profile tabs scrollable */
+    .profile-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 0;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+    }
+
+    .profile-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .profile-tabs .tab {
+        flex-shrink: 0;
+        padding: 10px 16px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    /* Stats */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .stat-card .value {
+        font-size: 20px;
+    }
+
+    /* Main grid */
+    .main-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    /* Hospital list */
+    .hospital-item {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+
+    /* Map */
+    .map-container {
+        min-height: 350px;
+    }
+
+    .map-overlay {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+    }
+
+    .map-overlay button {
+        width: 100%;
+    }
+
+    /* SOS button */
+    .sos-floating {
+        bottom: 20px;
+        right: 16px;
+        padding: 14px 28px;
+        font-size: 15px;
+        gap: 10px;
+        border-radius: 40px;
+    }
+
+    /* Modal */
+    .modal-content {
+        padding: 20px;
+        border-radius: 16px;
+        width: 95%;
+    }
+
+    #editModal .modal-content {
+        max-width: 95%;
+    }
+
+    /* Card header */
+    .card-header {
+        padding: 16px 18px;
+    }
+
+    .card-header h3 {
+        font-size: 16px;
+    }
+
+    /* Edit profile actions */
+    .profile-edit-actions {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .edit-profile-btn,
+    .save-profile-btn,
+    .cancel-profile-btn {
+        font-size: 13px;
+        padding: 7px 14px;
+    }
+
+    /* History & diet grids */
+    .history-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .history-full-width {
+        grid-column: 1 / -1;
+    }
+
+    .diet-list {
+        grid-template-columns: 1fr;
+    }
+
+    .diet-card.full {
+        grid-column: 1 / -1;
+    }
+
+    /* Med table scroll */
+    .medications-panel {
+        overflow-x: auto;
+    }
+
+    .med-table {
+        min-width: 520px;
+    }
+}
+
+/* Small phone breakpoint */
+@media (max-width: 480px) {
+    header {
+        height: 50px;
+        margin-bottom: -50px;
+        padding: 0 12px;
+    }
+
+    .search-bar {
+        display: none;
+    }
+
+    .dashboard-container,
+    .profile-container {
+        padding: 16px 12px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .stat-card .value {
+        font-size: 18px;
+    }
+
+    .stat-card label {
+        font-size: 11px;
+    }
+
+    .profile-main-card {
+        padding: 16px;
+    }
+
+    .vitals-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .vital-item {
+        padding: 10px 12px;
+        min-width: 0;
+    }
+
+    .vital-val {
+        font-size: 18px;
+    }
+
+    .vital-label {
+        font-size: 11px;
+    }
+
+    .name-header h2 {
+        font-size: 18px;
+    }
+
+    .profile-tabs .tab {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .timeline-item {
+        gap: 15px;
+    }
+
+    .sos-floating {
+        bottom: 16px;
+        right: 12px;
+        padding: 12px 22px;
+        font-size: 14px;
+        gap: 8px;
+    }
+
+    .modal-content {
+        padding: 16px;
+    }
+
+    #editFields {
+        grid-template-columns: 1fr;
+        gap: 0 16px;
+    }
+
+    /* Tracking view ETA card */
+    .eta-card {
+        bottom: 10px;
+        left: 10px;
+        min-width: 160px;
+        padding: 12px 16px;
+    }
+
+    .eta-minutes {
+        font-size: 24px;
+    }
+
+    /* Receipt on small screens */
+    .receipt {
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    .receipt-logo {
+        font-size: 20px;
+    }
+
+    .receipt-row {
+        font-size: 13px;
+    }
+
+    .receipt-row.total {
+        font-size: 16px;
+    }
+}
+
+/* Forced two-column layout for small mobile */
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+}
+
+/* Scroll Trap Fixes for Mobile */
+@media (max-width: 768px) {
+    .hospital-list {
+        max-height: none !important;
+        overflow-y: visible !important;
+    }
+
+    /* Map Interaction Overlay */
+    .map-wrapper::after {
+        content: 'Tap to interact with map';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        z-index: 1001;
+        pointer-events: all;
+        transition: opacity 0.3s ease;
+        border-radius: 20px;
+    }
+
+    .map-wrapper.interacting::after {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .map-container {
+        pointer-events: none;
+    }
+
+    .map-wrapper.interacting .map-container {
+        pointer-events: all;
+    }
+}
+
+/* Glassmorphism Overhaul for Sidebar & UI Elements */
+.sidebar {
+    background: rgba(var(--surface-color-rgb), 0.7) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border-right: 1px solid rgba(var(--surface-color-rgb), 0.2) !important;
+}
+
+[data-theme="dark"] .sidebar {
+    background: rgba(30, 30, 30, 0.75) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.profile-dropdown {
+    background: rgba(var(--surface-color-rgb), 0.8) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border: 1px solid rgba(var(--surface-color-rgb), 0.3) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme="dark"] .profile-dropdown {
+    background: rgba(30, 30, 30, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Sidebar Item Glass Effect on Hover */
+.nav-item:hover {
+    background: rgba(var(--surface-color-rgb), 0.4) !important;
+}
+
+[data-theme="dark"] .nav-item:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Mobile Logo & App Name Fix */
+.mobile-logo {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+}
+
+.mobile-logo img {
+    width: 30px;
+    height: 30px;
+    filter: drop-shadow(0 0 5px rgba(33, 170, 255, 0.4));
+}
+
+.mobile-logo span {
+    font-family: 'Blending', cursive;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-color);
+    letter-spacing: 0.5px;
+}
+
+[data-theme="dark"] .mobile-logo span {
+    color: #FFFFFF; /* High contrast for mobile header */
+}
+
+@media (max-width: 768px) {
+    .mobile-logo {
+        display: flex;
+    }
+    
+    .sidebar .logo {
+        margin-top: 15px; /* Prevent clipping at the top of the sidebar */
+        margin-bottom: 30px;
+    }
+    
+    .logo-text {
+        color: var(--primary-text) !important; /* Brighter in dark mode sidebar */
+    }
+}
+
+/* Ensure sidebar logo is always visible on small screens */
+@media (max-width: 480px) {
+    .sidebar {
+        padding-top: 40px !important;
+    }
+    
+    .search-bar {
+        display: none !important; /* Hide search bar to make room for logo on tiny screens */
+    }
+}

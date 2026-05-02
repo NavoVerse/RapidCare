@@ -1,26 +1,32 @@
 /* Choose User Script - Premium RapidCare Interface */
 
 document.addEventListener('DOMContentLoaded', () => {
-    /* ─── CURSOR ─── */
-    const cur = document.getElementById('cur'), curR = document.getElementById('curR');
-    let mx = 0, my = 0, rx = 0, ry = 0;
-    
-    document.addEventListener('mousemove', e => {
-        mx = e.clientX; my = e.clientY;
-        cur.style.left = mx + 'px'; cur.style.top = my + 'px';
-        const mGlow = document.getElementById('mGlow');
-        if (mGlow) {
-            mGlow.style.left = mx + 'px';
-            mGlow.style.top = my + 'px';
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    let effectsEnabled = localStorage.getItem('rapidcare_mouse_effects') !== 'false';
+
+    window.addEventListener('mouseEffectsToggled', (e) => {
+        effectsEnabled = e.detail.enabled;
+        if (!effectsEnabled) {
+            const mGlow = document.getElementById('mGlow');
+            if (mGlow) {
+                mGlow.style.left = '-100px';
+                mGlow.style.top = '-100px';
+            }
         }
     });
 
-    function animRing() {
-        rx += (mx - rx) * .12; ry += (my - ry) * .12;
-        curR.style.left = rx + 'px'; curR.style.top = ry + 'px';
-        requestAnimationFrame(animRing);
+    /* ─── MOUSE GLOW (Shared logic with cursor - Disabled on mobile) ─── */
+    if (!isTouch) {
+        document.addEventListener('mousemove', e => {
+            if (!effectsEnabled) return;
+            const mx = e.clientX, my = e.clientY;
+            const mGlow = document.getElementById('mGlow');
+            if (mGlow) {
+                mGlow.style.left = mx + 'px';
+                mGlow.style.top = my + 'px';
+            }
+        });
     }
-    animRing();
 
     /* ─── PARTICLE SYSTEM ─── */
     (function() {

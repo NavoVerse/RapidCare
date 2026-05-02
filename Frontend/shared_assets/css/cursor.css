@@ -1,0 +1,214 @@
+:root {
+  /* Default (Dark Mode colors) */
+  --cursor-l1: #A7EBF2;
+  --cursor-l2: #54ACBF;
+  --cursor-blend: screen;
+}
+
+[data-theme="light"] {
+  --cursor-l1: #191970; /* Midnight Blue from theme.css */
+  --cursor-l2: #2563EB; /* Primary Blue */
+  --cursor-blend: multiply;
+}
+
+body {
+  cursor: none !important;
+}
+
+/* Hide cursor on interactive elements as well */
+a, button, input, select, textarea, .stat-card, .amb-card, .tr-row {
+  cursor: none !important;
+}
+
+/* ── CURSOR ── */
+.cursor-dot {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: var(--cursor-l1);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform .1s, width .2s, height .2s;
+  mix-blend-mode: var(--cursor-blend);
+}
+
+.cursor-ring {
+  position: fixed;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--cursor-l1);
+  opacity: 0.4;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform .12s ease, width .3s, height .3s;
+}
+
+.cursor-dot.hover {
+  width: 16px;
+  height: 16px;
+  background: var(--cursor-l2);
+}
+
+.cursor-ring.hover {
+  width: 48px;
+  height: 48px;
+  border-color: var(--cursor-l2);
+  opacity: 0.6;
+}
+
+/* ── TRAIL ── */
+.cursor-trail {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9995;
+  border-radius: 50%;
+  background: var(--cursor-l2);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  animation: trailFade .5s ease-out forwards;
+}
+
+@keyframes trailFade {
+  0%   { opacity: .55; transform: translate(-50%,-50%) scale(1); }
+  100% { opacity: 0;   transform: translate(-50%,-50%) scale(0); }
+}
+
+/* ── SPLASH ── */
+.splash-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9996;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  animation: splashFly var(--dur, .7s) ease-out forwards;
+}
+
+@keyframes splashFly {
+  0%   { opacity: 1; transform: translate(-50%,-50%) translate(0,0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%,-50%) translate(var(--tx),var(--ty)) scale(0); }
+}
+
+.splash-ring {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9996;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--cursor-l1);
+  transform: translate(-50%, -50%) scale(1);
+  animation: splashRingOut .55s ease-out forwards;
+}
+
+@keyframes splashRingOut {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(6); }
+}
+
+/* ── TOUCH RIPPLE ── */
+.touch-ripple {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9997;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  border: 2px solid var(--cursor-l2);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  transition: none;
+}
+
+.touch-ripple.active {
+  animation: rippleAnim .6s ease-out forwards;
+}
+
+@keyframes rippleAnim {
+  0%   { opacity: .8; transform: translate(-50%, -50%) scale(0); }
+  100% { opacity: 0;  transform: translate(-50%, -50%) scale(2.5); }
+}
+
+/* Global class to disable all custom mouse effects */
+body.disable-mouse-effects, 
+body.disable-mouse-effects a, 
+body.disable-mouse-effects button, 
+body.disable-mouse-effects input, 
+body.disable-mouse-effects select, 
+body.disable-mouse-effects textarea,
+body.disable-mouse-effects .stat-card,
+body.disable-mouse-effects .amb-card,
+body.disable-mouse-effects .tr-row {
+  cursor: auto !important;
+}
+
+body.disable-mouse-effects .cursor-dot, 
+body.disable-mouse-effects .cursor-ring, 
+body.disable-mouse-effects .cursor-trail, 
+body.disable-mouse-effects .splash-particle, 
+body.disable-mouse-effects .splash-ring,
+body.disable-mouse-effects .m-glow,
+body.disable-mouse-effects #mGlow {
+  display: none !important;
+}
+
+/* Toggle Button Styling */
+.effects-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: var(--cursor-l1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10000;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255,255,255,0.1);
+  opacity: 0.6;
+}
+
+.effects-toggle:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.effects-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: #000;
+}
+
+body.disable-mouse-effects .effects-toggle {
+  background: #444;
+}
+
+body.disable-mouse-effects .effects-toggle svg {
+  fill: #fff;
+}
+
+/* Restore default cursor and hide custom elements on mobile */
+@media (max-width: 768px), (pointer: coarse) {
+  body, a, button, input, select, textarea, .stat-card, .amb-card, .tr-row {
+    cursor: auto !important;
+  }
+  
+  .cursor-dot, 
+  .cursor-ring, 
+  .cursor-trail, 
+  .splash-particle, 
+  .splash-ring {
+    display: none !important;
+  }
+
+  .effects-toggle {
+    display: none !important;
+  }
+}

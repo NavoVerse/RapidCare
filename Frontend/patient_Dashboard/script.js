@@ -8,7 +8,7 @@ window.pricingConfig = {
     ventilator: { original: 300, discounted: 280 }
 };
 
-window.recalculatePricing = function() {
+window.recalculatePricing = function () {
     const typeEl = document.querySelector('input[name="ambulance-type"]:checked');
     const distEl = document.getElementById('distance-input');
     const coupEl = document.getElementById('coupon-code');
@@ -21,7 +21,7 @@ window.recalculatePricing = function() {
     const selectedType = typeEl.value;
     const distance = parseFloat(distEl.value) || 5;
     const couponCode = coupEl ? coupEl.value.toUpperCase() : '';
-    
+
     if (distance <= 0) {
         if (payBtnElement) {
             payBtnElement.disabled = true;
@@ -42,14 +42,14 @@ window.recalculatePricing = function() {
     const platformCharge = 40;
     const hospitalReservation = 500;
     let discount = 0;
-    
+
     const validCoupons = {
         'RAPID20': 20,
         'RIDEMASTER': 40,
         'FIRSTCARE': 100,
         'FIRSTRAPIDCARE50': 50
     };
-    
+
     if (validCoupons[couponCode]) {
         discount = validCoupons[couponCode];
         if (couponMsg && !couponMsg.classList.contains('success')) {
@@ -57,7 +57,7 @@ window.recalculatePricing = function() {
             couponMsg.className = 'coupon-status success';
         }
     }
-    
+
     let finalTotal = Math.max(0, distanceCharge + platformCharge + hospitalReservation - discount);
 
     try {
@@ -81,7 +81,7 @@ window.recalculatePricing = function() {
         // Local Streak Reward Logic - Scoped to Payment View to prevent crashes
         const activePaymentTab = document.querySelector('#payment-view .tab-btn.active');
         const tabId = activePaymentTab ? activePaymentTab.getAttribute('data-tab') : 'upi';
-        
+
         const streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
         if (tabId === 'cash' && streak >= 3) {
             finalTotal = Math.max(0, finalTotal - 40);
@@ -94,18 +94,18 @@ window.recalculatePricing = function() {
 };
 
 
-window.openClaimHistoryModal = function(e) {
-    if(e) e.preventDefault();
+window.openClaimHistoryModal = function (e) {
+    if (e) e.preventDefault();
     const modal = document.getElementById('claim-history-modal');
-    if(modal) {
+    if (modal) {
         modal.style.display = 'flex';
         modal.classList.add('active');
     }
 };
 
-window.closeClaimHistoryModal = function() {
+window.closeClaimHistoryModal = function () {
     const modal = document.getElementById('claim-history-modal');
-    if(modal) {
+    if (modal) {
         modal.style.display = 'none';
         modal.classList.remove('active');
     }
@@ -114,7 +114,7 @@ window.closeClaimHistoryModal = function() {
 // Close modal on outside click
 window.addEventListener('click', (e) => {
     const modal = document.getElementById('claim-history-modal');
-    if(e.target === modal) {
+    if (e.target === modal) {
         modal.style.display = 'none';
         modal.classList.remove('active');
     }
@@ -124,13 +124,13 @@ window.addEventListener('click', (e) => {
 window.switchPaymentTab = (btn) => {
     const tabId = btn.getAttribute('data-tab');
     const section = btn.closest('.tabs-container') || document.querySelector('#payment-view');
-    
+
     if (!section) return;
 
     // Remove active classes within this context
     section.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     section.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    
+
     // Add active classes
     btn.classList.add('active');
     const targetContent = document.getElementById(`${tabId}-content`);
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     // REAL-TIME DISPATCH (Socket.IO)
     // =============================================
-    
+
     let socket = null;
     let overviewMap = null;
     let trackingMap = null;
@@ -198,52 +198,52 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadUserProfile() {
         try {
             const token = localStorage.getItem('rapidcare_token');
-        let data = null;
+            let data = null;
 
-        if (token) {
-            try {
-                const response = await fetch(API_BASE + '/patients/me', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    data = await response.json();
-                    localStorage.setItem('rapidcare_user', JSON.stringify(data));
-                }
-            } catch(err) {
-                console.warn('Failed to fetch profile from server, falling back to local cache:', err);
-            }
-        }
-
-        if (!data) {
-            const userStr = localStorage.getItem('rapidcare_user');
-            if (userStr) {
+            if (token) {
                 try {
-                    data = JSON.parse(userStr);
-                } catch(e) {}
+                    const response = await fetch(API_BASE + '/patients/me', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        data = await response.json();
+                        localStorage.setItem('rapidcare_user', JSON.stringify(data));
+                    }
+                } catch (err) {
+                    console.warn('Failed to fetch profile from server, falling back to local cache:', err);
+                }
             }
-        }
 
-        if (!data) {
-            // Set default dummy data to ensure frontend doesn't break/show empty
-            data = {
-                name: 'Samim Uddin Molla',
-                gender: 'Male',
-                date_of_birth: '1994-08-15',
-                blood_type: 'O+',
-                home_location: 'Kolkata, West Bengal',
-                height: 175,
-                weight: 72,
-                blood_pressure: '120/80',
-                allergies: 'None',
-                chronic_conditions: 'None',
-                own_diagnosis: 'None added',
-                health_barriers: 'None added',
-                habits: 'Healthy Diet, Exercise'
-            };
-            localStorage.setItem('rapidcare_user', JSON.stringify(data));
-        }
+            if (!data) {
+                const userStr = localStorage.getItem('rapidcare_user');
+                if (userStr) {
+                    try {
+                        data = JSON.parse(userStr);
+                    } catch (e) { }
+                }
+            }
 
-        localStorage.setItem('rapidcare_user_name', data.name);
+            if (!data) {
+                // Set default dummy data to ensure frontend doesn't break/show empty
+                data = {
+                    name: 'Samim Uddin Molla',
+                    gender: 'Male',
+                    date_of_birth: '1994-08-15',
+                    blood_type: 'O+',
+                    home_location: 'Kolkata, West Bengal',
+                    height: 175,
+                    weight: 72,
+                    blood_pressure: '120/80',
+                    allergies: 'None',
+                    chronic_conditions: 'None',
+                    own_diagnosis: 'None added',
+                    health_barriers: 'None added',
+                    habits: 'Healthy Diet, Exercise'
+                };
+                localStorage.setItem('rapidcare_user', JSON.stringify(data));
+            }
+
+            localStorage.setItem('rapidcare_user_name', data.name);
 
             // Update details view
             const setVal = (id, val, prefix = '', defaultVal = '--') => {
@@ -324,13 +324,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update sidebar and header
             const sidebarName = document.getElementById('sidebarName');
             if (sidebarName && data.name) sidebarName.textContent = data.name;
-            
+
             // Set avatars (Prefer uploaded one, fallback to UI Avatars)
             let avatarUrl = data.avatar_url;
             if (!avatarUrl && data.name) {
                 avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=2563eb&color=fff&size=128`;
             }
-            
+
             if (avatarUrl) {
                 const sidebarAvatar = document.getElementById('sidebarAvatar');
                 if (sidebarAvatar) sidebarAvatar.src = avatarUrl;
@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Convert to low-quality JPEG for database storage
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    
+
                     // Upload to backend
                     uploadAvatar(dataUrl);
                 };
@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function detectUserLocation() {
         const locationText = document.getElementById('userLocationText');
         const locationStatus = document.getElementById('locationStatus');
-        
+
         if (!navigator.geolocation) {
             if (locationText) locationText.textContent = "Geolocation not supported";
             return;
@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sidebar Toggle Logic
     const sidebar = document.querySelector('.sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
-    
+
     // Check for saved state
     const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
     if (isCollapsed && sidebar) {
@@ -556,7 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation(); // prevent immediate close on mobile
             const nowCollapsed = sidebar.classList.toggle('collapsed');
             localStorage.setItem('sidebar-collapsed', nowCollapsed);
-            
+
             // Trigger a map resize if needed, since the container size changes
             if (typeof map !== 'undefined' && map.invalidateSize) {
                 setTimeout(() => map.invalidateSize(), 300);
@@ -592,7 +592,7 @@ document.addEventListener('DOMContentLoaded', () => {
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             const viewKey = item.getAttribute('data-view');
-            
+
             if (item.getAttribute('href') === '#') {
                 e.preventDefault();
             }
@@ -611,7 +611,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedView) {
                 // History uses flex for its split pane layout
                 selectedView.style.display = (viewKey === 'history') ? 'flex' : 'block';
-                
+
                 // Specific View Initializations
                 if (viewKey === 'dashboard') {
                     if (typeof overviewMap !== 'undefined' && overviewMap.invalidateSize) {
@@ -692,7 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
         trackingMap = L.map('live-tracking-map', {
             center: [22.5430, 88.3690],
             zoom: 13,
-            zoomControl: false, 
+            zoomControl: false,
             attributionControl: true
         });
 
@@ -781,7 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load hospitals from backend MapAPI
     async function initHospitals(forced = false) {
         const storedHospitals = localStorage.getItem('hospitalData');
-        
+
         if (!forced && storedHospitals) {
             hospitals = JSON.parse(storedHospitals);
         } else {
@@ -893,10 +893,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     // REAL AMBULANCE BOOKING
     // =============================================
-    window.bookAmbulance = async function(hospitalId, hospitalName) {
+    window.bookAmbulance = async function (hospitalId, hospitalName) {
         // Save selected hospital for payment receipt
         localStorage.setItem('rapidcare_selected_hospital', hospitalName);
-        
+
         // Generate random 4-digit OTP
         const otp = Math.floor(1000 + Math.random() * 9000);
         const otpEl = document.getElementById('otpStatusValue');
@@ -951,18 +951,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let distanceBackgroundLine = null;
     let distancePolyline = null;
 
-    window.highlightDistance = async function(lat, lng) {
+    window.highlightDistance = async function (lat, lng) {
         if (!userMarker) return;
         const userLatLng = userMarker.getLatLng();
-        
+
         if (distancePolyline) overviewMap.removeLayer(distancePolyline);
         if (distanceBackgroundLine) overviewMap.removeLayer(distanceBackgroundLine);
-        
+
         try {
             // Fetch real road route using OSRM public API
             const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${userLatLng.lng},${userLatLng.lat};${lng},${lat}?overview=full&geometries=geojson`);
             const data = await response.json();
-            
+
             let coords = [];
             if (data.routes && data.routes.length > 0) {
                 // GeoJSON uses [lng, lat], Leaflet uses [lat, lng]
@@ -970,7 +970,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 coords = [userLatLng, [lat, lng]];
             }
- 
+
             // Draw outer thick border
             distanceBackgroundLine = L.polyline(coords, {
                 color: '#14532d',
@@ -979,7 +979,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 lineJoin: 'round',
                 lineCap: 'round'
             }).addTo(overviewMap);
- 
+
             // Draw inner smooth path
             distancePolyline = L.polyline(coords, {
                 color: '#22c55e',
@@ -988,9 +988,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 lineJoin: 'round',
                 lineCap: 'round'
             }).addTo(overviewMap);
- 
+
             overviewMap.fitBounds(distanceBackgroundLine.getBounds(), { padding: [50, 50] });
- 
+
         } catch (e) {
             console.error("Routing error:", e);
             // Fallback to straight dashed line if offline
@@ -1001,7 +1001,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    window.showHospitalStatus = function(hospitalName) {
+    window.showHospitalStatus = function (hospitalName) {
         const h = hospitals.find(item => item.name === hospitalName);
         if (!h) return;
 
@@ -1109,12 +1109,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const tripTimeStat = document.querySelectorAll('.stat-card .value')[3];
 
         if (!container) return;
-        
+
         if (isNaN(userLat) || isNaN(userLng)) {
             container.innerHTML = '<p style="text-align: center; color: var(--text-muted); margin-top: 40px;">Invalid location coordinates.</p>';
             return;
         }
-        
+
         container.innerHTML = '';
 
         const hospitalsWithDistance = hospitals.map(h => {
@@ -1200,11 +1200,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     function updateUserLocation(lat, lng) {
         if (userMarker) overviewMap.removeLayer(userMarker);
-        
+
         userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(overviewMap)
             .bindPopup('<b>Your Location</b>')
             .openPopup();
-            
+
         overviewMap.setView([lat, lng], 13);
         renderHospitalsList(lat, lng);
 
@@ -1225,7 +1225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!forced && savedLat && savedLng) {
             const latNum = parseFloat(savedLat);
             const lngNum = parseFloat(savedLng);
-            
+
             if (!isNaN(latNum) && !isNaN(lngNum)) {
                 if (locationText) locationText.textContent = savedName || "Saved Location";
                 if (locationStatus) {
@@ -1244,7 +1244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (locationText) locationText.textContent = "Detecting...";
             if (window.LocationService) {
                 const location = await window.LocationService.getCurrentLocation();
-                
+
                 if (locationText) locationText.textContent = location.address;
                 localStorage.setItem('userLocationName', location.address);
 
@@ -1254,7 +1254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 updateUserLocation(location.lat, location.lng);
-                
+
                 if (locationStatus) {
                     locationStatus.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> GPS Locked`;
                 }
@@ -1315,12 +1315,12 @@ document.addEventListener('DOMContentLoaded', () => {
         quickSelect.addEventListener('change', (e) => {
             const [lat, lng] = e.target.value.split(',').map(Number);
             const cityName = e.target.options[e.target.selectedIndex].text;
-            
+
             updateUserLocation(lat, lng);
             const locText = document.getElementById('userLocationText');
             if (locText) locText.textContent = cityName;
             localStorage.setItem('userLocationName', cityName);
-            
+
             const locationStatus = document.getElementById('locationStatus');
             if (locationStatus) {
                 locationStatus.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Manual`;
@@ -1346,7 +1346,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
                     const data = await response.json();
-                    
+
                     if (searchResults) {
                         searchResults.innerHTML = data.map(item => `
                             <div class="search-item" data-lat="${item.lat}" data-lon="${item.lon}" data-name="${item.display_name}">
@@ -1404,7 +1404,7 @@ document.addEventListener('DOMContentLoaded', () => {
     subTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             const targetId = tab.dataset.tab;
-            
+
             subTabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
 
@@ -1432,53 +1432,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Dynamic Edit Logic
     const editButtons = [
-        { 
-          id: 'editGeneralProfile', 
-          title: 'Edit Patient Profile', 
-          fields: [
-            { label: 'Full Name', id: 'edit-name', target: 'displayProfileName', prefix: '' },
-            { label: 'Gender (Male/Female)', id: 'edit-gender', target: 'displayProfileGender', prefix: '👤 ' },
-            { label: 'Date of Birth', id: 'edit-birth', target: 'displayProfileBirth', prefix: '🎂 ' },
-            { label: 'Height (Cm)', id: 'edit-height', target: 'displayProfileHeight', prefix: '' },
-            { label: 'Weight (kg)', id: 'edit-weight', target: 'displayProfileWeight', prefix: '' },
-            { label: 'Blood Type', id: 'edit-blood', target: 'displayProfileBlood', prefix: '🩸 ' },
-            { label: 'Home Location', id: 'edit-loc', target: 'displayProfileLocation', prefix: '📍 ' },
-            { label: 'Blood Pressure', id: 'edit-bp', target: 'displayProfileBP', prefix: '' },
-            { label: 'Allergies', id: 'edit-allergies', target: 'displayProfileAllergies', prefix: '' },
-            { label: 'Chronic Conditions', id: 'edit-chronic', target: 'displayProfileChronic', prefix: '' }
-          ] 
+        {
+            id: 'editGeneralProfile',
+            title: 'Edit Patient Profile',
+            fields: [
+                { label: 'Full Name', id: 'edit-name', target: 'displayProfileName', prefix: '' },
+                { label: 'Gender (Male/Female)', id: 'edit-gender', target: 'displayProfileGender', prefix: '👤 ' },
+                { label: 'Date of Birth', id: 'edit-birth', target: 'displayProfileBirth', prefix: '🎂 ' },
+                { label: 'Height (Cm)', id: 'edit-height', target: 'displayProfileHeight', prefix: '' },
+                { label: 'Weight (kg)', id: 'edit-weight', target: 'displayProfileWeight', prefix: '' },
+                { label: 'Blood Type', id: 'edit-blood', target: 'displayProfileBlood', prefix: '🩸 ' },
+                { label: 'Home Location', id: 'edit-loc', target: 'displayProfileLocation', prefix: '📍 ' },
+                { label: 'Blood Pressure', id: 'edit-bp', target: 'displayProfileBP', prefix: '' },
+                { label: 'Allergies', id: 'edit-allergies', target: 'displayProfileAllergies', prefix: '' },
+                { label: 'Chronic Conditions', id: 'edit-chronic', target: 'displayProfileChronic', prefix: '' }
+            ]
         },
-        { 
-          id: 'editTimeline', 
-          title: 'Edit Timeline', 
-          fields: [
-            { label: 'Event Title', id: 't-e', target: null },
-            { label: 'Date', id: 't-d', target: null },
-            { label: 'A1c Level', id: 't-a', target: null }
-          ] 
+        {
+            id: 'editTimeline',
+            title: 'Edit Timeline',
+            fields: [
+                { label: 'Event Title', id: 't-e', target: null },
+                { label: 'Date', id: 't-d', target: null },
+                { label: 'A1c Level', id: 't-a', target: null }
+            ]
         },
-        { 
-          id: 'editMedicalHistory', 
-          title: 'Edit Medical History', 
-          fields: [
-            { label: 'Chronic Disease', id: 'm-c', target: 'hist-chronic', prefix: '' },
-            { label: 'Emergencies', id: 'm-e', target: 'hist-emergencies', prefix: '' },
-            { label: 'Surgery', id: 'm-s', target: 'hist-surgery', prefix: '' },
-            { label: 'Family Disease', id: 'm-f', target: 'hist-family', prefix: '' },
-            { label: 'Complications', id: 'm-x', target: 'hist-complication', prefix: '' }
-          ] 
+        {
+            id: 'editMedicalHistory',
+            title: 'Edit Medical History',
+            fields: [
+                { label: 'Chronic Disease', id: 'm-c', target: 'hist-chronic', prefix: '' },
+                { label: 'Emergencies', id: 'm-e', target: 'hist-emergencies', prefix: '' },
+                { label: 'Surgery', id: 'm-s', target: 'hist-surgery', prefix: '' },
+                { label: 'Family Disease', id: 'm-f', target: 'hist-family', prefix: '' },
+                { label: 'Complications', id: 'm-x', target: 'hist-complication', prefix: '' }
+            ]
         },
         { id: 'editMedicationsList', title: 'Edit Medications', fields: [] },
         { id: 'editMedicationsListTab', title: 'Edit Medications', fields: [] },
-        { 
-          id: 'editDiet', 
-          title: 'Edit Diet Plan', 
-          fields: [
-            { label: 'Water Intake', id: 'd-w', target: 'diet-water', prefix: '🥃 ' },
-            { label: 'Coffee/Tea', id: 'd-c', target: 'diet-coffee', prefix: '☕ ' },
-            { label: 'Fasting Plan', id: 'd-f', target: 'diet-fasting', prefix: '⏰ ' },
-            { label: 'Sugar/Diet', id: 'd-s', target: 'diet-sugar', prefix: '🍭 ' }
-          ] 
+        {
+            id: 'editDiet',
+            title: 'Edit Diet Plan',
+            fields: [
+                { label: 'Water Intake', id: 'd-w', target: 'diet-water', prefix: '🥃 ' },
+                { label: 'Coffee/Tea', id: 'd-c', target: 'diet-coffee', prefix: '☕ ' },
+                { label: 'Fasting Plan', id: 'd-f', target: 'diet-fasting', prefix: '⏰ ' },
+                { label: 'Sugar/Diet', id: 'd-s', target: 'diet-sugar', prefix: '🍭 ' }
+            ]
         }
     ];
 
@@ -1506,14 +1506,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 activeEditConfig = btnConfig;
                 editModalTitle.textContent = btnConfig.title;
-                
+
                 editFields.innerHTML = btnConfig.fields.map(f => {
                     let currentVal = '';
                     if (f.target) {
                         const targetEl = document.getElementById(f.target);
                         currentVal = targetEl ? targetEl.textContent.replace(f.prefix, '') : '';
                     }
-                    
+
                     return `
                         <div class="form-group" style="margin-bottom: 20px;">
                             <label style="display:block; margin-bottom:4px; font-weight:700; font-size:0.75rem; color: var(--secondary-text); text-transform: uppercase; letter-spacing: 0.5px;">${f.label}</label>
@@ -1521,12 +1521,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
                 }).join('');
-                
+
                 // For empty field configs (placeholder for complex ones)
                 if (btnConfig.fields.length === 0) {
                     editFields.innerHTML = `<p style="color: var(--text-muted); padding: 10px;">Detailed editor for this section is coming soon.</p>`;
                 }
-                
+
                 editModal.style.display = 'flex';
             });
         }
@@ -1564,7 +1564,7 @@ document.addEventListener('DOMContentLoaded', () => {
             originalValues[field.id] = field.textContent;
             field.contentEditable = "true";
         });
-        
+
         // Focus the name field
         const nameField = document.getElementById('displayProfileName');
         if (nameField) nameField.focus();
@@ -1582,7 +1582,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 field.textContent = originalValues[field.id];
             }
         });
-        
+
         // Hide emoji picker and show display
         const picker = document.getElementById('habitEmojiPicker');
         const display = document.getElementById('habitEmojisDisplay');
@@ -1616,7 +1616,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!key) return;
                 let val = field.textContent.trim();
                 if (val === '--' || val === 'Unknown User' || val === 'Loading...' || val === 'None added') val = '';
-                
+
                 // Convert to number if needed
                 if (key === 'height' || key === 'weight') {
                     payload[key] = parseFloat(val) || null;
@@ -1624,7 +1624,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     payload[key] = val;
                 }
             });
-            
+
             // Add habits to payload as text (mapping emojis to their titles)
             const habitLabels = selectedHabits.map(emoji => {
                 const opt = document.querySelector(`.picker-option[data-emoji="${emoji}"]`);
@@ -1651,7 +1651,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     try {
                         const existing = localStorage.getItem('rapidcare_user');
                         if (existing) localUser = JSON.parse(existing);
-                    } catch(e) {}
+                    } catch (e) { }
                     localUser = { ...localUser, ...payload };
                     localStorage.setItem('rapidcare_user', JSON.stringify(localUser));
                 }
@@ -1659,10 +1659,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Update sidebar and header name if changed
                 const sidebarName = document.getElementById('sidebarName');
                 if (sidebarName && payload.name) sidebarName.textContent = payload.name;
-                
+
                 const sidebarNameH4 = document.querySelector('.user-info h4');
                 if (sidebarNameH4 && payload.name) sidebarNameH4.textContent = payload.name;
-                
+
                 const headerAvatar = document.getElementById('headerAvatar');
                 const sidebarAvatar = document.getElementById('sidebarAvatar');
                 const mainProfileAvatar = document.getElementById('mainProfileAvatar');
@@ -1699,14 +1699,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // SUGGESTIONS LOGIC
     // =============================================
     const commonAllergies = [
-        "Penicillin", "Peanuts", "Shellfish", "Latex", "Pollen", 
+        "Penicillin", "Peanuts", "Shellfish", "Latex", "Pollen",
         "Dust Mites", "Mold", "Aspirin", "Ibuprofen", "Dairy",
         "Eggs", "Soy", "Wheat"
     ];
 
     const commonChronic = [
-        "Asthma", "Diabetes (Type 1)", "Diabetes (Type 2)", 
-        "Hypertension", "Arthritis", "Heart Disease", 
+        "Asthma", "Diabetes (Type 1)", "Diabetes (Type 2)",
+        "Hypertension", "Arthritis", "Heart Disease",
         "Thyroid Disorder", "COPD", "Epilepsy", "Migraine",
         "Anxiety", "Depression", "GERD"
     ];
@@ -1718,8 +1718,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const commonBarriers = [
-        "Lack of Exercise", "Poor Diet", "Smoking", 
-        "Alcohol Consumption", "Sedentary Lifestyle", 
+        "Lack of Exercise", "Poor Diet", "Smoking",
+        "Alcohol Consumption", "Sedentary Lifestyle",
         "Irregular Sleep", "High Caffeine Intake",
         "Work Stress", "Financial Constraints"
     ];
@@ -1730,7 +1730,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!field || !dropdown) return;
 
         function renderSuggestions(filter = "") {
-            const filtered = list.filter(item => 
+            const filtered = list.filter(item =>
                 item.toLowerCase().includes(filter.toLowerCase())
             );
 
@@ -1769,12 +1769,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const parts = field.textContent.split(',').map(p => p.trim());
                 // Replace the last part (what the user was typing) with the selected value
                 parts[parts.length - 1] = value;
-                
+
                 // Filter out empty or placeholder strings
                 const filteredParts = parts.filter(p => p && p !== '--' && p !== 'None');
-                
+
                 field.textContent = filteredParts.join(', ') + ', ';
-                
+
                 // Keep focus and place cursor at end
                 setTimeout(() => {
                     field.focus();
@@ -1803,7 +1803,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (editForm) {
         editForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             if (activeEditConfig && activeEditConfig.id === 'editGeneralProfile') {
                 const payload = {
                     name: document.getElementById('edit-name')?.value,
@@ -1830,7 +1830,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             body: JSON.stringify(payload)
                         });
                         if (!response.ok) throw new Error('Failed to update profile');
-                        
+
                         // Re-geocode coordinates for the new address
                         if (payload.home_location) {
                             fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(payload.home_location)}`)
@@ -1880,7 +1880,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('Error updating medical history in database.');
                 }
             }
-            
+
             if (activeEditConfig && activeEditConfig.fields) {
                 activeEditConfig.fields.forEach(f => {
                     const input = document.getElementById(f.id);
@@ -1962,23 +1962,23 @@ document.addEventListener('DOMContentLoaded', () => {
         function openInsuranceModal(type, listContainer, pillElement, accordionItem) {
             const headerText = iModal.querySelector('.modal-header h3');
             const typeGroup = document.getElementById('scheme-type-group');
-            
+
             if (type === 'Global') {
                 iTypeInput.value = 'Global';
-                if(headerText) headerText.textContent = `Add New Insurance`;
-                if(typeGroup) typeGroup.style.display = 'flex';
+                if (headerText) headerText.textContent = `Add New Insurance`;
+                if (typeGroup) typeGroup.style.display = 'flex';
                 iCurrentContainer = null;
                 iCurrentPill = null;
                 iCurrentAccordion = null;
             } else {
                 iTypeInput.value = type;
-                if(headerText) headerText.textContent = `Add ${type} Insurance Scheme`;
-                if(typeGroup) typeGroup.style.display = 'none';
+                if (headerText) headerText.textContent = `Add ${type} Insurance Scheme`;
+                if (typeGroup) typeGroup.style.display = 'none';
                 iCurrentContainer = listContainer;
                 iCurrentPill = pillElement;
                 iCurrentAccordion = accordionItem;
             }
-            
+
             iModal.style.display = 'flex';
             setTimeout(() => iModal.classList.add('active'), 10);
         }
@@ -2002,7 +2002,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         iForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
+
             let targetType = iTypeInput.value;
             let targetContainer = iCurrentContainer;
             let targetPill = iCurrentPill;
@@ -2092,7 +2092,7 @@ document.addEventListener('DOMContentLoaded', () => {
         header.addEventListener('click', () => {
             const item = header.parentElement;
             const content = header.nextElementSibling;
-            
+
             const isActive = item.classList.toggle('active');
 
             if (isActive) {
@@ -2112,11 +2112,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     // INTEGRATED PAYMENT LOGIC
     // =============================================
-    let baseFarePayment = 350; 
+    let baseFarePayment = 350;
     let equipmentChargePayment = 100;
-    let platformChargePayment = 40; 
+    let platformChargePayment = 40;
     let donationAmountPayment = 10;
-    
+
     let isPlatformFreePayment = false;
     let isHighValueAppliedPayment = false;
     let selectedBankOfferPayment = 'none';
@@ -2128,7 +2128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const detailsPanelPay = document.getElementById('detailsPanelIntegrated');
     const donateBtnsPay = document.querySelectorAll('.donate-btn-integrated');
     const customDonationPay = document.getElementById('customDonation');
-    
+
     const payableDisplayPay = document.getElementById('payableAmountDisplay');
     const donationDisplayPay = document.getElementById('donationDisplay');
     const totalDisplayPay = document.getElementById('totalDisplay');
@@ -2182,7 +2182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         applyDiscBtnPay.addEventListener('click', () => {
             isPlatformFreePayment = cbPlatFreePay && cbPlatFreePay.checked;
             isHighValueAppliedPayment = cbHighValPay && cbHighValPay.checked;
-            
+
             for (let radio of bankRadsPay) {
                 if (radio.checked) {
                     selectedBankOfferPayment = radio.value;
@@ -2194,7 +2194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addDiscBtnPay.textContent = 'Discounts Applied';
             addDiscBtnPay.style.background = 'var(--primary-green)';
             addDiscBtnPay.style.color = 'white';
-            
+
             updateTotalPayment();
             discModalPay.style.display = 'none';
         });
@@ -2275,9 +2275,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     paymentDetails: { amount, user_id: 'patient_user' }
                                 })
                             });
-                            
+
                             const verifyData = await verifyRes.json();
-                            
+
                             if (verifyData.success) {
                                 alert('PAYMENT SUCCESSFUL!\n\nThank you for choosing RapidCare.\nYour bill is settled.');
                                 updateCashRewardUIPayment();
@@ -2293,13 +2293,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     theme: { color: '#0d9488' }
                 };
-                
+
                 const rzp = new window.Razorpay(options);
-                rzp.on('payment.failed', function (response){
+                rzp.on('payment.failed', function (response) {
                     alert('Payment Failed: ' + response.error.description);
                 });
                 rzp.open();
-                
+
             } catch (err) {
                 console.error('Payment error:', err);
                 alert('Could not initiate payment. Please try again.');
@@ -2319,7 +2319,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (radio.value === 'card') cardFormPay.style.display = 'block';
             else if (radio.value === 'upi') upiFormPay.style.display = 'block';
             else if (radio.value === 'cash') cashFormPay.style.display = 'block';
-            
+
             updateTotalPayment();
         });
     });
@@ -2361,7 +2361,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cashRewardDiscount > 0) effectivePlatformCharge = 0;
 
         let subtotal = baseFarePayment + equipmentChargePayment + effectivePlatformCharge;
-        
+
         let rideDiscount = 0;
         if (isHighValueAppliedPayment && (baseFarePayment + equipmentChargePayment + platformChargePayment) > 600) {
             rideDiscount = 10;
@@ -2372,7 +2372,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let bankDiscount = 0;
         let bankName = "";
-        
+
         if (selectedMethod === 'card' && selectedBankOfferPayment !== 'none') {
             if (selectedBankOfferPayment === 'hdfc') {
                 bankDiscount = Math.round((subtotal - rideDiscount) * 0.05);
@@ -2406,7 +2406,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const total = subtotal - rideDiscount - bankDiscount + donationAmountPayment;
-        
+
         if (donationDisplayPay) donationDisplayPay.textContent = `₹${donationAmountPayment}`;
         if (totalDisplayPay) totalDisplayPay.textContent = `₹${total}`;
         if (payableDisplayPay) payableDisplayPay.textContent = `Payable Amount: ₹${total}`;
@@ -2425,10 +2425,10 @@ document.addEventListener('DOMContentLoaded', () => {
         userProfileCard.addEventListener('click', (e) => {
             e.stopPropagation();
             const isActive = profileDropdown.classList.contains('active');
-            
+
             // Toggle dropdown
             profileDropdown.classList.toggle('active');
-            
+
             // Rotate chevron
             if (profileChevron) {
                 profileChevron.style.transform = isActive ? 'rotate(0deg)' : 'rotate(180deg)';
@@ -2457,11 +2457,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Switch to Details view
                 const detailsLink = document.querySelector('.nav-link[data-view="details"]');
                 if (detailsLink) detailsLink.click();
-                
+
                 // Activate Profile sub-tab
                 const profileTab = document.querySelector('.sub-tab[data-tab="profile"]');
                 if (profileTab) profileTab.click();
-                
+
                 profileDropdown.classList.remove('active');
                 if (profileChevron) profileChevron.style.transform = 'rotate(0deg)';
             });
@@ -2472,35 +2472,35 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function handleCall() {
-     const toast = document.createElement('div');
-     toast.style.cssText = "position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#15803d;color:white;padding:16px 24px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.2);z-index:9999;font-weight:600;display:flex;align-items:center;gap:12px;animation:slideUp 0.4s ease;";
-     toast.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 5.49 5.49l.94-.94a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 15.5z"/></svg> Initializing Secure Call...`;
-     document.body.appendChild(toast);
-     setTimeout(() => toast.remove(), 3000);
+    const toast = document.createElement('div');
+    toast.style.cssText = "position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#15803d;color:white;padding:16px 24px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.2);z-index:9999;font-weight:600;display:flex;align-items:center;gap:12px;animation:slideUp 0.4s ease;";
+    toast.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 5.49 5.49l.94-.94a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 15.5z"/></svg> Initializing Secure Call...`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
 }
 
 function handleMessage() {
-     const msg = prompt("Enter message for Matt Smith:");
-     if (msg) {
+    const msg = prompt("Enter message for Matt Smith:");
+    if (msg) {
         alert("Message sent to driver: " + msg);
-     }
+    }
 }
 
 
 // --- ANALYTICS SCRIPT --- 
-    // Analytics UI Elements (moved or redundant logic removed)
-    const themeToggle = document.getElementById('theme-toggle');
-    const body = document.body;
+// Analytics UI Elements (moved or redundant logic removed)
+const themeToggle = document.getElementById('theme-toggle');
+const body = document.body;
 
-    // 2. Theme Toggle (Unified)
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            const isDark = body.classList.contains('dark-mode');
-            localStorage.setItem('rapidcare-theme', isDark ? 'dark' : 'light');
-            
-            themeToggle.innerHTML = isDark ? 
-                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+// 2. Theme Toggle (Unified)
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        const isDark = body.classList.contains('dark-mode');
+        localStorage.setItem('rapidcare-theme', isDark ? 'dark' : 'light');
+
+        themeToggle.innerHTML = isDark ?
+            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="5"></circle>
                     <line x1="12" y1="1" x2="12" y2="3"></line>
                     <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -2510,84 +2510,84 @@ function handleMessage() {
                     <line x1="21" y1="12" x2="23" y2="12"></line>
                     <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>` : 
-                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                </svg>` :
+            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg>`;
-        });
+    });
+}
+
+// 3. Simulation Modal Handlers
+window.openSimModal = () => {
+    const modal = document.getElementById('simModal');
+    if (modal) modal.classList.add('active');
+};
+
+window.closeSimModal = () => {
+    const modal = document.getElementById('simModal');
+    if (modal) modal.classList.remove('active');
+};
+
+window.applySimulation = () => {
+    const elements = {
+        hr: document.getElementById('val-hr'),
+        bp: document.getElementById('val-bp'),
+        safety: document.getElementById('val-safety'),
+        barHr: document.getElementById('bar-hr'),
+        barBp: document.getElementById('bar-bp'),
+        barO2: document.getElementById('bar-o2')
+    };
+
+    const HR = document.getElementById('input-hr').value;
+    const BP = document.getElementById('input-bp').value;
+    const Safety = document.getElementById('input-safety').value;
+
+    // Update Values with animation
+    if (elements.hr) animateValue(elements.hr, HR);
+    if (elements.safety) animateValue(elements.safety, Safety);
+    if (elements.bp) elements.bp.innerText = `${BP}/76`;
+
+    // Update Bars
+    if (elements.barHr) elements.barHr.style.width = `${(HR / 150) * 100}%`;
+    if (elements.barBp) elements.barBp.style.width = `${(BP / 200) * 100}%`;
+
+    // Update Safety card progress
+    const safetyFill = document.querySelector('.metric-card .progress-bar-fill');
+    if (safetyFill) safetyFill.style.width = `${Safety}%`;
+
+    // Update circular progress
+    const fgCircle = document.querySelector('.circular-progress circle.fg');
+    if (fgCircle) {
+        const offset = 282.7 - (282.7 * (Safety / 100));
+        fgCircle.style.strokeDashoffset = offset;
     }
+    const progVal = document.querySelector('.progress-val span');
+    if (progVal) progVal.innerText = `${Math.round(Safety * 1.07)}%`;
 
-    // 3. Simulation Modal Handlers
-    window.openSimModal = () => {
-        const modal = document.getElementById('simModal');
-        if (modal) modal.classList.add('active');
-    };
+    closeSimModal();
+    showNotification('Analytics profile updated successfully');
+};
 
-    window.closeSimModal = () => {
-        const modal = document.getElementById('simModal');
-        if (modal) modal.classList.remove('active');
-    };
-
-    window.applySimulation = () => {
-        const elements = {
-            hr: document.getElementById('val-hr'),
-            bp: document.getElementById('val-bp'),
-            safety: document.getElementById('val-safety'),
-            barHr: document.getElementById('bar-hr'),
-            barBp: document.getElementById('bar-bp'),
-            barO2: document.getElementById('bar-o2')
-        };
-        
-        const HR = document.getElementById('input-hr').value;
-        const BP = document.getElementById('input-bp').value;
-        const Safety = document.getElementById('input-safety').value;
-
-        // Update Values with animation
-        if (elements.hr) animateValue(elements.hr, HR);
-        if (elements.safety) animateValue(elements.safety, Safety);
-        if (elements.bp) elements.bp.innerText = `${BP}/76`;
-
-        // Update Bars
-        if (elements.barHr) elements.barHr.style.width = `${(HR / 150) * 100}%`;
-        if (elements.barBp) elements.barBp.style.width = `${(BP / 200) * 100}%`;
-        
-        // Update Safety card progress
-        const safetyFill = document.querySelector('.metric-card .progress-bar-fill');
-        if (safetyFill) safetyFill.style.width = `${Safety}%`;
-
-        // Update circular progress
-        const fgCircle = document.querySelector('.circular-progress circle.fg');
-        if (fgCircle) {
-            const offset = 282.7 - (282.7 * (Safety / 100));
-            fgCircle.style.strokeDashoffset = offset;
+function animateValue(obj, end) {
+    let start = parseInt(obj.innerText);
+    let duration = 800;
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerText = Math.floor(progress * (end - start) + start);
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
         }
-        const progVal = document.querySelector('.progress-val span');
-        if (progVal) progVal.innerText = `${Math.round(Safety * 1.07)}%`;
-
-        closeSimModal();
-        showNotification('Analytics profile updated successfully');
     };
+    window.requestAnimationFrame(step);
+}
 
-    function animateValue(obj, end) {
-        let start = parseInt(obj.innerText);
-        let duration = 800;
-        let startTimestamp = null;
-        const step = (timestamp) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            obj.innerText = Math.floor(progress * (end - start) + start);
-            if (progress < 1) {
-                window.requestAnimationFrame(step);
-            }
-        };
-        window.requestAnimationFrame(step);
-    }
-
-    function showNotification(msg) {
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerText = msg;
-        toast.style.cssText = `
+function showNotification(msg) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerText = msg;
+    toast.style.cssText = `
             position: fixed;
             bottom: 30px;
             right: 30px;
@@ -2599,24 +2599,24 @@ function handleMessage() {
             animation: slideIn 0.3s forwards;
             z-index: 9999;
         `;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
 
-    // Add keyframe for toast
-    const style = document.createElement('style');
-    style.innerHTML = `
+// Add keyframe for toast
+const style = document.createElement('style');
+style.innerHTML = `
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
     `;
-    document.head.appendChild(style);
+document.head.appendChild(style);
 
-    // Initialize all views and data
-    if (typeof init === 'function') {
-        init();
-    }
+// Initialize all views and data
+if (typeof init === 'function') {
+    init();
+}
 
 
 
@@ -2682,7 +2682,7 @@ async function fetchMedicalRecords() {
             medicalRecords = data.map(record => ({
                 id: record.id,
                 date: record.created_at,
-                type: 'general', 
+                type: 'general',
                 title: record.diagnosis || 'Medical Visit',
                 doctor: record.doctor_name || 'Assigned Doctor',
                 hospital: record.hospital_name || 'RapidCare Facility',
@@ -2744,12 +2744,12 @@ async function fetchAnalytics() {
         if (response.ok) {
             const data = await response.json();
             const { metrics } = data;
-            
-            if (document.getElementById('val-response')) 
+
+            if (document.getElementById('val-response'))
                 document.getElementById('val-response').textContent = metrics.avg_response_time;
-            if (document.getElementById('val-safety')) 
+            if (document.getElementById('val-safety'))
                 document.getElementById('val-safety').textContent = metrics.safety_score;
-            if (document.getElementById('val-distance')) 
+            if (document.getElementById('val-distance'))
                 document.getElementById('val-distance').textContent = metrics.total_distance;
         }
     } catch (err) {
@@ -2763,9 +2763,9 @@ async function fetchAnalytics() {
 function renderHistory() {
     const filtered = medicalRecords.filter(record => {
         const matchesFilter = currentFilter === 'all' || record.type === currentFilter;
-        const matchesSearch = record.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                              record.doctor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              record.hospital.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = record.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            record.doctor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            record.hospital.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesFilter && matchesSearch;
     });
 
@@ -2773,7 +2773,7 @@ function renderHistory() {
         const dateObj = new Date(record.date);
         const day = dateObj.getDate();
         const month = dateObj.toLocaleString('default', { month: 'short' });
-        
+
         return `
             <div class="history-item" onclick="selectRecord(${record.id})">
                 <div class="date-box">
@@ -2795,10 +2795,10 @@ function renderHistory() {
 // Helper for trends
 function getTrend(currentValue, previousValue, type) {
     if (!previousValue) return { icon: '•', class: 'trend-stable', text: 'First reading' };
-    
+
     const curr = parseFloat(currentValue);
     const prev = parseFloat(previousValue);
-    
+
     if (curr > prev) {
         return { icon: '▲', class: type === 'weight' ? 'trend-up' : 'trend-up', text: 'Higher than last' };
     } else if (curr < prev) {
@@ -2818,14 +2818,14 @@ function selectRecord(id) {
 
     // Update active state in list
     document.querySelectorAll('.history-item').forEach(item => item.classList.remove('selected'));
-    
+
     // Using a more robust way to find the item in the DOM
     const listItems = historyList.querySelectorAll('.history-item');
     const filteredList = medicalRecords.filter(r => {
         const matchesFilter = currentFilter === 'all' || r.type === currentFilter;
-        const matchesSearch = r.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                              r.doctor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              r.hospital.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            r.doctor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            r.hospital.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesFilter && matchesSearch;
     });
     const itemIndex = filteredList.findIndex(r => r.id === id);
@@ -2833,7 +2833,7 @@ function selectRecord(id) {
 
     noSelection.style.display = 'none';
     detailContent.style.display = 'block';
-    
+
     // Mobile handling
     if (window.innerWidth <= 768) {
         detailPane.classList.add('mobile-active');
@@ -2867,17 +2867,17 @@ function selectRecord(id) {
                 <h3>Current Vitals & Trends</h3>
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
                     ${record.vitals ? Object.entries(record.vitals).map(([key, val]) => {
-                        const prevVal = prevRecord && prevRecord.vitals ? prevRecord.vitals[key] : null;
-                        const trend = getTrend(val, prevVal, key);
-                        const label = key.replace('bp', 'Blood Pressure').replace('hr', 'Heart Rate').replace('temp', 'Temp').replace('weight', 'Weight');
-                        return `
+        const prevVal = prevRecord && prevRecord.vitals ? prevRecord.vitals[key] : null;
+        const trend = getTrend(val, prevVal, key);
+        const label = key.replace('bp', 'Blood Pressure').replace('hr', 'Heart Rate').replace('temp', 'Temp').replace('weight', 'Weight');
+        return `
                             <div class="vital-card">
                                 <span class="vital-label">${label}</span>
                                 <span class="vital-value">${val}</span>
                                 <span class="vital-trend ${trend.class}">${trend.icon} ${trend.text}</span>
                             </div>
                         `;
-                    }).join('') : '<p>No vitals recorded.</p>'}
+    }).join('') : '<p>No vitals recorded.</p>'}
                 </div>
             </div>
 
@@ -2978,7 +2978,7 @@ async function loadDoctors() {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const doctors = await response.json();
-        
+
         // Populate datalist for doctor selection
         let datalist = document.getElementById('doctors-datalist');
         if (!datalist) {
@@ -2987,9 +2987,9 @@ async function loadDoctors() {
             document.body.appendChild(datalist);
             document.getElementById('book-doctor').setAttribute('list', 'doctors-datalist');
         }
-        
+
         datalist.innerHTML = doctors.map(d => `<option value="${d.name}" data-id="${d.id}" data-specialty="${d.specialization}" data-hospital="${d.hospital_id}">`).join('');
-        
+
         // Auto-fill specialty when doctor is selected
         document.getElementById('book-doctor').addEventListener('input', (e) => {
             const selectedOption = Array.from(datalist.options).find(opt => opt.value === e.target.value);
@@ -3012,7 +3012,7 @@ async function loadAppointments() {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const appointments = await response.json();
-        
+
         // Map backend appointments to frontend format
         const formatted = appointments.map(a => ({
             id: a.id,
@@ -3023,11 +3023,11 @@ async function loadAppointments() {
             hospital: 'General Hospital', // Simplified
             type: a.type
         }));
-        
+
         // Clear and update the global array (if used for rendering)
         doctorBookings.length = 0;
         doctorBookings.push(...formatted);
-        
+
         // Re-render if necessary
         if (selectedRecordId) selectRecord(selectedRecordId);
     } catch (err) {
@@ -3037,7 +3037,7 @@ async function loadAppointments() {
 
 async function handleBookingSubmit(event) {
     event.preventDefault();
-    
+
     const doctorInput = document.getElementById('book-doctor');
     const doctorId = doctorInput.dataset.selectedId;
     const date = document.getElementById('book-date').value;
@@ -3090,7 +3090,7 @@ window.addEventListener('resize', () => {
     // =============================================
     const resizer = document.getElementById('dragMe');
     if (!resizer) return;
-    
+
     const leftSide = resizer.previousElementSibling;
     const rightSide = resizer.nextElementSibling;
 
@@ -3100,13 +3100,13 @@ window.addEventListener('resize', () => {
     const mouseDownHandler = function (e) {
         x = e.clientX;
         leftWidth = leftSide.getBoundingClientRect().width;
-        
+
         document.addEventListener('mousemove', mouseMoveHandler);
         document.addEventListener('mouseup', mouseUpHandler);
-        
+
         resizer.classList.add('resizing');
         document.body.style.cursor = 'col-resize';
-        
+
         leftSide.style.pointerEvents = 'none';
         rightSide.style.pointerEvents = 'none';
         leftSide.style.userSelect = 'none';
@@ -3118,7 +3118,7 @@ window.addEventListener('resize', () => {
         const parentWidth = resizer.parentNode.getBoundingClientRect().width;
         // Calculate new width in percentage to keep it responsive
         const newLeftWidth = ((leftWidth + dx) * 100) / parentWidth;
-        
+
         // Limits
         if (newLeftWidth > 20 && newLeftWidth < 75) {
             leftSide.style.width = newLeftWidth + '%';
@@ -3128,7 +3128,7 @@ window.addEventListener('resize', () => {
     const mouseUpHandler = function () {
         resizer.classList.remove('resizing');
         document.body.style.cursor = '';
-        
+
         leftSide.style.pointerEvents = '';
         rightSide.style.pointerEvents = '';
         leftSide.style.userSelect = '';
@@ -3136,7 +3136,7 @@ window.addEventListener('resize', () => {
 
         document.removeEventListener('mousemove', mouseMoveHandler);
         document.removeEventListener('mouseup', mouseUpHandler);
-        
+
         // Trigger resize event for map rendering if needed
         window.dispatchEvent(new Event('resize'));
     };
@@ -3145,407 +3145,407 @@ window.addEventListener('resize', () => {
 });
 
 
-    /* --- IMPORTED PAYMENT JS --- */
-    // --- Data ---
-    const popularBanks = [
-        { name: "State Bank of India (SBI)", icon: "https://img.icons8.com/color/512/sbi.png" },
-        { name: "HDFC Bank Ltd.", icon: "https://img.icons8.com/color/512/hdfc-bank.png" },
-        { name: "ICICI Bank Ltd.", icon: "https://img.icons8.com/color/512/icici-bank.png" },
-        { name: "Axis Bank Ltd.", icon: "https://img.icons8.com/color/512/axis-bank.png" }
-    ];
+/* --- IMPORTED PAYMENT JS --- */
+// --- Data ---
+const popularBanks = [
+    { name: "State Bank of India (SBI)", icon: "https://img.icons8.com/color/512/sbi.png" },
+    { name: "HDFC Bank Ltd.", icon: "https://img.icons8.com/color/512/hdfc-bank.png" },
+    { name: "ICICI Bank Ltd.", icon: "https://img.icons8.com/color/512/icici-bank.png" },
+    { name: "Axis Bank Ltd.", icon: "https://img.icons8.com/color/512/axis-bank.png" }
+];
 
-    const pricingConfig = {
-        normal: { original: 100, discounted: 70 },
-        oxygen: { original: 150, discounted: 130 },
-        icu: { original: 200, discounted: 180 },
-        ventilator: { original: 300, discounted: 280 }
-    };
+const pricingConfig = {
+    normal: { original: 100, discounted: 70 },
+    oxygen: { original: 150, discounted: 130 },
+    icu: { original: 200, discounted: 180 },
+    ventilator: { original: 300, discounted: 280 }
+};
 
-    // --- DOM Elements ---
-    
-    const tabBtns = document.querySelectorAll('#payment-view .tab-btn');
-    const tabContents = document.querySelectorAll('#payment-view .tab-content');
-    const cardBankSearch = document.getElementById('card-bank-search');
-    const cardBankList = document.getElementById('card-bank-list');
-    const netBankSearch = document.getElementById('net-bank-search');
-    const netBankList = document.getElementById('net-bank-list');
-    const popularBanksGrid = document.getElementById('popular-banks');
-    const applyCouponBtn = document.getElementById('apply-coupon');
-    const couponInput = document.getElementById('coupon-code');
-    const couponMsg = document.getElementById('coupon-msg');
-    const totalAmountDisplay = document.getElementById('total-amount');
-    const distanceInput = document.getElementById('distance-input');
-    const ambulanceOptions = document.querySelectorAll('input[name="ambulance-type"]');
-    const payBtnElement = document.querySelector('.pay-btn');
+// --- DOM Elements ---
 
-    // --- Initialization ---
-    try {
-        populateBankLists();
-        
-        // Setup select bank global handler
-        window.selectBank = (bankName) => {
-            const select = document.getElementById('bankSelect');
-            if (select) {
-                for (let i = 0; i < select.options.length; i++) {
-                    if (select.options[i].text.toLowerCase().includes(bankName.toLowerCase())) {
-                        select.selectedIndex = i;
-                        break;
-                    }
+const tabBtns = document.querySelectorAll('#payment-view .tab-btn');
+const tabContents = document.querySelectorAll('#payment-view .tab-content');
+const cardBankSearch = document.getElementById('card-bank-search');
+const cardBankList = document.getElementById('card-bank-list');
+const netBankSearch = document.getElementById('net-bank-search');
+const netBankList = document.getElementById('net-bank-list');
+const popularBanksGrid = document.getElementById('popular-banks');
+const applyCouponBtn = document.getElementById('apply-coupon');
+const couponInput = document.getElementById('coupon-code');
+const couponMsg = document.getElementById('coupon-msg');
+const totalAmountDisplay = document.getElementById('total-amount');
+const distanceInput = document.getElementById('distance-input');
+const ambulanceOptions = document.querySelectorAll('input[name="ambulance-type"]');
+const payBtnElement = document.querySelector('.pay-btn');
+
+// --- Initialization ---
+try {
+    populateBankLists();
+
+    // Setup select bank global handler
+    window.selectBank = (bankName) => {
+        const select = document.getElementById('bankSelect');
+        if (select) {
+            for (let i = 0; i < select.options.length; i++) {
+                if (select.options[i].text.toLowerCase().includes(bankName.toLowerCase())) {
+                    select.selectedIndex = i;
+                    break;
                 }
             }
-        };
+        }
+    };
 
-    } catch (e) {
-        console.error('Payment Initialization Error:', e);
-    }
+} catch (e) {
+    console.error('Payment Initialization Error:', e);
+}
 
-    function populateBankLists() {
-        if (!popularBanksGrid) return;
-        popularBanksGrid.innerHTML = popularBanks.map(bank => `
+function populateBankLists() {
+    if (!popularBanksGrid) return;
+    popularBanksGrid.innerHTML = popularBanks.map(bank => `
             <div class="bank-card" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 12px; cursor: pointer; transition: all 0.2s; background: var(--bg-color);" onclick="window.selectBank('${bank.name}')">
                 <img src="${bank.icon}" alt="${bank.name}" style="width: 32px; height: 32px; object-fit: contain;">
                 <span style="font-size: 11px; font-weight: 600; text-align: center; opacity: 0.8;">${bank.name}</span>
             </div>
         `).join('');
-    }
-    
-    // --- Pricing Logic ---
-    window.recalculatePricing = async function() {
-        const typeEl = document.querySelector('input[name="ambulance-type"]:checked');
-        const distEl = document.getElementById('distance-input');
-        const coupEl = document.getElementById('coupon-code');
-        const totalEl = document.getElementById('total-amount');
+}
 
-        const payBtnElement = document.querySelector('.pay-btn') || document.querySelector('#pay-securely-btn');
-        if (!typeEl || !distEl || !totalEl) return;
+// --- Pricing Logic ---
+window.recalculatePricing = async function () {
+    const typeEl = document.querySelector('input[name="ambulance-type"]:checked');
+    const distEl = document.getElementById('distance-input');
+    const coupEl = document.getElementById('coupon-code');
+    const totalEl = document.getElementById('total-amount');
 
-        const selectedType = typeEl.value;
-        const distance = parseFloat(distEl.value) || 0;
-        const couponCode = coupEl ? coupEl.value.toUpperCase() : '';
-        
-        if (distance <= 0) {
-            if (payBtnElement) {
-                payBtnElement.disabled = true;
-                payBtnElement.style.opacity = '0.5';
-                payBtnElement.style.cursor = 'not-allowed';
-            }
-            return;
-        } else {
-            if (payBtnElement) {
-                payBtnElement.disabled = false;
-                payBtnElement.style.opacity = '1';
-                payBtnElement.style.cursor = 'pointer';
-            }
+    const payBtnElement = document.querySelector('.pay-btn') || document.querySelector('#pay-securely-btn');
+    if (!typeEl || !distEl || !totalEl) return;
+
+    const selectedType = typeEl.value;
+    const distance = parseFloat(distEl.value) || 0;
+    const couponCode = coupEl ? coupEl.value.toUpperCase() : '';
+
+    if (distance <= 0) {
+        if (payBtnElement) {
+            payBtnElement.disabled = true;
+            payBtnElement.style.opacity = '0.5';
+            payBtnElement.style.cursor = 'not-allowed';
         }
-
-        let data = null;
-        // Bypass API to allow client-side dynamic updates without API latency or static payload constraints
-        if (!data) {
-            const rates = pricingConfig[selectedType];
-            const distanceCharge = distance * rates.discounted;
-            const platformCharge = 40;
-            const hospitalReservation = 500;
-            let discount = 0;
-            
-            if (couponMsg && couponMsg.classList.contains('success')) {
-                if (couponCode === 'RAPID20') discount = 20;
-                else if (couponCode === 'RIDEMASTER') discount = 40;
-                else if (couponCode === 'FIRSTCARE') discount = 100;
-                else if (couponCode === 'FIRSTRAPIDCARE50') discount = 50;
-            }
-            
-            data = {
-                distanceCharge: distanceCharge,
-                discount: discount,
-                total: Math.max(0, distanceCharge + platformCharge + hospitalReservation - discount)
-            };
-        }
-
-        try {
-            // Update Summary
-            const distanceRow = document.getElementById('distance-charge-row');
-            if (distanceRow) {
-                distanceRow.querySelector('.original').textContent = `₹${(distance * pricingConfig[selectedType].original).toLocaleString()}`;
-                distanceRow.querySelector('.discounted').textContent = `₹${data.distanceCharge.toLocaleString()}`;
-            }
-
-            const savingsRow = document.getElementById('savings-row');
-            if (savingsRow) {
-                const originalTotal = distance * pricingConfig[selectedType].original;
-                const totalSavings = originalTotal - data.distanceCharge + data.discount;
-                savingsRow.querySelector('.save-amount').textContent = `Saved ₹${totalSavings.toLocaleString()}`;
-            }
-
-            // Fixed charges display (if they exist in UI)
-            // Note: index.html might need placeholders for these if we want to show them dynamically
-            
-            if (totalEl) {
-                let finalTotal = data.total;
-                
-                // Force apply frontend coupon discount if the backend missed it or offline!
-                let couponDiscount = 0;
-                if (couponMsg && couponMsg.classList.contains('success')) {
-                    if (couponCode === 'RAPID20') couponDiscount = 20;
-                    else if (couponCode === 'RIDEMASTER') couponDiscount = 40;
-                    else if (couponCode === 'FIRSTCARE') couponDiscount = 100;
-                    else if (couponCode === 'FIRSTRAPIDCARE50') couponDiscount = 50;
-                }
-                
-                if (couponDiscount > 0 && (!data.discount || data.discount < couponDiscount)) {
-                    finalTotal = Math.max(0, (data.total + (data.discount || 0)) - couponDiscount);
-                }
-
-                // Local Streak Reward Logic - Scoped to Payment View to prevent crashes
-                const activePaymentTab = document.querySelector('#payment-view .tab-btn.active');
-                const tabId = activePaymentTab ? activePaymentTab.getAttribute('data-tab') : 'upi';
-                
-                const streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
-                if (tabId === 'cash' && streak >= 3) {
-                    finalTotal = Math.max(0, finalTotal - 40);
-                }
-
-                totalEl.textContent = `₹${finalTotal.toLocaleString()}`;
-            }
-        } catch (err) {
-            console.error('Fare calculation error:', err);
+        return;
+    } else {
+        if (payBtnElement) {
+            payBtnElement.disabled = false;
+            payBtnElement.style.opacity = '1';
+            payBtnElement.style.cursor = 'pointer';
         }
     }
 
+    let data = null;
+    // Bypass API to allow client-side dynamic updates without API latency or static payload constraints
+    if (!data) {
+        const rates = pricingConfig[selectedType];
+        const distanceCharge = distance * rates.discounted;
+        const platformCharge = 40;
+        const hospitalReservation = 500;
+        let discount = 0;
 
-    // Bulletproof Event Delegation
-    document.addEventListener('click', (e) => {
-        const card = e.target.closest('.ambulance-card');
-        if (card) {
-            const option = card.closest('.ambulance-option');
-            const radio = option ? option.querySelector('input[name="ambulance-type"]') : null;
-            if (radio) {
-                radio.checked = true;
-                radio.dispatchEvent(new Event('change'));
-                if (typeof window.recalculatePricing === 'function') {
-                    window.recalculatePricing();
-                }
-            }
+        if (couponMsg && couponMsg.classList.contains('success')) {
+            if (couponCode === 'RAPID20') discount = 20;
+            else if (couponCode === 'RIDEMASTER') discount = 40;
+            else if (couponCode === 'FIRSTCARE') discount = 100;
+            else if (couponCode === 'FIRSTRAPIDCARE50') discount = 50;
         }
-    });
 
-    document.addEventListener('change', (e) => {
-        if (e.target && e.target.name === 'ambulance-type') {
-            if (typeof window.recalculatePricing === 'function') {
-                window.recalculatePricing();
-            }
-        }
-    });
-
-    if (distanceInput) {
-        distanceInput.addEventListener('input', () => {
-            if (typeof window.recalculatePricing === 'function') {
-                window.recalculatePricing();
-            }
-        });
-    }
-    
-    // Initial call on start
-    recalculatePricing();
-
-    // --- Tab Switching Logic (Global) ---
-    // (switchPaymentTab moved to top level)
-
-    // (Standard select components used in HTML)
-
-    // --- Coupon Logic ---
-    applyCouponBtn.addEventListener('click', () => {
-        const code = couponInput.value.toUpperCase();
-        const feedback = {
-            'RAPID20': 'Coupon applied! ₹20 off your ride.',
-            'RIDEMASTER': 'Coupon applied! ₹40 premium discount.',
-            'FIRSTRAPIDCARE50': 'Welcome! ₹50 off your first ride.',
-            'FIRSTCARE': 'Coupon applied! ₹100 off'
+        data = {
+            distanceCharge: distanceCharge,
+            discount: discount,
+            total: Math.max(0, distanceCharge + platformCharge + hospitalReservation - discount)
         };
+    }
 
-        if (feedback[code]) {
-            couponMsg.textContent = feedback[code];
-            couponMsg.className = 'coupon-status success';
-        } else {
-            couponMsg.textContent = 'Invalid or expired coupon code';
-            couponMsg.className = 'coupon-status error';
+    try {
+        // Update Summary
+        const distanceRow = document.getElementById('distance-charge-row');
+        if (distanceRow) {
+            distanceRow.querySelector('.original').textContent = `₹${(distance * pricingConfig[selectedType].original).toLocaleString()}`;
+            distanceRow.querySelector('.discounted').textContent = `₹${data.distanceCharge.toLocaleString()}`;
         }
-        recalculatePricing();
-    });
-    
-    if (couponInput) {
-        couponInput.addEventListener('input', () => {
+
+        const savingsRow = document.getElementById('savings-row');
+        if (savingsRow) {
+            const originalTotal = distance * pricingConfig[selectedType].original;
+            const totalSavings = originalTotal - data.distanceCharge + data.discount;
+            savingsRow.querySelector('.save-amount').textContent = `Saved ₹${totalSavings.toLocaleString()}`;
+        }
+
+        // Fixed charges display (if they exist in UI)
+        // Note: index.html might need placeholders for these if we want to show them dynamically
+
+        if (totalEl) {
+            let finalTotal = data.total;
+
+            // Force apply frontend coupon discount if the backend missed it or offline!
+            let couponDiscount = 0;
+            if (couponMsg && couponMsg.classList.contains('success')) {
+                if (couponCode === 'RAPID20') couponDiscount = 20;
+                else if (couponCode === 'RIDEMASTER') couponDiscount = 40;
+                else if (couponCode === 'FIRSTCARE') couponDiscount = 100;
+                else if (couponCode === 'FIRSTRAPIDCARE50') couponDiscount = 50;
+            }
+
+            if (couponDiscount > 0 && (!data.discount || data.discount < couponDiscount)) {
+                finalTotal = Math.max(0, (data.total + (data.discount || 0)) - couponDiscount);
+            }
+
+            // Local Streak Reward Logic - Scoped to Payment View to prevent crashes
+            const activePaymentTab = document.querySelector('#payment-view .tab-btn.active');
+            const tabId = activePaymentTab ? activePaymentTab.getAttribute('data-tab') : 'upi';
+
+            const streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
+            if (tabId === 'cash' && streak >= 3) {
+                finalTotal = Math.max(0, finalTotal - 40);
+            }
+
+            totalEl.textContent = `₹${finalTotal.toLocaleString()}`;
+        }
+    } catch (err) {
+        console.error('Fare calculation error:', err);
+    }
+}
+
+
+// Bulletproof Event Delegation
+document.addEventListener('click', (e) => {
+    const card = e.target.closest('.ambulance-card');
+    if (card) {
+        const option = card.closest('.ambulance-option');
+        const radio = option ? option.querySelector('input[name="ambulance-type"]') : null;
+        if (radio) {
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change'));
             if (typeof window.recalculatePricing === 'function') {
                 window.recalculatePricing();
             }
-        });
-    }
-
-    // --- Ride Streak Logic ---
-    function updateRideStreak() {
-        let streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
-        const dots = document.querySelectorAll('#streak-dots .streak-dot');
-        const msg = document.getElementById('streak-msg');
-
-        dots.forEach((dot, index) => {
-            if (index < streak) dot.classList.add('active');
-            else dot.classList.remove('active');
-        });
-
-        if (streak >= 3) {
-            msg.innerHTML = '<span style="color: #10b981;">Next ride Platform Fee: ₹0! (Streak Reward)</span>';
-        } else {
-            msg.textContent = `${3 - streak} more cash payments to unlock your ₹40 discount!`;
         }
     }
+});
 
-    // --- Stepper Controller ---
-    const overlay = document.getElementById('payment-overlay');
-    const stages = ['review', 'processing', 'success'];
-    let currentStage = 1;
-
-    window.closePaymentOverlay = () => {
-        overlay.classList.remove('active');
-    };
-
-    window.proceedToPayment = async () => {
-        setStage(2);
-        
-        // Artificial delay for "Connecting to Bank" (set to 2 seconds as requested)
-        setTimeout(async () => {
-            const success = await finalizePayment();
-            if (success) {
-                // Generate Dynamic Data for Success Stage
-                const txnId = 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
-                const now = new Date();
-                const dateTimeStr = now.toLocaleDateString('en-IN') + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-
-                const successTxnElem = document.getElementById('success-txn-id');
-                const successDateElem = document.getElementById('success-datetime');
-                if (successTxnElem) successTxnElem.textContent = txnId;
-                if (successDateElem) successDateElem.textContent = dateTimeStr;
-
-                setStage(3);
-                // (Auto-print removed per new manual download request)
-            } else {
-                alert('Payment verification failed. Please try again.');
-                setStage(1);
-            }
-        }, 2000);
-    };
-
-    function setStage(stepNum) {
-        currentStage = stepNum;
-        
-        // Update Stepper UI
-        document.querySelectorAll('.step').forEach((step, idx) => {
-            if (idx + 1 < stepNum) {
-                step.classList.add('completed');
-                step.classList.remove('active');
-            } else if (idx + 1 === stepNum) {
-                step.classList.add('active');
-                step.classList.remove('completed');
-            } else {
-                step.classList.remove('active', 'completed');
-            }
-        });
-
-        const progress = document.getElementById('stepper-progress');
-        progress.style.width = `${(stepNum - 1) * 40}%`;
-
-        // Update Stage Content
-        document.querySelectorAll('.stage-content').forEach((content, idx) => {
-            content.classList.toggle('active', idx + 1 === stepNum);
-        });
-    }
-
-    async function finalizePayment() {
-        const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
-        const method = activeTab.toUpperCase();
-        const token = localStorage.getItem('rapidcare_token');
-        const tripId = localStorage.getItem('rapidcare_last_trip_id');
-        const amount = parseInt(totalAmountDisplay.textContent.replace('₹', '').replace(',', ''));
-
-        if (!tripId) return false;
-
-        try {
-            const response = await fetch(API_BASE + '/payments', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    trip_id: tripId,
-                    amount: amount,
-                    payment_method: method.toLowerCase(),
-                    transaction_id: 'RC-' + Math.random().toString(36).substr(2, 9).toUpperCase()
-                })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                populateReceipt(method, data.transaction_id || ('RC-' + Math.random().toString(36).substr(2, 9).toUpperCase()), amount);
-                
-                // If cash, update streak
-                if (method === 'CASH') {
-                    let streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
-                    streak = (streak + 1) % 4; // Reset after 4
-                    localStorage.setItem('rapidcare_cash_streak', streak);
-                    updateRideStreak();
-                }
-
-                localStorage.removeItem('rapidcare_last_trip_id');
-                return true;
-            }
-            return false;
-        } catch (err) {
-            console.error('Payment Error:', err);
-            return false;
+document.addEventListener('change', (e) => {
+    if (e.target && e.target.name === 'ambulance-type') {
+        if (typeof window.recalculatePricing === 'function') {
+            window.recalculatePricing();
         }
     }
+});
 
-    function populateReceipt(method, txnId, amount) {
-        const patientEl = document.getElementById('receipt-patient');
-        const methodEl = document.getElementById('receipt-method');
-        const txnEl = document.getElementById('receipt-txn');
-        const dateEl = document.getElementById('receipt-date');
-        const totalEl = document.getElementById('receipt-total');
-        const quoteEl = document.getElementById('health-quote');
+if (distanceInput) {
+    distanceInput.addEventListener('input', () => {
+        if (typeof window.recalculatePricing === 'function') {
+            window.recalculatePricing();
+        }
+    });
+}
 
-        if (patientEl) patientEl.textContent = localStorage.getItem('rapidcare_user_name') || 'Valued Patient';
-        if (methodEl) methodEl.textContent = method;
-        if (txnEl) txnEl.textContent = txnId;
-        if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN');
-        if (totalEl) totalEl.textContent = `₹${amount.toLocaleString()}`;
+// Initial call on start
+recalculatePricing();
 
-        const quotes = [
-            "Your health is an investment, not an expense.",
-            "A healthy outside starts from the inside.",
-            "The greatest wealth is health.",
-            "Take care of your body. It’s the only place you have to live.",
-            "Health is not valued till sickness comes."
-        ];
-        if (quoteEl) quoteEl.textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
-    }
+// --- Tab Switching Logic (Global) ---
+// (switchPaymentTab moved to top level)
 
-    window.printReceipt = () => {
-        window.print();
+// (Standard select components used in HTML)
+
+// --- Coupon Logic ---
+applyCouponBtn.addEventListener('click', () => {
+    const code = couponInput.value.toUpperCase();
+    const feedback = {
+        'RAPID20': 'Coupon applied! ₹20 off your ride.',
+        'RIDEMASTER': 'Coupon applied! ₹40 premium discount.',
+        'FIRSTRAPIDCARE50': 'Welcome! ₹50 off your first ride.',
+        'FIRSTCARE': 'Coupon applied! ₹100 off'
     };
 
-    window.viewHistoryReceipt = () => {
-        // Add to history table
-        const tbody = document.getElementById('payment-history-body');
-        if (tbody) {
+    if (feedback[code]) {
+        couponMsg.textContent = feedback[code];
+        couponMsg.className = 'coupon-status success';
+    } else {
+        couponMsg.textContent = 'Invalid or expired coupon code';
+        couponMsg.className = 'coupon-status error';
+    }
+    recalculatePricing();
+});
+
+if (couponInput) {
+    couponInput.addEventListener('input', () => {
+        if (typeof window.recalculatePricing === 'function') {
+            window.recalculatePricing();
+        }
+    });
+}
+
+// --- Ride Streak Logic ---
+function updateRideStreak() {
+    let streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
+    const dots = document.querySelectorAll('#streak-dots .streak-dot');
+    const msg = document.getElementById('streak-msg');
+
+    dots.forEach((dot, index) => {
+        if (index < streak) dot.classList.add('active');
+        else dot.classList.remove('active');
+    });
+
+    if (streak >= 3) {
+        msg.innerHTML = '<span style="color: #10b981;">Next ride Platform Fee: ₹0! (Streak Reward)</span>';
+    } else {
+        msg.textContent = `${3 - streak} more cash payments to unlock your ₹40 discount!`;
+    }
+}
+
+// --- Stepper Controller ---
+const overlay = document.getElementById('payment-overlay');
+const stages = ['review', 'processing', 'success'];
+let currentStage = 1;
+
+window.closePaymentOverlay = () => {
+    overlay.classList.remove('active');
+};
+
+window.proceedToPayment = async () => {
+    setStage(2);
+
+    // Artificial delay for "Connecting to Bank" (set to 2 seconds as requested)
+    setTimeout(async () => {
+        const success = await finalizePayment();
+        if (success) {
+            // Generate Dynamic Data for Success Stage
+            const txnId = 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
             const now = new Date();
-            const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-            const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-            const txnId = document.getElementById('success-txn-id').textContent;
-            const amt = document.getElementById('review-total').textContent;
-            const service = localStorage.getItem('rapidcare_selected_ambulance') || 'Emergency Ambulance';
-            const provider = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Hospital';
+            const dateTimeStr = now.toLocaleDateString('en-IN') + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
+            const successTxnElem = document.getElementById('success-txn-id');
+            const successDateElem = document.getElementById('success-datetime');
+            if (successTxnElem) successTxnElem.textContent = txnId;
+            if (successDateElem) successDateElem.textContent = dateTimeStr;
+
+            setStage(3);
+            // (Auto-print removed per new manual download request)
+        } else {
+            alert('Payment verification failed. Please try again.');
+            setStage(1);
+        }
+    }, 2000);
+};
+
+function setStage(stepNum) {
+    currentStage = stepNum;
+
+    // Update Stepper UI
+    document.querySelectorAll('.step').forEach((step, idx) => {
+        if (idx + 1 < stepNum) {
+            step.classList.add('completed');
+            step.classList.remove('active');
+        } else if (idx + 1 === stepNum) {
+            step.classList.add('active');
+            step.classList.remove('completed');
+        } else {
+            step.classList.remove('active', 'completed');
+        }
+    });
+
+    const progress = document.getElementById('stepper-progress');
+    progress.style.width = `${(stepNum - 1) * 40}%`;
+
+    // Update Stage Content
+    document.querySelectorAll('.stage-content').forEach((content, idx) => {
+        content.classList.toggle('active', idx + 1 === stepNum);
+    });
+}
+
+async function finalizePayment() {
+    const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+    const method = activeTab.toUpperCase();
+    const token = localStorage.getItem('rapidcare_token');
+    const tripId = localStorage.getItem('rapidcare_last_trip_id');
+    const amount = parseInt(totalAmountDisplay.textContent.replace('₹', '').replace(',', ''));
+
+    if (!tripId) return false;
+
+    try {
+        const response = await fetch(API_BASE + '/payments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                trip_id: tripId,
+                amount: amount,
+                payment_method: method.toLowerCase(),
+                transaction_id: 'RC-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            populateReceipt(method, data.transaction_id || ('RC-' + Math.random().toString(36).substr(2, 9).toUpperCase()), amount);
+
+            // If cash, update streak
+            if (method === 'CASH') {
+                let streak = parseInt(localStorage.getItem('rapidcare_cash_streak') || '0');
+                streak = (streak + 1) % 4; // Reset after 4
+                localStorage.setItem('rapidcare_cash_streak', streak);
+                updateRideStreak();
+            }
+
+            localStorage.removeItem('rapidcare_last_trip_id');
+            return true;
+        }
+        return false;
+    } catch (err) {
+        console.error('Payment Error:', err);
+        return false;
+    }
+}
+
+function populateReceipt(method, txnId, amount) {
+    const patientEl = document.getElementById('receipt-patient');
+    const methodEl = document.getElementById('receipt-method');
+    const txnEl = document.getElementById('receipt-txn');
+    const dateEl = document.getElementById('receipt-date');
+    const totalEl = document.getElementById('receipt-total');
+    const quoteEl = document.getElementById('health-quote');
+
+    if (patientEl) patientEl.textContent = localStorage.getItem('rapidcare_user_name') || 'Valued Patient';
+    if (methodEl) methodEl.textContent = method;
+    if (txnEl) txnEl.textContent = txnId;
+    if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN');
+    if (totalEl) totalEl.textContent = `₹${amount.toLocaleString()}`;
+
+    const quotes = [
+        "Your health is an investment, not an expense.",
+        "A healthy outside starts from the inside.",
+        "The greatest wealth is health.",
+        "Take care of your body. It’s the only place you have to live.",
+        "Health is not valued till sickness comes."
+    ];
+    if (quoteEl) quoteEl.textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+}
+
+window.printReceipt = () => {
+    window.print();
+};
+
+window.viewHistoryReceipt = () => {
+    // Add to history table
+    const tbody = document.getElementById('payment-history-body');
+    if (tbody) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        const txnId = document.getElementById('success-txn-id').textContent;
+        const amt = document.getElementById('review-total').textContent;
+        const service = localStorage.getItem('rapidcare_selected_ambulance') || 'Emergency Ambulance';
+        const provider = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Hospital';
+
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
                 <td>${dateStr}</td>
                 <td>${service}</td>
                 <td>${provider}</td>
@@ -3553,23 +3553,23 @@ window.addEventListener('resize', () => {
                 <td><span class="badge-insurance approved">Paid</span></td>
                 <td><a href="javascript:void(0)" onclick="window.downloadReceipt()" style="color: var(--primary-green); text-decoration: none; font-weight: 600;">Download</a></td>
             `;
-            tbody.insertBefore(newRow, tbody.firstChild);
-        }
+        tbody.insertBefore(newRow, tbody.firstChild);
+    }
 
-        // Navigate to History view
-        window.closePaymentOverlay();
-        const historyBtn = document.querySelector('[data-view="history"]');
-        if (historyBtn) historyBtn.click();
-    };
+    // Navigate to History view
+    window.closePaymentOverlay();
+    const historyBtn = document.querySelector('[data-view="history"]');
+    if (historyBtn) historyBtn.click();
+};
 
-    window.downloadReceipt = () => {
-        const txnId = document.getElementById('success-txn-id') ? document.getElementById('success-txn-id').textContent : 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
-        const now = new Date();
-        const dateStr = now.toLocaleString('en-IN');
-        const amount = document.getElementById('review-total') ? document.getElementById('review-total').textContent : '₹1,740';
-        
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
+window.downloadReceipt = () => {
+    const txnId = document.getElementById('success-txn-id') ? document.getElementById('success-txn-id').textContent : 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
+    const now = new Date();
+    const dateStr = now.toLocaleString('en-IN');
+    const amount = document.getElementById('review-total') ? document.getElementById('review-total').textContent : '₹1,740';
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
             <html>
                 <head>
                     <title>RapidCare Receipt - ${txnId}</title>
@@ -3615,54 +3615,151 @@ window.addEventListener('resize', () => {
                 </body>
             </html>
         `);
-        printWindow.document.close();
-    };
+    printWindow.document.close();
+};
 
-    // --- Payment Feedback (Splash Screen) ---
-    if (payBtnElement) {
-        payBtnElement.addEventListener('click', () => {
-            const total = totalAmountDisplay.textContent;
-            const txnId = 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
+// --- Payment Feedback (Splash Screen) ---
+if (payBtnElement) {
+    payBtnElement.addEventListener('click', () => {
+        const total = totalAmountDisplay.textContent;
+        const txnId = 'TXN' + Math.floor(Math.random() * 900000 + 100000) + 'XY';
 
-            // Also populate the stepper overlay data in case receipt needs it
-            const hospitalName = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Available';
-            const ambulanceTypeElem = document.querySelector('input[name="ambulance-type"]:checked');
-            const ambulanceType = ambulanceTypeElem ? ambulanceTypeElem.nextElementSibling.querySelector('h3').textContent : 'Standard';
-            const distance = document.getElementById('distance-input').value;
+        // Also populate the stepper overlay data in case receipt needs it
+        const hospitalName = localStorage.getItem('rapidcare_selected_hospital') || 'Nearest Available';
+        const ambulanceTypeElem = document.querySelector('input[name="ambulance-type"]:checked');
+        const ambulanceType = ambulanceTypeElem ? ambulanceTypeElem.nextElementSibling.querySelector('h3').textContent : 'Standard';
+        const distance = document.getElementById('distance-input').value;
 
-            const reviewAmb = document.getElementById('review-ambulance');
-            const reviewHosp = document.getElementById('review-hospital');
-            const reviewDist = document.getElementById('review-distance');
-            const reviewTotal = document.getElementById('review-total');
-            const successTxn = document.getElementById('success-txn-id');
-            const successDate = document.getElementById('success-datetime');
+        const reviewAmb = document.getElementById('review-ambulance');
+        const reviewHosp = document.getElementById('review-hospital');
+        const reviewDist = document.getElementById('review-distance');
+        const reviewTotal = document.getElementById('review-total');
+        const successTxn = document.getElementById('success-txn-id');
+        const successDate = document.getElementById('success-datetime');
 
-            if (reviewAmb) reviewAmb.textContent = ambulanceType;
-            if (reviewHosp) reviewHosp.textContent = hospitalName;
-            if (reviewDist) reviewDist.textContent = `${distance} KM`;
-            if (reviewTotal) reviewTotal.textContent = total;
-            if (successTxn) successTxn.textContent = txnId;
-            if (successDate) {
-                const now = new Date();
-                successDate.textContent = now.toLocaleDateString('en-IN') + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        if (reviewAmb) reviewAmb.textContent = ambulanceType;
+        if (reviewHosp) reviewHosp.textContent = hospitalName;
+        if (reviewDist) reviewDist.textContent = `${distance} KM`;
+        if (reviewTotal) reviewTotal.textContent = total;
+        if (successTxn) successTxn.textContent = txnId;
+        if (successDate) {
+            const now = new Date();
+            successDate.textContent = now.toLocaleDateString('en-IN') + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Show the fullscreen splash screen
+        if (typeof showPaymentSplash === 'function') {
+            showPaymentSplash(total, txnId);
+        }
+    });
+}
+
+// Support landing on specific views via query parameter (e.g., ?view=payment)
+const urlParams = new URLSearchParams(window.location.search);
+const initialView = urlParams.get('view');
+if (initialView && views[initialView]) {
+    const targetNav = document.querySelector(`.nav-item[data-view="${initialView}"]`);
+    if (targetNav) targetNav.click();
+}
+
+// Initialize
+updateRideStreak();
+recalculatePricing();
+if (window.lucide) lucide.createIcons();
+
+// --- Map Interaction Logic for Mobile ---
+(function() {
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (!isTouch) return;
+
+    const mapWrapper = document.querySelector('.map-wrapper');
+    if (mapWrapper) {
+        mapWrapper.addEventListener('click', function(e) {
+            if (!this.classList.contains('interacting')) {
+                this.classList.add('interacting');
+                e.stopPropagation();
             }
+        });
 
-            // Show the fullscreen splash screen
-            if (typeof showPaymentSplash === 'function') {
-                showPaymentSplash(total, txnId);
+        // Reset interaction when clicking outside
+        document.addEventListener('click', function(e) {
+            if (mapWrapper && !mapWrapper.contains(e.target)) {
+                mapWrapper.classList.remove('interacting');
             }
         });
     }
+})();
 
-    // Support landing on specific views via query parameter (e.g., ?view=payment)
-    const urlParams = new URLSearchParams(window.location.search);
-    const initialView = urlParams.get('view');
-    if (initialView && views[initialView]) {
-        const targetNav = document.querySelector(`.nav-item[data-view="${initialView}"]`);
-        if (targetNav) targetNav.click();
+// --- Mobile Hospital List: Load More Logic ---
+let hospitalsShown = 5;
+
+// Redefine renderHospitalsList to support 'Load More'
+const originalRenderHospitalsList = renderHospitalsList;
+renderHospitalsList = function(userLat, userLng) {
+    const container = document.getElementById('hospitalListContainer');
+    if (!container) return;
+
+    const isMobile = window.innerWidth <= 768;
+
+    // Filter and sort hospitals
+    const hospitalsWithDistance = hospitals.map(h => {
+        const d = L.latLng(userLat, userLng).distanceTo(L.latLng(h.lat, h.lng));
+        return { ...h, distance: (d / 1000).toFixed(1) };
+    });
+    hospitalsWithDistance.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+
+    container.innerHTML = '';
+    const listToRender = isMobile ? hospitalsWithDistance.slice(0, hospitalsShown) : hospitalsWithDistance;
+
+    listToRender.forEach(h => {
+        const item = document.createElement('div');
+        item.className = 'hospital-item';
+        const statusColor = h.status === 'Available' ? '#15803d' : (h.status === 'Busy' ? '#dc2626' : '#eab308');
+        item.innerHTML = `
+            <div class="hospital-info" style="width: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px;">
+                    <span class="h-name">${h.name}</span>
+                    <span class="h-distance" style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem;">${h.distance} km</span>
+                </div>
+                <div class="h-actions-row" style="display: flex; gap: 10px;">
+                    <button class="book-btn uni-btn" onclick="event.stopPropagation(); window.bookAmbulance('${h.id}', '${h.name.replace(/'/g, "\\'")}')">🚑 Book Now</button>
+                    <button class="action-btn distance-btn uni-btn" onclick="event.stopPropagation(); window.highlightDistance(${h.lat}, ${h.lng})">📍 Distance</button>
+                    <button class="action-btn status-btn uni-btn" onclick="event.stopPropagation(); window.showHospitalStatus('${h.name.replace(/'/g, "\\'")}')" style="color: ${statusColor}; border-color: ${statusColor}">🛡️ ${h.status}</button>
+                </div>
+            </div>
+        `;
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.hospital-item').forEach(el => el.classList.remove('active-hospital'));
+            item.classList.add('active-hospital');
+            overviewMap.setView([h.lat, h.lng], 15);
+            const distInput = document.getElementById('distance-input');
+            if (distInput) { distInput.value = h.distance; distInput.dispatchEvent(new Event('input')); }
+            localStorage.setItem('rapidcare_selected_hospital', h.name);
+        });
+        container.appendChild(item);
+    });
+
+    if (isMobile && hospitalsShown < hospitalsWithDistance.length) {
+        const loadMoreWrapper = document.createElement('div');
+        loadMoreWrapper.style.padding = '0 16px 20px 16px';
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.className = 'load-more-hospitals';
+        loadMoreBtn.innerHTML = `<span>📂</span> Load More (${hospitalsWithDistance.length - hospitalsShown} more)`;
+        loadMoreBtn.style.cssText = 'width: 100%; padding: 14px; background: var(--surface-color); border: 1.5px solid var(--border-color); border-radius: 12px; color: var(--primary-color); font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;';
+        loadMoreBtn.onclick = () => {
+            hospitalsShown += 5;
+            renderHospitalsList(userLat, userLng);
+            setTimeout(() => { loadMoreBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        };
+        loadMoreWrapper.appendChild(loadMoreBtn);
+        container.appendChild(loadMoreWrapper);
     }
+};
 
-    // Initialize
-    updateRideStreak();
-    recalculatePricing();
-    if (window.lucide) lucide.createIcons();
+// Reset count when location is updated
+const originalUpdateUserLocation = updateUserLocation;
+updateUserLocation = function(lat, lng) {
+    hospitalsShown = 5;
+    originalUpdateUserLocation(lat, lng);
+};
