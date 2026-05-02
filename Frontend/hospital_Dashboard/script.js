@@ -174,18 +174,43 @@ function handleReq(id, action) {
   }
 }
 
-// ── 3D Tilt on stat cards (desktop) ──
-document.querySelectorAll('.stat-card,.panel,.amb-card').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    card.style.transform = `translateY(-4px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`;
-  });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = '';
-  });
+// ── 3D Tilt on stat cards (desktop only) ──
+const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+let effectsEnabled = localStorage.getItem('rapidcare_mouse_effects') !== 'false';
+
+window.addEventListener('mouseEffectsToggled', (e) => {
+  effectsEnabled = e.detail.enabled;
+  if (!effectsEnabled) {
+    document.querySelectorAll('.stat-card,.panel,.amb-card').forEach(card => card.style.transform = '');
+    const orb = document.querySelector('.orb1');
+    if (orb) orb.style.transform = '';
+  }
 });
+
+if (!isTouch) {
+  document.querySelectorAll('.stat-card,.panel,.amb-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      if (!effectsEnabled) return;
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `translateY(-4px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+
+  // ── Mouse glow effect on ocean bg (desktop only) ──
+  document.addEventListener('mousemove', e => {
+    if (!effectsEnabled) return;
+    const orb = document.querySelector('.orb1');
+    if (!orb) return;
+    const xPct = e.clientX / window.innerWidth;
+    const yPct = e.clientY / window.innerHeight;
+    orb.style.transform = `translate(${xPct * 40}px, ${yPct * 40}px)`;
+  });
+}
 
 // ── Search filter ──
 const searchInput = document.getElementById('searchInput');
@@ -210,14 +235,5 @@ setInterval(() => {
   showToast(`🔔 ${a.msg}`, a.type === 'critical' ? 'error' : 'info');
   alertIndex++;
 }, 25000);
-
-// ── Mouse glow effect on ocean bg ──
-document.addEventListener('mousemove', e => {
-  const orb = document.querySelector('.orb1');
-  if (!orb) return;
-  const xPct = e.clientX / window.innerWidth;
-  const yPct = e.clientY / window.innerHeight;
-  orb.style.transform = `translate(${xPct * 40}px, ${yPct * 40}px)`;
-});
 
 console.log('%c RapidCare Hospital Hub ', 'background:#023859;color:#A7EBF2;font-size:14px;padding:6px 12px;border-radius:6px;font-weight:bold');

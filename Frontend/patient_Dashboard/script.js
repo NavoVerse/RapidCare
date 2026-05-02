@@ -3666,3 +3666,100 @@ if (initialView && views[initialView]) {
 updateRideStreak();
 recalculatePricing();
 if (window.lucide) lucide.createIcons();
+
+// --- Map Interaction Logic for Mobile ---
+(function() {
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (!isTouch) return;
+
+    const mapWrapper = document.querySelector('.map-wrapper');
+    if (mapWrapper) {
+        mapWrapper.addEventListener('click', function(e) {
+            if (!this.classList.contains('interacting')) {
+                this.classList.add('interacting');
+                e.stopPropagation();
+            }
+        });
+
+        // Reset interaction when clicking outside
+        document.addEventListener('click', function(e) {
+            if (mapWrapper && !mapWrapper.contains(e.target)) {
+                mapWrapper.classList.remove('interacting');
+            }
+        });
+    }
+})();
+
+// --- Mobile Hospital List: Load More Logic ---
+let hospitalsShown = 5;
+
+// Redefine renderHospitalsList to support 'Load More'
+const originalRenderHospitalsList = renderHospitalsList;
+renderHospitalsList = function(userLat, userLng) {
+    const container = document.getElementById('hospitalListContainer');
+    if (!container) return;
+
+    const isMobile = window.innerWidth <= 768;
+
+    // Filter and sort hospitals
+    const hospitalsWithDistance = hospitals.map(h => {
+        const d = L.latLng(userLat, userLng).distanceTo(L.latLng(h.lat, h.lng));
+        return { ...h, distance: (d / 1000).toFixed(1) };
+    });
+    hospitalsWithDistance.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+
+    container.innerHTML = '';
+    const listToRender = isMobile ? hospitalsWithDistance.slice(0, hospitalsShown) : hospitalsWithDistance;
+
+    listToRender.forEach(h => {
+        const item = document.createElement('div');
+        item.className = 'hospital-item';
+        const statusColor = h.status === 'Available' ? '#15803d' : (h.status === 'Busy' ? '#dc2626' : '#eab308');
+        item.innerHTML = `
+            <div class="hospital-info" style="width: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px;">
+                    <span class="h-name">${h.name}</span>
+                    <span class="h-distance" style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem;">${h.distance} km</span>
+                </div>
+                <div class="h-actions-row" style="display: flex; gap: 10px;">
+                    <button class="book-btn uni-btn" onclick="event.stopPropagation(); window.bookAmbulance('${h.id}', '${h.name.replace(/'/g, "\\'")}')">🚑 Book Now</button>
+                    <button class="action-btn distance-btn uni-btn" onclick="event.stopPropagation(); window.highlightDistance(${h.lat}, ${h.lng})">📍 Distance</button>
+                    <button class="action-btn status-btn uni-btn" onclick="event.stopPropagation(); window.showHospitalStatus('${h.name.replace(/'/g, "\\'")}')" style="color: ${statusColor}; border-color: ${statusColor}">🛡️ ${h.status}</button>
+                </div>
+            </div>
+        `;
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.hospital-item').forEach(el => el.classList.remove('active-hospital'));
+            item.classList.add('active-hospital');
+            overviewMap.setView([h.lat, h.lng], 15);
+            const distInput = document.getElementById('distance-input');
+            if (distInput) { distInput.value = h.distance; distInput.dispatchEvent(new Event('input')); }
+            localStorage.setItem('rapidcare_selected_hospital', h.name);
+        });
+        container.appendChild(item);
+    });
+
+    if (isMobile && hospitalsShown < hospitalsWithDistance.length) {
+        const loadMoreWrapper = document.createElement('div');
+        loadMoreWrapper.style.padding = '0 16px 20px 16px';
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.className = 'load-more-hospitals';
+        loadMoreBtn.innerHTML = `<span>📂</span> Load More (${hospitalsWithDistance.length - hospitalsShown} more)`;
+        loadMoreBtn.style.cssText = 'width: 100%; padding: 14px; background: var(--surface-color); border: 1.5px solid var(--border-color); border-radius: 12px; color: var(--primary-color); font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;';
+        loadMoreBtn.onclick = () => {
+            hospitalsShown += 5;
+            renderHospitalsList(userLat, userLng);
+            setTimeout(() => { loadMoreBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        };
+        loadMoreWrapper.appendChild(loadMoreBtn);
+        container.appendChild(loadMoreWrapper);
+    }
+};
+
+// Reset count when location is updated
+const originalUpdateUserLocation = updateUserLocation;
+updateUserLocation = function(lat, lng) {
+    hospitalsShown = 5;
+    originalUpdateUserLocation(lat, lng);
+};

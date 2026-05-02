@@ -5712,3 +5712,138 @@ input:focus {
         font-size: 16px;
     }
 }
+
+/* Forced two-column layout for small mobile */
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+}
+
+/* Scroll Trap Fixes for Mobile */
+@media (max-width: 768px) {
+    .hospital-list {
+        max-height: none !important;
+        overflow-y: visible !important;
+    }
+
+    /* Map Interaction Overlay */
+    .map-wrapper::after {
+        content: 'Tap to interact with map';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        z-index: 1001;
+        pointer-events: all;
+        transition: opacity 0.3s ease;
+        border-radius: 20px;
+    }
+
+    .map-wrapper.interacting::after {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .map-container {
+        pointer-events: none;
+    }
+
+    .map-wrapper.interacting .map-container {
+        pointer-events: all;
+    }
+}
+
+/* Glassmorphism Overhaul for Sidebar & UI Elements */
+.sidebar {
+    background: rgba(var(--surface-color-rgb), 0.7) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border-right: 1px solid rgba(var(--surface-color-rgb), 0.2) !important;
+}
+
+[data-theme="dark"] .sidebar {
+    background: rgba(30, 30, 30, 0.75) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.profile-dropdown {
+    background: rgba(var(--surface-color-rgb), 0.8) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border: 1px solid rgba(var(--surface-color-rgb), 0.3) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme="dark"] .profile-dropdown {
+    background: rgba(30, 30, 30, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Sidebar Item Glass Effect on Hover */
+.nav-item:hover {
+    background: rgba(var(--surface-color-rgb), 0.4) !important;
+}
+
+[data-theme="dark"] .nav-item:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Mobile Logo & App Name Fix */
+.mobile-logo {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+}
+
+.mobile-logo img {
+    width: 30px;
+    height: 30px;
+    filter: drop-shadow(0 0 5px rgba(33, 170, 255, 0.4));
+}
+
+.mobile-logo span {
+    font-family: 'Blending', cursive;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-color);
+    letter-spacing: 0.5px;
+}
+
+[data-theme="dark"] .mobile-logo span {
+    color: #FFFFFF; /* High contrast for mobile header */
+}
+
+@media (max-width: 768px) {
+    .mobile-logo {
+        display: flex;
+    }
+    
+    .sidebar .logo {
+        margin-top: 15px; /* Prevent clipping at the top of the sidebar */
+        margin-bottom: 30px;
+    }
+    
+    .logo-text {
+        color: var(--primary-text) !important; /* Brighter in dark mode sidebar */
+    }
+}
+
+/* Ensure sidebar logo is always visible on small screens */
+@media (max-width: 480px) {
+    .sidebar {
+        padding-top: 40px !important;
+    }
+    
+    .search-bar {
+        display: none !important; /* Hide search bar to make room for logo on tiny screens */
+    }
+}

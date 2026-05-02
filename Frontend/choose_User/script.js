@@ -1,15 +1,32 @@
 /* Choose User Script - Premium RapidCare Interface */
 
 document.addEventListener('DOMContentLoaded', () => {
-    /* ─── MOUSE GLOW (Shared logic with cursor) ─── */
-    document.addEventListener('mousemove', e => {
-        const mx = e.clientX, my = e.clientY;
-        const mGlow = document.getElementById('mGlow');
-        if (mGlow) {
-            mGlow.style.left = mx + 'px';
-            mGlow.style.top = my + 'px';
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    let effectsEnabled = localStorage.getItem('rapidcare_mouse_effects') !== 'false';
+
+    window.addEventListener('mouseEffectsToggled', (e) => {
+        effectsEnabled = e.detail.enabled;
+        if (!effectsEnabled) {
+            const mGlow = document.getElementById('mGlow');
+            if (mGlow) {
+                mGlow.style.left = '-100px';
+                mGlow.style.top = '-100px';
+            }
         }
     });
+
+    /* ─── MOUSE GLOW (Shared logic with cursor - Disabled on mobile) ─── */
+    if (!isTouch) {
+        document.addEventListener('mousemove', e => {
+            if (!effectsEnabled) return;
+            const mx = e.clientX, my = e.clientY;
+            const mGlow = document.getElementById('mGlow');
+            if (mGlow) {
+                mGlow.style.left = mx + 'px';
+                mGlow.style.top = my + 'px';
+            }
+        });
+    }
 
     /* ─── PARTICLE SYSTEM ─── */
     (function() {
