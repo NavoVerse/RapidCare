@@ -13,7 +13,7 @@ yarn-error.log*
 # Database
 user_Database/*.db
 user_Database/*.sqlite
-
+Backend/user_Database/rapidcare.db
 # Logs
 logs
 *.log
@@ -34,4 +34,3 @@ Thumbs.db
 *.pem
 *.key
 Backend/rapidcare-5652c-firebase-adminsdk-fbsvc-882301ae39.json
-Backend/user_Database/rapidcare.db
