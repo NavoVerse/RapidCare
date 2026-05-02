@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RapidCare — Medicine Hub</title>
-<link rel="stylesheet" href="../Frontend/shared_assets/css/cursor.css">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -321,6 +321,200 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
 .live-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:pulse 2s infinite;display:inline-block;margin-right:6px}
 
+/* ── ALWAYS-ON AMBIENT ANIMATIONS ── */
+
+/* Gradient shift on hero */
+@keyframes heroGradient {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.hero {
+  background: linear-gradient(135deg, #004643 0%, #002d2b 25%, #00524f 50%, #003835 75%, #004643 100%);
+  background-size: 300% 300%;
+  animation: heroGradient 12s ease infinite;
+}
+
+/* Floating hero stats */
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+.hstat { animation: floatUp 4s ease-in-out infinite; }
+.hstat:nth-child(2) { animation-delay: 0.5s; }
+.hstat:nth-child(3) { animation-delay: 1.0s; }
+.hstat:nth-child(4) { animation-delay: 1.5s; }
+
+/* Hero title subtle glow */
+@keyframes titleGlow {
+  0%, 100% { text-shadow: 0 0 0 transparent; }
+  50%      { text-shadow: 0 0 30px rgba(245,166,35,0.15); }
+}
+.hero-title { animation: titleGlow 5s ease-in-out infinite; }
+
+/* Emergency banner breathing glow */
+@keyframes emergGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245,166,35,0); }
+  50%      { box-shadow: 0 0 30px 4px rgba(245,166,35,0.15); }
+}
+.emerg { animation: emergGlow 3s ease-in-out infinite; }
+
+/* Emergency timer pulse */
+@keyframes timerPulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
+}
+.emerg-timer-num { animation: timerPulse 2s ease-in-out infinite; display: inline-block; }
+
+/* Marquee trust strip */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.trust-strip {
+  overflow: hidden;
+  position: relative;
+}
+.trust-strip-inner {
+  display: flex;
+  gap: 40px;
+  white-space: nowrap;
+  animation: marquee 20s linear infinite;
+  width: max-content;
+}
+
+/* Product card shimmer on hover */
+@keyframes shimmer {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+.prod-card::after,
+.kit-card::after,
+.herbal-card::after,
+.device-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  pointer-events: none;
+  transition: none;
+}
+.prod-card:hover::after,
+.kit-card:hover::after,
+.herbal-card:hover::after,
+.device-card:hover::after {
+  animation: shimmer 0.8s ease forwards;
+}
+
+/* Card entrance stagger (always-on via IntersectionObserver) */
+.anim-reveal {
+  opacity: 0;
+  transform: translateY(32px) scale(0.97);
+  transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.anim-reveal.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Badge continuous pulse */
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.15); }
+}
+.prod-badge { animation: badgePulse 3s ease-in-out infinite; }
+.prod-badge:nth-child(odd) { animation-delay: 0.3s; }
+
+/* Cart badge bounce */
+@keyframes cartBounce {
+  0%, 100% { transform: scale(1); }
+  30%      { transform: scale(1.35); }
+  60%      { transform: scale(0.9); }
+}
+.cart-badge { transition: transform 0.3s; }
+.cart-badge.bounce { animation: cartBounce 0.5s ease; }
+
+/* Promo banner gradient shift */
+.promo-banner {
+  background: linear-gradient(135deg, #004643 0%, #002d2b 30%, #003d3a 60%, #001a19 100%);
+  background-size: 300% 300%;
+  animation: heroGradient 15s ease infinite;
+}
+
+/* Promo stat float */
+.promo-stat { animation: floatUp 5s ease-in-out infinite; }
+.promo-stat:nth-child(2) { animation-delay: 0.6s; }
+.promo-stat:nth-child(3) { animation-delay: 1.2s; }
+
+/* Oxygen vars float */
+.oxy-var { animation: floatUp 5s ease-in-out infinite; }
+.oxy-var:nth-child(2) { animation-delay: 0.4s; }
+.oxy-var:nth-child(3) { animation-delay: 0.8s; }
+.oxy-var:nth-child(4) { animation-delay: 1.2s; }
+
+/* Category pill wiggle on hover */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0); }
+  25%      { transform: rotate(-2deg); }
+  75%      { transform: rotate(2deg); }
+}
+.cat-pill:hover .cp-icon { animation: wiggle 0.4s ease; }
+
+/* Sidebar promo shimmer */
+@keyframes promoShimmer {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245,166,35,0); }
+  50%      { box-shadow: 0 4px 20px 2px rgba(245,166,35,0.12); }
+}
+.sb-promo { animation: promoShimmer 4s ease-in-out infinite; }
+
+/* Delivery icons subtle spin */
+@keyframes iconBreath {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.1); }
+}
+.del-icon { animation: iconBreath 4s ease-in-out infinite; }
+.del-item:nth-child(2) .del-icon { animation-delay: 0.5s; }
+.del-item:nth-child(3) .del-icon { animation-delay: 1.0s; }
+.del-item:nth-child(4) .del-icon { animation-delay: 1.5s; }
+
+/* Footer badge float */
+.footer-badge { animation: floatUp 6s ease-in-out infinite; }
+.footer-badge:nth-child(2) { animation-delay: 0.4s; }
+.footer-badge:nth-child(3) { animation-delay: 0.8s; }
+.footer-badge:nth-child(4) { animation-delay: 1.2s; }
+
+/* Smooth hover transitions for all interactive */
+.add-btn, .kit-add, .oxy-side-btn, .emerg-btn, .promo-btn, .btn-primary, .btn-outline, .sb-promo-btn, .checkout-btn {
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.add-btn:hover, .kit-add:hover, .oxy-side-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 18px rgba(0,70,67,0.18);
+}
+.emerg-btn:hover, .promo-btn:hover, .btn-primary:hover, .sb-promo-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* Topbar nav underline animation */
+.topbar-nav { position: relative; }
+.topbar-nav::after {
+  content: ''; position: absolute; bottom: -4px; left: 50%; width: 0; height: 2px;
+  background: var(--amber); transition: width 0.35s ease, left 0.35s ease; border-radius: 1px;
+}
+.topbar-nav:hover::after, .topbar-nav.active::after {
+  width: 100%; left: 0;
+}
+
+/* Section title slide-in */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Smooth page-level transitions */
+* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
 /* ── RESPONSIVE STYLES ── */
 @media (max-width: 1024px) {
   .hero { flex-direction: column; align-items: flex-start; padding: 40px 30px; }
@@ -487,12 +681,21 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
 <!-- TRUST STRIP -->
 <div class="trust-strip">
-  <div class="trust-item"><span>✅</span> CDSCO Approved</div>
-  <div class="trust-item"><span>🏥</span> 2,000+ Partner Pharmacies</div>
-  <div class="trust-item"><span>🌿</span> Genuine Ayurvedic Products</div>
-  <div class="trust-item"><span>💊</span> WHO-GMP Certified</div>
-  <div class="trust-item"><span>🔒</span> 100% Secure Payments</div>
-  <div class="trust-item"><span class="live-dot"></span> Live Order Tracking</div>
+  <div class="trust-strip-inner">
+    <div class="trust-item"><span>✅</span> CDSCO Approved</div>
+    <div class="trust-item"><span>🏥</span> 2,000+ Partner Pharmacies</div>
+    <div class="trust-item"><span>🌿</span> Genuine Ayurvedic Products</div>
+    <div class="trust-item"><span>💊</span> WHO-GMP Certified</div>
+    <div class="trust-item"><span>🔒</span> 100% Secure Payments</div>
+    <div class="trust-item"><span class="live-dot"></span> Live Order Tracking</div>
+    <!-- Duplicated for seamless marquee -->
+    <div class="trust-item"><span>✅</span> CDSCO Approved</div>
+    <div class="trust-item"><span>🏥</span> 2,000+ Partner Pharmacies</div>
+    <div class="trust-item"><span>🌿</span> Genuine Ayurvedic Products</div>
+    <div class="trust-item"><span>💊</span> WHO-GMP Certified</div>
+    <div class="trust-item"><span>🔒</span> 100% Secure Payments</div>
+    <div class="trust-item"><span class="live-dot"></span> Live Order Tracking</div>
+  </div>
 </div>
 
 <!-- CATEGORY PILLS -->
@@ -1457,22 +1660,96 @@ document.querySelectorAll('.sb-item').forEach(item => {
   });
 });
 
-// Cart counter
+// Cart counter with bounce animation
 let cartCount = 3;
 document.querySelectorAll('.add-btn, .kit-add, .oxy-side-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     cartCount++;
-    document.querySelector('.cart-badge').textContent = cartCount;
-    const orig = btn.textContent.trim();
+    const badge = document.querySelector('.cart-badge');
+    badge.textContent = cartCount;
+    badge.classList.remove('bounce');
+    void badge.offsetWidth; // trigger reflow
+    badge.classList.add('bounce');
     btn.style.background = '#1a7a4a';
     setTimeout(() => { btn.style.background = ''; }, 800);
   });
 });
+
+// ── INTERSECTION OBSERVER: Staggered reveal for cards & sections ──
+(function() {
+  const revealTargets = document.querySelectorAll(
+    '.prod-card, .kit-card, .herbal-card, .device-card, .sec-hd, .emerg, .promo-banner, .del-bar, .oxy-row, .oxy-main, .oxy-side, .sb-promo, .sb-offers'
+  );
+  revealTargets.forEach((el, i) => {
+    el.classList.add('anim-reveal');
+    el.style.transitionDelay = `${(i % 6) * 0.08}s`;
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      } else {
+        // Re-trigger when scrolling back
+        entry.target.classList.remove('visible');
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  revealTargets.forEach(el => observer.observe(el));
+})();
+
+// ── PARALLAX: Subtle shift on hero content ──
+(function() {
+  const heroLeft = document.querySelector('.hero-left');
+  const heroStats = document.querySelector('.hero-stats');
+  if (heroLeft || heroStats) {
+    window.addEventListener('mousemove', (e) => {
+      const xFactor = (window.innerWidth / 2 - e.clientX) / 80;
+      const yFactor = (window.innerHeight / 2 - e.clientY) / 80;
+      if (heroLeft) heroLeft.style.transform = `translate(${xFactor}px, ${yFactor}px)`;
+      if (heroStats) heroStats.style.transform = `translate(${-xFactor * 0.5}px, ${-yFactor * 0.5}px)`;
+    });
+  }
+})();
+
+// ── COUNT-UP ANIMATION on hero stats ──
+(function() {
+  function animateCountUp(el, target, suffix) {
+    const duration = 2000;
+    const start = performance.now();
+    const numTarget = parseInt(target.replace(/,/g, ''));
+    if (isNaN(numTarget)) return;
+    function step(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.floor(eased * numTarget);
+      el.textContent = current.toLocaleString('en-IN') + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  const statMap = [
+    { selector: '.hstat:nth-child(1) .hstat-num', target: '5200', suffix: '+' },
+  ];
+  const heroObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        statMap.forEach(s => {
+          const el = document.querySelector(s.selector);
+          if (el) animateCountUp(el, s.target, s.suffix);
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+  const heroStats = document.querySelector('.hero-stats');
+  if (heroStats) heroObs.observe(heroStats);
+})();
 </script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>AOS.init({duration: 800, once: true, offset: 50});</script>
-<script src="animations.js"></script>
+<script>AOS.init({duration: 800, once: false, offset: 50, easing: 'ease-out-cubic'});</script>
 <script src="products.js"></script>
-<script src="../Frontend/shared_assets/js/cursor.js"></script>
 </body>
 </html>
