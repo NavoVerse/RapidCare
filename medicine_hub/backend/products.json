@@ -1,0 +1,110 @@
+{
+  "medicines": [
+    {
+      "id": "crocin",
+      "name": "Crocin",
+      "molecule": "Paracetamol",
+      "category": "Pain Relief",
+      "rx": false,
+      "color": "bg-teal",
+      "icon": "💊",
+      "price": 48,
+      "mrp": 58,
+      "pack": "Strip of 10 tablets",
+      "img": "images/crocin.png"
+    },
+    {
+      "id": "augmentin",
+      "name": "Augmentin",
+      "molecule": "Amoxicillin + Clavulanate",
+      "category": "Antibiotics",
+      "rx": true,
+      "color": "bg-blue",
+      "icon": "🦠",
+      "price": 240,
+      "mrp": 280,
+      "pack": "Strip of 6 tablets",
+      "img": "images/augmentin.png"
+    },
+    {
+      "id": "telma-40",
+      "name": "Telma 40",
+      "molecule": "Telmisartan",
+      "category": "Cardiac Care",
+      "rx": true,
+      "color": "bg-teal",
+      "icon": "❤️",
+      "price": 180,
+      "mrp": 210,
+      "pack": "Strip of 15 tablets",
+      "img": "images/telma.png"
+    }
+  ],
+  "kits": [
+    {
+      "id": "first-aid-pro",
+      "name": "First Aid Kit Pro (42-item)",
+      "category": "First Aid",
+      "desc": "Bandages, antiseptic, sterile gloves, CPR guide, scissors, gauze pads...",
+      "items": ["Bandages", "Antiseptic", "Gloves", "Scissors"],
+      "price": 650,
+      "img": "images/med_9.jpg"
+    },
+    {
+      "id": "trauma-kit",
+      "name": "Trauma Response Kit",
+      "category": "Trauma",
+      "desc": "Tourniquet, hemostatic gauze, chest seal, emergency blanket...",
+      "items": ["Tourniquet", "Hemostatic Gauze", "Chest Seal"],
+      "price": 1200,
+      "img": "images/med_10.jpg"
+    }
+  ],
+  "oxygen": {
+    "main": {
+      "title": "OXYGEN CYLINDERS & PORTABLE CANS",
+      "desc": "Pure medical-grade oxygen delivered to your door. Suitable for home care, post-surgical recovery and emergency use.",
+      "vars": [
+        {"name": "Portable Can", "price": 380, "sub": "8L · Single use"},
+        {"name": "Small Cylinder", "price": 1800, "sub": "2L · With regulator"},
+        {"name": "Standard", "price": 3400, "sub": "10L · With mask"}
+      ],
+      "img": "images/med_15.jpg"
+    },
+    "side": {
+      "title": "OXYGEN CONCENTRATOR",
+      "desc": "Continuous flow, no refills needed. Ideal for long-term home therapy.",
+      "price": 18500,
+      "pack": "5L/min · 1yr warranty",
+      "img": "images/med_4.jpg"
+    }
+  },
+  "devices": [
+    {
+      "id": "bp-monitor",
+      "name": "Digital BP Monitor",
+      "category": "Cardiac",
+      "sub": "Omron / Dr Morepen",
+      "price": 1850,
+      "img": "images/med_5.jpg"
+    },
+    {
+      "id": "glucometer",
+      "name": "Glucometer Kit",
+      "category": "Diabetes",
+      "sub": "Roche India · 10 strips",
+      "price": 980,
+      "img": "images/med_6.jpg"
+    }
+  ],
+  "ayurveda": [
+    {
+      "id": "ashwagandha",
+      "name": "Ashwagandha (Himalaya)",
+      "category": "🌿 Adaptogen",
+      "sub": "60 capsules · Stress relief",
+      "price": 280,
+      "img": "images/med_15.jpg"
+    }
+  ]
+}

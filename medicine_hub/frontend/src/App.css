@@ -1,0 +1,100 @@
+/* App.css - Full Production Styles */
+
+/* Kit Cards */
+.kit-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; margin-bottom: 32px; }
+.kit-card { background: var(--white); border-radius: 14px; border: 1px solid var(--sand-border); overflow: hidden; cursor: pointer; transition: all 0.18s; }
+.kit-card:hover { border-color: var(--cyprus-border); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,70,67,0.1); }
+.kit-img { height: 140px; overflow: hidden; position: relative; }
+.kit-img img { width: 100%; height: 100%; object-fit: cover; }
+.kit-img-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.5)); }
+.kit-img-label { position: absolute; bottom: 10px; left: 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: rgba(255,255,255,0.8); }
+.kit-body { padding: 16px; }
+.kit-tag { font-size: 10px; font-weight: 700; color: var(--cyprus); margin-bottom: 4px; text-transform: uppercase; }
+.kit-name { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
+.kit-sub { font-size: 12px; color: var(--ink-faint); line-height: 1.55; margin-bottom: 14px; }
+.kit-items { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px; }
+.kit-item-tag { font-size: 10px; background: var(--cyprus-dim); color: var(--cyprus); font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+.kit-foot { display: flex; align-items: center; justify-content: space-between; }
+.kit-price { font-family: var(--headline); font-size: 26px; color: var(--cyprus); }
+.kit-add { background: var(--cyprus); color: var(--sand); border: none; border-radius: 8px; padding: 10px 20px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+
+/* Oxygen Section */
+.oxy-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 32px; }
+.oxy-main { grid-column: 1/3; background: var(--cyprus); border-radius: 14px; padding: 28px; display: flex; gap: 24px; align-items: center; }
+.oxy-text { flex: 1; }
+.oxy-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; color: rgba(240,237,229,0.5); margin-bottom: 8px; }
+.oxy-title { font-family: var(--headline); font-size: 36px; color: var(--sand); line-height: 1; }
+.oxy-desc { font-size: 12px; color: rgba(240,237,229,0.6); margin-top: 10px; line-height: 1.65; }
+.oxy-vars { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.oxy-var { background: rgba(240,237,229,0.08); border: 1px solid rgba(240,237,229,0.15); border-radius: 10px; padding: 12px 16px; flex: 1; }
+.oxy-var-name { font-size: 11px; color: rgba(240,237,229,0.55); margin-bottom: 4px; font-weight: 700; }
+.oxy-var-price { font-family: var(--headline); font-size: 22px; color: var(--sand); }
+.oxy-img-block { width: 110px; height: 110px; border-radius: 16px; overflow: hidden; flex-shrink: 0; }
+.oxy-img-block img { width: 100%; height: 100%; object-fit: cover; }
+.oxy-side { background: var(--white); border-radius: 14px; border: 1px solid var(--sand-border); padding: 22px; display: flex; flex-direction: column; }
+.oxy-side-img { width: 100%; height: 80px; object-fit: cover; border-radius: 10px; margin-bottom: 14px; }
+.oxy-side-price { font-family: var(--headline); font-size: 30px; color: var(--cyprus); }
+.oxy-side-btn { background: var(--cyprus); color: var(--sand); border: none; border-radius: 8px; padding: 12px 0; font-size: 13px; font-weight: 700; width: 100%; transition: background 0.15s; }
+
+/* Medical Devices */
+.devices-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-bottom: 32px; }
+.device-card { background: var(--white); border-radius: 14px; border: 1px solid var(--sand-border); overflow: hidden; cursor: pointer; transition: all 0.18s; }
+.device-img { height: 100px; overflow: hidden; }
+.device-img img { width: 100%; height: 100%; object-fit: cover; }
+.device-body { padding: 12px; }
+.device-name { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.device-sub { font-size: 11px; color: var(--ink-faint); margin-bottom: 10px; }
+.device-price { font-family: var(--headline); font-size: 20px; color: var(--cyprus); }
+
+/* Ayurveda / Herbal */
+.herbal-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; margin-bottom: 32px; }
+.herbal-card { background: var(--white); border-radius: 14px; border: 1px solid var(--sand-border); overflow: hidden; cursor: pointer; transition: all 0.18s; }
+.herbal-img { height: 110px; overflow: hidden; }
+.herbal-img img { width: 100%; height: 100%; object-fit: cover; }
+.herbal-body { padding: 14px; }
+.herbal-tag { font-size: 10px; font-weight: 700; color: var(--green); margin-bottom: 4px; text-transform: uppercase; }
+.herbal-name { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.herbal-sub { font-size: 11px; color: var(--ink-faint); margin-bottom: 12px; }
+.herbal-foot { display: flex; align-items: center; justify-content: space-between; }
+.herbal-price { font-family: var(--headline); font-size: 22px; color: var(--green); }
+
+/* Delivery Bar */
+.del-bar { background: var(--white); border: 1px solid var(--sand-border); border-radius: 14px; padding: 20px 28px; display: flex; gap: 0; margin-bottom: 32px; }
+.del-item { flex: 1; display: flex; align-items: center; gap: 14px; padding: 0 22px; }
+.del-item:not(:last-child) { border-right: 1px solid var(--sand-border); }
+.del-icon { width: 42px; height: 42px; border-radius: 11px; background: var(--cyprus-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--cyprus); }
+.del-title { font-size: 13px; font-weight: 700; color: var(--ink); }
+.del-sub { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+
+/* Emergency Banner */
+.emerg { background: var(--cyprus); border-radius: 16px; padding: 24px 28px; display: flex; align-items: center; gap: 24px; margin-bottom: 30px; }
+.emerg-icon { width: 54px; height: 54px; border-radius: 13px; background: rgba(240,237,229,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.emerg-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; color: var(--amber); margin-bottom: 4px; }
+.emerg-title { font-family: var(--headline); font-size: 28px; color: var(--sand); line-height: 1; }
+.emerg-sub { font-size: 13px; color: rgba(240,237,229,0.6); margin-top: 4px; }
+.emerg-right { display: flex; gap: 10px; align-items: center; }
+.emerg-timer { background: rgba(240,237,229,0.1); border: 1px solid rgba(240,237,229,0.2); border-radius: 11px; padding: 12px 18px; text-align: center; }
+.emerg-timer-num { font-family: var(--headline); font-size: 30px; color: var(--amber); line-height: 1; }
+.emerg-timer-label { font-size: 10px; color: rgba(240,237,229,0.5); font-weight: 700; margin-top: 2px; }
+.emerg-btn { background: var(--sand); color: var(--cyprus); border-radius: 10px; padding: 15px 24px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+
+/* Live Dot Animation */
+.live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); display: inline-block; margin-right: 8px; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+
+/* Hero Stats */
+.hero-stats { display: flex; gap: 36px; }
+.hstat-num { font-family: var(--headline); font-size: 40px; color: var(--sand); }
+.hstat-label { font-size: 11px; color: rgba(240,237,229,0.42); font-weight: 700; margin-top: 2px; }
+
+/* Section Headers */
+.sec-hd { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; margin-top: 32px; }
+.sec-title { font-family: var(--headline); font-size: 32px; color: var(--ink); letter-spacing: 0.03em; }
+.sec-link { font-size: 12px; font-weight: 700; color: var(--cyprus); cursor: pointer; }
+
+@media (max-width: 1024px) {
+  .oxy-row { grid-template-columns: 1fr; }
+  .oxy-main { grid-column: 1 / 2; flex-direction: column; align-items: flex-start; }
+  .devices-grid { grid-template-columns: repeat(2, 1fr); }
+  .herbal-grid { grid-template-columns: repeat(2, 1fr); }
+}

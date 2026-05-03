@@ -1,0 +1,93 @@
+/* RAPIDCARE GLOBAL STYLES */
+:root {
+  --cyprus: #004643;
+  --cyprus-hover: #005c58;
+  --cyprus-dim: rgba(0, 70, 67, 0.07);
+  --cyprus-border: rgba(0, 70, 67, 0.2);
+  --sand: #F0EDE5;
+  --sand-dark: #e4e0d6;
+  --sand-border: rgba(0, 70, 67, 0.12);
+  --ink: #1c1c1a;
+  --ink-mid: #4e4e48;
+  --ink-faint: #9a9a90;
+  --white: #ffffff;
+  --amber: #F5A623;
+  --red: #C0392B;
+  --blue: #185FA5;
+  --green: #1a7a4a;
+  --purple: #7B4EA6;
+  --headline: 'Bebas Neue', sans-serif;
+  --body: 'Inter', system-ui, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: hidden; max-width: 100vw; }
+body { 
+  background: var(--sand); 
+  font-family: var(--body); 
+  color: var(--ink); 
+  font-size: 15px; 
+  line-height: 1.6; 
+  min-width: 320px; 
+  overflow-x: hidden; 
+  max-width: 100vw; 
+}
+
+/* Framer Motion Utilities */
+.smooth-entry {
+  will-change: transform, opacity;
+}
+
+/* Button & Interactive */
+button {
+  cursor: pointer;
+  border: none;
+  font-family: var(--body);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* Layout */
+.hub { max-width: 100%; margin: 0 auto; }
+.content { padding: 32px 40px; display: flex; gap: 28px; }
+.main { flex: 1; min-width: 0; }
+.sidebar { width: 210px; flex-shrink: 0; }
+
+@media (max-width: 1024px) {
+  .content { flex-direction: column; padding: 30px; }
+  .sidebar { display: none; }
+}
+
+@media (max-width: 768px) {
+  .content { padding: 16px; }
+}
+
+/* Shared UI Components Styles (Migration from original) */
+.topbar {
+  background: var(--cyprus);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 62px; position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+}
+.topbar-rc { font-family: var(--headline); font-size: 30px; color: var(--sand); letter-spacing: 0.04em; }
+
+.hero {
+  background: var(--cyprus);
+  padding: 44px 40px 48px;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+  background: linear-gradient(135deg, #004643 0%, #002d2b 25%, #00524f 50%, #003835 75%, #004643 100%);
+  background-size: 300% 300%;
+}
+
+.prod-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; margin-bottom: 32px; }
+@media (max-width: 768px) {
+  .prod-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+}
+
+/* ... and other styles ... */
