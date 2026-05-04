@@ -15,13 +15,18 @@ setInterval(updateClock, 1000);
 
 // ── Count-Up Animation ──
 function countUp(el, target, duration = 1400) {
-  let start = 0;
-  const step = target / (duration / 16);
-  const timer = setInterval(() => {
-    start += step;
-    if (start >= target) { start = target; clearInterval(timer); }
-    el.textContent = Math.floor(start);
-  }, 16);
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    el.textContent = Math.floor(progress * target);
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    } else {
+      el.textContent = target;
+    }
+  };
+  window.requestAnimationFrame(step);
 }
 
 // ── IntersectionObserver: stagger cards ──
@@ -189,12 +194,21 @@ window.addEventListener('mouseEffectsToggled', (e) => {
 
 if (!isTouch) {
   document.querySelectorAll('.stat-card,.panel,.amb-card').forEach(card => {
+    let ticking = false;
     card.addEventListener('mousemove', e => {
       if (!effectsEnabled) return;
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform = `translateY(-4px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`;
+      const clientX = e.clientX;
+      const clientY = e.clientY;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const rect = card.getBoundingClientRect();
+          const x = (clientX - rect.left) / rect.width - 0.5;
+          const y = (clientY - rect.top) / rect.height - 0.5;
+          card.style.transform = `translateY(-4px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`;
+          ticking = false;
+        });
+        ticking = true;
+      }
     });
     card.addEventListener('mouseleave', () => {
       card.style.transform = '';
@@ -202,13 +216,23 @@ if (!isTouch) {
   });
 
   // ── Mouse glow effect on ocean bg (desktop only) ──
+  let bgTicking = false;
   document.addEventListener('mousemove', e => {
     if (!effectsEnabled) return;
-    const orb = document.querySelector('.orb1');
-    if (!orb) return;
-    const xPct = e.clientX / window.innerWidth;
-    const yPct = e.clientY / window.innerHeight;
-    orb.style.transform = `translate(${xPct * 40}px, ${yPct * 40}px)`;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    if (!bgTicking) {
+      window.requestAnimationFrame(() => {
+        const orb = document.querySelector('.orb1');
+        if (orb) {
+          const xPct = clientX / window.innerWidth;
+          const yPct = clientY / window.innerHeight;
+          orb.style.transform = `translate(${xPct * 40}px, ${yPct * 40}px)`;
+        }
+        bgTicking = false;
+      });
+      bgTicking = true;
+    }
   });
 }
 
