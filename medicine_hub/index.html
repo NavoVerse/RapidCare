@@ -782,6 +782,61 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 #section-oxygen, #section-devices, #section-supplements {
   scroll-margin-top: 120px;
 }
+
+/* ── MEDULA AI CHATBOT ── */
+.medula-trigger {
+  position: fixed; bottom: 140px; right: 25px; z-index: 10000;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--cyprus); color: var(--sand);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 8px 32px rgba(0,70,67,0.3);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-size: 24px; border: 2px solid rgba(255,255,255,0.1);
+}
+.medula-trigger:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 12px 40px rgba(0,70,67,0.4); }
+.medula-trigger.active { transform: scale(0.9) rotate(-90deg); background: var(--amber); color: var(--ink); }
+
+.medula-window {
+  position: fixed; bottom: 215px; right: 25px; z-index: 10000;
+  width: 380px; height: 500px; max-width: 90vw; max-height: 70vh;
+  background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px; border: 1px solid var(--sand-border);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  display: flex; flex-direction: column; overflow: hidden;
+  opacity: 0; pointer-events: none; transform: translateY(30px) scale(0.95);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.medula-window.active { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+
+.medula-header {
+  padding: 20px; background: var(--cyprus); color: var(--sand);
+  display: flex; align-items: center; gap: 12px;
+}
+.medula-avatar { width: 40px; height: 40px; border-radius: 12px; background: var(--amber); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.medula-info { flex: 1; }
+.medula-name { font-family: var(--headline); font-size: 22px; letter-spacing: 0.03em; line-height: 1; }
+.medula-status { font-size: 11px; opacity: 0.7; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+.medula-status .dot { width: 6px; height: 6px; background: #4caf50; border-radius: 50%; }
+
+.medula-chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; scrollbar-width: none; }
+.medula-chat::-webkit-scrollbar { display: none; }
+
+.msg { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 13px; line-height: 1.5; position: relative; animation: msgIn 0.3s ease forwards; }
+@keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.msg.bot { align-self: flex-start; background: var(--white); color: var(--ink); border-bottom-left-radius: 4px; border: 1px solid var(--sand-border); }
+.msg.user { align-self: flex-end; background: var(--cyprus); color: var(--sand); border-bottom-right-radius: 4px; }
+
+.medula-footer { padding: 16px; background: var(--white); border-top: 1px solid var(--sand-border); display: flex; gap: 10px; }
+.medula-input { flex: 1; border: none; background: var(--sand); padding: 12px 16px; border-radius: 12px; font-family: var(--body); font-size: 13px; outline: none; }
+.medula-send { width: 40px; height: 40px; border-radius: 10px; background: var(--cyprus); color: var(--sand); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.medula-send:hover { background: var(--cyprus-hover); transform: scale(1.05); }
+
+.typing { display: flex; gap: 4px; padding: 10px 14px; background: var(--white); border-radius: 16px; width: fit-content; border: 1px solid var(--sand-border); align-self: flex-start; }
+.typing span { width: 6px; height: 6px; background: var(--cyprus-border); border-radius: 50%; animation: typeBounce 1.4s infinite; }
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typeBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
   
 
 /* ── CART SIDEBAR ── */
@@ -1870,6 +1925,30 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 
 </div><!-- end hub -->
 
+<!-- MEDULA AI CHATBOT -->
+<div class="medula-trigger" id="medulaTrigger">
+  <span>✨</span>
+</div>
+
+<div class="medula-window" id="medulaWindow">
+  <div class="medula-header">
+    <div class="medula-avatar">🩺</div>
+    <div class="medula-info">
+      <div class="medula-name">MEDULA</div>
+      <div class="medula-status"><span class="dot"></span> Online • Medical Assistant</div>
+    </div>
+  </div>
+  <div class="medula-chat" id="medulaChat">
+    <div class="msg bot">Hello! I'm Medula, your AI medical assistant. How can I help you today?</div>
+  </div>
+  <div class="medula-footer">
+    <input type="text" class="medula-input" id="medulaInput" placeholder="Ask about medicines, symptoms..." autocomplete="off">
+    <button class="medula-send" id="medulaSend">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </button>
+  </div>
+</div>
+
 <script>
 // Category pills toggle
 document.querySelectorAll('.cat-pill').forEach(pill => {
@@ -2014,6 +2093,7 @@ document.querySelectorAll('.sec-link[data-cat]').forEach(link => {
     const text = link.textContent.trim();
     link.addEventListener('click', () => {
       if (text === 'Upload Prescription') { document.getElementById('rxOverlay')?.classList.add('active'); return; }
+      if (text === 'Pharmacist Chat') { document.getElementById('medulaTrigger')?.click(); return; }
       const anchor = map[text];
       if (anchor) document.querySelector(anchor)?.scrollIntoView({ behavior: 'smooth' });
       else showToast('🔗 ' + text + ' — coming soon!', 'success');
@@ -2115,8 +2195,85 @@ if (emergBtn) emergBtn.addEventListener('click', () => {
   const heroStats = document.querySelector('.hero-stats');
   if (heroStats) heroObs.observe(heroStats);
 })();
+
+// ── MEDULA CHATBOT LOGIC ──
+(function() {
+  const trigger = document.getElementById('medulaTrigger');
+  const windowEl = document.getElementById('medulaWindow');
+  const input = document.getElementById('medulaInput');
+  const sendBtn = document.getElementById('medulaSend');
+  const chatBody = document.getElementById('medulaChat');
+
+  if (!trigger || !windowEl) return;
+
+  trigger.addEventListener('click', () => {
+    trigger.classList.toggle('active');
+    windowEl.classList.toggle('active');
+    if (windowEl.classList.contains('active')) {
+      input.focus();
+    }
+  });
+
+  const addMsg = (text, side) => {
+    const msg = document.createElement('div');
+    msg.className = `msg ${side}`;
+    if (side === 'bot') {
+      msg.innerHTML = marked.parse(text);
+    } else {
+      msg.textContent = text;
+    }
+    chatBody.appendChild(msg);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return msg;
+  };
+
+  const addTyping = () => {
+    const div = document.createElement('div');
+    div.className = 'typing';
+    div.innerHTML = '<span></span><span></span><span></span>';
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return div;
+  };
+
+  const handleSend = async () => {
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    addMsg(text, 'user');
+
+    const loader = addTyping();
+
+    try {
+      const response = await fetch('http://localhost:5001/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      
+      const data = await response.json();
+      loader.remove();
+
+      if (!response.ok) {
+        addMsg(`⚠️ ${data.error || 'Server error'}. Please ensure your GEMINI_API_KEY is set in medula_ai/.env`, 'bot');
+        return;
+      }
+
+      addMsg(data.reply || "I'm sorry, I couldn't process that.", 'bot');
+    } catch (err) {
+      console.error('Medula Fetch Error:', err);
+      loader.remove();
+      addMsg("🚫 Connection failed. Please ensure the Medula AI server is running (npm run dev in medula_ai folder).", 'bot');
+    }
+  };
+
+  sendBtn.addEventListener('click', handleSend);
+  input.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
+})();
 </script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>AOS.init({duration: 800, once: false, offset: 50, easing: 'ease-out-cubic'});</script>
 <script src="products.js"></script>
 </body>
