@@ -1,169 +1,300 @@
-/* Choose User Script - Premium RapidCare Interface */
-
 document.addEventListener('DOMContentLoaded', () => {
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    let effectsEnabled = localStorage.getItem('rapidcare_mouse_effects') !== 'false';
-
-    window.addEventListener('mouseEffectsToggled', (e) => {
-        effectsEnabled = e.detail.enabled;
-        if (!effectsEnabled) {
-            const mGlow = document.getElementById('mGlow');
-            if (mGlow) {
-                mGlow.style.left = '-100px';
-                mGlow.style.top = '-100px';
-            }
-        }
-    });
-
-    /* ─── MOUSE GLOW (Shared logic with cursor - Disabled on mobile) ─── */
-    if (!isTouch) {
-        document.addEventListener('mousemove', e => {
-            if (!effectsEnabled) return;
-            const mx = e.clientX, my = e.clientY;
-            const mGlow = document.getElementById('mGlow');
-            if (mGlow) {
-                mGlow.style.left = mx + 'px';
-                mGlow.style.top = my + 'px';
-            }
-        });
-    }
 
     /* ─── PARTICLE SYSTEM ─── */
-    (function() {
-        const c = document.getElementById('particles');
-        if (!c) return;
-        const ctx = c.getContext('2d');
-        let W, H, pts = [];
-        function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
-        resize(); window.addEventListener('resize', resize);
-        function mkPt() { return { x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .3, vy: (Math.random() - .5) * .3, r: Math.random() * 1.5 + .5, a: Math.random() * .6 + .2 } }
-        for (let i = 0; i < 80; i++) pts.push(mkPt());
-        function draw() {
-            ctx.clearRect(0, 0, W, H);
-            pts.forEach(p => {
-                p.x += p.vx; p.y += p.vy;
-                if (p.x < 0 || p.x > W) p.vx *= -1;
-                if (p.y < 0 || p.y > H) p.vy *= -1;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(96,165,250,${p.a})`; ctx.fill();
-            });
-            pts.forEach((a, i) => {
-                pts.slice(i + 1).forEach(b => {
-                    const d = Math.hypot(a.x - b.x, a.y - b.y);
-                    if (d < 120) {
-                        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-                        ctx.strokeStyle = `rgba(96,165,250,${.15 * (1 - d / 120)})`;
-                        ctx.lineWidth = .5; ctx.stroke();
-                    }
+    /* Start on next frame so browser can paint the HTML first */
+    requestAnimationFrame(() => {
+        (function() {
+            const c = document.getElementById('particles');
+            if (!c) return;
+            const ctx = c.getContext('2d');
+            let W, H, pts = [];
+            function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+            resize(); window.addEventListener('resize', resize);
+            function mkPt() {
+                return { x: Math.random() * W, y: Math.random() * H,
+                         vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
+                         r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35 };
+            }
+            for (let i = 0; i < 80; i++) pts.push(mkPt());
+            const dSq120 = 120 * 120;
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                pts.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0 || p.x > W) p.vx *= -1;
+                    if (p.y < 0 || p.y > H) p.vy *= -1;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(147,197,253,${p.a})`; ctx.fill();
                 });
-            });
-            requestAnimationFrame(draw);
-        }
-        draw();
-    })();
+                /* Connection lines — squared distance fast-path */
+                for (let i = 0; i < pts.length; i++) {
+                    const a = pts[i];
+                    for (let j = i + 1; j < pts.length; j++) {
+                        const b = pts[j];
+                        const dx = a.x - b.x, dy = a.y - b.y;
+                        const dSq = dx * dx + dy * dy;
+                        if (dSq < dSq120) {
+                            const alpha = .28 * (1 - dSq / dSq120);
+                            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+                            ctx.strokeStyle = `rgba(147,197,253,${alpha})`;
+                            ctx.lineWidth = .6; ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+    });
 
     /* ─── LETTER SCRAMBLE TITLE ─── */
+    /* Uses setInterval (50 ms = 20 fps) so it never blocks the canvas rAF loops.
+       Waits for fonts so the correct typeface is used from character 1. */
     (function() {
         const el = document.getElementById('splashTitle');
         if (!el) return;
         const target = 'RAPID CARE';
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%';
-        let frame = 0, revealed = 0;
-        el.textContent = '';
+        const chars  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%';
+        const TICK_MS       = 50;   /* interval between updates (ms) */
+        const SCRAMBLES_PER = 8;    /* how many scramble frames per letter before it locks */
+        const REVEAL_EVERY  = 2;    /* reveal next letter every N ticks */
+
         const letters = target.split('').map(l => ({ char: l, done: false, scrambles: 0 }));
-        function tick() {
+        let tick = 0, revealed = 0;
+        let intervalId = null;
+
+        function runTick() {
             let out = '';
             letters.forEach((l, i) => {
-                if (l.char === ' ') { out += ' '; return }
-                if (l.done) { out += l.char; return }
+                if (l.char === ' ') { out += '\u00a0'; return; } /* non-breaking space keeps width */
+                if (l.done)         { out += l.char;  return; }
                 if (i <= revealed) {
                     l.scrambles++;
-                    if (l.scrambles > 14) { l.done = true; out += l.char }
-                    else out += chars[Math.floor(Math.random() * chars.length)];
+                    if (l.scrambles >= SCRAMBLES_PER) {
+                        l.done = true; out += l.char;
+                    } else {
+                        out += chars[Math.floor(Math.random() * chars.length)];
+                    }
                 } else {
                     out += chars[Math.floor(Math.random() * chars.length)];
                 }
             });
+
             el.textContent = out;
-            frame++;
-            if (frame % 5 === 0 && revealed < letters.length) revealed++;
-            if (!letters.every(l => l.done || l.char === ' ')) requestAnimationFrame(tick);
-            else el.textContent = target;
+            tick++;
+
+            if (tick % REVEAL_EVERY === 0 && revealed < letters.length) revealed++;
+
+            if (letters.every(l => l.done || l.char === ' ')) {
+                clearInterval(intervalId);
+                el.textContent = target; /* guarantee final state is clean */
+            }
         }
-        setTimeout(tick, 600);
+
+        /* Wait until the custom font is loaded — eliminates the FOUT flash */
+        const startScramble = () => {
+            el.textContent = chars[0]; /* trigger first paint in correct font */
+            setTimeout(() => {
+                intervalId = setInterval(runTick, TICK_MS);
+            }, 300); /* short pause after font ready so logo animation settles */
+        };
+
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(startScramble);
+        } else {
+            setTimeout(startScramble, 500);
+        }
     })();
 
     /* ─── GLOBE ─── */
     (function() {
         const c = document.getElementById('globe');
         if (!c) return;
-        const ctx = c.getContext('2d');
-        const W = 380, H = 380, R = 160, cx = W / 2, cy = H / 2;
-        let rot = 0;
+        const ctx = c.getContext('2d', { alpha: true });
+        const W = 380, H = 380, R = 162, cx = W / 2, cy = H / 2;
+        let rot = 0, lastTime = 0;
+        const ROT_SPEED = 0.20; // degrees per ms * 60fps ≈ 0.20°/frame equivalent
+
         const cities = [
-            [51.5, -0.12], [40.7, -74], [35.6, 139.7], [28.6, 77.2],
-            [48.8, 2.35], [-33.8, 151.2], [55.7, 37.6], [19.4, -99.1],
-            [1.35, 103.8], [25.2, 55.3], [6.5, 3.4], [30.04, 31.2],
-            [-23.5, -46.6], [37.7, -122.4], [41.0, 28.9], [22.5, 88.3],
-            [3.1, 101.7], [13.0, 80.3]
+            [51.5,-0.12],[40.7,-74],[35.6,139.7],[28.6,77.2],
+            [48.8,2.35],[-33.8,151.2],[55.7,37.6],[19.4,-99.1],
+            [1.35,103.8],[25.2,55.3],[6.5,3.4],[30.04,31.2],
+            [-23.5,-46.6],[37.7,-122.4],[41.0,28.9],[22.5,88.3],
+            [3.1,101.7],[13.0,80.3],[59.9,30.3],[34.0,-118.2]
         ];
-        function latLonToXY(lat, lon, r, rot) {
+
+        /* Pre-build sphere background gradient once */
+        const sphereGrad = ctx.createRadialGradient(cx - 40, cy - 40, 0, cx, cy, R + 12);
+        sphereGrad.addColorStop(0,  '#1a3a8a');
+        sphereGrad.addColorStop(0.45,'#0d2260');
+        sphereGrad.addColorStop(0.8, '#07123a');
+        sphereGrad.addColorStop(1,   '#040c24');
+
+        function ll2xy(lat, lon, r, rotDeg) {
             const phi = lat * Math.PI / 180;
-            const lam = (lon + rot) * Math.PI / 180;
-            const x = r * Math.cos(phi) * Math.sin(lam);
-            const y = r * Math.sin(phi);
-            const z = r * Math.cos(phi) * Math.cos(lam);
-            return { x: cx + x, y: cy - y, z, vis: z > 0 };
+            const lam = (lon + rotDeg) * Math.PI / 180;
+            const sinLam = Math.sin(lam), cosLam = Math.cos(lam);
+            const cosPhi = Math.cos(phi), sinPhi = Math.sin(phi);
+            const x = r * cosPhi * sinLam;
+            const y = r * sinPhi;
+            const z = r * cosPhi * cosLam;
+            return { x: cx + x, y: cy - y, z, vis: z > -R * 0.05 };
         }
-        function drawGlobe() {
+
+
+        function drawGlobe(ts) {
+            const dt = lastTime ? Math.min(ts - lastTime, 50) : 16.67;
+            lastTime = ts;
+            rot += ROT_SPEED * (dt / 16.67);
+
             ctx.clearRect(0, 0, W, H);
-            const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, R + 10);
-            grad.addColorStop(0, '#0d1f5c'); grad.addColorStop(.7, '#060d2a'); grad.addColorStop(1, '#030818');
-            ctx.beginPath(); ctx.arc(cx, cy, R + 2, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
-            for (let lat = -60; lat <= 60; lat += 30) {
-                ctx.beginPath(); let first = true;
-                for (let lon = -180; lon <= 180; lon += 4) {
-                    const p = latLonToXY(lat, lon, R, rot);
-                    if (p.vis) { p.x < W && p.y < H ? first ? (ctx.moveTo(p.x, p.y), first = false) : ctx.lineTo(p.x, p.y) : void 0 }
-                    else first = true;
+
+            /* Clip everything to the sphere circle */
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, cy, R + 2, 0, Math.PI * 2);
+            ctx.clip();
+
+            /* Sphere fill */
+            ctx.beginPath();
+            ctx.arc(cx, cy, R + 2, 0, Math.PI * 2);
+            ctx.fillStyle = sphereGrad;
+            ctx.fill();
+
+            /* Latitude lines — 20° step, 2° resolution for smooth curves */
+            for (let lat = -80; lat <= 80; lat += 20) {
+                ctx.beginPath();
+                let first = true;
+                for (let lon = -180; lon <= 180; lon += 2) {
+                    const p = ll2xy(lat, lon, R, rot);
+                    if (!p.vis) { first = true; continue; }
+                    first ? (ctx.moveTo(p.x, p.y), first = false) : ctx.lineTo(p.x, p.y);
                 }
-                ctx.strokeStyle = 'rgba(37,99,235,.15)'; ctx.lineWidth = .7; ctx.stroke();
+                const alpha = lat === 0 ? 0.45 : 0.22;
+                ctx.strokeStyle = `rgba(96,165,250,${alpha})`;
+                ctx.lineWidth = lat === 0 ? 1.0 : 0.7;
+                ctx.stroke();
             }
-            for (let lon = -180; lon < 180; lon += 30) {
-                ctx.beginPath(); let first = true;
-                for (let lat = -80; lat <= 80; lat += 4) {
-                    const p = latLonToXY(lat, lon, R, rot);
-                    if (p.vis) { p.x < W && p.y < H ? first ? (ctx.moveTo(p.x, p.y), first = false) : ctx.lineTo(p.x, p.y) : void 0 }
-                    else first = true;
+
+            /* Longitude lines — 20° step, 2° resolution */
+            for (let lon = -180; lon < 180; lon += 20) {
+                ctx.beginPath();
+                let first = true;
+                for (let lat = -85; lat <= 85; lat += 2) {
+                    const p = ll2xy(lat, lon, R, rot);
+                    if (!p.vis) { first = true; continue; }
+                    first ? (ctx.moveTo(p.x, p.y), first = false) : ctx.lineTo(p.x, p.y);
                 }
-                ctx.strokeStyle = 'rgba(37,99,235,.1)'; ctx.lineWidth = .5; ctx.stroke();
+                ctx.strokeStyle = 'rgba(59,130,246,0.18)';
+                ctx.lineWidth = 0.6;
+                ctx.stroke();
             }
-            const atm = ctx.createRadialGradient(cx, cy, R - 10, cx, cy, R + 30);
-            atm.addColorStop(0, 'rgba(37,99,235,.0)'); atm.addColorStop(.6, 'rgba(37,99,235,.08)'); atm.addColorStop(1, 'rgba(37,99,235,.0)');
-            ctx.beginPath(); ctx.arc(cx, cy, R + 30, 0, Math.PI * 2); ctx.fillStyle = atm; ctx.fill();
-            const mapped = cities.map(([lat, lon]) => latLonToXY(lat, lon, R, rot)).filter(p => p.vis);
-            for (let i = 0; i < mapped.length; i++) {
-                const a = mapped[i];
-                const nearest = mapped.filter((_, j) => j !== i).sort((x, y) => Math.hypot(x.x - a.x, x.y - a.y) - Math.hypot(y.x - a.x, y.y - a.y)).slice(0, 2);
-                nearest.forEach(b => {
-                    const d = Math.hypot(b.x - a.x, b.y - a.y);
-                    if (d < 160) {
-                        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-                        ctx.strokeStyle = `rgba(96,165,250,${.25 * (1 - d / 160)})`; ctx.lineWidth = .6; ctx.stroke();
+
+            /* Restore clip for atmosphere glow */
+            ctx.restore();
+
+            /* Atmosphere glow ring */
+            const atm = ctx.createRadialGradient(cx, cy, R - 8, cx, cy, R + 36);
+            atm.addColorStop(0,   'rgba(59,130,246,0.0)');
+            atm.addColorStop(0.5, 'rgba(96,165,250,0.22)');
+            atm.addColorStop(1,   'rgba(59,130,246,0.0)');
+            ctx.beginPath();
+            ctx.arc(cx, cy, R + 36, 0, Math.PI * 2);
+            ctx.fillStyle = atm;
+            ctx.fill();
+
+            /* Sphere edge specular highlight */
+            const spec = ctx.createRadialGradient(cx - 50, cy - 50, 10, cx, cy, R + 2);
+            spec.addColorStop(0,   'rgba(147,197,253,0.18)');
+            spec.addColorStop(0.3, 'rgba(147,197,253,0.04)');
+            spec.addColorStop(1,   'rgba(0,0,0,0)');
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, cy, R + 2, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.beginPath();
+            ctx.arc(cx, cy, R + 2, 0, Math.PI * 2);
+            ctx.fillStyle = spec;
+            ctx.fill();
+            ctx.restore();
+
+            /* City dots + connections */
+            const now = ts;
+            const mapped = cities.map(([lat, lon]) => ll2xy(lat, lon, R, rot)).filter(p => p.vis);
+
+            /* Draw nearest-city arcs first */
+            mapped.forEach((a, i) => {
+                const dSq160 = 160 * 160;
+                mapped.slice(i + 1).forEach(b => {
+                    const dx = b.x - a.x, dy = b.y - a.y;
+                    const dSq = dx * dx + dy * dy;
+                    if (dSq < dSq160) {
+                        const d = Math.sqrt(dSq);
+                        const alpha = 0.45 * (1 - d / 160) * Math.min((a.z + b.z) / (R * 1.5), 1);
+                        ctx.beginPath();
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
+                        ctx.strokeStyle = `rgba(147,197,253,${alpha})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.stroke();
                     }
                 });
-            }
-            mapped.forEach(p => {
-                const pulse = (Math.sin(Date.now() * .003 + p.x) * .5 + .5);
-                ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(239,68,68,${.7 + pulse * .3})`; ctx.fill();
-                ctx.beginPath(); ctx.arc(p.x, p.y, 5 + pulse * 3, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(239,68,68,${.15 * (1 - pulse)})`; ctx.fill();
             });
-            rot += .12;
+
+            /* City pulse dots — prominent beacon style */
+            mapped.forEach(p => {
+                const pulse  = Math.sin(now * 0.0025 + p.x * 0.05) * 0.5 + 0.5;
+                const pulse2 = Math.sin(now * 0.002  + p.x * 0.05 + 1.5) * 0.5 + 0.5;
+                const depthFade = 0.65 + 0.35 * (p.z / R); // min 0.65 so back-side still vivid
+
+                /* === Layer 1: far outer expanding halo === */
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 10 + pulse * 9, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(239,68,68,${0.12 * (1 - pulse) * depthFade})`;
+                ctx.fill();
+
+                /* === Layer 2: mid pulsing ring === */
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 6 + pulse2 * 4, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(248,113,113,${0.28 * (1 - pulse2) * depthFade})`;
+                ctx.fill();
+
+                /* === Layer 3: solid red core === */
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 4.2, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(239,68,68,${depthFade})`;
+                ctx.fill();
+
+                /* === Layer 4: bright orange-red inner === */
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(254,202,202,${depthFade})`;
+                ctx.fill();
+
+                /* === Layer 5: white hot center === */
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 1.1, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255,255,255,${0.9 * depthFade})`;
+                ctx.fill();
+
+                /* === Stroke ring for crispness === */
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 4.2, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(252,165,165,${0.7 * depthFade})`;
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
+            });
+
             requestAnimationFrame(drawGlobe);
         }
-        drawGlobe();
+
+        /* Defer globe start until after splash animations settle */
+        const startGlobe = () => requestAnimationFrame(drawGlobe);
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(startGlobe, { timeout: 800 });
+        } else {
+            setTimeout(startGlobe, 600);
+        }
     })();
 
     /* ─── SCROLL REVEAL ─── */
