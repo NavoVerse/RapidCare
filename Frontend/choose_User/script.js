@@ -353,7 +353,26 @@ window.addEventListener('pageshow', function(event) {
     if (trans) {
         trans.classList.remove('active');
     }
+    const medSplash = document.getElementById('medHubSplash');
+    if (medSplash) {
+        medSplash.classList.remove('active');
+    }
     if (event.persisted) {
         window.location.reload();
     }
 });
+
+/* ─── MEDICINE HUB REDIRECT ─── */
+function openMedicineHub() {
+    const splash = document.getElementById('medHubSplash');
+    if (splash) {
+        splash.classList.add('active');
+        
+        // Wait for splash animation then redirect
+        setTimeout(() => {
+            window.location.href = '../../medicine_hub/index.html';
+        }, 1500);
+    } else {
+        window.location.href = '../../medicine_hub/index.html';
+    }
+}
