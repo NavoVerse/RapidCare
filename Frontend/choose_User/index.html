@@ -20,17 +20,43 @@
 
     <!-- ═══ FLASH SCREEN ═══ -->
     <div id="flashScreen" class="flash-screen">
-        <div class="grid-overlay"></div>
-        <div class="flash-content">
-            <div class="flash-logo-mark">
-                <div class="flash-cross-h"></div>
-                <div class="flash-cross-v"></div>
-            </div>
-            <div class="flash-text">RAPID CARE</div>
-            <div class="flash-sub">SYSTEM INITIALIZATION</div>
+        <!-- Animated background orbs -->
+        <div class="flash-bg-orbs">
+            <div class="flash-orb flash-orb-1"></div>
+            <div class="flash-orb flash-orb-2"></div>
+            <div class="flash-orb flash-orb-3"></div>
         </div>
-        <div class="flash-loader">
-            <div class="flash-progress"></div>
+        <!-- Subtle grid overlay -->
+        <div class="flash-bg-grid"></div>
+
+        <!-- Corner accents -->
+        <div class="flash-corner flash-corner-tl"></div>
+        <div class="flash-corner flash-corner-tr"></div>
+        <div class="flash-corner flash-corner-bl"></div>
+        <div class="flash-corner flash-corner-br"></div>
+
+        <!-- Center content -->
+        <div class="flash-content">
+            <div class="flash-logo-wrap">
+                <div class="flash-logo-ring"></div>
+                <div class="flash-logo-mark">
+                    <div class="flash-cross-h"></div>
+                    <div class="flash-cross-v"></div>
+                </div>
+            </div>
+            <div class="flash-brand">
+                <div class="flash-text">RAPID<span>CARE</span></div>
+                <div class="flash-tagline">EMERGENCY CARE · INSTANTLY CONNECTED</div>
+            </div>
+            <div class="flash-status">
+                <span class="flash-status-dot"></span>
+                <span class="flash-sub">SYSTEM INITIALIZATION</span>
+            </div>
+        </div>
+
+        <!-- Full-width bottom sweep loader -->
+        <div class="flash-loader-bar">
+            <div class="flash-loader-sweep"></div>
         </div>
     </div>
 
@@ -73,8 +99,12 @@
             </div>
             <div class="splash-title" id="splashTitle">RAPID CARE</div>
             <div class="splash-tagline">Emergency Care · Instantly Connected · Worldwide</div>
-            <button class="btn-prim" onclick="document.getElementById('roles').scrollIntoView({behavior:'smooth'})"
-                style="margin-top: 30px;">Get Started</button>
+            <div class="splash-cta">
+                <button class="btn-prim" onclick="document.getElementById('roles').scrollIntoView({behavior:'smooth'})">
+                    Get Started
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
         </div>
 
         <div class="scroll-hint" onclick="document.getElementById('globe-sec').scrollIntoView({behavior:'smooth'})">

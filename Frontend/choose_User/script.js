@@ -47,27 +47,48 @@ document.addEventListener('DOMContentLoaded', () => {
         })();
     });
 
-    /* ─── LETTER SCRAMBLE TITLE ─── */
-    /* Uses setInterval (50 ms = 20 fps) so it never blocks the canvas rAF loops.
-       Waits for fonts so the correct typeface is used from character 1. */
+    /* ─── FLASH SCREEN & TITLE SCRAMBLE ─── */
     (function() {
-        const el = document.getElementById('splashTitle');
-        if (!el) return;
-        const target = 'RAPID CARE';
-        const chars  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%';
-        const TICK_MS       = 30;   /* interval between updates (ms) */
-        const SCRAMBLES_PER = 13;   /* how many scramble frames per letter before it locks */
-        const REVEAL_EVERY  = 3;    /* reveal next letter every N ticks */
+        const splashTitle = document.getElementById('splashTitle');
+        const flashScreen = document.getElementById('flashScreen');
+        const flashSub = flashScreen?.querySelector('.flash-sub');
+        
+        if (!flashScreen) return;
 
-        const letters = target.split('').map(l => ({ char: l, done: false, scrambles: 0 }));
+        /* Dynamic status messages cycling during initialization */
+        const messages = [
+            "SYSTEM INITIALIZATION",
+            "ESTABLISHING SECURE PROTOCOLS",
+            "LOADING BIOMETRIC DATA",
+            "RAPIDCARE ENGINE READY"
+        ];
+        let msgIdx = 0;
+        const msgInterval = setInterval(() => {
+            if (flashSub && msgIdx < messages.length - 1) {
+                msgIdx++;
+                flashSub.textContent = messages[msgIdx];
+            } else {
+                clearInterval(msgInterval);
+            }
+        }, 600);
+
+        /* ── Title Scramble Logic ── */
+        const targetText = 'RAPID CARE';
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%';
+        const TICK_MS = 30;
+        const SCRAMBLES_PER = 13;
+        const REVEAL_EVERY = 3;
+
+        const letters = targetText.split('').map(l => ({ char: l, done: false, scrambles: 0 }));
         let tick = 0, revealed = 0;
-        let intervalId = null;
+        let scrambleInterval = null;
 
-        function runTick() {
+        function runScrambleTick() {
+            if (!splashTitle) return;
             let out = '';
             letters.forEach((l, i) => {
-                if (l.char === ' ') { out += '\u00a0'; return; } /* non-breaking space keeps width */
-                if (l.done)         { out += l.char;  return; }
+                if (l.char === ' ') { out += '\u00a0'; return; }
+                if (l.done) { out += l.char; return; }
                 if (i <= revealed) {
                     l.scrambles++;
                     if (l.scrambles >= SCRAMBLES_PER) {
@@ -79,59 +100,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     out += chars[Math.floor(Math.random() * chars.length)];
                 }
             });
-
-            el.textContent = out;
+            splashTitle.textContent = out;
             tick++;
-
             if (tick % REVEAL_EVERY === 0 && revealed < letters.length) revealed++;
-
             if (letters.every(l => l.done || l.char === ' ')) {
-                clearInterval(intervalId);
-                el.textContent = target; /* guarantee final state is clean */
+                clearInterval(scrambleInterval);
+                splashTitle.textContent = targetText;
             }
         }
 
-        /* Wait until the custom font is loaded — eliminates the FOUT flash */
-        const startScramble = () => {
-            el.textContent = '\u00a0'; /* trigger first paint in correct font */
-            const flashScreen = document.getElementById('flashScreen');
-            const flashSub = flashScreen?.querySelector('.flash-sub');
+        const startSequence = () => {
+            if (splashTitle) splashTitle.textContent = '\u00a0';
             
-            if (flashScreen) {
-                /* Professional dynamic status messages */
-                const messages = [
-                    "SYSTEM INITIALIZATION",
-                    "ESTABLISHING SECURE PROTOCOLS",
-                    "LOADING BIOMETRIC DATA",
-                    "RAPIDCARE ENGINE READY"
-                ];
-                let msgIdx = 0;
-                const msgInterval = setInterval(() => {
-                    if (flashSub && msgIdx < messages.length - 1) {
-                        msgIdx++;
-                        flashSub.textContent = messages[msgIdx];
-                    } else {
-                        clearInterval(msgInterval);
+            /* Remove Flash Screen after 3s */
+            setTimeout(() => {
+                flashScreen.classList.add('hidden');
+                /* Start title scramble after flash screen starts to fade */
+                setTimeout(() => {
+                    if (splashTitle) {
+                        scrambleInterval = setInterval(runScrambleTick, TICK_MS);
                     }
-                }, 350);
-
-                setTimeout(() => {
-                    flashScreen.classList.add('hidden');
-                    setTimeout(() => {
-                        intervalId = setInterval(runTick, TICK_MS);
-                    }, 400); /* wait for flash screen to fade out */
-                }, 2500); /* display flash screen for 2.5s */
-            } else {
-                setTimeout(() => {
-                    intervalId = setInterval(runTick, TICK_MS);
-                }, 300); /* short pause after font ready so logo animation settles */
-            }
+                }, 600);
+            }, 3000);
         };
 
+        /* Run sequence regardless of font loading for robustness */
         if (document.fonts && document.fonts.ready) {
-            document.fonts.ready.then(startScramble);
+            document.fonts.ready.then(startSequence).catch(startSequence);
         } else {
-            setTimeout(startScramble, 500);
+            setTimeout(startSequence, 500);
         }
     })();
 
