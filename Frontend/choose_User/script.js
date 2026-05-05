@@ -55,9 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!el) return;
         const target = 'RAPID CARE';
         const chars  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%';
-        const TICK_MS       = 50;   /* interval between updates (ms) */
-        const SCRAMBLES_PER = 8;    /* how many scramble frames per letter before it locks */
-        const REVEAL_EVERY  = 2;    /* reveal next letter every N ticks */
+        const TICK_MS       = 30;   /* interval between updates (ms) */
+        const SCRAMBLES_PER = 13;   /* how many scramble frames per letter before it locks */
+        const REVEAL_EVERY  = 3;    /* reveal next letter every N ticks */
 
         const letters = target.split('').map(l => ({ char: l, done: false, scrambles: 0 }));
         let tick = 0, revealed = 0;
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /* Wait until the custom font is loaded — eliminates the FOUT flash */
         const startScramble = () => {
-            el.textContent = chars[0]; /* trigger first paint in correct font */
+            el.textContent = '\u00a0'; /* trigger first paint in correct font */
             setTimeout(() => {
                 intervalId = setInterval(runTick, TICK_MS);
             }, 300); /* short pause after font ready so logo animation settles */
