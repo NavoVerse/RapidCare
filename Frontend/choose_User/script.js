@@ -94,9 +94,38 @@ document.addEventListener('DOMContentLoaded', () => {
         /* Wait until the custom font is loaded — eliminates the FOUT flash */
         const startScramble = () => {
             el.textContent = '\u00a0'; /* trigger first paint in correct font */
-            setTimeout(() => {
-                intervalId = setInterval(runTick, TICK_MS);
-            }, 300); /* short pause after font ready so logo animation settles */
+            const flashScreen = document.getElementById('flashScreen');
+            const flashSub = flashScreen?.querySelector('.flash-sub');
+            
+            if (flashScreen) {
+                /* Professional dynamic status messages */
+                const messages = [
+                    "SYSTEM INITIALIZATION",
+                    "ESTABLISHING SECURE PROTOCOLS",
+                    "LOADING BIOMETRIC DATA",
+                    "RAPIDCARE ENGINE READY"
+                ];
+                let msgIdx = 0;
+                const msgInterval = setInterval(() => {
+                    if (flashSub && msgIdx < messages.length - 1) {
+                        msgIdx++;
+                        flashSub.textContent = messages[msgIdx];
+                    } else {
+                        clearInterval(msgInterval);
+                    }
+                }, 350);
+
+                setTimeout(() => {
+                    flashScreen.classList.add('hidden');
+                    setTimeout(() => {
+                        intervalId = setInterval(runTick, TICK_MS);
+                    }, 400); /* wait for flash screen to fade out */
+                }, 2500); /* display flash screen for 2.5s */
+            } else {
+                setTimeout(() => {
+                    intervalId = setInterval(runTick, TICK_MS);
+                }, 300); /* short pause after font ready so logo animation settles */
+            }
         };
 
         if (document.fonts && document.fonts.ready) {
