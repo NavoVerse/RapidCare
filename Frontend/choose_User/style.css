@@ -41,6 +41,141 @@ body {
 }
 
 
+/* ─── FLASH SCREEN ─── */
+.flash-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+    
+    /* Premium Diagonal Sweep Reveal */
+    clip-path: polygon(0 0, 0 0, 0 0, 0 0);
+    animation: flashReveal 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+@keyframes flashReveal {
+    0% { clip-path: polygon(0 0, 0 0, 0 0, 0 0); }
+    100% { clip-path: polygon(0 0, 200% 0, 0 200%, 0 0); }
+}
+
+.flash-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.05);
+    pointer-events: none;
+}
+
+.flash-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: flashContentIn 0.8s cubic-bezier(0.19, 1, 0.22, 1) 0.4s forwards, flashFloat 3s ease-in-out infinite 1.2s;
+}
+
+@keyframes flashContentIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.flash-logo-mark {
+    width: 48px;
+    height: 48px;
+    position: relative;
+    margin-bottom: 24px;
+    /* Rotate half cycle (180deg) as it appears */
+    animation: flashLogoHalf 1.2s cubic-bezier(0.77, 0, 0.175, 1) 0.5s forwards;
+}
+
+@keyframes flashLogoHalf {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(180deg); }
+}
+
+.flash-cross-h,
+.flash-cross-v {
+    background: var(--red);
+    border-radius: 4px;
+    position: absolute;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.flash-cross-h {
+    width: 48px;
+    height: 14px;
+    top: 17px;
+    left: 0;
+}
+
+.flash-cross-v {
+    width: 14px;
+    height: 48px;
+    top: 0;
+    left: 17px;
+}
+
+.flash-text {
+    font-family: var(--konstant-font);
+    font-size: clamp(24px, 8vw, 32px);
+    font-weight: 800;
+    letter-spacing: clamp(4px, 2vw, 6px);
+    color: var(--white);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes flashLogoPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+.flash-sub {
+    font-size: clamp(9px, 3vw, 11px);
+    font-weight: 600;
+    letter-spacing: clamp(2px, 1vw, 4px);
+    color: var(--blue-glow);
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+.flash-loader {
+    width: clamp(160px, 70vw, 240px);
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: clamp(32px, 10vw, 48px);
+    position: relative;
+    overflow: hidden;
+}
+
+.flash-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: var(--blue-glow);
+    animation: flashProgressAnim 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+@keyframes flashProgressAnim {
+    0% { width: 0%; transform: translateX(0); }
+    40% { width: 70%; transform: translateX(0); }
+    100% { width: 100%; transform: translateX(0); }
+}
+
+@keyframes flashFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+
 /* ─── SPLASH ─── */
 #splash {
     height: 100vh;
@@ -80,19 +215,28 @@ canvas#particles {
     width: 72px;
     height: 72px;
     position: relative;
-    animation: logoReveal .65s cubic-bezier(.34, 1.56, .64, 1) .15s both;
+    /* Faster, snappier sequence: Reveal + Full 360 Spin */
+    animation: mainLogoSequence 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
     will-change: transform, opacity;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes logoReveal {
-    from {
-        opacity: 0;
-        transform: scale(0) rotate(-180deg);
-    }
+.logo-mark:hover {
+    transform: scale(1.1) rotate(360deg);
+}
 
-    to {
-        opacity: 1;
-        transform: scale(1) rotate(0);
+@keyframes mainLogoSequence {
+    0% { 
+        opacity: 0; 
+        transform: scale(0) rotate(0deg); 
+    }
+    30% { 
+        opacity: 1; 
+        transform: scale(1) rotate(0deg); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1) rotate(360deg); 
     }
 }
 
@@ -528,6 +672,10 @@ canvas#globe {
     box-shadow: 0 32px 80px rgba(37, 99, 235, .25);
 }
 
+.role-card:hover .card-icon svg {
+    transform: rotate(360deg);
+}
+
 .role-card.chosen {
     border-color: var(--blue);
     box-shadow: 0 0 0 2px rgba(37, 99, 235, .3), 0 32px 80px rgba(37, 99, 235, .35);
@@ -586,6 +734,7 @@ canvas#globe {
     height: 22px;
     stroke: white;
     fill: none;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .card-body {
