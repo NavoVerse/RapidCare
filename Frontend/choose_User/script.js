@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.reveal, .step').forEach(el => revObs.observe(el));
 
     /* ─── NAV DOTS ─── */
-    const secs = ['splash', 'globe-sec', 'roles', 'how', 'features', 'fcta'];
+    const secs = ['splash', 'globe-sec', 'roles', 'how', 'features', 'faq', 'fcta'];
     const dots = document.querySelectorAll('.ndot');
     const secObs = new IntersectionObserver(entries => {
         entries.forEach(e => {

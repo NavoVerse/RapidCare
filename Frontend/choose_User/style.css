@@ -977,6 +977,79 @@ canvas#globe {
     font-style: normal;
 }
 
+/* ─── FAQ ─── */
+#faq {
+    background: var(--navy);
+    padding: 120px 40px 80px;
+}
+
+.faq-list {
+    max-width: 1000px;
+    margin: 48px auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.faq-item {
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(147, 197, 253, .08);
+    border-radius: 16px;
+    padding: 24px;
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.faq-item:hover {
+    background: rgba(255, 255, 255, .06);
+    border-color: rgba(147, 197, 253, .2);
+}
+
+.faq-item.active {
+    background: rgba(59, 130, 246, .08);
+    border-color: rgba(59, 130, 246, .3);
+}
+
+.faq-q {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--white);
+    user-select: none;
+}
+
+.faq-q svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--blue-glow);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.faq-item.active .faq-q svg {
+    transform: rotate(180deg);
+}
+
+.faq-a {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, margin-top 0.4s ease;
+}
+
+.faq-item.active .faq-a {
+    max-height: 300px;
+    opacity: 1;
+    margin-top: 16px;
+}
+
+.faq-a p {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.6;
+}
+
 /* ─── FOOTER CTA ─── */
 #fcta {
     padding: 140px 40px;
@@ -1551,6 +1624,10 @@ canvas#globe {
 
     .how-inner {
         padding: 0;
+    }
+
+    .faq-list {
+        grid-template-columns: 1fr;
     }
 }
 
