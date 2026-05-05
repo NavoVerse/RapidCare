@@ -1235,9 +1235,9 @@ canvas#globe {
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
     pointer-events: none;
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    clip-path: circle(0% at calc(100% - 60px) calc(100% - 60px));
+    transition: clip-path 1.2s cubic-bezier(0.86, 0, 0.07, 1);
 }
 
 @keyframes hubSplashBg {
@@ -1247,7 +1247,7 @@ canvas#globe {
 }
 
 .med-hub-splash.active {
-    opacity: 1;
+    clip-path: circle(150% at calc(100% - 60px) calc(100% - 60px));
     pointer-events: all;
 }
 
@@ -1255,33 +1255,36 @@ canvas#globe {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 32px;
-    transform: translateY(20px) scale(0.95);
-    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    gap: 28px;
+    transform: translateY(30px) scale(0.9);
+    opacity: 0;
+    transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+    transition-delay: 0.4s; /* Wait for circular reveal to reach center */
 }
 
 .med-hub-splash.active .med-hub-splash-content {
     transform: translateY(0) scale(1);
+    opacity: 1;
 }
 
 .med-hub-splash-icon {
-    width: 86px;
-    height: 86px;
-    border-radius: 20px;
-    background: rgba(240, 237, 229, 0.1); /* --sand with low opacity */
+    width: 120px;
+    height: 120px;
+    border-radius: 32px;
+    background: rgba(240, 237, 229, 0.08); /* --sand with low opacity */
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.2);
 }
 
 .med-hub-splash-icon::before {
     content: '';
     position: absolute;
-    inset: -12px;
-    border-radius: 26px;
-    border: 1px solid rgba(240, 237, 229, 0.2);
+    inset: -14px;
+    border-radius: 40px;
+    border: 1px solid rgba(240, 237, 229, 0.15);
     animation: splashPing 2.5s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
@@ -1291,34 +1294,99 @@ canvas#globe {
 }
 
 .med-hub-splash-icon svg {
-    width: 44px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
     stroke: #F0EDE5; /* --sand */
-    filter: drop-shadow(0 0 10px rgba(240, 237, 229, 0.5));
+    filter: drop-shadow(0 0 15px rgba(240, 237, 229, 0.4));
 }
 
 .med-hub-splash-title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 52px;
+    font-size: 72px;
     color: #F0EDE5; /* --sand */
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     text-align: center;
     line-height: 1;
-    text-shadow: 0 0 20px rgba(245, 166, 35, 0.2); /* --amber subtle glow */
+    text-shadow: 0 0 24px rgba(245, 166, 35, 0.15); /* --amber subtle glow */
 }
 
 .med-hub-splash-title span {
     color: #F5A623; /* --amber */
 }
 
-.med-hub-splash-loader {
-    width: 240px;
-    height: 3px;
-    background: rgba(240, 237, 229, 0.15);
-    position: relative;
+.med-hub-quote {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 20px;
+    font-style: italic;
+    font-weight: 400;
+    color: rgba(240, 237, 229, 0.6); /* --sand faint */
+    letter-spacing: 2px;
+    text-align: center;
+    margin-top: -18px;
+}
+
+/* Splash Background Animations */
+.splash-bg-orbs {
+    position: absolute;
+    inset: 0;
     overflow: hidden;
-    border-radius: 3px;
+    pointer-events: none;
+}
+.splash-bg-orbs .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0;
+    transition: opacity 2s ease 0.6s;
+}
+.med-hub-splash.active .splash-bg-orbs .orb {
+    opacity: 0.5;
+}
+.splash-bg-orbs .orb-1 {
+    width: 600px;
+    height: 600px;
+    background: #F5A623; /* --amber */
+    top: -200px;
+    right: -100px;
+    animation: floatOrb 10s ease-in-out infinite alternate;
+}
+.splash-bg-orbs .orb-2 {
+    width: 800px;
+    height: 800px;
+    background: #00ffc8;
+    bottom: -300px;
+    left: -200px;
+    animation: floatOrb 14s ease-in-out infinite alternate-reverse;
+}
+@keyframes floatOrb {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-80px, 80px) scale(1.1); }
+}
+
+.splash-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.5s ease 0.8s;
+}
+.med-hub-splash.active .splash-bg-grid {
+    opacity: 1;
+}
+
+/* Full-width bottom loader */
+.med-hub-splash-loader {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: rgba(240, 237, 229, 0.05);
+    border-radius: 0;
 }
 
 .med-hub-splash-loader::after {
@@ -1327,15 +1395,15 @@ canvas#globe {
     top: 0;
     left: 0;
     height: 100%;
-    width: 35%;
+    width: 25%;
     background: #F5A623; /* --amber */
-    border-radius: 3px;
-    animation: loadSweep 1.8s infinite cubic-bezier(0.65, 0, 0.35, 1);
+    border-radius: 0;
+    animation: loadSweep 2s infinite cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 @keyframes loadSweep {
     0% { transform: translateX(-100%); }
-    100% { transform: translateX(300%); }
+    100% { transform: translateX(400%); }
 }
 
 /* ─── MOBILE OPTIMIZATIONS ─── */
@@ -1576,5 +1644,46 @@ canvas#globe {
         padding: 14px 24px;
         font-size: 11px;
         letter-spacing: 1.5px;
+    }
+
+    /* Medicine Hub Popup - Show only logo */
+    .med-hub-popup {
+        bottom: 20px;
+        right: 20px;
+        padding: 14px;
+        border-radius: 50%;
+        gap: 0;
+    }
+    .med-hub-text {
+        display: none;
+    }
+    .med-hub-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    /* Medicine Hub Splash circular origin fix for mobile */
+    .med-hub-splash {
+        clip-path: circle(0% at calc(100% - 45px) calc(100% - 45px));
+    }
+    .med-hub-splash.active {
+        clip-path: circle(150% at calc(100% - 45px) calc(100% - 45px));
+    }
+
+    .med-hub-splash-title {
+        font-size: 42px;
+    }
+    .med-hub-quote {
+        font-size: 14px;
+        margin-top: -10px;
+    }
+    .med-hub-splash-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+    }
+    .med-hub-splash-icon svg {
+        width: 36px;
+        height: 36px;
     }
 }
