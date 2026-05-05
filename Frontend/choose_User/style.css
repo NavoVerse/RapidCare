@@ -1428,4 +1428,20 @@ canvas#globe {
         font-size: 11px;
         letter-spacing: 1.5px;
     }
+
+    /* Medicine Hub Popup - Show only logo */
+    .med-hub-popup {
+        bottom: 20px;
+        right: 20px;
+        padding: 14px;
+        border-radius: 50%;
+        gap: 0;
+    }
+    .med-hub-text {
+        display: none;
+    }
+    .med-hub-icon {
+        width: 36px;
+        height: 36px;
+    }
 }

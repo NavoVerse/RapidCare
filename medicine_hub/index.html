@@ -529,7 +529,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
   .hero-stats { flex-wrap: wrap; justify-content: flex-start; margin-top: 24px; }
   .content { flex-direction: column; padding: 30px; }
   .sidebar { display: none; }
-  .prod-grid, .herbal-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .prod-grid, .herbal-grid, .supp-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .devices-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
   .kit-grid { grid-template-columns: 1fr; }
   .oxy-row { grid-template-columns: 1fr; }
@@ -579,7 +579,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
   .cat { flex-shrink: 0; }
   .sort-wrap { flex: 1 1 auto; margin-left: 0; margin-top: 6px; }
   .content { padding: 16px; }
-  .prod-grid, .herbal-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+  .prod-grid, .herbal-grid, .supp-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
   .devices-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .emerg { flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px; }
   .emerg-right { width: 100%; flex-direction: row; align-items: stretch; gap: 10px; }
@@ -597,12 +597,20 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
   .prod-body { padding: 10px; }
   .prod-name { font-size: 12px; }
   .prod-price { font-size: 18px; }
+  .prod-modal { flex-direction: column; max-height: 90vh; overflow-y: auto; }
+  .pm-img-sec { padding: 20px; height: 220px; }
+  .pm-info-sec { padding: 20px; }
+  .pm-img { max-height: 100%; width: auto; }
+  .pm-actions { flex-direction: column; }
+  .pm-name { font-size: 28px; }
+  .pm-price { font-size: 28px; }
+  .rx-modal { padding: 24px; }
+  .rx-title { font-size: 28px; }
 }
 
 @media (max-width: 480px) {
-  .topbar-brand { gap: 6px; }
-  .topbar-sep { display: none; }
-  .topbar-sub { font-size: 10px; }
+  .topbar-brand { gap: 0; }
+  .topbar-sep, .topbar-sub { display: none; }
   .topbar-rc { font-size: 24px; }
   .hero { padding: 16px; }
   .hero-title { font-size: 36px; }
@@ -613,7 +621,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
   .promo-btn { width: 100%; min-height: 48px; }
   .footer-inner { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; align-items: flex-start; gap: 15px; }
-  .prod-grid, .herbal-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .prod-grid, .herbal-grid, .supp-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .oxy-vars { grid-template-columns: repeat(2,1fr); display:grid; }
 }
 
@@ -891,13 +899,7 @@ body{background:var(--sand);font-family:var(--body);color:var(--ink);font-size:1
 .ripple { position: absolute; border-radius: 50%; transform: scale(0); animation: ripple 0.6s linear; background-color: rgba(255, 255, 255, 0.4); }
 @keyframes ripple { to { transform: scale(4); opacity: 0; } }
 
-@media (max-width: 768px) {
-  .prod-modal { flex-direction: column; max-height: 90vh; overflow-y: auto;}
-  .pm-img-sec { padding: 30px; height: 250px; }
-  .pm-img { max-height: 100%; width: auto; }
-  .pm-actions { flex-direction: column; }
-}
-
+/* Responsive modal handled above */
 </style>
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
