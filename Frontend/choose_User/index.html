@@ -54,9 +54,26 @@
             </div>
         </div>
 
+        <!-- Animated EKG heartbeat line -->
+        <div class="flash-ekg">
+            <svg viewBox="0 0 600 60" preserveAspectRatio="none">
+                <polyline class="ekg-line" fill="none" stroke="url(#ekgGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    points="0,30 80,30 100,30 120,10 130,50 140,5 150,55 160,30 180,30 260,30 280,30 300,10 310,50 320,5 330,55 340,30 360,30 440,30 460,30 480,10 490,50 500,5 510,55 520,30 540,30 600,30"/>
+                <defs>
+                    <linearGradient id="ekgGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="rgba(96,165,250,0)" />
+                        <stop offset="40%" stop-color="rgba(239,68,68,0.8)" />
+                        <stop offset="60%" stop-color="rgba(239,68,68,0.8)" />
+                        <stop offset="100%" stop-color="rgba(96,165,250,0)" />
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+
         <!-- Full-width bottom sweep loader -->
         <div class="flash-loader-bar">
             <div class="flash-loader-sweep"></div>
+            <div class="flash-loader-progress"></div>
         </div>
     </div>
 
