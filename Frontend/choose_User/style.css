@@ -2387,3 +2387,26 @@ canvas#globe {
         height: 36px;
     }
 }
+
+/* ─── PERFORMANCE OPTIMIZATIONS ─── */
+section {
+    contain: content;
+    will-change: transform, opacity;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+}
+
+.reveal.vis {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+#splash, #globe-sec, #roles, #how, #features, #faq, #fcta {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}

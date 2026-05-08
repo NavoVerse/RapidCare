@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(147,197,253,${p.a})`; ctx.fill();
             });
+            
+            /* Optimized Line System — fewer connections */
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(147,197,253,0.15)';
+            ctx.lineWidth = 0.5;
             for (let i = 0; i < pts.length; i++) {
                 const a = pts[i];
                 for (let j = i + 1; j < pts.length; j++) {
@@ -31,13 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const dx = a.x - b.x, dy = a.y - b.y;
                     const dSq = dx * dx + dy * dy;
                     if (dSq < dSqLimit) {
-                        const alpha = .28 * (1 - dSq / dSqLimit);
-                        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-                        ctx.strokeStyle = `rgba(147,197,253,${alpha})`;
-                        ctx.lineWidth = .6; ctx.stroke();
+                        ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
                     }
                 }
             }
+            ctx.stroke();
             requestAnimationFrame(draw);
         }
         draw();
@@ -242,32 +245,32 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = sphereGrad;
             ctx.fill();
 
-            /* Latitude lines — 20° step, 2° resolution for smooth curves */
+            /* Latitude lines — Optimized 5° resolution */
             for (let lat = -80; lat <= 80; lat += 20) {
                 ctx.beginPath();
                 let first = true;
-                for (let lon = -180; lon <= 180; lon += 2) {
+                for (let lon = -180; lon <= 180; lon += 5) {
                     const p = ll2xy(lat, lon, R, rot);
                     if (!p.vis) { first = true; continue; }
                     first ? (ctx.moveTo(p.x, p.y), first = false) : ctx.lineTo(p.x, p.y);
                 }
-                const alpha = lat === 0 ? 0.45 : 0.22;
+                const alpha = lat === 0 ? 0.4 : 0.15;
                 ctx.strokeStyle = `rgba(96,165,250,${alpha})`;
-                ctx.lineWidth = lat === 0 ? 1.0 : 0.7;
+                ctx.lineWidth = lat === 0 ? 1.0 : 0.6;
                 ctx.stroke();
             }
 
-            /* Longitude lines — 20° step, 2° resolution */
+            /* Longitude lines — Optimized 5° resolution */
             for (let lon = -180; lon < 180; lon += 20) {
                 ctx.beginPath();
                 let first = true;
-                for (let lat = -85; lat <= 85; lat += 2) {
+                for (let lat = -85; lat <= 85; lat += 5) {
                     const p = ll2xy(lat, lon, R, rot);
                     if (!p.vis) { first = true; continue; }
                     first ? (ctx.moveTo(p.x, p.y), first = false) : ctx.lineTo(p.x, p.y);
                 }
-                ctx.strokeStyle = 'rgba(59,130,246,0.18)';
-                ctx.lineWidth = 0.6;
+                ctx.strokeStyle = 'rgba(59,130,246,0.12)';
+                ctx.lineWidth = 0.5;
                 ctx.stroke();
             }
 
@@ -303,67 +306,42 @@ document.addEventListener('DOMContentLoaded', () => {
             const now = ts;
             const mapped = cities.map(([lat, lon]) => ll2xy(lat, lon, R, rot)).filter(p => p.vis);
 
-            /* Draw nearest-city arcs first */
+            /* Draw nearest-city arcs — optimized single stroke */
+            ctx.beginPath();
+            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = 'rgba(147,197,253,0.12)';
             mapped.forEach((a, i) => {
-                const dSq160 = 160 * 160;
                 mapped.slice(i + 1).forEach(b => {
                     const dx = b.x - a.x, dy = b.y - a.y;
                     const dSq = dx * dx + dy * dy;
-                    if (dSq < dSq160) {
-                        const d = Math.sqrt(dSq);
-                        const alpha = 0.45 * (1 - d / 160) * Math.min((a.z + b.z) / (R * 1.5), 1);
-                        ctx.beginPath();
+                    if (dSq < 140 * 140) {
                         ctx.moveTo(a.x, a.y);
                         ctx.lineTo(b.x, b.y);
-                        ctx.strokeStyle = `rgba(147,197,253,${alpha})`;
-                        ctx.lineWidth = 0.8;
-                        ctx.stroke();
                     }
                 });
             });
+            ctx.stroke();
 
-            /* City pulse dots — prominent beacon style */
+            /* City pulse dots — optimized layer rendering */
             mapped.forEach(p => {
                 const pulse  = Math.sin(now * 0.0025 + p.x * 0.05) * 0.5 + 0.5;
-                const pulse2 = Math.sin(now * 0.002  + p.x * 0.05 + 1.5) * 0.5 + 0.5;
-                const depthFade = 0.65 + 0.35 * (p.z / R); // min 0.65 so back-side still vivid
+                const depthFade = 0.65 + 0.35 * (p.z / R);
 
-                /* === Layer 1: far outer expanding halo === */
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 10 + pulse * 9, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(239,68,68,${0.12 * (1 - pulse) * depthFade})`;
-                ctx.fill();
-
-                /* === Layer 2: mid pulsing ring === */
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 6 + pulse2 * 4, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(248,113,113,${0.28 * (1 - pulse2) * depthFade})`;
-                ctx.fill();
-
-                /* === Layer 3: solid red core === */
+                /* Grouped fills for performance */
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, 4.2, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(239,68,68,${depthFade})`;
                 ctx.fill();
 
-                /* === Layer 4: bright orange-red inner === */
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(254,202,202,${depthFade})`;
                 ctx.fill();
 
-                /* === Layer 5: white hot center === */
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, 1.1, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(255,255,255,${0.9 * depthFade})`;
                 ctx.fill();
-
-                /* === Stroke ring for crispness === */
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 4.2, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(252,165,165,${0.7 * depthFade})`;
-                ctx.lineWidth = 0.8;
-                ctx.stroke();
             });
 
             requestAnimationFrame(drawGlobe);
