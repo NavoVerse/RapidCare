@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── FLASH SCREEN, LOADING SOUND & TITLE SCRAMBLE ─── */
     (function() {
-        const splashTitle = document.getElementById('splashTitle');
         const flashScreen = document.getElementById('flashScreen');
         const flashSub = flashScreen?.querySelector('.flash-sub');
         
@@ -131,46 +130,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 700);
 
-        /* ── Title Scramble Logic ── */
-        const targetText = 'RAPID CARE';
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%';
-        const TICK_MS = 30;
-        const SCRAMBLES_PER = 13;
-        const REVEAL_EVERY = 3;
+        /* ── Interactive Cursor Glow for Title ── */
+        function initInteractiveTitleGlow() {
+            const title = document.getElementById('splashTitle');
+            if (!title) return;
 
-        const letters = targetText.split('').map(l => ({ char: l, done: false, scrambles: 0 }));
-        let tick = 0, revealed = 0;
-        let scrambleInterval = null;
-
-        function runScrambleTick() {
-            if (!splashTitle) return;
-            let out = '';
-            letters.forEach((l, i) => {
-                if (l.char === ' ') { out += '\u00a0'; return; }
-                if (l.done) { out += l.char; return; }
-                if (i <= revealed) {
-                    l.scrambles++;
-                    if (l.scrambles >= SCRAMBLES_PER) {
-                        l.done = true; out += l.char;
-                    } else {
-                        out += chars[Math.floor(Math.random() * chars.length)];
-                    }
-                } else {
-                    out += chars[Math.floor(Math.random() * chars.length)];
-                }
+            title.addEventListener('mousemove', (e) => {
+                const rect = title.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                title.style.setProperty('--mouse-x', `${x}px`);
+                title.style.setProperty('--mouse-y', `${y}px`);
             });
-            splashTitle.textContent = out;
-            tick++;
-            if (tick % REVEAL_EVERY === 0 && revealed < letters.length) revealed++;
-            if (letters.every(l => l.done || l.char === ' ')) {
-                clearInterval(scrambleInterval);
-                splashTitle.textContent = targetText;
-            }
         }
 
+        initInteractiveTitleGlow();
+
+
+
         const startSequence = () => {
-            if (splashTitle) splashTitle.textContent = '\u00a0';
-            
             /* Hide splash content behind flash initially */
             document.body.classList.add('flash-active');
             
@@ -191,13 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 /* Start heavy canvas animations ONLY after flash is gone */
                 if (window.initParticles) window.initParticles();
                 if (window.initGlobe) window.initGlobe();
-
-                /* Start title scramble after splash is visible */
-                setTimeout(() => {
-                    if (splashTitle) {
-                        scrambleInterval = setInterval(runScrambleTick, TICK_MS);
-                    }
-                }, 400);
             }, 3200);
 
             /* Cleanup: remove flash screen from DOM after transition completes */

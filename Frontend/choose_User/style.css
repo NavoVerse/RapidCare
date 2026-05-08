@@ -680,34 +680,149 @@ canvas#particles {
     50%       { transform: scale(1.4); opacity: 1; }
 }
 
-/* TITLE */
+/* TITLE — Holographic Surge with Interactive Glow */
 .splash-title {
     font-family: var(--konstant-font);
     font-weight: 900;
     font-size: clamp(60px, 10vw, 120px);
     letter-spacing: clamp(2px, 0.5vw, 6px);
     line-height: 1;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    cursor: default;
+}
+
+.title-text {
     color: transparent;
-    background: linear-gradient(135deg, #ffffff 10%, #93c5fd 45%, #dbeafe 65%, #ffffff 90%);
+    background: linear-gradient(
+        90deg,
+        #ffffff 0%, #93c5fd 20%, #c4b5fd 40%,
+        #fbcfe8 55%, #93c5fd 75%, #ffffff 100%
+    );
     background-clip: text;
     -webkit-background-clip: text;
-    background-size: 250% 250%;
-    animation: shimmer 4s linear infinite;
-    filter: drop-shadow(0 2px 40px rgba(147, 197, 253, .45));
-    will-change: background-position;
+    background-size: 300% 100%;
+    display: block;
+    
+    /* Entrance + persistent loops */
+    animation:
+        holoSurge 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both,
+        holoShimmer 6s linear 1.8s infinite,
+        glowPulse 3s ease-in-out 2s infinite;
+    will-change: transform, opacity, filter, text-shadow;
+}
+
+/* Interactive Glow Layer */
+.title-glow {
+    position: absolute;
+    inset: 0;
+    color: transparent;
+    background: radial-gradient(
+        circle 150px at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+        rgba(96, 165, 250, 0.95) 0%, 
+        rgba(59, 130, 246, 0.4) 30%,
+        transparent 70%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    pointer-events: none;
     opacity: 0;
-    animation: titleReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards, shimmer 4s linear 1.4s infinite;
+    transition: opacity 0.4s ease;
+    z-index: 2;
+    animation: holoSurge 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
 }
 
-@keyframes titleReveal {
-    from { opacity: 0; transform: translateY(20px) skewX(-2deg); filter: blur(8px) drop-shadow(0 2px 40px rgba(147, 197, 253, .45)); }
-    to   { opacity: 1; transform: translateY(0) skewX(0deg);     filter: drop-shadow(0 2px 40px rgba(147, 197, 253, .45)); }
+.splash-title:hover .title-glow {
+    opacity: 1;
 }
 
-@keyframes shimmer {
+/* ── Phase 1: Chromatic split — cyan ghost (left) ── */
+.title-text::before {
+    content: "RAPID CARE";
+    position: absolute;
+    inset: 0;
+    color: rgba(96, 165, 250, 0.7);
+    z-index: -1;
+    animation: chromaLeft 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+    pointer-events: none;
+}
+
+/* ── Phase 1: Chromatic split — red ghost (right) ── */
+.title-text::after {
+    content: "RAPID CARE";
+    position: absolute;
+    inset: 0;
+    color: rgba(239, 68, 68, 0.5);
+    z-index: -1;
+    animation: chromaRight 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+    pointer-events: none;
+}
+
+/* ── Main text entrance ── */
+@keyframes holoSurge {
+    0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(12px);
+        filter: blur(12px) brightness(2.5);
+    }
+    35% {
+        opacity: 1;
+        filter: blur(0px) brightness(1.6);
+        transform: scale(1.03) translateY(-2px);
+    }
+    60% {
+        filter: blur(0px) brightness(1.15);
+        transform: scale(1.01) translateY(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0px) brightness(1);
+    }
+}
+
+/* ── Cyan ghost: starts offset left, snaps to center ── */
+@keyframes chromaLeft {
+    0%   { transform: translateX(-8px); opacity: 0; }
+    15%  { opacity: 0.8; transform: translateX(-6px); }
+    40%  { opacity: 0.6; transform: translateX(-3px); }
+    65%  { opacity: 0.2; transform: translateX(-1px); }
+    100% { opacity: 0;   transform: translateX(0); }
+}
+
+/* ── Red ghost: starts offset right, snaps to center ── */
+@keyframes chromaRight {
+    0%   { transform: translateX(8px); opacity: 0; }
+    15%  { opacity: 0.6; transform: translateX(6px); }
+    40%  { opacity: 0.4; transform: translateX(3px); }
+    65%  { opacity: 0.15; transform: translateX(1px); }
+    100% { opacity: 0;   transform: translateX(0); }
+}
+
+/* ── Persistent holographic gradient shift ── */
+@keyframes holoShimmer {
     0%   { background-position: 0% 50%; }
-    100% { background-position: 250% 50%; }
+    100% { background-position: 300% 50%; }
 }
+
+/* ── Breathing neon glow ── */
+@keyframes glowPulse {
+    0%, 100% {
+        text-shadow:
+            0 0 10px rgba(147,197,253,0.3),
+            0 0 30px rgba(96,165,250,0.2),
+            0 0 60px rgba(59,130,246,0.1);
+    }
+    50% {
+        text-shadow:
+            0 0 15px rgba(147,197,253,0.5),
+            0 0 40px rgba(96,165,250,0.35),
+            0 0 80px rgba(59,130,246,0.2),
+            0 0 120px rgba(59,130,246,0.08);
+    }
+}
+
 
 .splash-tagline {
     font-size: clamp(10px, 1.5vw, 12px);
