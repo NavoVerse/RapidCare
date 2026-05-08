@@ -446,11 +446,11 @@ function openMedicineHub() {
     if (splash) {
         splash.classList.add('active');
         
-        // Wait for splash animation then redirect
+        // Wait for splash animation then redirect to unified route
         setTimeout(() => {
-            window.location.href = '../../medicine_hub/index.html';
+            window.location.href = '/medicine-hub';
         }, 1500);
     } else {
-        window.location.href = '../../medicine_hub/index.html';
+        window.location.href = '/medicine-hub';
     }
 }

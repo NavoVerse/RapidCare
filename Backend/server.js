@@ -21,6 +21,7 @@ const { initializeDB, knex } = require('./db');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const logger = require('./services/logger.service');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fs = require('fs');
 const admin = require('firebase-admin');
 
 // In-memory store for simulation or live FCM routing
@@ -157,6 +158,19 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_rapidcare_key_2026';
 
+// ── Medicine Hub: Data Loading ───────────────────────────────────────────────
+let medicineDb = { medicines: [], kits: [], oxygen: {}, devices: [], ayurveda: [] };
+try {
+    const productsPath = path.resolve(__dirname, '../medicine_hub/backend/products.json');
+    if (fs.existsSync(productsPath)) {
+        const data = fs.readFileSync(productsPath, 'utf8');
+        medicineDb = JSON.parse(data);
+        logger.info('[Medicine Hub] Product database loaded successfully.');
+    }
+} catch (err) {
+    logger.error('[Medicine Hub] Error loading products:', err);
+}
+
 // ── Services ────────────────────────────────────────────────────────────────
 const notificationService = require('./services/notification.service');
 
@@ -190,6 +204,7 @@ app.use('/insurance', express.static(path.resolve(__dirname, '../Frontend/Insura
 app.use('/admin/export', express.static(path.resolve(__dirname, '../Frontend/excel_dashboard')));
 app.use('/urgency', express.static(path.resolve(__dirname, '../Frontend/login_urgency')));
 app.use('/dev', express.static(path.resolve(__dirname, '../Frontend/DeveloperDashboard')));
+app.use('/medicine-hub', express.static(path.resolve(__dirname, '../medicine_hub')));
 app.use('/', express.static(path.resolve(__dirname, '../Frontend/choose_User')));
 
 // ── Static: Backend Scripts (for frontend consumption) ──────────────────────
@@ -804,6 +819,70 @@ app.post('/api/v1/medical_records', authenticateToken, authorize('patient', 'hos
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+});
+
+// =============================================================================
+// MEDICINE HUB API (/api/medicines, /api/chat, etc.)
+// =============================================================================
+
+// 1. Get Medicines (with filter)
+app.get('/api/medicines', (req, res) => {
+    const { category, search } = req.query;
+    let filtered = [...(medicineDb.medicines || [])];
+
+    if (category && category !== 'All') {
+        filtered = filtered.filter(p => p.category === category);
+    }
+
+    if (search) {
+        const query = search.toLowerCase();
+        filtered = filtered.filter(p => 
+            p.name.toLowerCase().includes(query) || 
+            (p.molecule && p.molecule.toLowerCase().includes(query))
+        );
+    }
+
+    res.json(filtered);
+});
+
+// 2. Medula AI Chat
+app.post('/api/chat', async (req, res) => {
+    const { message } = req.body;
+    if (!message) return res.status(400).json({ error: "Message is required" });
+
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    if (!apiKey) {
+        return res.json({ reply: "I'm Medula, but I need an API key to think. Please configure GEMINI_API_KEY." });
+    }
+
+    try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const medulaModel = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash",
+            systemInstruction: "You are Medula, a friendly medical assistant for RapidCare. Help users find medicines and give health tips. disclaimer: always consult a doctor. Keep it short."
+        });
+
+        const result = await medulaModel.generateContent(message);
+        const text = result.response.text();
+        res.json({ reply: text });
+    } catch (err) {
+        logger.error('[Medula AI Error]', err);
+        res.json({ reply: "I'm having a small headache right now. Can we talk in a minute?" });
+    }
+});
+
+// 3. Category Endpoints
+app.get('/api/kits', (req, res) => res.json(medicineDb.kits || []));
+app.get('/api/oxygen', (req, res) => res.json(medicineDb.oxygen || {}));
+app.get('/api/devices', (req, res) => res.json(medicineDb.devices || []));
+app.get('/api/ayurveda', (req, res) => res.json(medicineDb.ayurveda || []));
+
+// 4. Place Order
+app.post('/api/order', (req, res) => {
+    const { items, total } = req.body;
+    const orderId = 'RC-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    logger.info(`[Medicine Hub] Order received: ${orderId}`, { items, total });
+    res.json({ success: true, orderId });
 });
 
 // Update a medical record
