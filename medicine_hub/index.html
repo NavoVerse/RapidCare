@@ -3215,12 +3215,11 @@
       box-shadow: 0 8px 25px rgba(245, 166, 35, 0.4);
     }
 
-    /* ── PRODUCT MODAL ── */
-    /* ── PRODUCT MODAL (PREMIUM DARK) ── */
+    /* ── PRODUCT MODAL (PREMIUM HORIZONTAL & ANIMATIVE) ── */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.9);
       z-index: 100000;
       display: flex;
       align-items: center;
@@ -3237,54 +3236,61 @@
     }
 
     .prod-modal {
-      background: #111114;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 40px;
-      max-width: 440px;
+      background: #0d0d0f;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 32px;
+      max-width: 680px;
       width: 100%;
-      padding: 30px;
       display: flex;
-      flex-direction: column;
-      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+      flex-direction: row;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
       transform: scale(0.9) translateY(40px);
       transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
+      overflow: hidden;
     }
 
     .modal-overlay.active .prod-modal {
       transform: scale(1) translateY(0);
     }
 
-    .pm-top-row {
+    .pm-left {
+      flex: 0 0 240px;
+      background: linear-gradient(180deg, rgba(217, 59, 101, 0.05) 0%, transparent 100%);
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      margin-bottom: 25px;
+      justify-content: center;
+      padding: 40px 20px;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
     }
 
-    .pm-category-badge {
-      background: var(--amber);
-      color: #000;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 6px 14px;
-      border-radius: 20px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+    .pm-right {
+      flex: 1;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
 
+    /* Close Button */
     .pm-close {
-      background: rgba(255, 255, 255, 0.08);
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.2s;
+      z-index: 10;
     }
 
     .pm-close:hover {
@@ -3292,138 +3298,121 @@
       transform: rotate(90deg);
     }
 
-    .pm-visual-sec {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 30px;
-      position: relative;
+    /* Animations */
+    @keyframes pmSlideRight {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pmFadeUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-overlay.active .pm-icon-circle { animation: pmFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .modal-overlay.active .pm-category-badge { animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+    .modal-overlay.active .pm-type { animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+    .modal-overlay.active .pm-name-main { animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+    .modal-overlay.active .pm-subtitle { animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both; }
+    .modal-overlay.active .pm-stats-grid { animation: pmFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
+    .modal-overlay.active .pm-price-sec { animation: pmFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+    .modal-overlay.active .pm-main-actions { animation: pmFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both; }
+
+    .pm-category-badge {
+      background: var(--amber);
+      color: #000;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+      display: inline-block;
     }
 
     .pm-icon-circle {
-      width: 120px;
-      height: 120px;
+      width: 110px;
+      height: 110px;
       border-radius: 50%;
       background: #D93B65;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      box-shadow: 0 0 40px rgba(217, 59, 101, 0.3);
+      box-shadow: 0 0 30px rgba(217, 59, 101, 0.2);
     }
 
     .pm-icon-circle::after {
       content: '';
       position: absolute;
-      inset: -12px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      inset: -10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 50%;
     }
 
     .pm-pill-svg {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       fill: #fff;
     }
 
-    .pm-meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .pm-heart-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: transparent;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    .pm-stock-pill {
-      background: rgba(26, 122, 74, 0.1);
-      border: 1px solid rgba(26, 122, 74, 0.2);
-      padding: 6px 14px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .pm-stock-dot {
-      width: 6px;
-      height: 6px;
-      background: #1a7a4a;
-      border-radius: 50%;
-    }
-
-    .pm-stock-text {
-      font-size: 10px;
-      font-weight: 700;
-      color: #1a7a4a;
-    }
-
     .pm-type {
-      font-size: 10px;
+      font-size: 9px;
       letter-spacing: 2px;
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.3);
       text-transform: uppercase;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .pm-name-main {
       font-family: var(--headline);
-      font-size: 44px;
+      font-size: 38px;
       color: #fff;
       line-height: 1;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .pm-name-main span {
       color: var(--amber);
       font-style: italic;
-      font-size: 0.9em;
-      margin-left: 10px;
+      font-size: 0.85em;
+      margin-left: 8px;
     }
 
     .pm-subtitle {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.5);
-      margin-bottom: 25px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 20px;
     }
 
     .pm-stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 30px;
+      gap: 10px;
+      margin-bottom: 24px;
     }
 
     .pm-stat-box {
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       background: rgba(255, 255, 255, 0.02);
-      border-radius: 16px;
-      padding: 14px 10px;
+      border-radius: 12px;
+      padding: 10px 8px;
       text-align: center;
     }
 
     .pm-stat-lbl {
-      font-size: 9px;
-      color: rgba(255, 255, 255, 0.3);
+      font-size: 8px;
+      color: rgba(255, 255, 255, 0.25);
       text-transform: uppercase;
       font-weight: 700;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
     }
 
     .pm-stat-val {
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 700;
       color: #fff;
     }
@@ -3433,50 +3422,50 @@
     .pm-price-sec {
       display: flex;
       align-items: baseline;
-      gap: 12px;
-      margin-bottom: 25px;
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     .pm-price-main {
       display: flex;
       align-items: flex-start;
-      gap: 4px;
+      gap: 3px;
     }
 
     .pm-currency {
-      font-size: 16px;
+      font-size: 14px;
       color: var(--amber);
       font-weight: 700;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .pm-price-val {
       font-family: var(--headline);
-      font-size: 64px;
+      font-size: 48px;
       color: #fff;
       line-height: 1;
     }
 
     .pm-price-orig {
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.2);
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.15);
       text-decoration: line-through;
     }
 
     .pm-discount-tag {
-      background: rgba(245, 166, 35, 0.1);
+      background: rgba(245, 166, 35, 0.08);
       color: var(--amber);
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 6px;
+      padding: 3px 8px;
+      border-radius: 5px;
       margin-left: 4px;
     }
 
     .pm-savings {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.4);
-      margin-top: 10px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.3);
+      margin-top: 6px;
     }
 
     .pm-savings span { color: var(--amber); }
@@ -3484,59 +3473,100 @@
     .pm-main-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 30px;
+      gap: 12px;
+      margin-top: auto;
     }
 
     .pm-btn {
-      border-radius: 16px;
-      padding: 16px 10px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: transparent;
+      border-radius: 14px;
+      padding: 12px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       transition: all 0.2s;
     }
 
     .pm-btn:hover {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.05);
       transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.15);
     }
 
-    .pm-btn-icon {
-      font-size: 20px;
+    .pm-btn-icon { font-size: 18px; }
+    .pm-btn-title { font-size: 12px; font-weight: 700; color: #fff; }
+    .pm-btn-sub { font-size: 9px; color: rgba(255, 255, 255, 0.3); }
+
+    .pm-meta-row {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 25px;
     }
 
-    .pm-btn-title {
-      font-size: 13px;
-      font-weight: 700;
+    .pm-heart-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: transparent;
       color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
 
-    .pm-btn-sub {
-      font-size: 10px;
-      color: rgba(255, 255, 255, 0.4);
+    .pm-stock-pill {
+      background: rgba(26, 122, 74, 0.08);
+      border: 1px solid rgba(26, 122, 74, 0.15);
+      padding: 5px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
+
+    .pm-stock-dot { width: 5px; height: 5px; background: #1a7a4a; border-radius: 50%; }
+    .pm-stock-text { font-size: 9px; font-weight: 700; color: #1a7a4a; }
 
     .pm-footer-badges {
       display: flex;
       justify-content: center;
-      gap: 15px;
-      margin-top: 30px;
-      opacity: 0.3;
+      gap: 12px;
+      margin-top: 20px;
+      opacity: 0.2;
     }
 
     .pm-fbadge {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 10px;
+      gap: 5px;
+      font-size: 9px;
       color: #fff;
       font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .prod-modal {
+        flex-direction: column;
+        max-width: 400px;
+      }
+      .pm-left {
+        flex: 0 0 auto;
+        padding: 30px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .pm-right {
+        padding: 24px;
+      }
+      .pm-name-main { font-size: 32px; }
+      .pm-price-val { font-size: 40px; }
     }
 
     /* Ripple effect */
@@ -6786,85 +6816,78 @@
     <!-- PRODUCT MODAL -->
     <div class="modal-overlay" id="modalOverlay">
       <div class="prod-modal" id="prodModal">
-        <!-- Header -->
-        <div class="pm-top-row">
-          <div class="pm-category-badge" id="pmTag">Antibiotics</div>
-          <button class="pm-close" id="closeModal">✕</button>
-        </div>
-
-        <!-- Visual -->
-        <div class="pm-visual-sec">
+        <!-- Visual Section (Left) -->
+        <div class="pm-left">
           <div class="pm-icon-circle">
             <svg class="pm-pill-svg" viewBox="0 0 24 24">
               <path d="M19,10H16V7a5,5,0,0,0-10,0v3H3a1,1,0,0,0-1,1v8a5,5,0,0,0,5,5H17a5,5,0,0,0,5-5V11A1,1,0,0,0,19,10ZM8,7a3,3,0,0,1,6,0v3H8Zm12,12a3,3,0,0,1-3,3H7a3,3,0,0,1-3-3V12H20Z" />
             </svg>
           </div>
-        </div>
-
-        <!-- Meta -->
-        <div class="pm-meta-row">
-          <button class="pm-heart-btn">❤️</button>
-          <div class="pm-stock-pill">
-            <span class="pm-stock-dot"></span>
-            <span class="pm-stock-text">In stock</span>
-          </div>
-        </div>
-
-        <!-- Body -->
-        <div class="pm-type">Prescription Medicine</div>
-        <div class="pm-name-main" id="pmName">Azithromycin <span>500</span></div>
-        <div class="pm-subtitle"><span id="pmMol">Azithromycin</span> - Strip of 5 tablets</div>
-
-        <!-- Stats -->
-        <div class="pm-stats-grid">
-          <div class="pm-stat-box">
-            <div class="pm-stat-lbl">Delivery</div>
-            <div class="pm-stat-val amber">30 mins</div>
-          </div>
-          <div class="pm-stat-box">
-            <div class="pm-stat-lbl">Verified</div>
-            <div class="pm-stat-val">CDSCO</div>
-          </div>
-          <div class="pm-stat-box">
-            <div class="pm-stat-lbl">Fee</div>
-            <div class="pm-stat-val">Free</div>
-          </div>
-        </div>
-
-        <!-- Price -->
-        <div class="pm-price-sec">
-          <div class="pm-price-main">
-            <span class="pm-currency">₹</span>
-            <span class="pm-price-val" id="pmPrice">89</span>
-          </div>
-          <div style="margin-left: 10px;">
-            <div style="display:flex; align-items:center;">
-              <span class="pm-price-orig" id="pmMrp">₹112</span>
-              <span class="pm-discount-tag">21% off</span>
+          <div class="pm-meta-row">
+            <button class="pm-heart-btn">❤️</button>
+            <div class="pm-stock-pill">
+              <span class="pm-stock-dot"></span>
+              <span class="pm-stock-text">In stock</span>
             </div>
           </div>
-        </div>
-        <div class="pm-savings">You save <span>₹23</span> on this order</div>
-
-        <!-- Actions -->
-        <div class="pm-main-actions">
-          <button class="pm-btn" id="pmBookNow">
-            <span class="pm-btn-icon">⚡</span>
-            <span class="pm-btn-title">Immediate Book</span>
-            <span class="pm-btn-sub">Instant Dispatch</span>
-          </button>
-          <button class="pm-btn" id="pmAddToCart">
-            <span class="pm-btn-icon">🛒</span>
-            <span class="pm-btn-title">Add to Cart</span>
-            <span class="pm-btn-sub">Save for later</span>
-          </button>
+          <div class="pm-footer-badges">
+            <div class="pm-fbadge">🛡️ Genuine</div>
+            <div class="pm-fbadge">✨ WHO-GMP</div>
+          </div>
         </div>
 
-        <!-- Footer -->
-        <div class="pm-footer-badges">
-          <div class="pm-fbadge">🛡️ Genuine</div>
-          <div class="pm-fbadge">✨ WHO-GMP</div>
-          <div class="pm-fbadge">🔒 Secure</div>
+        <!-- Info Section (Right) -->
+        <div class="pm-right">
+          <button class="pm-close" id="closeModal">✕</button>
+          <div class="pm-category-badge" id="pmTag">Antibiotics</div>
+          <div class="pm-type">Prescription Medicine</div>
+          <div class="pm-name-main" id="pmName">Azithromycin <span>500</span></div>
+          <div class="pm-subtitle"><span id="pmMol">Azithromycin</span> - Strip of 5 tablets</div>
+
+          <!-- Stats -->
+          <div class="pm-stats-grid">
+            <div class="pm-stat-box">
+              <div class="pm-stat-lbl">Delivery</div>
+              <div class="pm-stat-val amber">30 mins</div>
+            </div>
+            <div class="pm-stat-box">
+              <div class="pm-stat-lbl">Verified</div>
+              <div class="pm-stat-val">CDSCO</div>
+            </div>
+            <div class="pm-stat-box">
+              <div class="pm-stat-lbl">Fee</div>
+              <div class="pm-stat-val">Free</div>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="pm-price-sec">
+            <div class="pm-price-main">
+              <span class="pm-currency">₹</span>
+              <span class="pm-price-val" id="pmPrice">89</span>
+            </div>
+            <div style="margin-left: 10px;">
+              <div style="display:flex; align-items:center;">
+                <span class="pm-price-orig" id="pmMrp">₹112</span>
+                <span class="pm-discount-tag">21% off</span>
+              </div>
+              <div class="pm-savings">Save <span>₹23</span></div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="pm-main-actions">
+            <button class="pm-btn" id="pmBookNow">
+              <span class="pm-btn-icon">⚡</span>
+              <span class="pm-btn-title">Immediate Book</span>
+              <span class="pm-btn-sub">Express Dispatch</span>
+            </button>
+            <button class="pm-btn" id="pmAddToCart">
+              <span class="pm-btn-icon">🛒</span>
+              <span class="pm-btn-title">Add to Cart</span>
+              <span class="pm-btn-sub">Save to List</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

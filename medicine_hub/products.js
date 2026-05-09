@@ -439,10 +439,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (savingsEl) savingsEl.innerText = `₹${savings}`;
 
     // Update icon circle color based on product color class
+    const pmLeft = document.querySelector(".pm-left");
     if (pmIconCircle) {
       // Remove previous color classes if any
       pmIconCircle.className = "pm-icon-circle"; 
-      // Mapping background classes to hex or just adding them
+      // Mapping background classes to hex
       const colorMap = {
         'bg-teal': '#008080',
         'bg-amber': '#F5A623',
@@ -454,7 +455,11 @@ document.addEventListener("DOMContentLoaded", () => {
       };
       const bgColor = colorMap[product.color] || '#D93B65';
       pmIconCircle.style.backgroundColor = bgColor;
-      pmIconCircle.style.boxShadow = `0 0 40px ${bgColor}4d`; // 30% opacity
+      pmIconCircle.style.boxShadow = `0 0 30px ${bgColor}4d`; // 30% opacity
+      
+      if (pmLeft) {
+        pmLeft.style.background = `linear-gradient(180deg, ${bgColor}1a 0%, transparent 100%)`; // 10% opacity
+      }
     }
 
     modalOverlay.classList.add("active");
