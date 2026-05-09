@@ -51,6 +51,8 @@ body {
     cursor: auto;
     height: 100%;
     margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 
@@ -989,21 +991,11 @@ canvas#particles {
 
 /* ── Breathing neon glow ── */
 @keyframes glowPulse {
-
-    0%,
-    100% {
-        text-shadow:
-            0 0 10px rgba(147, 197, 253, 0.3),
-            0 0 30px rgba(96, 165, 250, 0.2),
-            0 0 60px rgba(59, 130, 246, 0.1);
+    0%, 100% {
+        text-shadow: 0 0 15px rgba(147, 197, 253, 0.3);
     }
-
     50% {
-        text-shadow:
-            0 0 15px rgba(147, 197, 253, 0.5),
-            0 0 40px rgba(96, 165, 250, 0.35),
-            0 0 80px rgba(59, 130, 246, 0.2),
-            0 0 120px rgba(59, 130, 246, 0.08);
+        text-shadow: 0 0 35px rgba(147, 197, 253, 0.6);
     }
 }
 
@@ -1302,6 +1294,10 @@ section {
     position: relative;
     overflow: hidden;
     padding: 120px 40px;
+    contain: content;
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 1000px;
+    transform: translateZ(0);
 }
 
 .tag {
@@ -1333,13 +1329,17 @@ section {
 @keyframes fadeUp {
     from {
         opacity: 0;
-        transform: translateY(24px);
+        transform: translateY(24px) translateZ(0);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) translateZ(0);
     }
+}
+
+.reveal, .step, .role-card {
+    will-change: transform, opacity;
 }
 
 /* ─── GLOBE SECTION ─── */
@@ -1831,16 +1831,22 @@ canvas#globe {
 }
 
 .faq-a {
-    max-height: 0;
+    display: grid;
+    grid-template-rows: 0fr;
     opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, margin-top 0.4s ease;
+    transition: grid-template-rows 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, margin-top 0.4s ease;
+    will-change: grid-template-rows, opacity;
 }
 
 .faq-item.active .faq-a {
-    max-height: 300px;
+    grid-template-rows: 1fr;
     opacity: 1;
     margin-top: 16px;
+}
+
+.faq-a-inner {
+    overflow: hidden;
+    transform: translateZ(0);
 }
 
 .faq-a p {

@@ -211,11 +211,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = sphereGrad;
             ctx.fill();
 
-            /* Latitude lines — Optimized 5° resolution */
+            /* Latitude lines — Optimized 10° resolution for performance */
             for (let lat = -80; lat <= 80; lat += 20) {
                 ctx.beginPath();
                 let first = true;
-                for (let lon = -180; lon <= 180; lon += 5) {
+                for (let lon = -180; lon <= 180; lon += 10) {
                     const p = ll2xy(lat, lon, R, rot);
                     if (!p.vis) { first = true; continue; }
                     first ? (ctx.moveTo(p.x, p.y), first = false) : ctx.lineTo(p.x, p.y);
@@ -226,11 +226,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.stroke();
             }
 
-            /* Longitude lines — Optimized 5° resolution */
+            /* Longitude lines — Optimized 10° resolution */
             for (let lon = -180; lon < 180; lon += 20) {
                 ctx.beginPath();
                 let first = true;
-                for (let lat = -85; lat <= 85; lat += 5) {
+                for (let lat = -80; lat <= 80; lat += 10) {
                     const p = ll2xy(lat, lon, R, rot);
                     if (!p.vis) { first = true; continue; }
                     first ? (ctx.moveTo(p.x, p.y), first = false) : ctx.lineTo(p.x, p.y);
