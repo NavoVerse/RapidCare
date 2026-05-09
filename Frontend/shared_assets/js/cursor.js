@@ -84,39 +84,39 @@
     })();
   }
   
-  // ── Hover Effects ──
-  function updateHoverListeners() {
-    if (isTouch) return;
-    document.querySelectorAll('a, button, .stat-card, .amb-card, .tr-row, input, select, textarea, [role="button"]').forEach(el => {
-      if (el.dataset.cursorBound) return;
-      el.dataset.cursorBound = 'true';
-      el.addEventListener('mouseenter', () => { 
-        if (!effectsEnabled) return;
-        dot.classList.add('hover'); 
-        ring.classList.add('hover'); 
-      });
-      el.addEventListener('mouseleave', () => { 
-        dot.classList.remove('hover'); 
-        ring.classList.remove('hover'); 
-      });
-    });
-  }
-  updateHoverListeners();
-  if (!isTouch) setInterval(updateHoverListeners, 2000);
+  // ── Hover Effects (Optimized with Event Delegation) ──
+  document.addEventListener('mouseover', e => {
+    if (isTouch || !effectsEnabled) return;
+    const target = e.target.closest('a, button, .stat-card, .amb-card, .tr-row, input, select, textarea, [role="button"], .role-card, .faq-item, .btn-prim, .btn-out, .med-hub-popup');
+    if (target) {
+      dot.classList.add('hover'); 
+      ring.classList.add('hover');
+    }
+  });
+
+  document.addEventListener('mouseout', e => {
+    if (isTouch || !effectsEnabled) return;
+    const target = e.target.closest('a, button, .stat-card, .amb-card, .tr-row, input, select, textarea, [role="button"], .role-card, .faq-item, .btn-prim, .btn-out, .med-hub-popup');
+    if (target) {
+      dot.classList.remove('hover'); 
+      ring.classList.remove('hover');
+    }
+  });
   
-  // ── Cursor Trail ──
+  // ── Cursor Trail (Throttled) ──
   function spawnTrail(x, y) {
-    if (!effectsEnabled) return;
+    if (!effectsEnabled || isTouch) return;
     const now = Date.now();
-    if (now - lastTrail < 35) return;
+    if (now - lastTrail < 45) return; // Increased throttle for better performance
     lastTrail = now;
+    
     const el = document.createElement('div');
     el.className = 'cursor-trail';
-    const size = Math.random() * 6 + 4;
+    const size = Math.random() * 5 + 3;
     const palette = getPalette();
     el.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:${palette[Math.floor(Math.random() * palette.length)]};`;
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 500);
+    setTimeout(() => el.remove(), 400); // Shorter lifetime
   }
   
   // ── Click Splash ──

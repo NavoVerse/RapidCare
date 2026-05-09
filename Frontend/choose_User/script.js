@@ -1,22 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── PARTICLE SYSTEM ─── */
-    window.initParticles = function() {
+    (function() {
         const c = document.getElementById('particles');
         if (!c) return;
-        const ctx = c.getContext('2d');
+        const ctx = c.getContext('2d', { alpha: true });
         let W, H, pts = [];
-        function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
-        resize(); window.addEventListener('resize', resize);
-        function mkPt() {
-            return { x: Math.random() * W, y: Math.random() * H,
-                     vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
-                     r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35 };
+        let isVisible = false;
+        
+        function resize() { 
+            W = c.width = window.innerWidth; 
+            H = c.height = window.innerHeight; 
         }
-        for (let i = 0; i < 45; i++) pts.push(mkPt());
+        resize(); window.addEventListener('resize', resize);
+        
+        function mkPt() {
+            return { 
+                x: Math.random() * W, y: Math.random() * H,
+                vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
+                r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35 
+            };
+        }
+        for (let i = 0; i < 40; i++) pts.push(mkPt());
+        
         const dSqLimit = 100 * 100;
+        
         function draw() {
             ctx.clearRect(0, 0, W, H);
+            
+            // Draw particles
             pts.forEach(p => {
                 p.x += p.vx; p.y += p.vy;
                 if (p.x < 0 || p.x > W) p.vx *= -1;
@@ -25,9 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillStyle = `rgba(147,197,253,${p.a})`; ctx.fill();
             });
             
-            /* Optimized Line System — fewer connections */
+            /* Optimized Line System — single stroke for all lines */
             ctx.beginPath();
-            ctx.strokeStyle = 'rgba(147,197,253,0.15)';
+            ctx.strokeStyle = 'rgba(147,197,253,0.12)';
             ctx.lineWidth = 0.5;
             for (let i = 0; i < pts.length; i++) {
                 const a = pts[i];
@@ -41,10 +53,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             ctx.stroke();
-            requestAnimationFrame(draw);
+            
+            if (isVisible) requestAnimationFrame(draw);
         }
-        draw();
-    };
+        
+        const observer = new IntersectionObserver(entries => {
+            const wasVisible = isVisible;
+            isVisible = entries[0].isIntersecting;
+            if (isVisible && !wasVisible) draw();
+        }, { threshold: 0 });
+        
+        window.initParticles = function() {
+            observer.observe(c);
+            draw();
+        };
+    })();
+
 
     /* ─── FLASH SCREEN, LOADING SOUND & TITLE SCRAMBLE ─── */
     (function() {
@@ -173,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 /* Start heavy canvas animations ONLY after flash is gone */
                 if (window.initParticles) window.initParticles();
                 if (window.initGlobe) window.initGlobe();
-            }, 3200);
+            }, 3000);
 
             /* Cleanup: remove flash screen from DOM after transition completes */
             setTimeout(() => {
@@ -324,7 +348,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* City pulse dots — optimized layer rendering */
             mapped.forEach(p => {
-                const pulse  = Math.sin(now * 0.0025 + p.x * 0.05) * 0.5 + 0.5;
                 const depthFade = 0.65 + 0.35 * (p.z / R);
 
                 /* Grouped fills for performance */
@@ -344,12 +367,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fill();
             });
 
-            requestAnimationFrame(drawGlobe);
+            if (lastTime) requestAnimationFrame(drawGlobe);
         }
 
         /* Encapsulate globe start */
         window.initGlobe = function() {
-            requestAnimationFrame(drawGlobe);
+            const globeObserver = new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting) {
+                    if (!lastTime) {
+                        lastTime = performance.now();
+                        requestAnimationFrame(drawGlobe);
+                    }
+                } else {
+                    lastTime = 0; // Stop loop
+                }
+            }, { threshold: 0 });
+            globeObserver.observe(c);
         };
     })();
 

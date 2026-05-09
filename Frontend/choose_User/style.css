@@ -92,15 +92,8 @@ body {
 
 @keyframes grainMove {
     0%, 100% { transform:translate(0, 0); }
-    10% { transform:translate(-5%, -10%); }
-    20% { transform:translate(-15%, 5%); }
-    30% { transform:translate(7%, -25%); }
-    40% { transform:translate(-5%, 25%); }
-    50% { transform:translate(-15%, 10%); }
-    60% { transform:translate(15%, 0%); }
-    70% { transform:translate(0%, 15%); }
-    80% { transform:translate(3%, 35%); }
-    90% { transform:translate(-10%, 10%); }
+    33% { transform:translate(-2%, -2%); }
+    66% { transform:translate(2%, 2%); }
 }
 
 /* ── Enhanced Radial Vignette ── */
@@ -251,8 +244,9 @@ body.flash-revealed section:not(#splash) {
 .flash-orb {
     position: absolute;
     border-radius: 50%;
-    filter: blur(80px);
+    filter: blur(60px);
     opacity: 0;
+    will-change: transform, opacity;
     animation: flashOrbIn 1.5s ease forwards;
 }
 
@@ -1717,12 +1711,7 @@ canvas#globe {
 }
 
 /* SECTION FADE IN */
-.reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity .5s cubic-bezier(.25, .46, .45, .94), transform .5s cubic-bezier(.25, .46, .45, .94);
-    will-change: opacity, transform;
-}
+/* Reveal class placeholder - actual styles at bottom */
 
 .reveal.vis {
     opacity: 1;
@@ -2391,14 +2380,14 @@ canvas#globe {
 /* ─── PERFORMANCE OPTIMIZATIONS ─── */
 section {
     contain: content;
-    will-change: transform, opacity;
 }
 
+/* Optimized reveal styles */
 .reveal {
     opacity: 0;
-    transform: translateY(30px) scale(0.98);
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform, opacity;
+    transform: translateY(24px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
 }
 
 .reveal.vis {

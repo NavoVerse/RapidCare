@@ -495,12 +495,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- ATTACH EVENTS ---
   
-  // Intercept all clicks on prod-cards across the whole document
   document.body.addEventListener("click", (e) => {
     const card = e.target.closest(".prod-card");
     if (!card) return;
     
-    // If clicked exactly on "Add" button, we handle it separately
     const isAddBtn = e.target.closest(".add-btn");
     
     const nameEl = card.querySelector(".prod-name");
@@ -509,7 +507,6 @@ document.addEventListener("DOMContentLoaded", () => {
     
     let product = allProducts.find(p => name.includes(p.name) || p.name.includes(name));
     
-    // Fallback for static cards in HTML not present in allProducts array
     if (!product) {
       const priceText = card.querySelector(".prod-price") ? card.querySelector(".prod-price").innerText.replace("₹", "") : "100";
       const mrpText = card.querySelector(".prod-mrp") ? card.querySelector(".prod-mrp").innerText.replace("₹", "") : "120";
@@ -518,7 +515,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const molEl = card.querySelector(".prod-mfr");
       
       product = {
-        id: name.toLowerCase().replace(/\\s+/g, '-'),
+        id: name.toLowerCase().replace(/\s+/g, '-'),
         name: name,
         molecule: molEl ? molEl.innerText : "Medicine",
         category: tagEl ? tagEl.innerText : "General",
@@ -535,6 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     openModal(product);
   });
+
 
   // Modal Buttons
   document.getElementById("pmAddToCart").addEventListener("click", () => {
