@@ -32,7 +32,7 @@ try {
     const fs = require('fs');
     const serviceAccountPath = path.resolve(__dirname, 'firebase-service-account.json');
     let serviceAccount;
-    
+
     if (fs.existsSync(serviceAccountPath)) {
         serviceAccount = require(serviceAccountPath);
     } else {
@@ -412,7 +412,7 @@ app.get('/api/v1/hospitals/external-details', async (req, res) => {
 
         const result = await model.generateContent(prompt);
         const text = result.response.text();
-        
+
         let details;
         try {
             const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -836,8 +836,8 @@ app.get('/api/medicines', (req, res) => {
 
     if (search) {
         const query = search.toLowerCase();
-        filtered = filtered.filter(p => 
-            p.name.toLowerCase().includes(query) || 
+        filtered = filtered.filter(p =>
+            p.name.toLowerCase().includes(query) ||
             (p.molecule && p.molecule.toLowerCase().includes(query))
         );
     }
@@ -857,7 +857,7 @@ app.post('/api/chat', async (req, res) => {
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const medulaModel = genAI.getGenerativeModel({ 
+        const medulaModel = genAI.getGenerativeModel({
             model: "gemini-1.5-flash",
             systemInstruction: "You are Medula, a friendly medical assistant for RapidCare. Help users find medicines and give health tips. disclaimer: always consult a doctor. Keep it short."
         });
@@ -1126,10 +1126,10 @@ app.put('/api/v1/appointments/:id', authenticateToken, async (req, res) => {
 // POST /api/v1/triage — AI Triage assessment
 app.post('/api/v1/triage', authenticateToken, async (req, res) => {
     const { heart_rate, blood_pressure, spo2, complaint } = req.body;
-    
+
     let triageLevel = 'STANDARD';
     let rationale = 'Rule-based evaluation applied.';
-    
+
     // BP Parsing e.g. "140/90"
     let systolic = 120;
     if (blood_pressure && blood_pressure.toString().includes('/')) {
@@ -1149,7 +1149,7 @@ app.post('/api/v1/triage', authenticateToken, async (req, res) => {
         try {
             const genAI = new GoogleGenerativeAI(apiKey);
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-            
+
             const prompt = `
                 You are an expert emergency medical triage AI.
                 Evaluate the following patient condition and vital signs:
@@ -1167,7 +1167,7 @@ app.post('/api/v1/triage', authenticateToken, async (req, res) => {
 
             const result = await model.generateContent(prompt);
             const text = result.response.text();
-            
+
             const jsonMatch = text.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
                 const parsed = JSON.parse(jsonMatch[0]);
@@ -1190,11 +1190,11 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
 
@@ -1579,14 +1579,14 @@ app.put('/api/v1/trips/:id/status', authenticateToken, authorize('driver'), asyn
         const updateData = { status };
         if (status === 'completed') {
             updateData.end_time = knex.fn.now();
-            
+
             // Auto-query patient's active insurance policies and generate draft claim
             try {
                 const policy = await knex('insurance_policies').where({ patient_id: trip.patient_id, status: 'active' }).first();
                 if (policy) {
                     const hospitalRecord = await knex('hospitals').where({ user_id: trip.hospital_id }).first();
                     const hospId = hospitalRecord ? hospitalRecord.id : null;
-                    
+
                     const claimData = {
                         patient_id: trip.patient_id,
                         policy_id: policy.id,
@@ -1596,7 +1596,7 @@ app.put('/api/v1/trips/:id/status', authenticateToken, authorize('driver'), asyn
                         reference_number: 'CLM-' + Date.now(),
                         hospital_id: hospId
                     };
-                    
+
                     await knex('insurance_claims').insert(claimData);
                     logger.info(`[Auto-Claim] Created auto insurance claim for trip ${trip.id}, patient ${trip.patient_id}`);
                 }
@@ -1667,13 +1667,13 @@ app.post('/api/v1/insurance/claims/auto', authenticateToken, async (req, res) =>
     try {
         const trip = await knex('trips').where({ id: trip_id }).first();
         if (!trip) return res.status(404).json({ error: 'Trip not found' });
-        
+
         const policy = await knex('insurance_policies').where({ patient_id: trip.patient_id, status: 'active' }).first();
         if (!policy) return res.status(400).json({ error: 'No active insurance policy found' });
-        
+
         const hospitalRecord = await knex('hospitals').where({ user_id: trip.hospital_id }).first();
         const hospId = hospitalRecord ? hospitalRecord.id : null;
-        
+
         const claimData = {
             patient_id: trip.patient_id,
             policy_id: policy.id,
@@ -1683,7 +1683,7 @@ app.post('/api/v1/insurance/claims/auto', authenticateToken, async (req, res) =>
             reference_number: 'CLM-' + Date.now(),
             hospital_id: hospId
         };
-        
+
         const [claimId] = await knex('insurance_claims').insert(claimData).returning('id');
         const cId = typeof claimId === 'object' ? claimId.id : claimId;
         res.json({ message: 'Claim auto-generated successfully', claim_id: cId });
@@ -1894,9 +1894,9 @@ app.get('/api/v1/hospital/me', authenticateToken, authorize('hospital'), async (
             .where('u.id', req.user.id)
             .select('u.name', 'u.email', 'u.phone', 'h.*')
             .first();
-        
+
         if (!hospital) return res.status(404).json({ error: 'Hospital profile not found' });
-        
+
         if (hospital.departments && typeof hospital.departments === 'string') {
             try {
                 hospital.departments = JSON.parse(hospital.departments);
@@ -1904,7 +1904,7 @@ app.get('/api/v1/hospital/me', authenticateToken, authorize('hospital'), async (
                 hospital.departments = [];
             }
         }
-        
+
         res.json(hospital);
     } catch (err) {
         res.status(500).json({ error: err.message });

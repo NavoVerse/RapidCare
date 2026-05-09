@@ -1,16 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── PARTICLE SYSTEM ─── */
+<<<<<<< HEAD
     (function() {
+=======
+    window.initParticles = function () {
+>>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
         const c = document.getElementById('particles');
         if (!c) return;
         const ctx = c.getContext('2d', { alpha: true });
         let W, H, pts = [];
+<<<<<<< HEAD
         let isVisible = false;
         
         function resize() { 
             W = c.width = window.innerWidth; 
             H = c.height = window.innerHeight; 
+=======
+        function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        function mkPt() {
+            return {
+                x: Math.random() * W, y: Math.random() * H,
+                vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
+                r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35
+            };
+>>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
         }
         resize(); window.addEventListener('resize', resize);
         
@@ -36,8 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(147,197,253,${p.a})`; ctx.fill();
             });
+<<<<<<< HEAD
             
             /* Optimized Line System — single stroke for all lines */
+=======
+
+            /* Optimized Line System — fewer connections */
+>>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
             ctx.beginPath();
             ctx.strokeStyle = 'rgba(147,197,253,0.12)';
             ctx.lineWidth = 0.5;
@@ -71,13 +91,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     /* ─── FLASH SCREEN, LOADING SOUND & TITLE SCRAMBLE ─── */
-    (function() {
+    (function () {
         const flashScreen = document.getElementById('flashScreen');
         const flashSub = flashScreen?.querySelector('.flash-sub');
-        
+
         if (!flashScreen) return;
 
         /* ── Web Audio: Synthesized loading chime ── */
+<<<<<<< HEAD
+=======
+        function playLoadingSound() {
+            try {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                if (!AC) return;
+                const ctx = new AC();
+
+                /* Deep ambient pad — faded in softly */
+                const padOsc = ctx.createOscillator();
+                const padGain = ctx.createGain();
+                const padFilter = ctx.createBiquadFilter();
+                padOsc.type = 'sine';
+                padOsc.frequency.setValueAtTime(110, ctx.currentTime);
+                padOsc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 2.5);
+                padFilter.type = 'lowpass';
+                padFilter.frequency.setValueAtTime(400, ctx.currentTime);
+                padGain.gain.setValueAtTime(0, ctx.currentTime);
+                padGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.8);
+                padGain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 2);
+                padGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 3);
+                padOsc.connect(padFilter);
+                padFilter.connect(padGain);
+                padGain.connect(ctx.destination);
+                padOsc.start(ctx.currentTime);
+                padOsc.stop(ctx.currentTime + 3.2);
+
+                /* Ascending chime notes — medical beep feel */
+                const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+                notes.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                    gain.gain.setValueAtTime(0, ctx.currentTime + 0.5 + i * 0.4);
+                    gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.6 + i * 0.4);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2 + i * 0.4);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + 0.5 + i * 0.4);
+                    osc.stop(ctx.currentTime + 1.4 + i * 0.4);
+                });
+
+                /* "Ready" confirmation tone at ~2.5s */
+                const readyOsc = ctx.createOscillator();
+                const readyGain = ctx.createGain();
+                readyOsc.type = 'sine';
+                readyOsc.frequency.setValueAtTime(880, ctx.currentTime);
+                readyGain.gain.setValueAtTime(0, ctx.currentTime + 2.4);
+                readyGain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 2.5);
+                readyGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.2);
+                readyOsc.connect(readyGain);
+                readyGain.connect(ctx.destination);
+                readyOsc.start(ctx.currentTime + 2.4);
+                readyOsc.stop(ctx.currentTime + 3.4);
+            } catch (e) { /* Audio not supported — silent fallback */ }
+        }
+>>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
 
         /* Dynamic status messages cycling during initialization */
         const messages = [
@@ -111,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const rect = title.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                
+
                 title.style.setProperty('--mouse-x', `${x}px`);
                 title.style.setProperty('--mouse-y', `${y}px`);
             });
@@ -124,8 +202,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const startSequence = () => {
             /* Hide splash content behind flash initially */
             document.body.classList.add('flash-active');
+<<<<<<< HEAD
             
             /* Sound removed per request */
+=======
+
+            /* Play loading sound */
+            playLoadingSound();
+>>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
 
             /* Stage 1 @ 2.4s: Fade out flash inner content (text floats up) */
             setTimeout(() => {
@@ -137,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 flashScreen.classList.add('hidden');
                 document.body.classList.remove('flash-active');
                 document.body.classList.add('flash-revealed');
-                
+
                 /* Start heavy canvas animations ONLY after flash is gone */
                 if (window.initParticles) window.initParticles();
                 if (window.initGlobe) window.initGlobe();
@@ -159,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 
     /* ─── GLOBE ─── */
-    (function() {
+    (function () {
         const c = document.getElementById('globe');
         if (!c) return;
         const ctx = c.getContext('2d', { alpha: true });
@@ -168,19 +252,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const ROT_SPEED = 0.20; // degrees per ms * 60fps ≈ 0.20°/frame equivalent
 
         const cities = [
-            [51.5,-0.12],[40.7,-74],[35.6,139.7],[28.6,77.2],
-            [48.8,2.35],[-33.8,151.2],[55.7,37.6],[19.4,-99.1],
-            [1.35,103.8],[25.2,55.3],[6.5,3.4],[30.04,31.2],
-            [-23.5,-46.6],[37.7,-122.4],[41.0,28.9],[22.5,88.3],
-            [3.1,101.7],[13.0,80.3],[59.9,30.3],[34.0,-118.2]
+            [51.5, -0.12], [40.7, -74], [35.6, 139.7], [28.6, 77.2],
+            [48.8, 2.35], [-33.8, 151.2], [55.7, 37.6], [19.4, -99.1],
+            [1.35, 103.8], [25.2, 55.3], [6.5, 3.4], [30.04, 31.2],
+            [-23.5, -46.6], [37.7, -122.4], [41.0, 28.9], [22.5, 88.3],
+            [3.1, 101.7], [13.0, 80.3], [59.9, 30.3], [34.0, -118.2]
         ];
 
         /* Pre-build sphere background gradient once */
         const sphereGrad = ctx.createRadialGradient(cx - 40, cy - 40, 0, cx, cy, R + 12);
-        sphereGrad.addColorStop(0,  '#1a3a8a');
-        sphereGrad.addColorStop(0.45,'#0d2260');
+        sphereGrad.addColorStop(0, '#1a3a8a');
+        sphereGrad.addColorStop(0.45, '#0d2260');
         sphereGrad.addColorStop(0.8, '#07123a');
-        sphereGrad.addColorStop(1,   '#040c24');
+        sphereGrad.addColorStop(1, '#040c24');
 
         function ll2xy(lat, lon, r, rotDeg) {
             const phi = lat * Math.PI / 180;
@@ -247,9 +331,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* Atmosphere glow ring */
             const atm = ctx.createRadialGradient(cx, cy, R - 8, cx, cy, R + 36);
-            atm.addColorStop(0,   'rgba(59,130,246,0.0)');
+            atm.addColorStop(0, 'rgba(59,130,246,0.0)');
             atm.addColorStop(0.5, 'rgba(96,165,250,0.22)');
-            atm.addColorStop(1,   'rgba(59,130,246,0.0)');
+            atm.addColorStop(1, 'rgba(59,130,246,0.0)');
             ctx.beginPath();
             ctx.arc(cx, cy, R + 36, 0, Math.PI * 2);
             ctx.fillStyle = atm;
@@ -257,9 +341,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* Sphere edge specular highlight */
             const spec = ctx.createRadialGradient(cx - 50, cy - 50, 10, cx, cy, R + 2);
-            spec.addColorStop(0,   'rgba(147,197,253,0.18)');
+            spec.addColorStop(0, 'rgba(147,197,253,0.18)');
             spec.addColorStop(0.3, 'rgba(147,197,253,0.04)');
-            spec.addColorStop(1,   'rgba(0,0,0,0)');
+            spec.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.save();
             ctx.beginPath();
             ctx.arc(cx, cy, R + 2, 0, Math.PI * 2);
@@ -292,6 +376,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* City pulse dots — optimized layer rendering */
             mapped.forEach(p => {
+<<<<<<< HEAD
+=======
+                const pulse = Math.sin(now * 0.0025 + p.x * 0.05) * 0.5 + 0.5;
+>>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
                 const depthFade = 0.65 + 0.35 * (p.z / R);
 
                 /* Grouped fills for performance */
@@ -315,6 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         /* Encapsulate globe start */
+<<<<<<< HEAD
         window.initGlobe = function() {
             const globeObserver = new IntersectionObserver(entries => {
                 if (entries[0].isIntersecting) {
@@ -327,6 +416,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, { threshold: 0 });
             globeObserver.observe(c);
+=======
+        window.initGlobe = function () {
+            requestAnimationFrame(drawGlobe);
+>>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
         };
     })();
 
@@ -381,7 +474,7 @@ function navigateWithTransition(target) {
 }
 
 /* ─── BACK BUTTON FIX ─── */
-window.addEventListener('pageshow', function(event) {
+window.addEventListener('pageshow', function (event) {
     const trans = document.getElementById('pgTrans');
     if (trans) {
         trans.classList.remove('active');
@@ -400,8 +493,13 @@ function openMedicineHub() {
     const splash = document.getElementById('medHubSplash');
     if (splash) {
         splash.classList.add('active');
+<<<<<<< HEAD
         
         // Accelerated redirect for "lagless" feel
+=======
+
+        // Wait for splash animation then redirect to unified route
+>>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
         setTimeout(() => {
             window.location.href = '/medicine-hub';
         }, 750);
