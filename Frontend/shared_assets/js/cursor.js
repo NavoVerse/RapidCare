@@ -18,6 +18,8 @@
   let mx = 0, my = 0, rx = 0, ry = 0;
   let lastTrail = 0;
   let effectsEnabled = localStorage.getItem('rapidcare_mouse_effects') !== 'false';
+  let isScrolling = false;
+  let scrollTimeout;
   const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
   // ── Create Elements ──
@@ -62,6 +64,13 @@
     window.dispatchEvent(new CustomEvent('mouseEffectsToggled', { detail: { enabled: effectsEnabled } }));
   });
 
+  // ── Scroll Detection for performance ──
+  window.addEventListener('scroll', () => {
+    isScrolling = true;
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => { isScrolling = false; }, 150);
+  }, { passive: true });
+
   // ── Movement ──
   if (!isTouch) {
     document.addEventListener('mousemove', e => {
@@ -103,9 +112,9 @@
     }
   });
 
-  // ── Cursor Trail (Throttled) ──
+  // ── Cursor Trail (Throttled & Disabled on Scroll) ──
   function spawnTrail(x, y) {
-    if (!effectsEnabled || isTouch) return;
+    if (!effectsEnabled || isTouch || isScrolling) return;
     const now = Date.now();
     if (now - lastTrail < 65) return; // Further throttled for scroll performance
     lastTrail = now;

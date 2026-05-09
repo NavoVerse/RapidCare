@@ -357,6 +357,33 @@ document.addEventListener('DOMContentLoaded', () => {
             window.open('https://youtu.be/ubltmM3TzX0?si=ukI79E1Bv98i2vAi', '_blank');
         });
     }
+
+    /* ─── OPTIMIZED FAQ TOGGLE ─── */
+    const faqList = document.querySelector('.faq-list');
+    if (faqList) {
+        faqList.addEventListener('click', (e) => {
+            const item = e.target.closest('.faq-item');
+            if (item) {
+                // Use requestAnimationFrame for a "frame-perfect" toggle
+                requestAnimationFrame(() => {
+                    // Close other items for a cleaner experience (Optional, but helps performance)
+                    faqList.querySelectorAll('.faq-item.active').forEach(activeItem => {
+                        if (activeItem !== item) activeItem.classList.remove('active');
+                    });
+                    item.classList.toggle('active');
+                });
+            }
+        });
+    }
+
+    /* ─── SCROLL PERFORMANCE ENHANCEMENT ─── */
+    // Ensure fixed background doesn't trigger unnecessary repaints
+    const globalBg = document.querySelector('.global-bg');
+    if (globalBg) {
+        // Force GPU layer
+        globalBg.style.transform = 'translateZ(0)';
+        globalBg.style.backfaceVisibility = 'hidden';
+    }
 });
 
 /* ─── ROLE SELECT ─── */
