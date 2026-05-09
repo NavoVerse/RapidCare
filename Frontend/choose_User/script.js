@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── PARTICLE SYSTEM ─── */
-    window.initParticles = function() {
+    window.initParticles = function () {
         const c = document.getElementById('particles');
         if (!c) return;
         const ctx = c.getContext('2d');
@@ -9,9 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
         function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
         resize(); window.addEventListener('resize', resize);
         function mkPt() {
-            return { x: Math.random() * W, y: Math.random() * H,
-                     vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
-                     r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35 };
+            return {
+                x: Math.random() * W, y: Math.random() * H,
+                vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
+                r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35
+            };
         }
         for (let i = 0; i < 45; i++) pts.push(mkPt());
         const dSqLimit = 100 * 100;
@@ -24,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(147,197,253,${p.a})`; ctx.fill();
             });
-            
+
             /* Optimized Line System — fewer connections */
             ctx.beginPath();
             ctx.strokeStyle = 'rgba(147,197,253,0.15)';
@@ -47,10 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /* ─── FLASH SCREEN, LOADING SOUND & TITLE SCRAMBLE ─── */
-    (function() {
+    (function () {
         const flashScreen = document.getElementById('flashScreen');
         const flashSub = flashScreen?.querySelector('.flash-sub');
-        
+
         if (!flashScreen) return;
 
         /* ── Web Audio: Synthesized loading chime ── */
@@ -107,21 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 readyGain.connect(ctx.destination);
                 readyOsc.start(ctx.currentTime + 2.4);
                 readyOsc.stop(ctx.currentTime + 3.4);
-            } catch(e) { /* Audio not supported — silent fallback */ }
+            } catch (e) { /* Audio not supported — silent fallback */ }
         }
-
-        /* Resume AudioContext on first interaction to satisfy browser policies */
-        const resumeAudio = () => {
-            const AC = window.AudioContext || window.webkitAudioContext;
-            if (AC) {
-                const tempCtx = new AC();
-                if (tempCtx.state === 'suspended') tempCtx.resume();
-            }
-            window.removeEventListener('click', resumeAudio);
-            window.removeEventListener('keydown', resumeAudio);
-        };
-        window.addEventListener('click', resumeAudio);
-        window.addEventListener('keydown', resumeAudio);
 
         /* Dynamic status messages cycling during initialization */
         const messages = [
@@ -155,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const rect = title.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                
+
                 title.style.setProperty('--mouse-x', `${x}px`);
                 title.style.setProperty('--mouse-y', `${y}px`);
             });
@@ -165,13 +154,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-        let started = false;
         const startSequence = () => {
-            if (started) return;
-            started = true;
             /* Hide splash content behind flash initially */
             document.body.classList.add('flash-active');
-            
+
             /* Play loading sound */
             playLoadingSound();
 
@@ -185,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 flashScreen.classList.add('hidden');
                 document.body.classList.remove('flash-active');
                 document.body.classList.add('flash-revealed');
-                
+
                 /* Start heavy canvas animations ONLY after flash is gone */
                 if (window.initParticles) window.initParticles();
                 if (window.initGlobe) window.initGlobe();
@@ -198,21 +184,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 4600);
         };
 
-        /* Run sequence with a safety timeout for font loading to prevent hangs */
-        const fontTimeout = setTimeout(startSequence, 1500);
+        /* Run sequence regardless of font loading for robustness */
         if (document.fonts && document.fonts.ready) {
-            document.fonts.ready.then(() => {
-                clearTimeout(fontTimeout);
-                startSequence();
-            }).catch(() => {
-                clearTimeout(fontTimeout);
-                startSequence();
-            });
+            document.fonts.ready.then(startSequence).catch(startSequence);
+        } else {
+            setTimeout(startSequence, 500);
         }
     })();
 
     /* ─── GLOBE ─── */
-    (function() {
+    (function () {
         const c = document.getElementById('globe');
         if (!c) return;
         const ctx = c.getContext('2d', { alpha: true });
@@ -221,19 +202,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const ROT_SPEED = 0.20; // degrees per ms * 60fps ≈ 0.20°/frame equivalent
 
         const cities = [
-            [51.5,-0.12],[40.7,-74],[35.6,139.7],[28.6,77.2],
-            [48.8,2.35],[-33.8,151.2],[55.7,37.6],[19.4,-99.1],
-            [1.35,103.8],[25.2,55.3],[6.5,3.4],[30.04,31.2],
-            [-23.5,-46.6],[37.7,-122.4],[41.0,28.9],[22.5,88.3],
-            [3.1,101.7],[13.0,80.3],[59.9,30.3],[34.0,-118.2]
+            [51.5, -0.12], [40.7, -74], [35.6, 139.7], [28.6, 77.2],
+            [48.8, 2.35], [-33.8, 151.2], [55.7, 37.6], [19.4, -99.1],
+            [1.35, 103.8], [25.2, 55.3], [6.5, 3.4], [30.04, 31.2],
+            [-23.5, -46.6], [37.7, -122.4], [41.0, 28.9], [22.5, 88.3],
+            [3.1, 101.7], [13.0, 80.3], [59.9, 30.3], [34.0, -118.2]
         ];
 
         /* Pre-build sphere background gradient once */
         const sphereGrad = ctx.createRadialGradient(cx - 40, cy - 40, 0, cx, cy, R + 12);
-        sphereGrad.addColorStop(0,  '#1a3a8a');
-        sphereGrad.addColorStop(0.45,'#0d2260');
+        sphereGrad.addColorStop(0, '#1a3a8a');
+        sphereGrad.addColorStop(0.45, '#0d2260');
         sphereGrad.addColorStop(0.8, '#07123a');
-        sphereGrad.addColorStop(1,   '#040c24');
+        sphereGrad.addColorStop(1, '#040c24');
 
         function ll2xy(lat, lon, r, rotDeg) {
             const phi = lat * Math.PI / 180;
@@ -300,9 +281,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* Atmosphere glow ring */
             const atm = ctx.createRadialGradient(cx, cy, R - 8, cx, cy, R + 36);
-            atm.addColorStop(0,   'rgba(59,130,246,0.0)');
+            atm.addColorStop(0, 'rgba(59,130,246,0.0)');
             atm.addColorStop(0.5, 'rgba(96,165,250,0.22)');
-            atm.addColorStop(1,   'rgba(59,130,246,0.0)');
+            atm.addColorStop(1, 'rgba(59,130,246,0.0)');
             ctx.beginPath();
             ctx.arc(cx, cy, R + 36, 0, Math.PI * 2);
             ctx.fillStyle = atm;
@@ -310,9 +291,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* Sphere edge specular highlight */
             const spec = ctx.createRadialGradient(cx - 50, cy - 50, 10, cx, cy, R + 2);
-            spec.addColorStop(0,   'rgba(147,197,253,0.18)');
+            spec.addColorStop(0, 'rgba(147,197,253,0.18)');
             spec.addColorStop(0.3, 'rgba(147,197,253,0.04)');
-            spec.addColorStop(1,   'rgba(0,0,0,0)');
+            spec.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.save();
             ctx.beginPath();
             ctx.arc(cx, cy, R + 2, 0, Math.PI * 2);
@@ -345,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* City pulse dots — optimized layer rendering */
             mapped.forEach(p => {
-                const pulse  = Math.sin(now * 0.0025 + p.x * 0.05) * 0.5 + 0.5;
+                const pulse = Math.sin(now * 0.0025 + p.x * 0.05) * 0.5 + 0.5;
                 const depthFade = 0.65 + 0.35 * (p.z / R);
 
                 /* Grouped fills for performance */
@@ -369,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         /* Encapsulate globe start */
-        window.initGlobe = function() {
+        window.initGlobe = function () {
             requestAnimationFrame(drawGlobe);
         };
     })();
@@ -425,7 +406,7 @@ function navigateWithTransition(target) {
 }
 
 /* ─── BACK BUTTON FIX ─── */
-window.addEventListener('pageshow', function(event) {
+window.addEventListener('pageshow', function (event) {
     const trans = document.getElementById('pgTrans');
     if (trans) {
         trans.classList.remove('active');
@@ -444,7 +425,7 @@ function openMedicineHub() {
     const splash = document.getElementById('medHubSplash');
     if (splash) {
         splash.classList.add('active');
-        
+
         // Wait for splash animation then redirect to unified route
         setTimeout(() => {
             window.location.href = '/medicine-hub';
