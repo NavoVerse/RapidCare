@@ -271,9 +271,10 @@ body.flash-revealed section:not(#splash) {
 .flash-orb {
     position: absolute;
     border-radius: 50%;
-    filter: blur(60px);
+    /* Replaced blur(60px) with deeper gradients for performance */
     opacity: 0;
-    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
     animation: flashOrbIn 1.5s ease forwards;
 }
 
@@ -286,7 +287,7 @@ body.flash-revealed section:not(#splash) {
 .flash-orb-1 {
     width: clamp(300px, 50vw, 700px);
     height: clamp(300px, 50vw, 700px);
-    background: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.05) 40%, transparent 75%);
     top: -15%;
     right: -10%;
     animation-delay: 0.3s;
@@ -296,7 +297,7 @@ body.flash-revealed section:not(#splash) {
 .flash-orb-2 {
     width: clamp(400px, 60vw, 900px);
     height: clamp(400px, 60vw, 900px);
-    background: radial-gradient(circle, rgba(96, 165, 250, 0.10) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(96, 165, 250, 0.1) 0%, rgba(96, 165, 250, 0.02) 40%, transparent 75%);
     bottom: -20%;
     left: -15%;
     animation: flashOrbIn 1.5s ease 0.5s forwards, floatOrbB 18s ease-in-out infinite 2s;
@@ -305,7 +306,7 @@ body.flash-revealed section:not(#splash) {
 .flash-orb-3 {
     width: clamp(150px, 25vw, 350px);
     height: clamp(150px, 25vw, 350px);
-    background: radial-gradient(circle, rgba(239, 68, 68, 0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.06) 0%, rgba(239, 68, 68, 0.02) 40%, transparent 75%);
     top: 30%;
     left: 60%;
     animation: flashOrbIn 1.5s ease 0.8s forwards, floatOrbA 10s ease-in-out infinite 2.5s alternate-reverse;
@@ -693,6 +694,8 @@ body.flash-revealed section:not(#splash) {
     z-index: -1;
     pointer-events: none;
     overflow: hidden;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 /* ─── SPLASH ─── */

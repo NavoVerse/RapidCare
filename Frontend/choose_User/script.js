@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35 
             };
         }
-        for (let i = 0; i < 40; i++) pts.push(mkPt());
+        for (let i = 0; i < 25; i++) pts.push(mkPt());
         
         const dSqLimit = 100 * 100;
         
