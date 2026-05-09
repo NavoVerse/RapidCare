@@ -78,61 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!flashScreen) return;
 
         /* ── Web Audio: Synthesized loading chime ── */
-        function playLoadingSound() {
-            try {
-                const AC = window.AudioContext || window.webkitAudioContext;
-                if (!AC) return;
-                const ctx = new AC();
-
-                /* Deep ambient pad — faded in softly */
-                const padOsc = ctx.createOscillator();
-                const padGain = ctx.createGain();
-                const padFilter = ctx.createBiquadFilter();
-                padOsc.type = 'sine';
-                padOsc.frequency.setValueAtTime(110, ctx.currentTime);
-                padOsc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 2.5);
-                padFilter.type = 'lowpass';
-                padFilter.frequency.setValueAtTime(400, ctx.currentTime);
-                padGain.gain.setValueAtTime(0, ctx.currentTime);
-                padGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.8);
-                padGain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 2);
-                padGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 3);
-                padOsc.connect(padFilter);
-                padFilter.connect(padGain);
-                padGain.connect(ctx.destination);
-                padOsc.start(ctx.currentTime);
-                padOsc.stop(ctx.currentTime + 3.2);
-
-                /* Ascending chime notes — medical beep feel */
-                const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
-                notes.forEach((freq, i) => {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-                    gain.gain.setValueAtTime(0, ctx.currentTime + 0.5 + i * 0.4);
-                    gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.6 + i * 0.4);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2 + i * 0.4);
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start(ctx.currentTime + 0.5 + i * 0.4);
-                    osc.stop(ctx.currentTime + 1.4 + i * 0.4);
-                });
-
-                /* "Ready" confirmation tone at ~2.5s */
-                const readyOsc = ctx.createOscillator();
-                const readyGain = ctx.createGain();
-                readyOsc.type = 'sine';
-                readyOsc.frequency.setValueAtTime(880, ctx.currentTime);
-                readyGain.gain.setValueAtTime(0, ctx.currentTime + 2.4);
-                readyGain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 2.5);
-                readyGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.2);
-                readyOsc.connect(readyGain);
-                readyGain.connect(ctx.destination);
-                readyOsc.start(ctx.currentTime + 2.4);
-                readyOsc.stop(ctx.currentTime + 3.4);
-            } catch(e) { /* Audio not supported — silent fallback */ }
-        }
 
         /* Dynamic status messages cycling during initialization */
         const messages = [
@@ -180,8 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
             /* Hide splash content behind flash initially */
             document.body.classList.add('flash-active');
             
-            /* Play loading sound */
-            playLoadingSound();
+            /* Sound removed per request */
 
             /* Stage 1 @ 2.4s: Fade out flash inner content (text floats up) */
             setTimeout(() => {
@@ -457,10 +401,10 @@ function openMedicineHub() {
     if (splash) {
         splash.classList.add('active');
         
-        // Wait for splash animation then redirect to unified route
+        // Accelerated redirect for "lagless" feel
         setTimeout(() => {
             window.location.href = '/medicine-hub';
-        }, 1500);
+        }, 750);
     } else {
         window.location.href = '/medicine-hub';
     }

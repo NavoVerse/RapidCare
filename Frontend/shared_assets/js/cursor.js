@@ -107,7 +107,7 @@
   function spawnTrail(x, y) {
     if (!effectsEnabled || isTouch) return;
     const now = Date.now();
-    if (now - lastTrail < 45) return; // Increased throttle for better performance
+    if (now - lastTrail < 65) return; // Further throttled for scroll performance
     lastTrail = now;
     
     const el = document.createElement('div');
@@ -122,7 +122,7 @@
   // ── Click Splash ──
   function spawnSplash(x, y) {
     if (!effectsEnabled) return;
-    const count = 14;
+    const count = 8; // Reduced particle count for better performance
     for (let i = 0; i < count; i++) {
       const el = document.createElement('div');
       el.className = 'splash-particle';
