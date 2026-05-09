@@ -1,48 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── PARTICLE SYSTEM ─── */
-<<<<<<< HEAD
-    (function() {
-=======
-    window.initParticles = function () {
->>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
+    (function () {
         const c = document.getElementById('particles');
         if (!c) return;
         const ctx = c.getContext('2d', { alpha: true });
         let W, H, pts = [];
-<<<<<<< HEAD
         let isVisible = false;
-        
-        function resize() { 
-            W = c.width = window.innerWidth; 
-            H = c.height = window.innerHeight; 
-=======
-        function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+
+        function resize() {
+            W = c.width = window.innerWidth;
+            H = c.height = window.innerHeight;
+        }
         resize(); window.addEventListener('resize', resize);
+
         function mkPt() {
             return {
                 x: Math.random() * W, y: Math.random() * H,
                 vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
                 r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35
             };
->>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
-        }
-        resize(); window.addEventListener('resize', resize);
-        
-        function mkPt() {
-            return { 
-                x: Math.random() * W, y: Math.random() * H,
-                vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
-                r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35 
-            };
         }
         for (let i = 0; i < 25; i++) pts.push(mkPt());
-        
+
         const dSqLimit = 100 * 100;
-        
+
         function draw() {
             ctx.clearRect(0, 0, W, H);
-            
+
             // Draw particles
             pts.forEach(p => {
                 p.x += p.vx; p.y += p.vy;
@@ -51,13 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(147,197,253,${p.a})`; ctx.fill();
             });
-<<<<<<< HEAD
-            
-            /* Optimized Line System — single stroke for all lines */
-=======
 
-            /* Optimized Line System — fewer connections */
->>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
+            /* Optimized Line System — single stroke for all lines */
             ctx.beginPath();
             ctx.strokeStyle = 'rgba(147,197,253,0.12)';
             ctx.lineWidth = 0.5;
@@ -73,17 +53,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             ctx.stroke();
-            
+
             if (isVisible) requestAnimationFrame(draw);
         }
-        
+
         const observer = new IntersectionObserver(entries => {
             const wasVisible = isVisible;
             isVisible = entries[0].isIntersecting;
             if (isVisible && !wasVisible) draw();
         }, { threshold: 0 });
-        
-        window.initParticles = function() {
+
+        window.initParticles = function () {
             observer.observe(c);
             draw();
         };
@@ -96,66 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const flashSub = flashScreen?.querySelector('.flash-sub');
 
         if (!flashScreen) return;
-
-        /* ── Web Audio: Synthesized loading chime ── */
-<<<<<<< HEAD
-=======
-        function playLoadingSound() {
-            try {
-                const AC = window.AudioContext || window.webkitAudioContext;
-                if (!AC) return;
-                const ctx = new AC();
-
-                /* Deep ambient pad — faded in softly */
-                const padOsc = ctx.createOscillator();
-                const padGain = ctx.createGain();
-                const padFilter = ctx.createBiquadFilter();
-                padOsc.type = 'sine';
-                padOsc.frequency.setValueAtTime(110, ctx.currentTime);
-                padOsc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 2.5);
-                padFilter.type = 'lowpass';
-                padFilter.frequency.setValueAtTime(400, ctx.currentTime);
-                padGain.gain.setValueAtTime(0, ctx.currentTime);
-                padGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.8);
-                padGain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 2);
-                padGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 3);
-                padOsc.connect(padFilter);
-                padFilter.connect(padGain);
-                padGain.connect(ctx.destination);
-                padOsc.start(ctx.currentTime);
-                padOsc.stop(ctx.currentTime + 3.2);
-
-                /* Ascending chime notes — medical beep feel */
-                const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
-                notes.forEach((freq, i) => {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-                    gain.gain.setValueAtTime(0, ctx.currentTime + 0.5 + i * 0.4);
-                    gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.6 + i * 0.4);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2 + i * 0.4);
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start(ctx.currentTime + 0.5 + i * 0.4);
-                    osc.stop(ctx.currentTime + 1.4 + i * 0.4);
-                });
-
-                /* "Ready" confirmation tone at ~2.5s */
-                const readyOsc = ctx.createOscillator();
-                const readyGain = ctx.createGain();
-                readyOsc.type = 'sine';
-                readyOsc.frequency.setValueAtTime(880, ctx.currentTime);
-                readyGain.gain.setValueAtTime(0, ctx.currentTime + 2.4);
-                readyGain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 2.5);
-                readyGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.2);
-                readyOsc.connect(readyGain);
-                readyGain.connect(ctx.destination);
-                readyOsc.start(ctx.currentTime + 2.4);
-                readyOsc.stop(ctx.currentTime + 3.4);
-            } catch (e) { /* Audio not supported — silent fallback */ }
-        }
->>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
 
         /* Dynamic status messages cycling during initialization */
         const messages = [
@@ -197,26 +117,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         initInteractiveTitleGlow();
 
-
-
         const startSequence = () => {
+            if (flashScreen.dataset.started) return;
+            flashScreen.dataset.started = "true";
+
             /* Hide splash content behind flash initially */
             document.body.classList.add('flash-active');
-<<<<<<< HEAD
             
-            /* Sound removed per request */
-=======
-
-            /* Play loading sound */
-            playLoadingSound();
->>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
-
-            /* Stage 1 @ 2.4s: Fade out flash inner content (text floats up) */
+            /* Stage 1 @ 1.2s: Fade out flash inner content (text floats up) */
             setTimeout(() => {
                 flashScreen.classList.add('fade-content');
-            }, 2400);
+            }, 1200);
 
-            /* Stage 2 @ 3.0s: Dissolve background with blur + reveal splash */
+            /* Stage 2 @ 1.8s: Dissolve background with blur + reveal splash */
             setTimeout(() => {
                 flashScreen.classList.add('hidden');
                 document.body.classList.remove('flash-active');
@@ -225,21 +138,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 /* Start heavy canvas animations ONLY after flash is gone */
                 if (window.initParticles) window.initParticles();
                 if (window.initGlobe) window.initGlobe();
-            }, 3000);
+            }, 1800);
 
             /* Cleanup: remove flash screen from DOM after transition completes */
             setTimeout(() => {
                 flashScreen.remove();
                 document.body.classList.remove('flash-revealed');
-            }, 4600);
+            }, 3200);
         };
 
-        /* Run sequence regardless of font loading for robustness */
+        /* Run sequence when fonts are ready, or after a safety timeout */
         if (document.fonts && document.fonts.ready) {
             document.fonts.ready.then(startSequence).catch(startSequence);
-        } else {
-            setTimeout(startSequence, 500);
         }
+        
+        /* Absolute safety fallback: Start sequence after 600ms regardless of fonts */
+        setTimeout(startSequence, 600);
     })();
 
     /* ─── GLOBE ─── */
@@ -376,10 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* City pulse dots — optimized layer rendering */
             mapped.forEach(p => {
-<<<<<<< HEAD
-=======
-                const pulse = Math.sin(now * 0.0025 + p.x * 0.05) * 0.5 + 0.5;
->>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
                 const depthFade = 0.65 + 0.35 * (p.z / R);
 
                 /* Grouped fills for performance */
@@ -403,8 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         /* Encapsulate globe start */
-<<<<<<< HEAD
-        window.initGlobe = function() {
+        window.initGlobe = function () {
             const globeObserver = new IntersectionObserver(entries => {
                 if (entries[0].isIntersecting) {
                     if (!lastTime) {
@@ -416,10 +325,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, { threshold: 0 });
             globeObserver.observe(c);
-=======
-        window.initGlobe = function () {
-            requestAnimationFrame(drawGlobe);
->>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
         };
     })();
 
@@ -493,13 +398,8 @@ function openMedicineHub() {
     const splash = document.getElementById('medHubSplash');
     if (splash) {
         splash.classList.add('active');
-<<<<<<< HEAD
-        
-        // Accelerated redirect for "lagless" feel
-=======
 
-        // Wait for splash animation then redirect to unified route
->>>>>>> 8c72ed63a6848889dd36c056b2dfb25e21483ac5
+        // Accelerated redirect for "lagless" feel
         setTimeout(() => {
             window.location.href = '/medicine-hub';
         }, 750);
