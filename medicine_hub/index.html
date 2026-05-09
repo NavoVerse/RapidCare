@@ -60,19 +60,23 @@
       min-width: 320px;
       overflow-x: hidden;
       max-width: 100vw;
-      animation: pageFadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: pageFadeIn 0.4s ease-out forwards;
+      -webkit-font-smoothing: antialiased;
     }
 
     @keyframes pageFadeIn {
-      0% {
-        opacity: 0;
-        transform: translateY(20px);
-      }
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
 
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* ── TOPBAR ── */
@@ -87,6 +91,7 @@
       top: 0;
       z-index: 100;
       box-shadow: 0 2px 20px rgba(0, 0, 0, 0.18);
+      animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     .topbar-brand {
@@ -174,6 +179,7 @@
       align-items: flex-end;
       justify-content: space-between;
       gap: 24px;
+      animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
     }
 
     .hero-eyebrow {
@@ -3210,18 +3216,18 @@
     }
 
     /* ── PRODUCT MODAL ── */
+    /* ── PRODUCT MODAL (PREMIUM DARK) ── */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 70, 67, 0.7);
+      background: rgba(0, 0, 0, 0.85);
       z-index: 100000;
-      backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       padding: 20px;
     }
 
@@ -3231,15 +3237,17 @@
     }
 
     .prod-modal {
-      background: var(--white);
-      border-radius: 24px;
-      max-width: 800px;
+      background: #111114;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 40px;
+      max-width: 440px;
       width: 100%;
+      padding: 30px;
       display: flex;
-      overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-      transform: scale(0.95) translateY(20px);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-direction: column;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+      transform: scale(0.9) translateY(40px);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
     }
 
@@ -3247,158 +3255,288 @@
       transform: scale(1) translateY(0);
     }
 
+    .pm-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .pm-category-badge {
+      background: var(--amber);
+      color: #000;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
     .pm-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: var(--sand);
-      border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      font-size: 16px;
-      cursor: pointer;
-      color: var(--cyprus);
-      transition: background 0.2s;
-      z-index: 10;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
     .pm-close:hover {
-      background: var(--sand-dark);
+      background: rgba(255, 255, 255, 0.15);
+      transform: rotate(90deg);
     }
 
-    .pm-img-sec {
-      flex: 1;
-      background: var(--sand);
+    .pm-visual-sec {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .pm-icon-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #D93B65;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px;
+      position: relative;
+      box-shadow: 0 0 40px rgba(217, 59, 101, 0.3);
     }
 
-    .pm-img {
-      width: 100%;
-      max-width: 300px;
-      height: auto;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      object-fit: cover;
-      aspect-ratio: 1/1;
+    .pm-icon-circle::after {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
     }
 
-    .pm-info-sec {
-      flex: 1.2;
-      padding: 40px;
+    .pm-pill-svg {
+      width: 48px;
+      height: 48px;
+      fill: #fff;
+    }
+
+    .pm-meta-row {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
     }
 
-    .pm-tag {
-      font-size: 11px;
+    .pm-heart-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: transparent;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .pm-stock-pill {
+      background: rgba(26, 122, 74, 0.1);
+      border: 1px solid rgba(26, 122, 74, 0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pm-stock-dot {
+      width: 6px;
+      height: 6px;
+      background: #1a7a4a;
+      border-radius: 50%;
+    }
+
+    .pm-stock-text {
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.1em;
-      color: var(--cyprus);
+      color: #1a7a4a;
+    }
+
+    .pm-type {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.4);
       text-transform: uppercase;
+      font-weight: 700;
       margin-bottom: 8px;
     }
 
-    .pm-name {
+    .pm-name-main {
       font-family: var(--headline);
-      font-size: 42px;
-      color: var(--ink);
+      font-size: 44px;
+      color: #fff;
       line-height: 1;
-      margin-bottom: 6px;
+      margin-bottom: 10px;
     }
 
-    .pm-mol {
-      font-size: 15px;
-      color: var(--ink-mid);
-      margin-bottom: 16px;
-      font-weight: 700;
+    .pm-name-main span {
+      color: var(--amber);
+      font-style: italic;
+      font-size: 0.9em;
+      margin-left: 10px;
     }
 
-    .pm-desc {
-      font-size: 14px;
-      color: var(--ink-faint);
-      line-height: 1.6;
-      margin-bottom: 24px;
+    .pm-subtitle {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 25px;
     }
 
-    .pm-price-wrap {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
+    .pm-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
       margin-bottom: 30px;
     }
 
-    .pm-price {
-      font-family: var(--headline);
-      font-size: 38px;
-      color: var(--cyprus);
+    .pm-stat-box {
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 16px;
+      padding: 14px 10px;
+      text-align: center;
     }
 
-    .pm-mrp {
+    .pm-stat-lbl {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.3);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .pm-stat-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .pm-stat-val.amber { color: var(--amber); }
+
+    .pm-price-sec {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .pm-price-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .pm-currency {
       font-size: 16px;
-      color: var(--ink-faint);
+      color: var(--amber);
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .pm-price-val {
+      font-family: var(--headline);
+      font-size: 64px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .pm-price-orig {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.2);
       text-decoration: line-through;
     }
 
-    .pm-actions {
-      display: flex;
+    .pm-discount-tag {
+      background: rgba(245, 166, 35, 0.1);
+      color: var(--amber);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-left: 4px;
+    }
+
+    .pm-savings {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 10px;
+    }
+
+    .pm-savings span { color: var(--amber); }
+
+    .pm-main-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 14px;
-      margin-top: auto;
+      margin-top: 30px;
     }
 
-    .pm-btn-cart {
-      flex: 1;
-      background: var(--cyprus);
-      color: var(--white);
-      border: none;
-      border-radius: 12px;
-      padding: 16px;
-      font-size: 14px;
-      font-weight: 700;
+    .pm-btn {
+      border-radius: 16px;
+      padding: 16px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: transparent;
       cursor: pointer;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
       gap: 8px;
       transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
     }
 
-    .pm-btn-cart:hover {
-      background: var(--cyprus-hover);
+    .pm-btn:hover {
+      background: rgba(255, 255, 255, 0.04);
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 70, 67, 0.2);
+      border-color: rgba(255, 255, 255, 0.2);
     }
 
-    .pm-btn-book {
-      flex: 1;
-      background: var(--amber);
-      color: var(--ink);
-      border: none;
-      border-radius: 12px;
-      padding: 16px;
-      font-size: 14px;
+    .pm-btn-icon {
+      font-size: 20px;
+    }
+
+    .pm-btn-title {
+      font-size: 13px;
       font-weight: 700;
-      cursor: pointer;
+      color: #fff;
+    }
+
+    .pm-btn-sub {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .pm-footer-badges {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 30px;
+      opacity: 0.3;
+    }
+
+    .pm-fbadge {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .pm-btn-book:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(245, 166, 35, 0.3);
+      gap: 6px;
+      font-size: 10px;
+      color: #fff;
+      font-weight: 600;
     }
 
     /* Ripple effect */
@@ -6648,24 +6786,85 @@
     <!-- PRODUCT MODAL -->
     <div class="modal-overlay" id="modalOverlay">
       <div class="prod-modal" id="prodModal">
-        <button class="pm-close" id="closeModal">✕</button>
-        <div class="pm-img-sec">
-          <img src="" alt="Product" class="pm-img" id="pmImg">
+        <!-- Header -->
+        <div class="pm-top-row">
+          <div class="pm-category-badge" id="pmTag">Antibiotics</div>
+          <button class="pm-close" id="closeModal">✕</button>
         </div>
-        <div class="pm-info-sec">
-          <div class="pm-tag" id="pmTag">Category</div>
-          <div class="pm-name" id="pmName">Product Name</div>
-          <div class="pm-mol" id="pmMol">Molecule Name</div>
-          <div class="pm-desc" id="pmDesc">This is a high quality essential medicine verified by CDSCO. Sourced directly
-            from verified manufacturers and partner pharmacies to ensure 100% genuine quality.</div>
-          <div class="pm-price-wrap">
-            <div class="pm-price" id="pmPrice">₹0</div>
-            <div class="pm-mrp" id="pmMrp">₹0</div>
+
+        <!-- Visual -->
+        <div class="pm-visual-sec">
+          <div class="pm-icon-circle">
+            <svg class="pm-pill-svg" viewBox="0 0 24 24">
+              <path d="M19,10H16V7a5,5,0,0,0-10,0v3H3a1,1,0,0,0-1,1v8a5,5,0,0,0,5,5H17a5,5,0,0,0,5-5V11A1,1,0,0,0,19,10ZM8,7a3,3,0,0,1,6,0v3H8Zm12,12a3,3,0,0,1-3,3H7a3,3,0,0,1-3-3V12H20Z" />
+            </svg>
           </div>
-          <div class="pm-actions">
-            <button class="pm-btn-cart ripple-btn" id="pmAddToCart">🛒 Add to Cart</button>
-            <button class="pm-btn-book ripple-btn" id="pmBookNow">⚡ Immediate Book</button>
+        </div>
+
+        <!-- Meta -->
+        <div class="pm-meta-row">
+          <button class="pm-heart-btn">❤️</button>
+          <div class="pm-stock-pill">
+            <span class="pm-stock-dot"></span>
+            <span class="pm-stock-text">In stock</span>
           </div>
+        </div>
+
+        <!-- Body -->
+        <div class="pm-type">Prescription Medicine</div>
+        <div class="pm-name-main" id="pmName">Azithromycin <span>500</span></div>
+        <div class="pm-subtitle"><span id="pmMol">Azithromycin</span> - Strip of 5 tablets</div>
+
+        <!-- Stats -->
+        <div class="pm-stats-grid">
+          <div class="pm-stat-box">
+            <div class="pm-stat-lbl">Delivery</div>
+            <div class="pm-stat-val amber">30 mins</div>
+          </div>
+          <div class="pm-stat-box">
+            <div class="pm-stat-lbl">Verified</div>
+            <div class="pm-stat-val">CDSCO</div>
+          </div>
+          <div class="pm-stat-box">
+            <div class="pm-stat-lbl">Fee</div>
+            <div class="pm-stat-val">Free</div>
+          </div>
+        </div>
+
+        <!-- Price -->
+        <div class="pm-price-sec">
+          <div class="pm-price-main">
+            <span class="pm-currency">₹</span>
+            <span class="pm-price-val" id="pmPrice">89</span>
+          </div>
+          <div style="margin-left: 10px;">
+            <div style="display:flex; align-items:center;">
+              <span class="pm-price-orig" id="pmMrp">₹112</span>
+              <span class="pm-discount-tag">21% off</span>
+            </div>
+          </div>
+        </div>
+        <div class="pm-savings">You save <span>₹23</span> on this order</div>
+
+        <!-- Actions -->
+        <div class="pm-main-actions">
+          <button class="pm-btn" id="pmBookNow">
+            <span class="pm-btn-icon">⚡</span>
+            <span class="pm-btn-title">Immediate Book</span>
+            <span class="pm-btn-sub">Instant Dispatch</span>
+          </button>
+          <button class="pm-btn" id="pmAddToCart">
+            <span class="pm-btn-icon">🛒</span>
+            <span class="pm-btn-title">Add to Cart</span>
+            <span class="pm-btn-sub">Save for later</span>
+          </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="pm-footer-badges">
+          <div class="pm-fbadge">🛡️ Genuine</div>
+          <div class="pm-fbadge">✨ WHO-GMP</div>
+          <div class="pm-fbadge">🔒 Secure</div>
         </div>
       </div>
     </div>
@@ -6783,25 +6982,7 @@
       });
     });
 
-    // Cart counter with bounce + toast
-    let cartCount = 3;
-    document.querySelectorAll('.add-btn, .kit-add, .oxy-side-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        cartCount++;
-        const badge = document.querySelector('.cart-badge');
-        const mnBadge = document.getElementById('mnCartBadge');
-        badge.textContent = cartCount;
-        if (mnBadge) mnBadge.textContent = cartCount;
-        badge.classList.remove('bounce');
-        void badge.offsetWidth;
-        badge.classList.add('bounce');
-        btn.style.background = '#1a7a4a';
-        setTimeout(() => { btn.style.background = ''; }, 800);
-        showToast('✓ Added to cart', 'success');
-      });
-    });
-
-    // ── TOAST SYSTEM ──
+    // Toast notification system is globally available for products.js
     function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');
       if (!container) return;

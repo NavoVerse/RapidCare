@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* Hide splash content behind flash initially */
             document.body.classList.add('flash-active');
-            
+
             /* Stage 1 @ 1.2s: Fade out flash inner content (text floats up) */
             setTimeout(() => {
                 flashScreen.classList.add('fade-content');
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.fonts && document.fonts.ready) {
             document.fonts.ready.then(startSequence).catch(startSequence);
         }
-        
+
         /* Absolute safety fallback: Start sequence after 600ms regardless of fonts */
         setTimeout(startSequence, 600);
     })();

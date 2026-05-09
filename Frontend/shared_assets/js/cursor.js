@@ -2,7 +2,7 @@
  * RapidCare Shared Cursor Script
  * Provides custom dot, ring, trail, and splash effects.
  */
-(function() {
+(function () {
   // ── Configuration ──
   const PALETTES = {
     dark: ['#A7EBF2', '#54ACBF', '#26658C', '#A7EBF2', '#ffffff'],
@@ -13,26 +13,26 @@
     const theme = document.documentElement.getAttribute('data-theme') || 'dark';
     return PALETTES[theme] || PALETTES.dark;
   }
-  
+
   // ── State ──
   let mx = 0, my = 0, rx = 0, ry = 0;
   let lastTrail = 0;
   let effectsEnabled = localStorage.getItem('rapidcare_mouse_effects') !== 'false';
   const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-  
+
   // ── Create Elements ──
   const dot = document.createElement('div');
   dot.className = 'cursor-dot';
   dot.id = 'cursorDot';
-  
+
   const ring = document.createElement('div');
   ring.className = 'cursor-ring';
   ring.id = 'cursorRing';
-  
+
   const ripple = document.createElement('div');
   ripple.className = 'touch-ripple';
   ripple.id = 'touchRipple';
-  
+
   // Toggle Button
   const toggle = document.createElement('div');
   toggle.className = 'effects-toggle';
@@ -40,7 +40,7 @@
   toggle.innerHTML = `<svg viewBox="0 0 24 24"><path d="M13.151,12l6.599-6.6a1,1,0,0,0-1.414-1.414L11.737,10.586,5.138,3.987A1,1,0,0,0,3.724,5.4L10.323,12l-6.6,6.6a1,1,0,1,0,1.414,1.414l6.6-6.6,6.6,6.6a1,1,0,0,0,1.414-1.414Z"/></svg>`;
   // Use a cursor icon or something similar. Let's use a pointer icon.
   toggle.innerHTML = `<svg viewBox="0 0 24 24"><path d="M13.64,21.94c-0.34,0-0.65-0.19-0.82-0.51L9.33,14.6L5.35,18.58c-0.31,0.31-0.78,0.4-1.18,0.22 c-0.4-0.18-0.66-0.58-0.66-1.02V3.79c0-0.44,0.26-0.84,0.66-1.02c0.4-0.18,0.87-0.09,1.18,0.22l15,15c0.31,0.31,0.4,0.78,0.22,1.18 c-0.18,0.4-0.58,0.66-1.02,0.66h-5.46l3.49,6.79c0.17,0.32,0.1,0.72-0.17,0.96l-2.48,1.24C14.07,21.9,13.86,21.94,13.64,21.94z M6.5,5.91 v10.59l2.83-2.83c0.19-0.19,0.45-0.29,0.71-0.29c0.26,0,0.52,0.1,0.71,0.29l4.07,7.91l1.06-0.53l-4.07-7.91 c-0.19-0.19-0.29-0.45-0.29-0.71c0-0.26,0.1-0.52,0.29-0.71l2.83-2.83H6.5z"/></svg>`;
-  
+
   if (!isTouch) {
     document.body.appendChild(dot);
     document.body.appendChild(ring);
@@ -57,39 +57,39 @@
     effectsEnabled = !effectsEnabled;
     localStorage.setItem('rapidcare_mouse_effects', effectsEnabled);
     document.body.classList.toggle('disable-mouse-effects', !effectsEnabled);
-    
+
     // Dispatch custom event for other scripts to listen
     window.dispatchEvent(new CustomEvent('mouseEffectsToggled', { detail: { enabled: effectsEnabled } }));
   });
-  
+
   // ── Movement ──
   if (!isTouch) {
     document.addEventListener('mousemove', e => {
       if (!effectsEnabled) return;
-      mx = e.clientX; 
+      mx = e.clientX;
       my = e.clientY;
-      dot.style.left = mx + 'px'; 
+      dot.style.left = mx + 'px';
       dot.style.top = my + 'px';
       spawnTrail(mx, my);
     });
 
     (function animRing() {
       if (effectsEnabled) {
-        rx += (mx - rx) * 0.12; 
+        rx += (mx - rx) * 0.12;
         ry += (my - ry) * 0.12;
-        ring.style.left = rx + 'px'; 
+        ring.style.left = rx + 'px';
         ring.style.top = ry + 'px';
       }
       requestAnimationFrame(animRing);
     })();
   }
-  
+
   // ── Hover Effects (Optimized with Event Delegation) ──
   document.addEventListener('mouseover', e => {
     if (isTouch || !effectsEnabled) return;
     const target = e.target.closest('a, button, .stat-card, .amb-card, .tr-row, input, select, textarea, [role="button"], .role-card, .faq-item, .btn-prim, .btn-out, .med-hub-popup');
     if (target) {
-      dot.classList.add('hover'); 
+      dot.classList.add('hover');
       ring.classList.add('hover');
     }
   });
@@ -98,18 +98,18 @@
     if (isTouch || !effectsEnabled) return;
     const target = e.target.closest('a, button, .stat-card, .amb-card, .tr-row, input, select, textarea, [role="button"], .role-card, .faq-item, .btn-prim, .btn-out, .med-hub-popup');
     if (target) {
-      dot.classList.remove('hover'); 
+      dot.classList.remove('hover');
       ring.classList.remove('hover');
     }
   });
-  
+
   // ── Cursor Trail (Throttled) ──
   function spawnTrail(x, y) {
     if (!effectsEnabled || isTouch) return;
     const now = Date.now();
     if (now - lastTrail < 65) return; // Further throttled for scroll performance
     lastTrail = now;
-    
+
     const el = document.createElement('div');
     el.className = 'cursor-trail';
     const size = Math.random() * 5 + 3;
@@ -118,7 +118,7 @@
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 400); // Shorter lifetime
   }
-  
+
   // ── Click Splash ──
   function spawnSplash(x, y) {
     if (!effectsEnabled) return;
@@ -138,7 +138,7 @@
       document.body.appendChild(el);
       setTimeout(() => el.remove(), dur * 1000 + 50);
     }
-    
+
     // Ring burst
     const rb = document.createElement('div');
     rb.className = 'splash-ring';
@@ -146,11 +146,14 @@
     document.body.appendChild(rb);
     setTimeout(() => rb.remove(), 600);
   }
-  
+
+  /* Click splash effect removed per performance request */
+  /*
   if (!isTouch) {
     document.addEventListener('click', e => spawnSplash(e.clientX, e.clientY));
   }
-  
+  */
+
   // ── Touch Ripple ──
   document.addEventListener('touchstart', e => {
     // Touch ripples are always enabled as they are functional feedback

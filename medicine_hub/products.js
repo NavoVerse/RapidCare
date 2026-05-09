@@ -403,12 +403,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function openModal(product) {
     currentModalProduct = product;
-    pmImg.src = product.img;
-    pmTag.innerText = product.category;
-    pmName.innerText = product.name;
-    pmMol.innerText = product.molecule;
-    pmPrice.innerText = "₹" + product.price;
-    pmMrp.innerText = "₹" + product.mrp;
+    
+    // Update IDs
+    const pmTag = document.getElementById("pmTag");
+    const pmName = document.getElementById("pmName");
+    const pmMol = document.getElementById("pmMol");
+    const pmPrice = document.getElementById("pmPrice");
+    const pmMrp = document.getElementById("pmMrp");
+    const pmIconCircle = document.querySelector(".pm-icon-circle");
+    
+    if (pmTag) pmTag.innerText = product.category;
+    
+    // Split name and dosage if possible (e.g., "Azithromycin 500" -> "Azithromycin <span>500</span>")
+    if (pmName) {
+      const parts = product.name.split(" ");
+      if (parts.length > 1 && !isNaN(parts[parts.length-1])) {
+        const dosage = parts.pop();
+        pmName.innerHTML = `${parts.join(" ")} <span>${dosage}</span>`;
+      } else {
+        pmName.innerText = product.name;
+      }
+    }
+    
+    if (pmMol) pmMol.innerText = product.molecule;
+    if (pmPrice) pmPrice.innerText = product.price;
+    if (pmMrp) pmMrp.innerText = "₹" + product.mrp;
+
+    // Calculate discount and savings
+    const discount = Math.round(((product.mrp - product.price) / product.mrp) * 100);
+    const savings = product.mrp - product.price;
+    
+    const discountTag = document.querySelector(".pm-discount-tag");
+    const savingsEl = document.querySelector(".pm-savings span");
+    if (discountTag) discountTag.innerText = `${discount}% off`;
+    if (savingsEl) savingsEl.innerText = `₹${savings}`;
+
+    // Update icon circle color based on product color class
+    if (pmIconCircle) {
+      // Remove previous color classes if any
+      pmIconCircle.className = "pm-icon-circle"; 
+      // Mapping background classes to hex or just adding them
+      const colorMap = {
+        'bg-teal': '#008080',
+        'bg-amber': '#F5A623',
+        'bg-red': '#C0392B',
+        'bg-blue': '#185FA5',
+        'bg-purple': '#7B4EA6',
+        'bg-green': '#1a7a4a',
+        'bg-sand': '#F0EDE5'
+      };
+      const bgColor = colorMap[product.color] || '#D93B65';
+      pmIconCircle.style.backgroundColor = bgColor;
+      pmIconCircle.style.boxShadow = `0 0 40px ${bgColor}4d`; // 30% opacity
+    }
 
     modalOverlay.classList.add("active");
   }
@@ -486,42 +533,57 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     updateCartUI();
 
+    // Show feedback
+    if (typeof showToast === 'function') {
+      showToast('✓ Added to cart: ' + product.name, 'success');
+    }
+
     // Animate badge
-    cartBadge.style.transform = "scale(1.5)";
-    setTimeout(() => {
-      cartBadge.style.transform = "scale(1)";
-    }, 200);
+    const badge = document.querySelector(".cart-badge");
+    const mnBadge = document.getElementById("mnCartBadge");
+    if (badge) {
+      badge.classList.remove('bounce');
+      void badge.offsetWidth;
+      badge.classList.add('bounce');
+    }
+    if (mnBadge) {
+      mnBadge.textContent = cart.reduce((acc, item) => acc + item.qty, 0);
+    }
   }
 
   // --- ATTACH EVENTS ---
 
   document.body.addEventListener("click", (e) => {
-    const card = e.target.closest(".prod-card");
+    const card = e.target.closest(".prod-card, .kit-card, .herbal-card, .device-card");
     if (!card) return;
 
-    const isAddBtn = e.target.closest(".add-btn");
+    const isAddBtn = e.target.closest(".add-btn, .kit-add, .oxy-side-btn");
 
-    const nameEl = card.querySelector(".prod-name");
+    // Extract name
+    const nameEl = card.querySelector(".prod-name, .kit-name, .herbal-name, .device-name");
     if (!nameEl) return;
-    const name = nameEl.innerText.split(" Tablet")[0];
+    const rawName = nameEl.innerText;
+    const name = rawName.split(" Tablet")[0];
 
     let product = allProducts.find(p => name.includes(p.name) || p.name.includes(name));
 
     if (!product) {
-      const priceText = card.querySelector(".prod-price") ? card.querySelector(".prod-price").innerText.replace("₹", "") : "100";
-      const mrpText = card.querySelector(".prod-mrp") ? card.querySelector(".prod-mrp").innerText.replace("₹", "") : "120";
+      // Fallback for cards not in allProducts (static ones)
+      const priceEl = card.querySelector(".prod-price, .kit-price, .herbal-price, .device-price, .oxy-side-price");
+      const priceText = priceEl ? priceEl.innerText.replace(/[^0-9]/g, "") : "100";
       const imgEl = card.querySelector("img");
-      const tagEl = card.querySelector(".prod-tag");
-      const molEl = card.querySelector(".prod-mfr");
+      const tagEl = card.querySelector(".prod-tag, .herbal-tag");
+      const molEl = card.querySelector(".prod-mfr, .herbal-sub, .device-sub");
 
       product = {
         id: name.toLowerCase().replace(/\s+/g, '-'),
         name: name,
-        molecule: molEl ? molEl.innerText : "Medicine",
+        molecule: molEl ? molEl.innerText : "Verified Quality",
         category: tagEl ? tagEl.innerText : "General",
-        price: parseInt(priceText),
-        mrp: parseInt(mrpText),
-        img: imgEl ? imgEl.src : "images/tablets.png"
+        price: parseInt(priceText) || 100,
+        mrp: Math.round((parseInt(priceText) || 100) * 1.2),
+        img: imgEl ? imgEl.src : "images/tablets.png",
+        color: "bg-teal"
       };
     }
 

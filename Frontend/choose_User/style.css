@@ -991,9 +991,12 @@ canvas#particles {
 
 /* ── Breathing neon glow ── */
 @keyframes glowPulse {
-    0%, 100% {
+
+    0%,
+    100% {
         text-shadow: 0 0 15px rgba(147, 197, 253, 0.3);
     }
+
     50% {
         text-shadow: 0 0 35px rgba(147, 197, 253, 0.6);
     }
@@ -1338,12 +1341,19 @@ section {
     }
 }
 
-.reveal, .step, .role-card {
+.reveal,
+.step,
+.role-card {
     will-change: transform, opacity;
 }
 
 /* ─── GLOBE SECTION ─── */
-#how, #features, #faq, #fcta, #globe-sec, #roles {
+#how,
+#features,
+#faq,
+#fcta,
+#globe-sec,
+#roles {
     text-align: center;
     background: transparent;
 }
@@ -1463,6 +1473,7 @@ canvas#globe {
     transform-style: preserve-3d;
     will-change: transform;
     contain: layout;
+    transform: translate3d(0, 0, 0);
 }
 
 .role-card:hover {
@@ -1624,14 +1635,14 @@ canvas#globe {
     padding-bottom: 60px;
     position: relative;
     opacity: 0;
-    transform: translateX(-32px);
+    transform: translate3d(-32px, 0, 0);
     transition: opacity .5s cubic-bezier(.25, .46, .45, .94), transform .5s cubic-bezier(.25, .46, .45, .94);
     will-change: opacity, transform;
 }
 
 .step.vis {
     opacity: 1;
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
 }
 
 .step:not(:last-child)::after {
@@ -1796,7 +1807,9 @@ canvas#globe {
     border-radius: 16px;
     padding: 24px;
     cursor: pointer;
-    transition: background 0.3s ease, border-color 0.3s ease;
+    transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+    transform: translate3d(0, 0, 0);
+    will-change: transform, background;
 }
 
 .faq-item:hover {
@@ -1983,7 +1996,7 @@ canvas#globe {
 
 .reveal.vis {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
 }
 
 /* ─── PAGE TRANSITION ─── */
