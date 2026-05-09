@@ -60,7 +60,7 @@
       min-width: 320px;
       overflow-x: hidden;
       max-width: 100vw;
-      animation: pageFadeIn 0.4s ease-out forwards;
+      animation: pageFadeIn 0.15s cubic-bezier(0.2, 1, 0.2, 1) forwards;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -70,12 +70,12 @@
     }
 
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(16px); }
+      from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-20px); }
+      from { opacity: 0; transform: translateY(-25px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -91,7 +91,7 @@
       top: 0;
       z-index: 100;
       box-shadow: 0 2px 20px rgba(0, 0, 0, 0.18);
-      animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation: slideDown 0.25s cubic-bezier(0.2, 1, 0.2, 1) both;
     }
 
     .topbar-brand {
@@ -179,7 +179,7 @@
       align-items: flex-end;
       justify-content: space-between;
       gap: 24px;
-      animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+      animation: slideUp 0.2s cubic-bezier(0.2, 1, 0.2, 1) 0.05s both;
     }
 
     .hero-eyebrow {
@@ -3300,23 +3300,60 @@
 
     /* Animations */
     @keyframes pmSlideRight {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
     @keyframes pmFadeUp {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .modal-overlay.active .pm-icon-circle { animation: pmFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
-    .modal-overlay.active .pm-category-badge { animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
-    .modal-overlay.active .pm-type { animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
-    .modal-overlay.active .pm-name-main { animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
-    .modal-overlay.active .pm-subtitle { animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both; }
-    .modal-overlay.active .pm-stats-grid { animation: pmFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
-    .modal-overlay.active .pm-price-sec { animation: pmFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
-    .modal-overlay.active .pm-main-actions { animation: pmFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both; }
+    .modal-overlay.active .pm-icon-circle {
+      animation: pmFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .modal-overlay.active .pm-category-badge {
+      animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+    }
+
+    .modal-overlay.active .pm-type {
+      animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+    }
+
+    .modal-overlay.active .pm-name-main {
+      animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+    }
+
+    .modal-overlay.active .pm-subtitle {
+      animation: pmSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+    }
+
+    .modal-overlay.active .pm-stats-grid {
+      animation: pmFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+    }
+
+    .modal-overlay.active .pm-price-sec {
+      animation: pmFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+    }
+
+    .modal-overlay.active .pm-main-actions {
+      animation: pmFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+    }
 
     .pm-category-badge {
       background: var(--amber);
@@ -3417,7 +3454,9 @@
       color: #fff;
     }
 
-    .pm-stat-val.amber { color: var(--amber); }
+    .pm-stat-val.amber {
+      color: var(--amber);
+    }
 
     .pm-price-sec {
       display: flex;
@@ -3468,7 +3507,9 @@
       margin-top: 6px;
     }
 
-    .pm-savings span { color: var(--amber); }
+    .pm-savings span {
+      color: var(--amber);
+    }
 
     .pm-main-actions {
       display: grid;
@@ -3496,9 +3537,20 @@
       border-color: rgba(255, 255, 255, 0.15);
     }
 
-    .pm-btn-icon { font-size: 18px; }
-    .pm-btn-title { font-size: 12px; font-weight: 700; color: #fff; }
-    .pm-btn-sub { font-size: 9px; color: rgba(255, 255, 255, 0.3); }
+    .pm-btn-icon {
+      font-size: 18px;
+    }
+
+    .pm-btn-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .pm-btn-sub {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.3);
+    }
 
     .pm-meta-row {
       display: flex;
@@ -3530,8 +3582,18 @@
       gap: 6px;
     }
 
-    .pm-stock-dot { width: 5px; height: 5px; background: #1a7a4a; border-radius: 50%; }
-    .pm-stock-text { font-size: 9px; font-weight: 700; color: #1a7a4a; }
+    .pm-stock-dot {
+      width: 5px;
+      height: 5px;
+      background: #1a7a4a;
+      border-radius: 50%;
+    }
+
+    .pm-stock-text {
+      font-size: 9px;
+      font-weight: 700;
+      color: #1a7a4a;
+    }
 
     .pm-footer-badges {
       display: flex;
@@ -3556,17 +3618,25 @@
         flex-direction: column;
         max-width: 400px;
       }
+
       .pm-left {
         flex: 0 0 auto;
         padding: 30px;
         border-right: none;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       }
+
       .pm-right {
         padding: 24px;
       }
-      .pm-name-main { font-size: 32px; }
-      .pm-price-val { font-size: 40px; }
+
+      .pm-name-main {
+        font-size: 32px;
+      }
+
+      .pm-price-val {
+        font-size: 40px;
+      }
     }
 
     /* Ripple effect */
@@ -6820,7 +6890,8 @@
         <div class="pm-left">
           <div class="pm-icon-circle">
             <svg class="pm-pill-svg" viewBox="0 0 24 24">
-              <path d="M19,10H16V7a5,5,0,0,0-10,0v3H3a1,1,0,0,0-1,1v8a5,5,0,0,0,5,5H17a5,5,0,0,0,5-5V11A1,1,0,0,0,19,10ZM8,7a3,3,0,0,1,6,0v3H8Zm12,12a3,3,0,0,1-3,3H7a3,3,0,0,1-3-3V12H20Z" />
+              <path
+                d="M19,10H16V7a5,5,0,0,0-10,0v3H3a1,1,0,0,0-1,1v8a5,5,0,0,0,5,5H17a5,5,0,0,0,5-5V11A1,1,0,0,0,19,10ZM8,7a3,3,0,0,1,6,0v3H8Zm12,12a3,3,0,0,1-3,3H7a3,3,0,0,1-3-3V12H20Z" />
             </svg>
           </div>
           <div class="pm-meta-row">
@@ -7283,7 +7354,7 @@
   </script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script>AOS.init({ duration: 800, once: false, offset: 50, easing: 'ease-out-cubic' });</script>
+  <script>AOS.init({ duration: 400, once: true, offset: 50, easing: 'ease-out-expo' });</script>
   <script src="products.js"></script>
 </body>
 

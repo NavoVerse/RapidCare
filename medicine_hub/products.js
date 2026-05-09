@@ -403,7 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function openModal(product) {
     currentModalProduct = product;
-    
+
     // Update IDs
     const pmTag = document.getElementById("pmTag");
     const pmName = document.getElementById("pmName");
@@ -411,20 +411,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const pmPrice = document.getElementById("pmPrice");
     const pmMrp = document.getElementById("pmMrp");
     const pmIconCircle = document.querySelector(".pm-icon-circle");
-    
+
     if (pmTag) pmTag.innerText = product.category;
-    
+
     // Split name and dosage if possible (e.g., "Azithromycin 500" -> "Azithromycin <span>500</span>")
     if (pmName) {
       const parts = product.name.split(" ");
-      if (parts.length > 1 && !isNaN(parts[parts.length-1])) {
+      if (parts.length > 1 && !isNaN(parts[parts.length - 1])) {
         const dosage = parts.pop();
         pmName.innerHTML = `${parts.join(" ")} <span>${dosage}</span>`;
       } else {
         pmName.innerText = product.name;
       }
     }
-    
+
     if (pmMol) pmMol.innerText = product.molecule;
     if (pmPrice) pmPrice.innerText = product.price;
     if (pmMrp) pmMrp.innerText = "₹" + product.mrp;
@@ -432,7 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Calculate discount and savings
     const discount = Math.round(((product.mrp - product.price) / product.mrp) * 100);
     const savings = product.mrp - product.price;
-    
+
     const discountTag = document.querySelector(".pm-discount-tag");
     const savingsEl = document.querySelector(".pm-savings span");
     if (discountTag) discountTag.innerText = `${discount}% off`;
@@ -442,7 +442,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const pmLeft = document.querySelector(".pm-left");
     if (pmIconCircle) {
       // Remove previous color classes if any
-      pmIconCircle.className = "pm-icon-circle"; 
+      pmIconCircle.className = "pm-icon-circle";
       // Mapping background classes to hex
       const colorMap = {
         'bg-teal': '#008080',
@@ -456,7 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const bgColor = colorMap[product.color] || '#D93B65';
       pmIconCircle.style.backgroundColor = bgColor;
       pmIconCircle.style.boxShadow = `0 0 30px ${bgColor}4d`; // 30% opacity
-      
+
       if (pmLeft) {
         pmLeft.style.background = `linear-gradient(180deg, ${bgColor}1a 0%, transparent 100%)`; // 10% opacity
       }
