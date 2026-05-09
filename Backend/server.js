@@ -391,7 +391,7 @@ app.get('/api/v1/hospitals/external-details', async (req, res) => {
     }
 
     try {
-        const { GoogleGenerativeAI } = require("@google/generativeai");
+        const { GoogleGenerativeAI } = require("@google/generative-ai");
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 

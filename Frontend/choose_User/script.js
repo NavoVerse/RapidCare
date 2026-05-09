@@ -110,6 +110,19 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch(e) { /* Audio not supported — silent fallback */ }
         }
 
+        /* Resume AudioContext on first interaction to satisfy browser policies */
+        const resumeAudio = () => {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) {
+                const tempCtx = new AC();
+                if (tempCtx.state === 'suspended') tempCtx.resume();
+            }
+            window.removeEventListener('click', resumeAudio);
+            window.removeEventListener('keydown', resumeAudio);
+        };
+        window.addEventListener('click', resumeAudio);
+        window.addEventListener('keydown', resumeAudio);
+
         /* Dynamic status messages cycling during initialization */
         const messages = [
             "SYSTEM INITIALIZATION",
@@ -152,7 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+        let started = false;
         const startSequence = () => {
+            if (started) return;
+            started = true;
             /* Hide splash content behind flash initially */
             document.body.classList.add('flash-active');
             
@@ -182,11 +198,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 4600);
         };
 
-        /* Run sequence regardless of font loading for robustness */
+        /* Run sequence with a safety timeout for font loading to prevent hangs */
+        const fontTimeout = setTimeout(startSequence, 1500);
         if (document.fonts && document.fonts.ready) {
-            document.fonts.ready.then(startSequence).catch(startSequence);
-        } else {
-            setTimeout(startSequence, 500);
+            document.fonts.ready.then(() => {
+                clearTimeout(fontTimeout);
+                startSequence();
+            }).catch(() => {
+                clearTimeout(fontTimeout);
+                startSequence();
+            });
         }
     })();
 
