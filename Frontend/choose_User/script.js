@@ -1,12 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── PARTICLE SYSTEM ─── */
-    window.initParticles = function () {
+    (function () {
         const c = document.getElementById('particles');
         if (!c) return;
-        const ctx = c.getContext('2d');
+        const ctx = c.getContext('2d', { alpha: true });
         let W, H, pts = [];
-        function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+        let isVisible = false;
+
+        function resize() {
+            W = c.width = window.innerWidth;
+            H = c.height = window.innerHeight;
+        }
         resize(); window.addEventListener('resize', resize);
         function mkPt() {
             return {
@@ -15,10 +20,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35
             };
         }
-        for (let i = 0; i < 45; i++) pts.push(mkPt());
+        resize(); window.addEventListener('resize', resize);
+
+        function mkPt() {
+            return {
+                x: Math.random() * W, y: Math.random() * H,
+                vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
+                r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35
+            };
+        }
+        for (let i = 0; i < 25; i++) pts.push(mkPt());
+
         const dSqLimit = 100 * 100;
+
         function draw() {
             ctx.clearRect(0, 0, W, H);
+
+            // Draw particles
             pts.forEach(p => {
                 p.x += p.vx; p.y += p.vy;
                 if (p.x < 0 || p.x > W) p.vx *= -1;
@@ -27,9 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillStyle = `rgba(147,197,253,${p.a})`; ctx.fill();
             });
 
-            /* Optimized Line System — fewer connections */
+            /* Optimized Line System — single stroke for all lines */
             ctx.beginPath();
-            ctx.strokeStyle = 'rgba(147,197,253,0.15)';
+            ctx.strokeStyle = 'rgba(147,197,253,0.12)';
             ctx.lineWidth = 0.5;
             for (let i = 0; i < pts.length; i++) {
                 const a = pts[i];
@@ -43,10 +61,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             ctx.stroke();
-            requestAnimationFrame(draw);
+
+            if (isVisible) requestAnimationFrame(draw);
         }
-        draw();
-    };
+
+        const observer = new IntersectionObserver(entries => {
+            const wasVisible = isVisible;
+            isVisible = entries[0].isIntersecting;
+            if (isVisible && !wasVisible) draw();
+        }, { threshold: 0 });
+
+        window.initParticles = function () {
+            observer.observe(c);
+            draw();
+        };
+    })();
+
 
     /* ─── FLASH SCREEN, LOADING SOUND & TITLE SCRAMBLE ─── */
     (function () {
@@ -111,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 readyOsc.stop(ctx.currentTime + 3.4);
             } catch (e) { /* Audio not supported — silent fallback */ }
         }
-
         /* Dynamic status messages cycling during initialization */
         const messages = [
             "SYSTEM INITIALIZATION",
@@ -152,21 +181,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         initInteractiveTitleGlow();
 
-
-
         const startSequence = () => {
+            if (flashScreen.dataset.started) return;
+            flashScreen.dataset.started = "true";
+
             /* Hide splash content behind flash initially */
             document.body.classList.add('flash-active');
 
             /* Play loading sound */
-            playLoadingSound();
+            if (typeof playLoadingSound === 'function') playLoadingSound();
 
-            /* Stage 1 @ 2.4s: Fade out flash inner content (text floats up) */
+            /* Stage 1 @ 1.2s: Fade out flash inner content (text floats up) */
             setTimeout(() => {
                 flashScreen.classList.add('fade-content');
-            }, 2400);
+            }, 1200);
 
-            /* Stage 2 @ 3.0s: Dissolve background with blur + reveal splash */
+            /* Stage 2 @ 1.8s: Dissolve background with blur + reveal splash */
             setTimeout(() => {
                 flashScreen.classList.add('hidden');
                 document.body.classList.remove('flash-active');
@@ -175,21 +205,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 /* Start heavy canvas animations ONLY after flash is gone */
                 if (window.initParticles) window.initParticles();
                 if (window.initGlobe) window.initGlobe();
-            }, 3200);
+            }, 1800);
 
             /* Cleanup: remove flash screen from DOM after transition completes */
             setTimeout(() => {
                 flashScreen.remove();
                 document.body.classList.remove('flash-revealed');
-            }, 4600);
+            }, 3200);
         };
 
-        /* Run sequence regardless of font loading for robustness */
+        /* Run sequence when fonts are ready, or after a safety timeout */
         if (document.fonts && document.fonts.ready) {
             document.fonts.ready.then(startSequence).catch(startSequence);
         } else {
             setTimeout(startSequence, 500);
         }
+
+        /* Absolute safety fallback: Start sequence after 600ms regardless of fonts */
+        setTimeout(startSequence, 600);
     })();
 
     /* ─── GLOBE ─── */
@@ -247,11 +280,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = sphereGrad;
             ctx.fill();
 
-            /* Latitude lines — Optimized 5° resolution */
+            /* Latitude lines — Optimized 10° resolution for performance */
             for (let lat = -80; lat <= 80; lat += 20) {
                 ctx.beginPath();
                 let first = true;
-                for (let lon = -180; lon <= 180; lon += 5) {
+                for (let lon = -180; lon <= 180; lon += 10) {
                     const p = ll2xy(lat, lon, R, rot);
                     if (!p.vis) { first = true; continue; }
                     first ? (ctx.moveTo(p.x, p.y), first = false) : ctx.lineTo(p.x, p.y);
@@ -262,11 +295,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.stroke();
             }
 
-            /* Longitude lines — Optimized 5° resolution */
+            /* Longitude lines — Optimized 10° resolution */
             for (let lon = -180; lon < 180; lon += 20) {
                 ctx.beginPath();
                 let first = true;
-                for (let lat = -85; lat <= 85; lat += 5) {
+                for (let lat = -80; lat <= 80; lat += 10) {
                     const p = ll2xy(lat, lon, R, rot);
                     if (!p.vis) { first = true; continue; }
                     first ? (ctx.moveTo(p.x, p.y), first = false) : ctx.lineTo(p.x, p.y);
@@ -346,12 +379,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fill();
             });
 
-            requestAnimationFrame(drawGlobe);
+            if (lastTime) requestAnimationFrame(drawGlobe);
         }
 
         /* Encapsulate globe start */
         window.initGlobe = function () {
-            requestAnimationFrame(drawGlobe);
+            const globeObserver = new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting) {
+                    if (!lastTime) {
+                        lastTime = performance.now();
+                        requestAnimationFrame(drawGlobe);
+                    }
+                } else {
+                    lastTime = 0; // Stop loop
+                }
+            }, { threshold: 0 });
+            globeObserver.observe(c);
+        };
         };
     })();
 
@@ -383,6 +427,33 @@ document.addEventListener('DOMContentLoaded', () => {
         demoBtn.addEventListener('click', () => {
             window.open('https://youtu.be/ubltmM3TzX0?si=ukI79E1Bv98i2vAi', '_blank');
         });
+    }
+
+    /* ─── OPTIMIZED FAQ TOGGLE ─── */
+    const faqList = document.querySelector('.faq-list');
+    if (faqList) {
+        faqList.addEventListener('click', (e) => {
+            const item = e.target.closest('.faq-item');
+            if (item) {
+                // Use requestAnimationFrame for a "frame-perfect" toggle
+                requestAnimationFrame(() => {
+                    // Close other items for a cleaner experience (Optional, but helps performance)
+                    faqList.querySelectorAll('.faq-item.active').forEach(activeItem => {
+                        if (activeItem !== item) activeItem.classList.remove('active');
+                    });
+                    item.classList.toggle('active');
+                });
+            }
+        });
+    }
+
+    /* ─── SCROLL PERFORMANCE ENHANCEMENT ─── */
+    // Ensure fixed background doesn't trigger unnecessary repaints
+    const globalBg = document.querySelector('.global-bg');
+    if (globalBg) {
+        // Force GPU layer
+        globalBg.style.transform = 'translateZ(0)';
+        globalBg.style.backfaceVisibility = 'hidden';
     }
 });
 
@@ -426,10 +497,10 @@ function openMedicineHub() {
     if (splash) {
         splash.classList.add('active');
 
-        // Wait for splash animation then redirect to unified route
+        // Accelerated redirect for "lagless" feel
         setTimeout(() => {
             window.location.href = '/medicine-hub';
-        }, 1500);
+        }, 750);
     } else {
         window.location.href = '/medicine-hub';
     }

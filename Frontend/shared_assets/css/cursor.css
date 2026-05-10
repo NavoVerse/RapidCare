@@ -6,8 +6,10 @@
 }
 
 [data-theme="light"] {
-  --cursor-l1: #191970; /* Midnight Blue from theme.css */
-  --cursor-l2: #2563EB; /* Primary Blue */
+  --cursor-l1: #191970;
+  /* Midnight Blue from theme.css */
+  --cursor-l2: #2563EB;
+  /* Primary Blue */
   --cursor-blend: multiply;
 }
 
@@ -16,7 +18,14 @@ body {
 }
 
 /* Hide cursor on interactive elements as well */
-a, button, input, select, textarea, .stat-card, .amb-card, .tr-row {
+a,
+button,
+input,
+select,
+textarea,
+.stat-card,
+.amb-card,
+.tr-row {
   cursor: none !important;
 }
 
@@ -73,8 +82,15 @@ a, button, input, select, textarea, .stat-card, .amb-card, .tr-row {
 }
 
 @keyframes trailFade {
-  0%   { opacity: .55; transform: translate(-50%,-50%) scale(1); }
-  100% { opacity: 0;   transform: translate(-50%,-50%) scale(0); }
+  0% {
+    opacity: .55;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
 }
 
 /* ── SPLASH ── */
@@ -88,8 +104,15 @@ a, button, input, select, textarea, .stat-card, .amb-card, .tr-row {
 }
 
 @keyframes splashFly {
-  0%   { opacity: 1; transform: translate(-50%,-50%) translate(0,0) scale(1); }
-  100% { opacity: 0; transform: translate(-50%,-50%) translate(var(--tx),var(--ty)) scale(0); }
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(0);
+  }
 }
 
 .splash-ring {
@@ -105,8 +128,15 @@ a, button, input, select, textarea, .stat-card, .amb-card, .tr-row {
 }
 
 @keyframes splashRingOut {
-  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(6); }
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(6);
+  }
 }
 
 /* ── TOUCH RIPPLE ── */
@@ -128,16 +158,23 @@ a, button, input, select, textarea, .stat-card, .amb-card, .tr-row {
 }
 
 @keyframes rippleAnim {
-  0%   { opacity: .8; transform: translate(-50%, -50%) scale(0); }
-  100% { opacity: 0;  transform: translate(-50%, -50%) scale(2.5); }
+  0% {
+    opacity: .8;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.5);
+  }
 }
 
 /* Global class to disable all custom mouse effects */
-body.disable-mouse-effects, 
-body.disable-mouse-effects a, 
-body.disable-mouse-effects button, 
-body.disable-mouse-effects input, 
-body.disable-mouse-effects select, 
+body.disable-mouse-effects,
+body.disable-mouse-effects a,
+body.disable-mouse-effects button,
+body.disable-mouse-effects input,
+body.disable-mouse-effects select,
 body.disable-mouse-effects textarea,
 body.disable-mouse-effects .stat-card,
 body.disable-mouse-effects .amb-card,
@@ -145,10 +182,10 @@ body.disable-mouse-effects .tr-row {
   cursor: auto !important;
 }
 
-body.disable-mouse-effects .cursor-dot, 
-body.disable-mouse-effects .cursor-ring, 
-body.disable-mouse-effects .cursor-trail, 
-body.disable-mouse-effects .splash-particle, 
+body.disable-mouse-effects .cursor-dot,
+body.disable-mouse-effects .cursor-ring,
+body.disable-mouse-effects .cursor-trail,
+body.disable-mouse-effects .splash-particle,
 body.disable-mouse-effects .splash-ring,
 body.disable-mouse-effects .m-glow,
 body.disable-mouse-effects #mGlow {
@@ -169,9 +206,9 @@ body.disable-mouse-effects #mGlow {
   justify-content: center;
   cursor: pointer;
   z-index: 10000;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
-  border: 2px solid rgba(255,255,255,0.1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   opacity: 0.6;
 }
 
@@ -195,15 +232,25 @@ body.disable-mouse-effects .effects-toggle svg {
 }
 
 /* Restore default cursor and hide custom elements on mobile */
-@media (max-width: 768px), (pointer: coarse) {
-  body, a, button, input, select, textarea, .stat-card, .amb-card, .tr-row {
+@media (max-width: 768px),
+(pointer: coarse) {
+
+  body,
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  .stat-card,
+  .amb-card,
+  .tr-row {
     cursor: auto !important;
   }
-  
-  .cursor-dot, 
-  .cursor-ring, 
-  .cursor-trail, 
-  .splash-particle, 
+
+  .cursor-dot,
+  .cursor-ring,
+  .cursor-trail,
+  .splash-particle,
   .splash-ring {
     display: none !important;
   }
