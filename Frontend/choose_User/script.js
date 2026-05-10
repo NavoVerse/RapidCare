@@ -13,14 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
             H = c.height = window.innerHeight;
         }
         resize(); window.addEventListener('resize', resize);
-        function mkPt() {
-            return {
-                x: Math.random() * W, y: Math.random() * H,
-                vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
-                r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35
-            };
-        }
-        resize(); window.addEventListener('resize', resize);
 
         function mkPt() {
             return {
@@ -395,7 +387,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, { threshold: 0 });
             globeObserver.observe(c);
-        };
         };
     })();
 
