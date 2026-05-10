@@ -33,7 +33,7 @@ const fcmTokens = {};
 
 // ── Firebase Admin SDK Initialization ─────────────────────────────────────────
 try {
-    const fs = require('fs');
+
     const serviceAccountPath = path.resolve(__dirname, 'firebase-service-account.json');
     let serviceAccount;
 
