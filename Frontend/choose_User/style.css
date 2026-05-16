@@ -2887,10 +2887,3 @@ section {
     transform: translateZ(0);
     content-visibility: auto;
 }
-
-backface-visibility: hidden;
-transform: translateZ(0);
-}
-
-ransform: translateZ(0);
-}
