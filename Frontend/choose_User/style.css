@@ -2381,6 +2381,25 @@ canvas#globe {
     .mouse-glow {
         display: none !important;
     }
+
+    /* Prevent double-tap issue on iOS by neutralizing hover transforms on touch devices */
+    #splash .btn-prim:hover,
+    .btn-prim:hover,
+    .btn-out:hover,
+    .cta-btn:hover:not(:disabled),
+    .role-card:hover,
+    .med-hub-popup:hover {
+        transform: none !important;
+    }
+    
+    #splash .btn-prim:hover::before,
+    .med-hub-popup:hover::before {
+        transform: translateX(-105%) skewX(-15deg) !important;
+    }
+    
+    .role-card:hover .card-icon svg {
+        transform: none !important;
+    }
 }
 
 /* Always hide mouse glow */
@@ -2889,5 +2908,5 @@ section {
 #fcta {
     backface-visibility: hidden;
     transform: translateZ(0);
-    content-visibility: auto;
+    /* content-visibility: auto; Disabled because it breaks scrollIntoView on mobile */
 }
