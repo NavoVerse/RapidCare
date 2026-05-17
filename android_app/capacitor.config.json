@@ -1,0 +1,10 @@
+{
+  "appId": "com.navoverse.rapidcare",
+  "appName": "RapidCare",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://rapidcare-c2jt.onrender.com",
+    "cleartext": true
+  }
+}

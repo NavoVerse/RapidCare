@@ -30,3 +30,8 @@ yarn-error.log*
 ehthumbs.db
 Thumbs.db
 Backend\rapidcare-5652c-firebase-adminsdk-fbsvc-882301ae39.json
+
+# Windows App build artifacts
+windows_app/dist/
+*.exe
+windows_app/build_output.log

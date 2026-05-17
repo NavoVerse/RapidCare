@@ -1,0 +1,21 @@
+{
+  "name": "rapidcare-android",
+  "version": "1.0.0",
+  "description": "RapidCare Android App Wrapper",
+  "main": "index.js",
+  "scripts": {
+    "build": "cap sync android"
+  },
+  "keywords": [
+    "rapidcare",
+    "android",
+    "capacitor"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/android": "^8.3.4",
+    "@capacitor/cli": "^8.3.4",
+    "@capacitor/core": "^8.3.4"
+  }
+}
