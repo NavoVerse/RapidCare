@@ -1,0 +1,30 @@
+{
+  "name": "rapidcare-windows",
+  "version": "1.0.0",
+  "description": "RapidCare Windows Desktop Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": [
+    "rapidcare",
+    "windows",
+    "desktop"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tree-kill": "^1.2.2"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.navoverse.rapidcare",
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
