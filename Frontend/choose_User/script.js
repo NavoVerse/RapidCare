@@ -1,5 +1,10 @@
-document.addEventListener('DOMContentLoaded', () => {
+/* Force page to load at the very top, ignoring browser's scroll restoration */
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+window.scrollTo(0, 0);
 
+document.addEventListener('DOMContentLoaded', () => {
     /* ─── PARTICLE SYSTEM ─── */
     (function () {
         const c = document.getElementById('particles');
@@ -17,13 +22,15 @@ document.addEventListener('DOMContentLoaded', () => {
         function mkPt() {
             return {
                 x: Math.random() * W, y: Math.random() * H,
-                vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
-                r: Math.random() * 1.8 + .6, a: Math.random() * .7 + .35
+                vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35,
+                r: Math.random() * 2.5 + 1.2, a: Math.random() * .5 + .5
             };
         }
-        for (let i = 0; i < 25; i++) pts.push(mkPt());
+        let numParticles = window.innerWidth < 768 ? 15 : 35;
+        for (let i = 0; i < numParticles; i++) pts.push(mkPt());
 
-        const dSqLimit = 100 * 100;
+        const baseDist = window.innerWidth < 768 ? 100 : 140;
+        const dSqLimit = baseDist * baseDist;
 
         function draw() {
             ctx.clearRect(0, 0, W, H);
@@ -39,8 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* Optimized Line System — single stroke for all lines */
             ctx.beginPath();
-            ctx.strokeStyle = 'rgba(147,197,253,0.12)';
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = 'rgba(147,197,253,0.25)';
+            ctx.lineWidth = 0.8;
             for (let i = 0; i < pts.length; i++) {
                 const a = pts[i];
                 for (let j = i + 1; j < pts.length; j++) {
