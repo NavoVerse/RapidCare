@@ -37,9 +37,7 @@ body {
 html {
     scroll-behavior: smooth;
     height: 100%;
-    /* Improve scroll performance */
     overflow-y: scroll;
-    scrollbar-gutter: stable;
     background: #020c1b;
 }
 
@@ -1306,9 +1304,6 @@ section {
     overflow: hidden;
     padding: 120px 40px;
     background-color: transparent;
-    contain: content;
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 1000px;
     transform: translateZ(0);
 }
 
@@ -2882,9 +2877,6 @@ canvas#globe {
 }
 
 /* ─── PERFORMANCE OPTIMIZATIONS ─── */
-section {
-    contain: content;
-}
 
 /* Optimized reveal styles */
 .reveal {
