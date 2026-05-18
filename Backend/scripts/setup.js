@@ -69,6 +69,12 @@ function runCmd(cmd, opts = {}) {
 
 // ── Main Setup ───────────────────────────────────────────────────────────────
 async function main() {
+    // Bypass setup checks on cloud providers (Render, Heroku, etc.)
+    if (process.env.NODE_ENV === 'production') {
+        console.log('  ℹ  Production environment detected. Bypassing automatic development setup.');
+        return;
+    }
+
     const TOTAL_STEPS = 5;
 
     console.log('');
