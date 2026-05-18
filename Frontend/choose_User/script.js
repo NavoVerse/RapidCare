@@ -335,6 +335,10 @@ document.addEventListener('DOMContentLoaded', () => {
         globalBg.style.transform = 'translateZ(0)';
         globalBg.style.backfaceVisibility = 'hidden';
     }
+
+    /* ─── INITIALIZE ANIMATIONS DIRECTLY ─── */
+    if (window.initParticles) window.initParticles();
+    if (window.initGlobe) window.initGlobe();
 });
 
 /* ─── ROLE SELECT ─── */
@@ -396,6 +400,3 @@ window.addEventListener('scroll', () => {
     progressBar.style.width = scrolled + '%';
 }, { passive: true });
 
-/* ─── INITIALIZE ANIMATIONS DIRECTLY ─── */
-if (window.initParticles) window.initParticles();
-if (window.initGlobe) window.initGlobe();
