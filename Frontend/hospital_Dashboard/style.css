@@ -97,7 +97,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);overflo
 
 /* ── STATS ROW ── */
 .stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
-.stat-card{position:relative;background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:20px 18px;overflow:hidden;opacity:0;transform:translateY(20px);transition:opacity .5s ease-out,transform .5s ease-out,box-shadow .3s,border-color .3s, background .3s;transform-style:preserve-3d;cursor:default;contain:content;will-change:transform,opacity}
+.stat-card{position:relative;background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:20px 18px;overflow:hidden;opacity:0;transform:translateY(20px);transition:opacity .5s ease-out,transform .5s ease-out,box-shadow .3s,border-color .3s, background .3s;transform-style:preserve-3d;cursor:default;contain:content}
 
 .stat-card:hover {
     border-color: var(--l2);
@@ -173,7 +173,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);overflo
 
 /* ── AMBULANCE ── */
 .amb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.amb-card{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:20px;transition:var(--trans);opacity:0;transform:translateY(20px);contain:content;will-change:transform,opacity}
+.amb-card{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:20px;transition:var(--trans);opacity:0;transform:translateY(20px);contain:content}
 .amb-card.visible{opacity:1;transform:translateY(0)}
 .amb-card:hover{border-color:rgba(84,172,191,.4);box-shadow:0 8px 40px rgba(84,172,191,.15);transform:translateY(-4px)}
 .amb-card.standby:hover{border-color:rgba(45,224,138,.3);box-shadow:0 8px 30px rgba(45,224,138,.1)}

@@ -71,9 +71,9 @@ body {
     height: 100svh;
     z-index: 999999;
     background:
-        radial-gradient(ellipse 80% 60% at 50% 45%, rgba(15, 32, 64, 0.95) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 40% at 20% 80%, rgba(37, 99, 235, 0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 80% 20%, rgba(239, 68, 68, 0.04) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 60% at 50% 45%, rgba(15, 32, 64, 0.94) 0%, rgba(1, 8, 18, 0.98) 70%),
+        radial-gradient(ellipse 50% 40% at 20% 80%, rgba(37, 99, 235, 0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 20%, rgba(239, 68, 68, 0.03) 0%, transparent 60%),
         linear-gradient(160deg, #010812 0%, #0a1628 35%, #071324 65%, #010812 100%);
     display: flex;
     flex-direction: column;
@@ -84,21 +84,22 @@ body {
     visibility: visible;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.8);
+    transition: opacity 0.6s cubic-bezier(0.33, 1, 0.68, 1),
+        transform 0.6s cubic-bezier(0.33, 1, 0.68, 1),
+        visibility 0.6s;
 }
 
 /* ── Cinematic Grain Overlay ── */
 .flash-screen::before {
     content: '';
     position: absolute;
-    inset: -100%;
-    width: 300%;
-    height: 300%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-    opacity: 0.04;
+    opacity: 0.03;
     pointer-events: none;
     z-index: 1;
-    animation: grainMove 6s steps(8) infinite;
-    will-change: transform;
 }
 
 @keyframes grainMove {
@@ -152,22 +153,21 @@ body {
 }
 
 /* ── Stage 1: Content fades out first ── */
-.flash-screen.fade-content .flash-content,
-.flash-screen.fade-content .flash-ekg,
-.flash-screen.fade-content .flash-corner {
+.flash-screen.fade-content .flash-content {
     opacity: 0;
-    transform: translateY(-20px) scale(0.96);
-    transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform: translateY(-20px) scale(0.97);
+    transition: opacity 0.4s cubic-bezier(0.33, 1, 0.68, 1),
+        transform 0.4s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .flash-screen.fade-content .flash-loader-bar {
     opacity: 0;
-    transition: opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: opacity 0.4s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .flash-screen.fade-content .flash-bg-orbs {
     opacity: 0.8;
-    transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: opacity 0.6s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 /* ── Stage 2: Background dissolves smoothly ── */
@@ -176,9 +176,6 @@ body {
     visibility: hidden;
     transform: scale(1.02);
     pointer-events: none;
-    transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
-        transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
-        visibility 0.6s;
     will-change: transform, opacity;
 }
 
@@ -195,7 +192,7 @@ body.flash-active section:not(#splash) {
 }
 
 body.flash-revealed #splash {
-    animation: splashEnter 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation: splashEnter 0.8s cubic-bezier(0.33, 1, 0.68, 1) forwards;
     will-change: transform, opacity;
 }
 
@@ -212,7 +209,7 @@ body.flash-revealed section:not(#splash) {
 @keyframes splashEnter {
     from {
         opacity: 0;
-        transform: scale(0.99) translateY(10px);
+        transform: scale(0.97) translateY(15px);
     }
 
     to {
@@ -296,8 +293,7 @@ body.flash-revealed section:not(#splash) {
     background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.05) 40%, transparent 75%);
     top: -15%;
     right: -10%;
-    animation-delay: 0.3s;
-    animation: flashOrbIn 1.5s ease 0.3s forwards, floatOrbA 14s ease-in-out infinite 1.8s;
+    animation: flashOrbIn 1.2s ease 0.2s forwards;
 }
 
 .flash-orb-2 {
@@ -306,7 +302,7 @@ body.flash-revealed section:not(#splash) {
     background: radial-gradient(circle, rgba(96, 165, 250, 0.1) 0%, rgba(96, 165, 250, 0.02) 40%, transparent 75%);
     bottom: -20%;
     left: -15%;
-    animation: flashOrbIn 1.5s ease 0.5s forwards, floatOrbB 18s ease-in-out infinite 2s;
+    animation: flashOrbIn 1.2s ease 0.3s forwards;
 }
 
 .flash-orb-3 {
@@ -315,7 +311,7 @@ body.flash-revealed section:not(#splash) {
     background: radial-gradient(circle, rgba(239, 68, 68, 0.06) 0%, rgba(239, 68, 68, 0.02) 40%, transparent 75%);
     top: 30%;
     left: 60%;
-    animation: flashOrbIn 1.5s ease 0.8s forwards, floatOrbA 10s ease-in-out infinite 2.5s alternate-reverse;
+    animation: flashOrbIn 1.2s ease 0.4s forwards;
 }
 
 @keyframes floatOrbA {
@@ -361,40 +357,7 @@ body.flash-revealed section:not(#splash) {
     }
 }
 
-/* ── Corner Accents ── */
-.flash-corner {
-    position: absolute;
-    width: clamp(24px, 4vw, 40px);
-    height: clamp(24px, 4vw, 40px);
-    opacity: 0;
-    animation: flashCornerIn 0.6s ease 0.9s forwards;
-}
-
-@keyframes flashCornerIn {
-    to {
-        opacity: 1;
-    }
-}
-
-.flash-corner-tl {
-    top: clamp(16px, 3vw, 32px);
-    left: clamp(16px, 3vw, 32px);
-}
-
-.flash-corner-tr {
-    top: clamp(16px, 3vw, 32px);
-    right: clamp(16px, 3vw, 32px);
-}
-
-.flash-corner-bl {
-    bottom: clamp(28px, 4vw, 48px);
-    left: clamp(16px, 3vw, 32px);
-}
-
-.flash-corner-br {
-    bottom: clamp(28px, 4vw, 48px);
-    right: clamp(16px, 3vw, 32px);
-}
+/* Corner borders removed for hyper-minimal clean aesthetic */
 
 /* ── Center Content ── */
 .flash-content {
@@ -427,35 +390,7 @@ body.flash-revealed section:not(#splash) {
     height: clamp(80px, 14vw, 120px);
 }
 
-.flash-logo-ring {
-    position: absolute;
-    inset: -16px;
-    border-radius: 50%;
-    border: 1px solid rgba(96, 165, 250, 0.25);
-    animation: flashRingPulse 2.4s cubic-bezier(0, 0, 0.2, 1) infinite 1.2s;
-}
-
-.flash-logo-ring::before {
-    content: '';
-    position: absolute;
-    inset: -18px;
-    border-radius: 50%;
-    border: 1px solid rgba(96, 165, 250, 0.12);
-    animation: flashRingPulse 2.4s cubic-bezier(0, 0, 0.2, 1) infinite 1.6s;
-}
-
-@keyframes flashRingPulse {
-    0% {
-        transform: scale(1);
-        opacity: 0.8;
-    }
-
-    75%,
-    100% {
-        transform: scale(1.45);
-        opacity: 0;
-    }
-}
+/* Logo rings removed for hyper-minimal clean aesthetic */
 
 /* ── Plus Mark ── */
 .flash-logo-mark {
@@ -516,9 +451,9 @@ body.flash-revealed section:not(#splash) {
 
 .flash-text {
     font-family: var(--konstant-font);
-    font-size: clamp(36px, 10vw, 88px);
+    font-size: clamp(48px, 10vw, 96px);
     font-weight: 900;
-    letter-spacing: clamp(6px, 2vw, 14px);
+    letter-spacing: clamp(4px, 1.5vw, 10px);
     color: rgba(255, 255, 255, 0.92);
     line-height: 1;
     text-transform: uppercase;
@@ -591,16 +526,6 @@ body.flash-revealed section:not(#splash) {
     z-index: 10;
 }
 
-.flash-loader-sweep {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 30%;
-    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.8), rgba(37, 99, 235, 1), rgba(96, 165, 250, 0.8), transparent);
-    animation: flashSweep 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-}
-
 .flash-loader-progress {
     position: absolute;
     top: 0;
@@ -609,18 +534,8 @@ body.flash-revealed section:not(#splash) {
     width: 0%;
     background: linear-gradient(90deg, rgba(37, 99, 235, 0.6), rgba(96, 165, 250, 0.9));
     box-shadow: 0 0 12px rgba(96, 165, 250, 0.5);
-    animation: flashProgress 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: flashProgress 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     border-radius: 0 2px 2px 0;
-}
-
-@keyframes flashSweep {
-    0% {
-        transform: translateX(-100%);
-    }
-
-    100% {
-        transform: translateX(450%);
-    }
 }
 
 @keyframes flashProgress {
@@ -645,53 +560,7 @@ body.flash-revealed section:not(#splash) {
     }
 }
 
-/* ── EKG Heartbeat Line ── */
-.flash-ekg {
-    position: absolute;
-    bottom: 40px;
-    left: 0;
-    width: 100%;
-    height: 40px;
-    z-index: 8;
-    opacity: 0;
-    animation: ekgFadeIn 0.8s ease 1s forwards;
-    overflow: hidden;
-}
-
-.flash-ekg svg {
-    width: 200%;
-    height: 100%;
-    animation: ekgScroll 3s linear infinite;
-}
-
-.ekg-line {
-    filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.5));
-    stroke-dasharray: 1200;
-    stroke-dashoffset: 1200;
-    animation: ekgDraw 2s ease 1.2s forwards;
-}
-
-@keyframes ekgFadeIn {
-    to {
-        opacity: 0.5;
-    }
-}
-
-@keyframes ekgScroll {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(-50%);
-    }
-}
-
-@keyframes ekgDraw {
-    to {
-        stroke-dashoffset: 0;
-    }
-}
+/* EKG elements removed for hyper-minimal clean aesthetic */
 
 
 /* ─── GLOBAL BACKGROUND ─── */
@@ -708,6 +577,7 @@ body.flash-revealed section:not(#splash) {
 
 /* ─── SPLASH ─── */
 #splash {
+    width: 100%;
     height: 100vh;
     min-height: 600px;
     display: flex;
@@ -740,6 +610,8 @@ canvas#particles {
     flex-direction: column;
     align-items: center;
     gap: 16px;
+    margin-top: -45px;
+    /* Optical centering compensation to balance the tall logo + pill at the top */
 }
 
 /* LOGO ICON */
@@ -833,8 +705,8 @@ canvas#particles {
 .splash-title {
     font-family: var(--konstant-font);
     font-weight: 900;
-    font-size: clamp(60px, 10vw, 120px);
-    letter-spacing: clamp(2px, 0.5vw, 6px);
+    font-size: clamp(48px, 10vw, 96px);
+    letter-spacing: clamp(4px, 1.5vw, 10px);
     line-height: 1;
     text-align: center;
     position: relative;
@@ -1090,8 +962,8 @@ canvas#particles {
 .ring {
     position: absolute;
     border-radius: 50%;
-    border: 1px solid rgba(96, 165, 250, .15);
-    animation: ringPulse 4s ease-out infinite;
+    border: 1px solid rgba(96, 165, 250, .04);
+    animation: ringPulse 10s ease-in-out infinite;
     will-change: transform, opacity;
 }
 
@@ -1104,31 +976,35 @@ canvas#particles {
 .ring:nth-child(2) {
     width: 340px;
     height: 340px;
-    animation-delay: 1s;
+    animation-delay: 2s;
 }
 
 .ring:nth-child(3) {
     width: 520px;
     height: 520px;
-    animation-delay: 2s;
-    border-color: rgba(96, 165, 250, .08);
+    animation-delay: 4s;
+    border-color: rgba(96, 165, 250, .02);
 }
 
 .ring:nth-child(4) {
     width: 720px;
     height: 720px;
-    animation-delay: 3s;
-    border-color: rgba(96, 165, 250, .04);
+    animation-delay: 6s;
+    border-color: rgba(96, 165, 250, .01);
 }
 
 @keyframes ringPulse {
     0% {
-        transform: scale(0.85);
-        opacity: 0.7;
+        transform: scale(0.96);
+        opacity: 0.15;
+    }
+
+    50% {
+        opacity: 0.25;
     }
 
     100% {
-        transform: scale(1.12);
+        transform: scale(1.04);
         opacity: 0;
     }
 }
@@ -1150,11 +1026,15 @@ canvas#particles {
 .scroll-hint {
     position: absolute;
     bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: max-content;
     gap: 6px;
     opacity: 0;
     animation: fadeUp 1s ease 2.2s forwards;
@@ -1171,6 +1051,8 @@ canvas#particles {
     letter-spacing: 3.5px;
     text-transform: uppercase;
     color: rgba(148, 163, 184, 0.4);
+    margin-right: -3.5px;
+    /* Offset the trailing letter-spacing to align the text center perfectly */
 }
 
 .scroll-line {
@@ -2512,17 +2394,9 @@ canvas#globe {
         border-radius: 14px;
     }
 
-    .flash-logo-ring {
-        inset: -12px;
-    }
-
-    .flash-logo-ring::before {
-        inset: -14px;
-    }
-
     .flash-text {
-        font-size: clamp(32px, 10vw, 56px);
-        letter-spacing: clamp(4px, 1.5vw, 10px);
+        font-size: clamp(36px, 10vw, 64px);
+        letter-spacing: clamp(3px, 1.2vw, 8px);
     }
 
     .flash-tagline {
@@ -2537,16 +2411,6 @@ canvas#globe {
     .flash-sub {
         font-size: 9px;
         letter-spacing: 2px;
-    }
-
-    .flash-corner {
-        width: 20px;
-        height: 20px;
-    }
-
-    .flash-ekg {
-        bottom: 30px;
-        height: 30px;
     }
 
     .flash-content {
@@ -2580,7 +2444,8 @@ canvas#globe {
     }
 
     .splash-title {
-        font-size: clamp(42px, 12vw, 72px);
+        font-size: clamp(36px, 10vw, 64px);
+        letter-spacing: clamp(3px, 1.2vw, 8px);
     }
 
     .splash-tagline {
@@ -2664,7 +2529,8 @@ canvas#globe {
     }
 
     .splash-title {
-        font-size: clamp(36px, 14vw, 56px);
+        font-size: clamp(28px, 12vw, 48px);
+        letter-spacing: clamp(2px, 1vw, 6px);
     }
 
     .splash-tagline {
@@ -2685,8 +2551,8 @@ canvas#globe {
     }
 
     .flash-text {
-        font-size: clamp(28px, 10vw, 42px);
-        letter-spacing: clamp(3px, 1vw, 6px);
+        font-size: clamp(28px, 12vw, 48px);
+        letter-spacing: clamp(2px, 1vw, 6px);
     }
 
     .flash-tagline {
@@ -2694,17 +2560,8 @@ canvas#globe {
         letter-spacing: 2px;
     }
 
-    .flash-corner {
-        display: none;
-    }
-
     .flash-bg-grid {
         background-size: 35px 35px;
-    }
-
-    .flash-ekg {
-        bottom: 20px;
-        height: 24px;
     }
 
     .flash-content {
@@ -2907,4 +2764,20 @@ canvas#globe {
     backface-visibility: hidden;
     transform: translateZ(0);
     /* content-visibility: auto; Disabled because it breaks scrollIntoView on mobile */
+}
+
+/* ─── READING SCROLL PROGRESS BAR ─── */
+.scroll-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: linear-gradient(90deg, #2563eb 0%, #60a5fa 50%, #ef4444 100%);
+    z-index: 10000000;
+    /* Stays above overlays, splash, and navs */
+    box-shadow: 0 0 10px rgba(96, 165, 250, 0.6), 0 0 4px rgba(239, 68, 68, 0.4);
+    pointer-events: none;
+    transition: width 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: width;
 }

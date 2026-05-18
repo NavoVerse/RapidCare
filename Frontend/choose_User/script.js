@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
         function mkPt() {
             return {
                 x: Math.random() * W, y: Math.random() * H,
-                vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35,
-                r: Math.random() * 2.5 + 1.2, a: Math.random() * .5 + .5
+                vx: (Math.random() - .5) * .12, vy: (Math.random() - .5) * .12,
+                r: Math.random() * 2.5 + 1.2, a: Math.random() * .15 + .05
             };
         }
         let numParticles = window.innerWidth < 768 ? 15 : 35;
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* Optimized Line System — single stroke for all lines */
             ctx.beginPath();
-            ctx.strokeStyle = 'rgba(147,197,253,0.25)';
+            ctx.strokeStyle = 'rgba(147,197,253,0.06)';
             ctx.lineWidth = 0.8;
             for (let i = 0; i < pts.length; i++) {
                 const a = pts[i];
@@ -152,30 +152,40 @@ document.addEventListener('DOMContentLoaded', () => {
             if (flashSub && msgIdx < messages.length - 1) {
                 msgIdx++;
                 /* Fade text transition */
-                flashSub.style.transition = 'opacity 0.2s ease';
+                flashSub.style.transition = 'opacity 0.15s ease';
                 flashSub.style.opacity = '0';
                 setTimeout(() => {
                     flashSub.textContent = messages[msgIdx];
                     flashSub.style.opacity = '1';
-                }, 200);
+                }, 150);
             } else {
                 clearInterval(msgInterval);
             }
-        }, 700);
+        }, 280);
 
         /* ── Interactive Cursor Glow for Title ── */
         function initInteractiveTitleGlow() {
             const title = document.getElementById('splashTitle');
             if (!title) return;
 
+            let rect = null;
+
+            title.addEventListener('mouseenter', () => {
+                rect = title.getBoundingClientRect();
+            });
+
             title.addEventListener('mousemove', (e) => {
-                const rect = title.getBoundingClientRect();
+                if (!rect) return;
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
 
                 title.style.setProperty('--mouse-x', `${x}px`);
                 title.style.setProperty('--mouse-y', `${y}px`);
             });
+            
+            window.addEventListener('resize', () => {
+                rect = null; // Invalidate cache on resize
+            }, { passive: true });
         }
 
         initInteractiveTitleGlow();
@@ -190,12 +200,12 @@ document.addEventListener('DOMContentLoaded', () => {
             /* Play loading sound */
             if (typeof playLoadingSound === 'function') playLoadingSound();
 
-            /* Stage 1 @ 1.2s: Fade out flash inner content (text floats up) */
+            /* Stage 1 @ 0.65s: Fade out flash inner content (text floats up) */
             setTimeout(() => {
                 flashScreen.classList.add('fade-content');
-            }, 1200);
+            }, 650);
 
-            /* Stage 2 @ 1.8s: Dissolve background with blur + reveal splash */
+            /* Stage 2 @ 1.15s: Dissolve background with blur + reveal splash */
             setTimeout(() => {
                 flashScreen.classList.add('hidden');
                 document.body.classList.remove('flash-active');
@@ -204,13 +214,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 /* Start heavy canvas animations ONLY after flash is gone */
                 if (window.initParticles) window.initParticles();
                 if (window.initGlobe) window.initGlobe();
-            }, 1800);
+            }, 1150);
 
             /* Cleanup: remove flash screen from DOM after transition completes */
             setTimeout(() => {
                 flashScreen.remove();
                 document.body.classList.remove('flash-revealed');
-            }, 3200);
+            }, 2000);
         };
 
         /* Run sequence when fonts are ready, or after a safety timeout */
@@ -503,3 +513,13 @@ function openMedicineHub() {
         window.location.href = '/medicine-hub';
     }
 }
+
+/* ─── TOP READING SCROLL PROGRESS BAR ─── */
+window.addEventListener('scroll', () => {
+    const progressBar = document.getElementById('scrollProgress');
+    if (!progressBar) return;
+    const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+    progressBar.style.width = scrolled + '%';
+}, { passive: true });

@@ -30,9 +30,18 @@ echo "[1/3] Node.js $(node -v) detected ✔"
 
 # 2. Kill any existing process on port 5000
 echo "[2/3] Checking port 5000..."
-if lsof -i :5000 -t &> /dev/null; then
-    echo "       Port 5000 is in use. Killing existing process..."
-    kill -9 $(lsof -i :5000 -t) 2>/dev/null || true
+PID=""
+if command -v lsof &> /dev/null; then
+    PID=$(lsof -i :5000 -t)
+elif command -v fuser &> /dev/null; then
+    PID=$(fuser 5000/tcp 2>/dev/null | awk '{print $NF}')
+elif command -v ss &> /dev/null; then
+    PID=$(ss -lptn 'sport = :5000' 2>/dev/null | grep -oP 'pid=\K[0-9]+' | head -n 1)
+fi
+
+if [ -n "$PID" ]; then
+    echo "       Port 5000 is in use by PID $PID. Killing existing process..."
+    kill -9 $PID 2>/dev/null || true
 fi
 
 # 3. Run the automatic setup script
@@ -45,6 +54,16 @@ echo ""
 echo "Starting RapidCare Backend..."
 node server.js &
 SERVER_PID=$!
+
+# Graceful cleanup trap
+cleanup() {
+    echo ""
+    echo "Shutting down RapidCare Backend..."
+    if [ -n "$SERVER_PID" ]; then
+        kill "$SERVER_PID" 2>/dev/null || true
+    fi
+}
+trap cleanup EXIT INT TERM
 
 # Wait for server to be ready
 sleep 2

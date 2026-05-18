@@ -149,7 +149,7 @@ async function main() {
     // ── Step 5: Run migrations ───────────────────────────────────────────────
     step(5, TOTAL_STEPS, 'Running database migrations...');
     try {
-        runCmd('npx knex migrate:latest');
+        runCmd('node node_modules/knex/bin/cli.js migrate:latest');
         success('Database schema is up to date');
     } catch (err) {
         warn('Migration encountered an issue (this may be OK on first run).');
@@ -176,6 +176,25 @@ async function main() {
  */
 function needsInstall() {
     if (!fs.existsSync(NODE_MODULES)) return true;
+
+    // Detect native binary incompatibilities (e.g. copied from Windows/other OS)
+    try {
+        require(path.join(NODE_MODULES, 'sqlite3'));
+    } catch (err) {
+        if (err.message.includes('invalid ELF header') || err.message.includes('compiled against') || err.message.includes('Cannot find module')) {
+            console.log(`  ${COLORS.yellow}⚠${COLORS.reset}  Native binary incompatibility detected: ${err.message}`);
+            console.log(`  ${COLORS.yellow}⚠${COLORS.reset}  Cleaning old node_modules to trigger a fresh native compile...`);
+            try {
+                fs.rmSync(NODE_MODULES, { recursive: true, force: true });
+                if (fs.existsSync(PACKAGE_LOCK)) {
+                    fs.rmSync(PACKAGE_LOCK, { force: true });
+                }
+            } catch (rmErr) {
+                // Ignore
+            }
+            return true;
+        }
+    }
 
     try {
         const lockStat = fs.statSync(PACKAGE_LOCK);
