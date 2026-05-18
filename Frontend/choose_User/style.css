@@ -179,32 +179,7 @@ body {
     will-change: transform, opacity;
 }
 
-/* ── Splash page entrance after flash ── */
-body.flash-active {
-    overflow: hidden;
-}
 
-body.flash-active #splash,
-body.flash-active .nav-dots,
-body.flash-active section:not(#splash) {
-    opacity: 0;
-    pointer-events: none;
-}
-
-body.flash-revealed #splash {
-    animation: splashEnter 0.8s cubic-bezier(0.33, 1, 0.68, 1) forwards;
-    will-change: transform, opacity;
-}
-
-body.flash-revealed .nav-dots {
-    animation: splashEnter 0.5s ease 0.1s forwards;
-    will-change: transform, opacity;
-}
-
-body.flash-revealed section:not(#splash) {
-    opacity: 1;
-    transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s;
-}
 
 @keyframes splashEnter {
     from {

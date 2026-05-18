@@ -77,93 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 
 
-    /* ─── FLASH SCREEN, LOADING SOUND & TITLE SCRAMBLE ─── */
+    /* ─── INTERACTIVE TITLE GLOW ─── */
     (function () {
-        const flashScreen = document.getElementById('flashScreen');
-        const flashSub = flashScreen?.querySelector('.flash-sub');
-
-        if (!flashScreen) return;
-
-        /* ── Web Audio: Synthesized loading chime ── */
-        function playLoadingSound() {
-            try {
-                const AC = window.AudioContext || window.webkitAudioContext;
-                if (!AC) return;
-                const ctx = new AC();
-
-                /* Deep ambient pad — faded in softly */
-                const padOsc = ctx.createOscillator();
-                const padGain = ctx.createGain();
-                const padFilter = ctx.createBiquadFilter();
-                padOsc.type = 'sine';
-                padOsc.frequency.setValueAtTime(110, ctx.currentTime);
-                padOsc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 2.5);
-                padFilter.type = 'lowpass';
-                padFilter.frequency.setValueAtTime(400, ctx.currentTime);
-                padGain.gain.setValueAtTime(0, ctx.currentTime);
-                padGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.8);
-                padGain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 2);
-                padGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 3);
-                padOsc.connect(padFilter);
-                padFilter.connect(padGain);
-                padGain.connect(ctx.destination);
-                padOsc.start(ctx.currentTime);
-                padOsc.stop(ctx.currentTime + 3.2);
-
-                /* Ascending chime notes — medical beep feel */
-                const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
-                notes.forEach((freq, i) => {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-                    gain.gain.setValueAtTime(0, ctx.currentTime + 0.5 + i * 0.4);
-                    gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.6 + i * 0.4);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2 + i * 0.4);
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start(ctx.currentTime + 0.5 + i * 0.4);
-                    osc.stop(ctx.currentTime + 1.4 + i * 0.4);
-                });
-
-                /* "Ready" confirmation tone at ~2.5s */
-                const readyOsc = ctx.createOscillator();
-                const readyGain = ctx.createGain();
-                readyOsc.type = 'sine';
-                readyOsc.frequency.setValueAtTime(880, ctx.currentTime);
-                readyGain.gain.setValueAtTime(0, ctx.currentTime + 2.4);
-                readyGain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 2.5);
-                readyGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.2);
-                readyOsc.connect(readyGain);
-                readyGain.connect(ctx.destination);
-                readyOsc.start(ctx.currentTime + 2.4);
-                readyOsc.stop(ctx.currentTime + 3.4);
-            } catch (e) { /* Audio not supported — silent fallback */ }
-        }
-        /* Dynamic status messages cycling during initialization */
-        const messages = [
-            "SYSTEM INITIALIZATION",
-            "ESTABLISHING SECURE PROTOCOLS",
-            "LOADING BIOMETRIC DATA",
-            "RAPIDCARE ENGINE READY"
-        ];
-        let msgIdx = 0;
-        const msgInterval = setInterval(() => {
-            if (flashSub && msgIdx < messages.length - 1) {
-                msgIdx++;
-                /* Fade text transition */
-                flashSub.style.transition = 'opacity 0.15s ease';
-                flashSub.style.opacity = '0';
-                setTimeout(() => {
-                    flashSub.textContent = messages[msgIdx];
-                    flashSub.style.opacity = '1';
-                }, 150);
-            } else {
-                clearInterval(msgInterval);
-            }
-        }, 280);
-
-        /* ── Interactive Cursor Glow for Title ── */
         function initInteractiveTitleGlow() {
             const title = document.getElementById('splashTitle');
             if (!title) return;
@@ -189,49 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         initInteractiveTitleGlow();
-
-        const startSequence = () => {
-            if (flashScreen.dataset.started) return;
-            flashScreen.dataset.started = "true";
-
-            /* Hide splash content behind flash initially */
-            document.body.classList.add('flash-active');
-
-            /* Play loading sound */
-            if (typeof playLoadingSound === 'function') playLoadingSound();
-
-            /* Stage 1 @ 0.65s: Fade out flash inner content (text floats up) */
-            setTimeout(() => {
-                flashScreen.classList.add('fade-content');
-            }, 650);
-
-            /* Stage 2 @ 1.15s: Dissolve background with blur + reveal splash */
-            setTimeout(() => {
-                flashScreen.classList.add('hidden');
-                document.body.classList.remove('flash-active');
-                document.body.classList.add('flash-revealed');
-
-                /* Start heavy canvas animations ONLY after flash is gone */
-                if (window.initParticles) window.initParticles();
-                if (window.initGlobe) window.initGlobe();
-            }, 1150);
-
-            /* Cleanup: remove flash screen from DOM after transition completes */
-            setTimeout(() => {
-                flashScreen.remove();
-                document.body.classList.remove('flash-revealed');
-            }, 2000);
-        };
-
-        /* Run sequence when fonts are ready, or after a safety timeout */
-        if (document.fonts && document.fonts.ready) {
-            document.fonts.ready.then(startSequence).catch(startSequence);
-        } else {
-            setTimeout(startSequence, 500);
-        }
-
-        /* Absolute safety fallback: Start sequence after 600ms regardless of fonts */
-        setTimeout(startSequence, 600);
     })();
 
     /* ─── GLOBE ─── */
@@ -523,3 +395,7 @@ window.addEventListener('scroll', () => {
     const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
     progressBar.style.width = scrolled + '%';
 }, { passive: true });
+
+/* ─── INITIALIZE ANIMATIONS DIRECTLY ─── */
+if (window.initParticles) window.initParticles();
+if (window.initGlobe) window.initGlobe();
