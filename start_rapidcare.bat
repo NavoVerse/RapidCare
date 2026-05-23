@@ -47,7 +47,7 @@ cd /d "%ROOT_DIR%"
 :: Open Frontend
 echo.
 echo Launching App Entry Point in 3 seconds...
-timeout /t 3 >nul
+ping 127.0.0.1 -n 4 >nul
 start "" "http://localhost:5000"
 
 echo.

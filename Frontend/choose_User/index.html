@@ -73,12 +73,17 @@
                 <span class="title-glow" id="splashTitleGlow">RAPID CARE</span>
             </div>
             <div class="splash-tagline">Emergency Care · Instantly Connected · Worldwide</div>
-            <div class="splash-cta">
+            <div class="splash-cta" style="display: flex; gap: 1rem; justify-content: center;">
                 <button class="btn-prim" onclick="document.getElementById('roles').scrollIntoView({behavior:'smooth'})">
                     Get Started
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </button>
+                <button class="btn-out" onclick="window.location.href='/lite/patient'">
+                    Lite Version
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                     </svg>
                 </button>
             </div>

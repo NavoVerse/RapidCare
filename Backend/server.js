@@ -209,6 +209,8 @@ app.use('/admin/export', express.static(path.resolve(__dirname, '../Frontend/exc
 app.use('/urgency', express.static(path.resolve(__dirname, '../Frontend/login_urgency')));
 app.use('/dev', express.static(path.resolve(__dirname, '../Frontend/DeveloperDashboard')));
 app.use('/medicine-hub', express.static(path.resolve(__dirname, '../medicine_hub')));
+app.use('/lite/patient', express.static(path.resolve(__dirname, '../RapidCareLite/patient')));
+app.use('/lite/driver', express.static(path.resolve(__dirname, '../RapidCareLite/driver')));
 app.use('/', express.static(path.resolve(__dirname, '../Frontend/choose_User')));
 
 // ── Static: Backend Scripts (for frontend consumption) ──────────────────────

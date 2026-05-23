@@ -1,0 +1,197 @@
+:root {
+    --bg-dark: #0f1115;
+    --bg-card: rgba(255, 255, 255, 0.03);
+    --border: rgba(255, 255, 255, 0.08);
+    --text-main: #ffffff;
+    --text-muted: #8b92a5;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --danger: #ef4444;
+    --danger-hover: #dc2626;
+    --success: #10b981;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+#app {
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+}
+
+.view {
+    display: none;
+    padding: 2rem 1.5rem;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.view.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Typography & Utilities */
+h1 { font-size: 2rem; margin-bottom: 0.5rem; font-weight: 800; }
+h1 span { color: var(--accent); }
+.subtitle { color: var(--text-muted); margin-bottom: 2rem; }
+.hidden { display: none !important; }
+.error-msg { color: var(--danger); font-size: 0.875rem; margin-top: 1rem; text-align: center; }
+
+/* Cards (Glassmorphism) */
+.glass {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+}
+
+.card {
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-mark {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Inputs */
+.input-group {
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+input, select {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-main);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+    border-color: var(--accent);
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.primary-btn { background: var(--accent); color: #fff; }
+.primary-btn:hover { background: var(--accent-hover); }
+
+.ghost-btn { background: transparent; color: var(--text-muted); padding: 0.5rem 1rem; width: auto; font-size: 0.875rem;}
+.ghost-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+/* Header */
+.glass-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 2rem;
+}
+
+.greeting { font-size: 1.25rem; font-weight: 600; }
+.loc-text { font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+/* SOS Button */
+.danger-btn {
+    background: var(--danger);
+    color: #fff;
+    padding: 1.5rem;
+    font-size: 1.125rem;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.danger-btn:hover { background: var(--danger-hover); transform: scale(1.02); }
+.danger-btn:active { transform: scale(0.98); }
+
+.pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* Status Card */
+.status-card {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+}
+
+#trip-details {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapidCare Lite - Patient</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Auth View -->
+        <div id="auth-view" class="view active">
+            <div class="card glass">
+                <div class="logo-mark">🚑</div>
+                <h1>RapidCare <span>Lite</span></h1>
+                <p class="subtitle">Emergency access portal</p>
+                <div class="input-group">
+                    <input type="email" id="email" placeholder="Email" value="patient@rapidcare.com">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Password" value="password123">
+                </div>
+                <button id="login-btn" class="primary-btn">Login & Access</button>
+                <div id="auth-error" class="error-msg hidden"></div>
+            </div>
+        </div>
+
+        <!-- Main View -->
+        <div id="main-view" class="view">
+            <header class="glass-header">
+                <div>
+                    <h2 class="greeting">Hi, <span id="user-name">User</span></h2>
+                    <p class="loc-text">📍 Locating...</p>
+                </div>
+                <button id="logout-btn" class="ghost-btn">Sign out</button>
+            </header>
+
+            <main class="content">
+                <div class="card glass main-card">
+                    <h3>Request Emergency Transport</h3>
+                    <div class="input-group">
+                        <label>Select Destination</label>
+                        <select id="hospital-select">
+                            <!-- Populated dynamically or hardcoded fallback -->
+                            <option value="3">Main General Hospital (Default)</option>
+                        </select>
+                    </div>
+
+                    <button id="sos-btn" class="danger-btn">
+                        <div class="pulse-ring"></div>
+                        <span>SOS / BOOK AMBULANCE</span>
+                    </button>
+                </div>
+                
+                <div id="status-card" class="card glass status-card hidden">
+                    <div class="status-indicator"></div>
+                    <div class="status-info">
+                        <h3 id="trip-status">Dispatching...</h3>
+                        <p id="trip-details">Looking for nearest driver</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

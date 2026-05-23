@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapidCare Lite - Driver</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Auth View -->
+        <div id="auth-view" class="view active">
+            <div class="card glass">
+                <div class="logo-mark">🚑</div>
+                <h1>Driver <span>Lite</span></h1>
+                <p class="subtitle">Emergency dispatch portal</p>
+                <div class="input-group">
+                    <input type="email" id="email" placeholder="Email" value="driver@rapidcare.com">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Password" value="password123">
+                </div>
+                <button id="login-btn" class="primary-btn">Go Online</button>
+                <div id="auth-error" class="error-msg hidden"></div>
+            </div>
+        </div>
+
+        <!-- Main View -->
+        <div id="main-view" class="view">
+            <header class="glass-header">
+                <div>
+                    <h2 class="greeting">Driver: <span id="user-name">User</span></h2>
+                    <p class="loc-text status-online">🟢 Online & Waiting</p>
+                </div>
+                <button id="logout-btn" class="ghost-btn">Go Offline</button>
+            </header>
+
+            <main class="content">
+                <!-- Idle State -->
+                <div id="idle-state" class="card glass center-text">
+                    <div class="radar-ping"></div>
+                    <p>Scanning for emergencies...</p>
+                </div>
+
+                <!-- Active Request State -->
+                <div id="request-card" class="card glass hidden">
+                    <div class="urgent-banner">NEW EMERGENCY!</div>
+                    <div class="request-details">
+                        <h2>Distance: <span id="req-dist">2.4km</span></h2>
+                        <p class="req-meta">Patient: <span id="req-patient-id">...</span></p>
+                    </div>
+                    <div class="action-grid">
+                        <button id="reject-btn" class="ghost-btn danger-text">Reject</button>
+                        <button id="accept-btn" class="primary-btn pulse-success">ACCEPT</button>
+                    </div>
+                </div>
+
+                <!-- Active Trip State -->
+                <div id="active-trip-card" class="card glass hidden">
+                    <h3>Trip <span id="trip-id-display">#102</span> Active</h3>
+                    <p class="subtitle">Proceed to patient location immediately.</p>
+                    
+                    <div class="status-steps">
+                        <button class="status-btn" data-status="arrived">Arrived at Patient</button>
+                        <button class="status-btn" data-status="heading_to_hospital">Heading to Hospital</button>
+                        <button class="status-btn" data-status="completed">Trip Completed</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
