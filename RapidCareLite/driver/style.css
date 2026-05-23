@@ -184,6 +184,24 @@ button {
     gap: 1rem;
 }
 
+/* Request Info Grid */
+.req-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+.req-info-item { display: flex; flex-direction: column; }
+.req-info-item.full-width { grid-column: 1 / -1; }
+.req-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
+.req-value { font-weight: 600; font-size: 1rem; color: var(--text-main); }
+
+/* Triage Badges */
+.triage-critical { color: #ef4444; font-weight: 800; }
+.triage-urgent   { color: #f59e0b; font-weight: 800; }
+.triage-standard { color: #10b981; font-weight: 800; }
+
 .pulse-success {
     background: var(--success);
     animation: successPulse 1.5s infinite;

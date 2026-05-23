@@ -19,21 +19,18 @@ const acceptBtn = document.getElementById('accept-btn');
 const rejectBtn = document.getElementById('reject-btn');
 const statusBtns = document.querySelectorAll('.status-btn');
 
-// Init
+// ─── Init ─────────────────────────────────────────────────────────────────────
 function checkAuth() {
     const token = localStorage.getItem('lite_driver_token');
     const user = JSON.parse(localStorage.getItem('lite_driver_user') || 'null');
-    
+
     if (token && user && user.role === 'driver') {
         authView.classList.remove('active');
         mainView.classList.add('active');
         document.getElementById('user-name').textContent = user.name;
-        
-        // Reset view to idle
+
         showView('idle');
         initSocket(user.id);
-        
-        // Check if there's an active trip in local storage or fetch from API
         checkActiveTrip(token);
     } else {
         authView.classList.add('active');
@@ -45,46 +42,67 @@ function showView(viewName) {
     idleState.classList.add('hidden');
     requestCard.classList.add('hidden');
     activeTripCard.classList.add('hidden');
-    
+
     if (viewName === 'idle') idleState.classList.remove('hidden');
     if (viewName === 'request') requestCard.classList.remove('hidden');
     if (viewName === 'active') activeTripCard.classList.remove('hidden');
 }
 
-// Check existing trip
+// ─── Check Existing Active Trip (on page load / refresh) ─────────────────────
 async function checkActiveTrip(token) {
     try {
         const res = await fetch(`${API_BASE}/drivers/trips`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (res.ok) {
-            const trips = await res.json();
-            const active = trips.find(t => !['completed', 'cancelled'].includes(t.status));
-            
-            if (active) {
-                if (active.status === 'requested') {
-                    currentTripId = active.id;
-                    document.getElementById('req-patient-id').textContent = `User #${active.patient_id}`;
-                    document.getElementById('req-dist').textContent = 'Location Locked';
-                    showView('request');
-                } else {
-                    currentTripId = active.id;
-                    document.getElementById('trip-id-display').textContent = `#${active.id}`;
-                    showView('active');
-                    updateStatusButtons(active.status);
-                }
-            }
+        if (!res.ok) return;
+
+        const trips = await res.json();
+        const pendingTrip = trips.find(t => t.status === 'requested');
+        const activeTrip = trips.find(t => !['completed', 'cancelled', 'requested'].includes(t.status));
+
+        if (pendingTrip) {
+            // If there's already a pending request (e.g. after page refresh), show it
+            showIncomingRequest(pendingTrip);
+        } else if (activeTrip) {
+            currentTripId = activeTrip.id;
+            document.getElementById('trip-id-display').textContent = `#${activeTrip.id}`;
+            showView('active');
+            updateStatusButtons(activeTrip.status);
         }
     } catch (err) {
         console.error('Failed to load trips', err);
     }
 }
 
-// Login
+// ─── Show Incoming Request Card ────────────────────────────────────────────────
+function showIncomingRequest(data) {
+    currentTripId = data.trip_id || data.id;
+
+    // Build distance display
+    const dist = data.distance_km != null
+        ? `${data.distance_km.toFixed(1)} km`
+        : 'Location Locked';
+
+    const triageBadge = data.triage_level
+        ? ` · <span class="triage-${data.triage_level.toLowerCase()}">${data.triage_level}</span>`
+        : '';
+
+    document.getElementById('req-dist').innerHTML = dist + triageBadge;
+    document.getElementById('req-patient-id').textContent =
+        data.patient_name || `Patient #${data.patient_id}`;
+    document.getElementById('req-hospital').textContent =
+        data.hospital_name || 'Hospital';
+    document.getElementById('req-complaint').textContent =
+        data.complaint || 'Emergency';
+
+    showView('request');
+}
+
+// ─── Login ─────────────────────────────────────────────────────────────────────
 loginBtn.addEventListener('click', async () => {
     loginBtn.textContent = 'Authenticating...';
     errorMsg.classList.add('hidden');
-    
+
     try {
         const res = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
@@ -95,7 +113,7 @@ loginBtn.addEventListener('click', async () => {
                 expectedRole: 'driver'
             })
         });
-        
+
         const data = await res.json();
         if (res.ok) {
             localStorage.setItem('lite_driver_token', data.token);
@@ -113,42 +131,55 @@ loginBtn.addEventListener('click', async () => {
     }
 });
 
-// Logout
+// ─── Logout ────────────────────────────────────────────────────────────────────
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('lite_driver_token');
     localStorage.removeItem('lite_driver_user');
-    if(socket) socket.disconnect();
+    if (socket) socket.disconnect();
     checkAuth();
 });
 
-// Socket Integration
+// ─── Socket.io: Real-time Trip Dispatch ───────────────────────────────────────
 function initSocket(userId) {
     if (socket) socket.disconnect();
-    socket = io(window.location.origin);
-    
+    socket = io(window.location.origin, { transports: ['websocket', 'polling'] });
+
     socket.on('connect', () => {
+        console.log('[Socket] Connected:', socket.id);
+        // Join the driver-specific room so the backend can push directly to this driver
         socket.emit('join', { userId, role: 'driver' });
     });
-    
-    // Simulate incoming trip for local testing (since backend only saves to DB right now and expects polling, 
-    // or we might catch a socket emit if backend is modified. Let's poll or rely on initial fetch).
-    // The backend does not currently emit 'trip:new' to the driver socket. 
-    // It relies on polling or push notifications.
-    // For Lite, we will poll every 5 seconds if idle.
-    
-    setInterval(() => {
-        if (!idleState.classList.contains('hidden')) {
-            checkActiveTrip(localStorage.getItem('lite_driver_token'));
+
+    // ✅ Backend emits this when a patient books → backend assigns nearest driver → pushes here
+    socket.on('trip:new_request', (data) => {
+        console.log('[Socket] New trip request received:', data);
+        // Only show if not already handling a trip
+        if (!currentTripId || currentTripId === null) {
+            showIncomingRequest(data);
         }
-    }, 5000);
+    });
+
+    // Backend emits this if the trip times out (no accept in 60s)
+    socket.on('trip:cancelled', (data) => {
+        if (data.trip_id == currentTripId) {
+            alert('⏱ Trip request timed out. Back to standby.');
+            currentTripId = null;
+            showView('idle');
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('[Socket] Disconnected');
+    });
 }
 
-// Accept Trip
+// ─── Accept Trip ───────────────────────────────────────────────────────────────
 acceptBtn.addEventListener('click', async () => {
     if (!currentTripId) return;
     const token = localStorage.getItem('lite_driver_token');
     acceptBtn.textContent = 'Accepting...';
-    
+    acceptBtn.disabled = true;
+
     try {
         const res = await fetch(`${API_BASE}/trips/${currentTripId}/accept`, {
             method: 'POST',
@@ -158,52 +189,60 @@ acceptBtn.addEventListener('click', async () => {
             document.getElementById('trip-id-display').textContent = `#${currentTripId}`;
             showView('active');
         } else {
-            alert('Failed to accept trip.');
+            const d = await res.json();
+            alert(d.error || 'Failed to accept trip.');
+            currentTripId = null;
             showView('idle');
         }
     } catch (e) {
         alert('Network error');
     } finally {
         acceptBtn.textContent = 'ACCEPT';
+        acceptBtn.disabled = false;
     }
 });
 
-// Reject Trip
+// ─── Reject Trip ───────────────────────────────────────────────────────────────
 rejectBtn.addEventListener('click', async () => {
     if (!currentTripId) return;
     const token = localStorage.getItem('lite_driver_token');
-    
+    rejectBtn.disabled = true;
+
     try {
         await fetch(`${API_BASE}/trips/${currentTripId}/reject`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` }
         });
-    } catch (e) {}
-    
-    currentTripId = null;
-    showView('idle');
+    } catch (e) {
+        console.error('Reject failed silently');
+    } finally {
+        currentTripId = null;
+        rejectBtn.disabled = false;
+        showView('idle');
+    }
 });
 
-// Update Status
+// ─── Update Trip Status ────────────────────────────────────────────────────────
 statusBtns.forEach(btn => {
     btn.addEventListener('click', async () => {
         if (!currentTripId) return;
-        
+
         const newStatus = btn.getAttribute('data-status');
         const token = localStorage.getItem('lite_driver_token');
-        
+
         btn.textContent = 'Updating...';
-        
+        btn.disabled = true;
+
         try {
             const res = await fetch(`${API_BASE}/trips/${currentTripId}/status`, {
                 method: 'PUT',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ status: newStatus })
             });
-            
+
             if (res.ok) {
                 updateStatusButtons(newStatus);
                 if (newStatus === 'completed') {
@@ -212,31 +251,38 @@ statusBtns.forEach(btn => {
                         showView('idle');
                     }, 2000);
                 }
+            } else {
+                alert('Failed to update status. Please try again.');
             }
         } catch (e) {
-            alert('Failed to update status');
+            alert('Network error updating status.');
+        } finally {
+            // Restore button text
+            const labels = {
+                'arrived': 'Arrived at Patient',
+                'heading_to_hospital': 'Heading to Hospital',
+                'completed': 'Trip Completed ✓'
+            };
+            btn.textContent = labels[newStatus] || newStatus;
+            btn.disabled = false;
         }
-        
-        // Reset text
-        if (newStatus === 'arrived') btn.textContent = 'Arrived at Patient';
-        if (newStatus === 'heading_to_hospital') btn.textContent = 'Heading to Hospital';
-        if (newStatus === 'completed') btn.textContent = 'Trip Completed';
     });
 });
 
 function updateStatusButtons(currentStatus) {
     statusBtns.forEach(b => b.classList.remove('active'));
-    
-    let activeBtn = null;
-    if (currentStatus === 'arrived') {
-        activeBtn = document.querySelector('[data-status="arrived"]');
-    } else if (currentStatus === 'heading_to_hospital' || currentStatus === 'at_hospital') {
-        activeBtn = document.querySelector('[data-status="heading_to_hospital"]');
-    } else if (currentStatus === 'completed') {
-        activeBtn = document.querySelector('[data-status="completed"]');
+    const statusMap = {
+        'accepted': null,
+        'arrived': '[data-status="arrived"]',
+        'heading_to_hospital': '[data-status="heading_to_hospital"]',
+        'at_hospital': '[data-status="heading_to_hospital"]',
+        'completed': '[data-status="completed"]'
+    };
+    const selector = statusMap[currentStatus];
+    if (selector) {
+        const btn = document.querySelector(selector);
+        if (btn) btn.classList.add('active');
     }
-    
-    if (activeBtn) activeBtn.classList.add('active');
 }
 
 checkAuth();

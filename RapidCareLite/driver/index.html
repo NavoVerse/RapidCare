@@ -32,7 +32,7 @@
             <header class="glass-header">
                 <div>
                     <h2 class="greeting">Driver: <span id="user-name">User</span></h2>
-                    <p class="loc-text status-online">🟢 Online & Waiting</p>
+                    <p class="loc-text status-online">🟢 Online &amp; Waiting</p>
                 </div>
                 <button id="logout-btn" class="ghost-btn">Go Offline</button>
             </header>
@@ -42,30 +42,46 @@
                 <div id="idle-state" class="card glass center-text">
                     <div class="radar-ping"></div>
                     <p>Scanning for emergencies...</p>
+                    <p class="subtitle" style="margin-top: 0.5rem; font-size: 0.8rem;">You will be notified the moment a patient books.</p>
                 </div>
 
                 <!-- Active Request State -->
                 <div id="request-card" class="card glass hidden">
-                    <div class="urgent-banner">NEW EMERGENCY!</div>
+                    <div class="urgent-banner">🚨 NEW EMERGENCY REQUEST!</div>
+
                     <div class="request-details">
-                        <h2>Distance: <span id="req-dist">2.4km</span></h2>
-                        <p class="req-meta">Patient: <span id="req-patient-id">...</span></p>
+                        <h2>Distance: <span id="req-dist">—</span></h2>
+                        <div class="req-info-grid">
+                            <div class="req-info-item">
+                                <span class="req-label">Patient</span>
+                                <span id="req-patient-id" class="req-value">—</span>
+                            </div>
+                            <div class="req-info-item">
+                                <span class="req-label">Hospital</span>
+                                <span id="req-hospital" class="req-value">—</span>
+                            </div>
+                            <div class="req-info-item full-width">
+                                <span class="req-label">Complaint</span>
+                                <span id="req-complaint" class="req-value">—</span>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="action-grid">
-                        <button id="reject-btn" class="ghost-btn danger-text">Reject</button>
-                        <button id="accept-btn" class="primary-btn pulse-success">ACCEPT</button>
+                        <button id="reject-btn" class="ghost-btn danger-text">✕ Reject</button>
+                        <button id="accept-btn" class="primary-btn pulse-success">✓ ACCEPT</button>
                     </div>
                 </div>
 
                 <!-- Active Trip State -->
                 <div id="active-trip-card" class="card glass hidden">
-                    <h3>Trip <span id="trip-id-display">#102</span> Active</h3>
+                    <h3>Trip <span id="trip-id-display">#—</span> Active</h3>
                     <p class="subtitle">Proceed to patient location immediately.</p>
-                    
+
                     <div class="status-steps">
                         <button class="status-btn" data-status="arrived">Arrived at Patient</button>
                         <button class="status-btn" data-status="heading_to_hospital">Heading to Hospital</button>
-                        <button class="status-btn" data-status="completed">Trip Completed</button>
+                        <button class="status-btn" data-status="completed">Trip Completed ✓</button>
                     </div>
                 </div>
             </main>
