@@ -29,7 +29,7 @@ const { validate } = require('./middleware/validate');
 const { generalLimiter, loginLimiter, otpLimiter } = require('./middleware/rateLimiter');
 
 // In-memory store for simulation or live FCM routing
-const fcmTokens = {};
+const fcmTokens = new Map();
 
 // ── Firebase Admin SDK Initialization ─────────────────────────────────────────
 try {
@@ -66,7 +66,7 @@ try {
  */
 async function sendPushNotification(patientId, title, body) {
     try {
-        const fcmToken = fcmTokens[patientId];
+        const fcmToken = fcmTokens.get(String(patientId));
 
         if (fcmToken && admin.apps.length > 0) {
             const message = {
@@ -398,7 +398,7 @@ app.get('/api/v1/hospitals/external-details', async (req, res) => {
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: "You are a hospital intelligence engine. Return only valid JSON objects. Never include markdown, preamble, or explanations outside of JSON." });
 
         const prompt = `
             You are an authoritative hospital intelligence engine.
@@ -528,8 +528,8 @@ app.post('/api/v1/auth/login', loginLimiter, validate(loginSchema), async (req, 
 
         // Role-gated login: reject if the user's role doesn't match the expected role
         if (expectedRole && user.role !== expectedRole) {
-            const pageMap = { patient: '/login', driver: '/driver-login', hospital: '/login' };
-            const correctPage = pageMap[user.role] || '/login';
+            const pageMap = new Map([['patient', '/login'], ['driver', '/driver-login'], ['hospital', '/login']]);
+            const correctPage = pageMap.get(user.role) || '/login';
             return res.status(403).json({
                 error: `This login page is for ${expectedRole}s only. Your account is registered as a ${user.role}. Please use the correct login page.`,
                 correctLoginPage: correctPage
@@ -690,7 +690,9 @@ app.get('/api/v1/patients/me', authenticateToken, authorize('patient'), async (r
             'chronic_disease', 'diabetes_emergencies', 'surgeries', 'family_history', 'diabetes_complications'
         ];
         sensitiveFields.forEach(field => {
-            if (patient[field]) patient[field] = decrypt(patient[field]);
+            if (Object.prototype.hasOwnProperty.call(patient, field) && patient[field]) {
+                patient[field] = decrypt(patient[field]);
+            }
         });
 
         res.json(patient);
@@ -937,7 +939,12 @@ app.post('/api/v1/payments/calculate', authenticateToken, async (req, res) => {
         return res.status(400).json({ error: 'distance and ambulanceType are required' });
     }
 
-    const config = pricingConfig[ambulanceType.toLowerCase()];
+    const ALLOWED_AMBULANCE_TYPES = ['basic', 'icu', 'neonatal'];
+    const normalizedType = ambulanceType.toLowerCase();
+    if (!ALLOWED_AMBULANCE_TYPES.includes(normalizedType)) {
+        return res.status(400).json({ error: 'Invalid ambulance type' });
+    }
+    const config = Object.prototype.hasOwnProperty.call(pricingConfig, normalizedType) ? pricingConfig[normalizedType] : null;
     if (!config) {
         return res.status(400).json({ error: 'Invalid ambulance type' });
     }
@@ -1153,7 +1160,7 @@ app.post('/api/v1/triage', authenticateToken, async (req, res) => {
     if (apiKey) {
         try {
             const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: "You are an expert emergency medical triage AI. Only return valid JSON. Never provide explanations outside JSON." });
 
             const prompt = `
                 You are an expert emergency medical triage AI.
@@ -1218,7 +1225,7 @@ app.post('/api/v1/trips/request', authenticateToken, authorize('patient'), async
     if (apiKey && (heart_rate || blood_pressure || spo2 || complaint)) {
         try {
             const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: "You are an expert emergency medical triage AI. Only return valid JSON. Never provide explanations outside JSON." });
             const prompt = `
                 You are an expert emergency medical triage AI.
                 Evaluate the patient condition:
@@ -1475,7 +1482,7 @@ app.post('/api/v1/trips/:id/accept', authenticateToken, authorize('driver'), asy
         if (apiKey && patientProfile) {
             try {
                 const genAI = new GoogleGenerativeAI(apiKey);
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: "You are an expert emergency medical triage AI. Only return valid JSON. Never provide explanations outside JSON." });
                 const prompt = `
                     You are an expert emergency medical triage AI.
                     Evaluate the patient profile:
@@ -1700,8 +1707,7 @@ app.post('/api/v1/insurance/claims/auto', authenticateToken, async (req, res) =>
 app.post('/api/v1/users/fcm-token', authenticateToken, async (req, res) => {
     const { fcm_token } = req.body;
     try {
-        if (!fcm_token) return res.status(400).json({ error: 'FCM Token required' });
-        fcmTokens[req.user.id] = fcm_token;
+        fcmTokens.set(String(req.user.id), fcm_token);
         res.json({ message: 'FCM Token registered successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
