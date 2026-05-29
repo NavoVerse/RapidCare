@@ -75,7 +75,7 @@ RapidCare/
 │   ├── login_urgency/    ← Quick triage login flow
 │   └── shared_assets/    ← CSS, JS, fonts, images shared across all pages
 │
-├── RapidCareLite/        ← Minimalist single-page apps for low-end devices
+├── RapidCareLite (Incomplete)/ ← Minimalist single-page apps for low-end devices
 │   ├── patient/          ← Lite patient view (served at /lite/patient)
 │   └── driver/           ← Lite driver view (served at /lite/driver)
 │
