@@ -377,7 +377,15 @@ window.addEventListener('pageshow', function (event) {
 
 /* ─── MEDICINE HUB REDIRECT ─── */
 function openMedicineHub() {
-    alert('Medicine Hub coming soon!');
+    const splash = document.getElementById('medHubSplash');
+    if (splash) {
+        splash.classList.add('active');
+        setTimeout(() => {
+            window.location.href = '/medicine_hub/';
+        }, 750);
+    } else {
+        window.location.href = '/medicine_hub/';
+    }
 }
 
 /* ─── TOP READING SCROLL PROGRESS BAR ─── */

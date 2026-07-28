@@ -43,10 +43,10 @@ function App() {
   const fetchAll = async () => {
     try {
       const [k, o, d, a] = await Promise.all([
-        axios.get('http://localhost:5000/api/kits'),
-        axios.get('http://localhost:5000/api/oxygen'),
-        axios.get('http://localhost:5000/api/devices'),
-        axios.get('http://localhost:5000/api/ayurveda')
+        axios.get('https://rapidcare-backend-mcg2.onrender.com/api/kits'),
+        axios.get('https://rapidcare-backend-mcg2.onrender.com/api/oxygen'),
+        axios.get('https://rapidcare-backend-mcg2.onrender.com/api/devices'),
+        axios.get('https://rapidcare-backend-mcg2.onrender.com/api/ayurveda')
       ]);
       setKits(k.data);
       setOxygen(o.data);
@@ -59,7 +59,7 @@ function App() {
 
   const fetchMedicines = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/medicines`, {
+      const response = await axios.get(`https://rapidcare-backend-mcg2.onrender.com/api/medicines`, {
         params: { category: activeCategory, search: searchQuery }
       });
       setMedicines(response.data);
