@@ -13,7 +13,7 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
-const isProduction = process.env.DB_TYPE === 'postgresql';
+const isProduction = process.env.DB_TYPE === 'postgresql' || process.env.NODE_ENV === 'production';
 
 if (!isProduction) {
     const dbDir = path.resolve(__dirname, './user_Database');
