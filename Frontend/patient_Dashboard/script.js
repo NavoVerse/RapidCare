@@ -541,7 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sosBtn = document.getElementById('sos-btn');
     if (sosBtn) {
         sosBtn.addEventListener('click', () => {
-            window.location.href = '/urgency';
+            window.location.href = '/login_urgency/';
         });
     }
 

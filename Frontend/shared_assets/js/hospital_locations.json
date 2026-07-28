@@ -1,0 +1,51 @@
+[
+    {
+        "id": 1,
+        "name": "AMRI Hospital, Dhakuria",
+        "lat": 22.5135,
+        "lng": 88.3629,
+        "status": "Available"
+    },
+    {
+        "id": 2,
+        "name": "Apollo Gleneagles Hospitals",
+        "lat": 22.5710,
+        "lng": 88.4055,
+        "status": "Limited"
+    },
+    {
+        "id": 3,
+        "name": "Fortis Hospital, Anandapur",
+        "lat": 22.5165,
+        "lng": 88.4042,
+        "status": "Available"
+    },
+    {
+        "id": 4,
+        "name": "Medica Superspecialty Hospital",
+        "lat": 22.4939,
+        "lng": 88.3980,
+        "status": "Busy"
+    },
+    {
+        "id": 5,
+        "name": "NRS Medical College & Hospital",
+        "lat": 22.5645,
+        "lng": 88.3685,
+        "status": "Available"
+    },
+    {
+        "id": 6,
+        "name": "Peerless Hospital",
+        "lat": 22.4770,
+        "lng": 88.3900,
+        "status": "Available"
+    },
+    {
+        "id": 7,
+        "name": "SSKM Hospital",
+        "lat": 22.5392,
+        "lng": 88.3444,
+        "status": "Busy"
+    }
+]

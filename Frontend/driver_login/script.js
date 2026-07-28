@@ -43,10 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // "Create an account" → redirect straight to Driver Registration
         if (showSignupLink) {
-            showSignupLink.href = '/driver-register';
+            showSignupLink.href = '/driver_registration/';
             showSignupLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                window.location.href = '/driver-register';
+                window.location.href = '/driver_registration/';
             });
         }
 
@@ -120,9 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // but usually this page is only for drivers.
                 setTimeout(() => {
                     if (data.user.role === 'driver') {
-                        window.location.href = '/driver';
+                        window.location.href = '/driver_dashboard/';
                     } else {
-                        window.location.href = '/dashboard';
+                        window.location.href = '/patient_Dashboard/';
                     }
                 }, 1500);
             } else {

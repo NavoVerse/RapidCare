@@ -169,11 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Redirect based on role
                 setTimeout(() => {
                     if (data.user.role === 'driver') {
-                        window.location.href = '/driver';
+                        window.location.href = '/driver_dashboard/';
                     } else if (data.user.role === 'hospital') {
-                        window.location.href = '/hospital-register';
+                        window.location.href = '/hospital_registration/';
                     } else {
-                        window.location.href = '/dashboard';
+                        window.location.href = '/patient_Dashboard/';
                     }
                 }, 1500);
             } else {
@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sosButton = document.querySelector('.sos-button');
     if (sosButton) {
         sosButton.addEventListener('click', () => {
-            window.location.href = '/urgency';
+            window.location.href = '/login_urgency/';
         });
     }
 });

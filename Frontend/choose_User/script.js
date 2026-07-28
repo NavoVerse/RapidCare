@@ -377,17 +377,7 @@ window.addEventListener('pageshow', function (event) {
 
 /* ─── MEDICINE HUB REDIRECT ─── */
 function openMedicineHub() {
-    const splash = document.getElementById('medHubSplash');
-    if (splash) {
-        splash.classList.add('active');
-
-        // Accelerated redirect for "lagless" feel
-        setTimeout(() => {
-            window.location.href = 'https://rapidcare-4gzf.onrender.com/medicine-hub';
-        }, 750);
-    } else {
-        window.location.href = 'https://rapidcare-4gzf.onrender.com/medicine-hub';
-    }
+    alert('Medicine Hub coming soon!');
 }
 
 /* ─── TOP READING SCROLL PROGRESS BAR ─── */

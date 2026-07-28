@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. Session & Auth Check
     const token = localStorage.getItem('rapidcare_token');
     if (!token) {
-        window.location.href = '/driver-login';
+        window.location.href = '/driver_login/';
         return;
     }
 
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!response.ok) {
             if (response.status === 401 || response.status === 403) {
                 localStorage.removeItem('rapidcare_token');
-                window.location.href = '/driver-login';
+                window.location.href = '/driver_login/';
                 return;
             }
             throw new Error('Failed to fetch profile');
@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.preventDefault();
             localStorage.removeItem('rapidcare_token');
             localStorage.removeItem('rapidcare_user');
-            window.location.href = '/driver-login';
+            window.location.href = '/driver_login/';
         });
     }
 
@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!confirm('Are you absolutely sure you want to trigger a critical Emergency SOS alert?')) return;
 
             try {
-                const response = await fetch('/api/v1/sos', {
+                const response = await fetch(`${apiBase}/sos`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -808,7 +808,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!activeTripData) return;
 
         try {
-            const response = await fetch(`/api/v1/trips/${activeTripData.id}/status`, {
+            const response = await fetch(`${apiBase}/trips/${activeTripData.id}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
