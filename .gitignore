@@ -6,6 +6,7 @@ Backend/.env
 
 # Node dependencies
 node_modules/
+Backend/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
