@@ -383,10 +383,10 @@ function openMedicineHub() {
 
         // Accelerated redirect for "lagless" feel
         setTimeout(() => {
-            window.location.href = '/medicine-hub';
+            window.location.href = 'https://rapidcare-4gzf.onrender.com/medicine-hub';
         }, 750);
     } else {
-        window.location.href = '/medicine-hub';
+        window.location.href = 'https://rapidcare-4gzf.onrender.com/medicine-hub';
     }
 }
 
