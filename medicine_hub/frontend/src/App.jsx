@@ -12,6 +12,72 @@ import OxygenSection from './components/OxygenSection';
 import DeliveryBar from './components/DeliveryBar';
 import Footer from './components/Footer';
 
+// ── Medicine Purchase Receipt ──
+function showMedicineReceipt(cart, total, paymentId, orderId) {
+  const existing = document.querySelector('.receipt-overlay');
+  if (existing) existing.remove();
+  const itemRows = cart.map((item, i) =>
+    `<div class="receipt-row" style="animation-delay:${0.25 + i * 0.06}s">
+      <span>${item.name} × ${item.qty}</span>
+      <span>₹${item.price * item.qty}</span>
+    </div>`
+  ).join('');
+  const now = new Date();
+  const invoiceNo = 'MH-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + '-' + String(Date.now()).slice(-6);
+  const overlay = document.createElement('div');
+  overlay.className = 'receipt-overlay';
+  overlay.innerHTML = `<style>
+    .receipt-overlay{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
+    .receipt-overlay.show{opacity:1}
+    .receipt-card{background:#fff;border-radius:20px;width:440px;max-width:94vw;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,0.25);transform:scale(.85) translateY(30px);transition:transform .4s cubic-bezier(.34,1.56,.64,1);padding:32px 28px}
+    .receipt-overlay.show .receipt-card{transform:scale(1) translateY(0)}
+    .receipt-check{width:64px;height:64px;border-radius:50%;background:#059669;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;animation:rc-in .4s cubic-bezier(.34,1.56,.64,1) .2s both}
+    .receipt-check::after{content:'';width:20px;height:10px;border-left:3px solid #fff;border-bottom:3px solid #fff;transform:rotate(-45deg) translateY(-2px)}
+    @keyframes rc-in{0%{transform:scale(0)}100%{transform:scale(1)}}
+    .receipt-header{text-align:center;margin-bottom:16px}
+    .receipt-header h2{margin:0;font-size:1.3rem;color:#059669;font-weight:700}
+    .receipt-header p{margin:4px 0 0;font-size:.85rem;color:#64748b}
+    .receipt-divider{height:1px;background:linear-gradient(90deg,transparent,#cbd5e1,transparent);margin:14px 0}
+    .receipt-row{display:flex;justify-content:space-between;padding:4px 0;font-size:.88rem;color:#334155;opacity:0;transform:translateY(8px);animation:rc-up .3s ease forwards}
+    .receipt-row.label{color:#64748b;font-size:.82rem}
+    .receipt-row.total{font-weight:700;font-size:1rem;color:#059669;border-top:1.5px dashed #cbd5e1;margin-top:6px;padding-top:12px}
+    @keyframes rc-up{to{opacity:1;transform:translateY(0)}}
+    .receipt-actions{display:flex;gap:10px;margin-top:20px}
+    .receipt-actions button{flex:1;padding:12px;border:none;border-radius:12px;font-weight:600;font-size:.9rem;cursor:pointer;transition:all .2s}
+    .btn-print{background:#059669;color:#fff}
+    .btn-print:hover{background:#047857}
+    .btn-close{background:#f1f5f9;color:#475569}
+    .btn-close:hover{background:#e2e8f0}
+    .receipt-items{max-height:200px;overflow-y:auto;margin:8px 0}
+    .receipt-items::-webkit-scrollbar{width:4px}
+    .receipt-items::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+    @media print{body *{visibility:hidden}.receipt-overlay,.receipt-overlay *{visibility:visible}.receipt-overlay{position:absolute;opacity:1!important;background:none;backdrop-filter:none}.receipt-card{box-shadow:none;transform:none!important;border:1px solid #e2e8f0}.receipt-actions{display:none}.receipt-row{opacity:1!important;transform:none!important}}
+  </style>
+  <div class="receipt-card">
+    <div class="receipt-check"></div>
+    <div class="receipt-header">
+      <h2>Order Confirmed</h2>
+      <p>RapidCare Medicine Hub</p>
+      <span style="display:inline-block;padding:3px 14px;border-radius:20px;font-size:.75rem;font-weight:600;background:#d1fae5;color:#065f46;margin-top:8px">● Paid</span>
+    </div>
+    <div class="receipt-divider"></div>
+    <div class="receipt-row label" style="animation-delay:.1s"><span>Invoice</span><span>${invoiceNo}</span></div>
+    <div class="receipt-row label" style="animation-delay:.13s"><span>Date</span><span>${now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} ${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span></div>
+    <div class="receipt-divider"></div>
+    <div class="receipt-items">${itemRows}</div>
+    <div class="receipt-divider"></div>
+    <div class="receipt-row label" style="animation-delay:.45s"><span>Items</span><span>${cart.length}</span></div>
+    <div class="receipt-row total" style="animation-delay:.5s"><span>Total Paid</span><span>₹${total}</span></div>
+    <div style="font-size:.75rem;color:#94a3b8;text-align:center;animation:rc-up .3s .55s both;margin-top:10px">Transaction: ${paymentId}${orderId ? '<br>Order: ' + orderId : ''}</div>
+    <div class="receipt-actions">
+      <button class="btn-print" onclick="window.print()">📄 Download / Print</button>
+      <button class="btn-close" onclick="this.closest('.receipt-overlay').remove()">Close</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('show'));
+}
+
 const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
@@ -384,7 +450,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
             });
             clearCart();
             onClose();
-            alert('✅ Payment successful! Your order is confirmed.');
+            showMedicineReceipt(cart, cartTotal, response.razorpay_payment_id, response.razorpay_order_id);
           } catch {
             alert('Payment verified but failed to save. Contact support with ID: ' + response.razorpay_payment_id);
           }

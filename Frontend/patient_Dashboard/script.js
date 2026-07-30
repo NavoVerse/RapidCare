@@ -1,4 +1,4 @@
-var API_BASE = (window.RapidCareConfig && RapidCareConfig.API_BASE) || 'http://localhost:5000/api/v1';
+var API_BASE = (window.RapidCareConfig && RapidCareConfig.API_BASE) || 'https://rapidcare-backend-mcg2.onrender.com/api/v1';
 window.API_BASE = API_BASE; // Make accessible to global functions
 
 window.pricingConfig = {
@@ -897,6 +897,126 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     // REAL AMBULANCE BOOKING
     // =============================================
+
+    // ── Payment Receipt ──
+    window.showPaymentReceipt = function (details) {
+        const existing = document.querySelector('.receipt-overlay');
+        if (existing) existing.remove();
+
+        const {
+            amount, transactionId, paymentId, orderId,
+            hospital, tripId, paymentMethod,
+            patientName = localStorage.getItem('rapidcare_user_name') || 'Valued Patient',
+            breakdown = {}
+        } = details;
+
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        const invoiceNo = 'RCP-' + now.getFullYear() + now.getMonth()+1 + '-' + String(Date.now()).slice(-6);
+
+        const overlay = document.createElement('div');
+        overlay.className = 'receipt-overlay';
+        overlay.innerHTML = `
+        <style>
+          .receipt-overlay {
+            position: fixed; inset: 0; z-index: 99999;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
+          }
+          .receipt-overlay.show { opacity: 1; }
+          .receipt-card {
+            background: #fff; border-radius: 20px; width: 420px; max-width: 94vw;
+            max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+            transform: scale(0.85) translateY(30px); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            padding: 32px 28px; position: relative;
+          }
+          .receipt-overlay.show .receipt-card { transform: scale(1) translateY(0); }
+          .receipt-check {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: #059669; margin: 0 auto 16px;
+            display: flex; align-items: center; justify-content: center;
+            animation: rc-scale-in 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+          }
+          .receipt-check::after {
+            content: ''; display: block; width: 20px; height: 10px;
+            border-left: 3px solid #fff; border-bottom: 3px solid #fff;
+            transform: rotate(-45deg) translateY(-2px);
+          }
+          @keyframes rc-scale-in { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+          .receipt-header { text-align: center; margin-bottom: 20px; }
+          .receipt-header h2 { margin: 0; font-size: 1.3rem; color: #059669; font-weight: 700; }
+          .receipt-header p { margin: 4px 0 0; font-size: 0.85rem; color: #64748b; }
+          .receipt-divider { height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 16px 0; }
+          .receipt-row {
+            display: flex; justify-content: space-between; padding: 5px 0;
+            font-size: 0.88rem; color: #334155;
+            opacity: 0; transform: translateY(8px);
+            animation: rc-fade-up 0.3s ease forwards;
+          }
+          .receipt-row.label { color: #64748b; }
+          .receipt-row.total { font-weight: 700; font-size: 1rem; color: #059669; border-top: 1.5px dashed #cbd5e1; margin-top: 6px; padding-top: 12px; }
+          @keyframes rc-fade-up { to { opacity: 1; transform: translateY(0); } }
+          .receipt-actions { display: flex; gap: 10px; margin-top: 22px; }
+          .receipt-actions button {
+            flex: 1; padding: 12px; border: none; border-radius: 12px;
+            font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+          }
+          .receipt-actions .btn-print { background: #059669; color: #fff; }
+          .receipt-actions .btn-print:hover { background: #047857; }
+          .receipt-actions .btn-close { background: #f1f5f9; color: #475569; }
+          .receipt-actions .btn-close:hover { background: #e2e8f0; }
+          .receipt-status {
+            display: inline-block; padding: 3px 14px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600; background: #d1fae5; color: #065f46;
+            margin-top: 12px;
+          }
+          @media print {
+            body * { visibility: hidden; }
+            .receipt-overlay, .receipt-overlay * { visibility: visible; }
+            .receipt-overlay { position: absolute; opacity: 1 !important; background: none; backdrop-filter: none; }
+            .receipt-card { box-shadow: none; transform: none !important; border: 1px solid #e2e8f0; }
+            .receipt-actions { display: none; }
+            .receipt-row { opacity: 1 !important; transform: none !important; }
+          }
+        </style>
+        <div class="receipt-card">
+          <div class="receipt-check"></div>
+          <div class="receipt-header">
+            <h2>Payment Successful</h2>
+            <p>RapidCare Emergency Services</p>
+            <span class="receipt-status">● Paid</span>
+          </div>
+          <div class="receipt-divider"></div>
+          <div class="receipt-row label" style="animation-delay:0.1s"><span>Invoice</span><span>${invoiceNo}</span></div>
+          <div class="receipt-row label" style="animation-delay:0.15s"><span>Date</span><span>${dateStr} ${timeStr}</span></div>
+          <div class="receipt-row label" style="animation-delay:0.2s"><span>Patient</span><span>${patientName}</span></div>
+          ${hospital ? `<div class="receipt-row label" style="animation-delay:0.25s"><span>Hospital</span><span>${hospital}</span></div>` : ''}
+          ${tripId ? `<div class="receipt-row label" style="animation-delay:0.3s"><span>Trip ID</span><span>${tripId}</span></div>` : ''}
+          <div class="receipt-divider"></div>
+          ${breakdown.baseFare ? `<div class="receipt-row" style="animation-delay:0.3s"><span>Base Fare</span><span>₹${breakdown.baseFare}</span></div>` : ''}
+          ${breakdown.equipment ? `<div class="receipt-row" style="animation-delay:0.35s"><span>Equipment Charge</span><span>₹${breakdown.equipment}</span></div>` : ''}
+          ${breakdown.platform ? `<div class="receipt-row" style="animation-delay:0.4s"><span>Platform Fee</span><span>₹${breakdown.platform}</span></div>` : ''}
+          ${breakdown.discount ? `<div class="receipt-row" style="animation-delay:0.45s;color:#059669"><span>Discount</span><span>-₹${breakdown.discount}</span></div>` : ''}
+          ${breakdown.donation ? `<div class="receipt-row" style="animation-delay:0.5s"><span>Donation</span><span>₹${breakdown.donation}</span></div>` : ''}
+          <div class="receipt-row total" style="animation-delay:0.55s">
+            <span>Total Paid</span><span>₹${amount}</span>
+          </div>
+          ${paymentId ? `<div class="receipt-divider"></div>
+          <div style="font-size:0.75rem;color:#94a3b8;text-align:center;animation:rc-fade-up 0.3s 0.6s both;">
+            Transaction: ${paymentId}<br>
+            ${orderId ? `Order: ${orderId}` : ''}
+          </div>` : ''}
+          <div class="receipt-actions">
+            <button class="btn-print" onclick="window.print()">📄 Download / Print</button>
+            <button class="btn-close" onclick="this.closest('.receipt-overlay').remove()">Close</button>
+          </div>
+        </div>`;
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('show'));
+    };
+
     window.bookAmbulance = async function (hospitalId, hospitalName) {
         // Save selected hospital for payment receipt
         localStorage.setItem('rapidcare_selected_hospital', hospitalName);
@@ -974,12 +1094,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         })
                     });
                     const tripData = await tripRes.json();
-                    if (tripRes.ok) {
-                        localStorage.setItem('rapidcare_last_trip_id', tripData.trip_id);
-                        alert(`🚑 DISPATCHING RAPIDCARE!\n\nDestination: ${hospitalName}\nTrip ID: ${tripData.trip_id}\n\nOTP: ${otp}\nPayment: ₹${amount} — Successful`);
-                    } else {
-                        alert(`🚑 Trip created (SIMULATION)\n\nDestination: ${hospitalName}\nOTP: ${otp}\nPayment: ₹${amount} — Successful`);
-                    }
+                    const tripId = tripRes.ok ? tripData.trip_id : ('SIM-' + Date.now());
+                    if (tripRes.ok) localStorage.setItem('rapidcare_last_trip_id', tripId);
+                    window.showPaymentReceipt({
+                        amount,
+                        transactionId: response.razorpay_payment_id,
+                        orderId: response.razorpay_order_id,
+                        paymentId: response.razorpay_payment_id,
+                        hospital: hospitalName,
+                        tripId,
+                        paymentMethod: 'Razorpay',
+                        breakdown: {
+                            baseFare: typeof baseFarePayment !== 'undefined' ? baseFarePayment : amount - 140,
+                            equipment: typeof equipmentChargePayment !== 'undefined' ? equipmentChargePayment : 100,
+                            platform: typeof platformChargePayment !== 'undefined' ? platformChargePayment : 40
+                        }
+                    });
                 },
                 modal: { confirm_close: true },
                 theme: { color: '#0d9488' }
@@ -2284,7 +2414,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     cashRideCountPayment++;
                 }
                 localStorage.setItem('rapidcare_cash_rides', cashRideCountPayment.toString());
-                alert('PAYMENT SUCCESSFUL!\n\nThank you for choosing RapidCare.\nYour bill is settled via Cash.');
+                const totalAmt = parseInt(document.getElementById('payBtnAmount')?.textContent) || 0;
+                window.showPaymentReceipt({
+                    amount: totalAmt,
+                    transactionId: 'CASH-' + Date.now(),
+                    paymentId: null,
+                    hospital: localStorage.getItem('rapidcare_selected_hospital') || '',
+                    tripId: localStorage.getItem('rapidcare_last_trip_id') || '',
+                    paymentMethod: 'Cash',
+                    breakdown: {
+                        baseFare: baseFarePayment,
+                        equipment: equipmentChargePayment,
+                        platform: platformChargePayment,
+                        discount: isCashRewardActivePayment ? 40 : 0
+                    }
+                });
                 updateCashRewardUIPayment();
                 updateTotalPayment();
                 document.querySelector('.nav-item[data-view="overview"]')?.click();
@@ -2330,7 +2474,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             const verifyData = await verifyRes.json();
 
                             if (verifyData.success) {
-                                alert('PAYMENT SUCCESSFUL!\n\nThank you for choosing RapidCare.\nYour bill is settled.');
+                                window.showPaymentReceipt({
+                                    amount,
+                                    transactionId: response.razorpay_payment_id,
+                                    orderId: response.razorpay_order_id,
+                                    paymentId: response.razorpay_payment_id,
+                                    hospital: localStorage.getItem('rapidcare_selected_hospital') || '',
+                                    tripId: localStorage.getItem('rapidcare_last_trip_id') || '',
+                                    paymentMethod: document.querySelector('input[name="payment-method"]:checked')?.value || 'Online',
+                                    breakdown: {
+                                        baseFare: baseFarePayment,
+                                        equipment: equipmentChargePayment,
+                                        platform: platformChargePayment,
+                                        discount: (typeof rideDiscount !== 'undefined' ? rideDiscount : 0) + (typeof bankDiscount !== 'undefined' ? bankDiscount : 0),
+                                        donation: donationAmountPayment
+                                    }
+                                });
                                 updateCashRewardUIPayment();
                                 updateTotalPayment();
                                 document.querySelector('.nav-item[data-view="overview"]')?.click();
