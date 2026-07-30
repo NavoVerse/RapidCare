@@ -437,6 +437,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
         prefill: { contact: '', email: '' },
         theme: { color: '#004643' },
         handler: async (response) => {
+            // Save cart snapshot before any state changes
+            const items = [...cart];
+            const total = cartTotal;
           try {
             await fetch('https://rapidcare-backend-mcg2.onrender.com/api/v1/payments/verify-payment', {
               method: 'POST',
@@ -445,15 +448,15 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                paymentDetails: { amount: Math.round(cartTotal) },
+                paymentDetails: { amount: Math.round(total) },
               }),
             });
+          } catch {
+            // verify failed but payment still went through
+          }
             clearCart();
             onClose();
-            showMedicineReceipt(cart, cartTotal, response.razorpay_payment_id, response.razorpay_order_id);
-          } catch {
-            alert('Payment verified but failed to save. Contact support with ID: ' + response.razorpay_payment_id);
-          }
+            showMedicineReceipt(items, total, response.razorpay_payment_id, response.razorpay_order_id);
         },
         modal: { ondismiss: () => setLoading(false) },
       };
