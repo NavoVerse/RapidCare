@@ -901,11 +901,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Save selected hospital for payment receipt
         localStorage.setItem('rapidcare_selected_hospital', hospitalName);
 
-        // Generate random 4-digit OTP
-        const otp = Math.floor(1000 + Math.random() * 9000);
-        const otpEl = document.getElementById('otpStatusValue');
-        if (otpEl) otpEl.textContent = otp;
-
         const token = localStorage.getItem('rapidcare_token');
         if (!token) {
             alert("Please login to book an ambulance.");
@@ -915,38 +910,89 @@ document.addEventListener('DOMContentLoaded', () => {
         // Get current location from localStorage, or use fallback for testing
         let lat = localStorage.getItem('userLat');
         let lng = localStorage.getItem('userLng');
-
         if (!lat || !lng) {
             console.warn("GPS location missing. Falling back to default coordinates for testing.");
-            lat = 22.5726; // Default to Kolkata lat
-            lng = 88.3639; // Default to Kolkata lng
+            lat = 22.5726; lng = 88.3639;
         }
 
-        try {
-            const response = await fetch(API_BASE + '/trips/request', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    pickup_lat: parseFloat(lat),
-                    pickup_lng: parseFloat(lng),
-                    hospital_id: hospitalId
-                })
-            });
+        // Amount: use the existing payment breakdown
+        const amount = (typeof baseFarePayment !== 'undefined' ? baseFarePayment : 350)
+                     + (typeof equipmentChargePayment !== 'undefined' ? equipmentChargePayment : 100)
+                     + (typeof platformChargePayment !== 'undefined' ? platformChargePayment : 40);
 
-            const data = await response.json();
-            if (response.ok) {
-                localStorage.setItem('rapidcare_last_trip_id', data.trip_id);
-                alert(`🚑 DISPATCHING RAPIDCARE!\n\nDestination: ${hospitalName}\nTrip ID: ${data.trip_id}\n\nOTP: ${otp}`);
-            } else {
-                console.warn(`Dispatch Error: ${data.error}. Falling back to simulation.`);
-                alert(`🚑 DISPATCHING RAPIDCARE (Simulation Mode)!\n\nDestination: ${hospitalName}\n\nOTP: ${otp}`);
-            }
+        try {
+            // 1. Create Razorpay order
+            const orderRes = await fetch(API_BASE + '/payments/create-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ amount, currency: 'INR', receipt: 'amb_' + Date.now() })
+            });
+            const orderData = await orderRes.json();
+            if (!orderData.success) throw new Error('Could not create payment order');
+
+            // 2. Open Razorpay checkout
+            const options = {
+                key: orderData.key_id,
+                amount: orderData.order.amount,
+                currency: orderData.order.currency,
+                name: 'RapidCare',
+                description: `Ambulance to ${hospitalName}`,
+                order_id: orderData.order.id,
+                handler: async function (response) {
+                    // 3. Verify payment
+                    const verifyRes = await fetch(API_BASE + '/payments/verify-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            paymentDetails: { amount, user_id: 'patient_user', hospital: hospitalName }
+                        })
+                    });
+                    const verifyData = await verifyRes.json();
+                    if (!verifyData.success) {
+                        alert('Payment verification failed. Booking cancelled.');
+                        return;
+                    }
+
+                    // 4. Payment verified — dispatch the ambulance
+                    const otp = Math.floor(1000 + Math.random() * 9000);
+                    const otpEl = document.getElementById('otpStatusValue');
+                    if (otpEl) otpEl.textContent = otp;
+
+                    const tripRes = await fetch(API_BASE + '/trips/request', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            pickup_lat: parseFloat(lat),
+                            pickup_lng: parseFloat(lng),
+                            hospital_id: hospitalId
+                        })
+                    });
+                    const tripData = await tripRes.json();
+                    if (tripRes.ok) {
+                        localStorage.setItem('rapidcare_last_trip_id', tripData.trip_id);
+                        alert(`🚑 DISPATCHING RAPIDCARE!\n\nDestination: ${hospitalName}\nTrip ID: ${tripData.trip_id}\n\nOTP: ${otp}\nPayment: ₹${amount} — Successful`);
+                    } else {
+                        alert(`🚑 Trip created (SIMULATION)\n\nDestination: ${hospitalName}\nOTP: ${otp}\nPayment: ₹${amount} — Successful`);
+                    }
+                },
+                modal: { confirm_close: true },
+                theme: { color: '#0d9488' }
+            };
+            const rzp = new window.Razorpay(options);
+            rzp.on('payment.failed', function (resp) {
+                alert('Payment failed: ' + (resp.error?.description || 'Could not complete payment'));
+            });
+            rzp.open();
+
         } catch (error) {
             console.error('Booking error:', error);
-            alert(`🚑 DISPATCHING RAPIDCARE (Simulation Mode)!\n\nDestination: ${hospitalName}\n\nOTP: ${otp}`);
+            alert('Could not complete booking. Please try again.');
         }
     };
 
