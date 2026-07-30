@@ -1,4 +1,4 @@
-var API_BASE = (window.RapidCareConfig && RapidCareConfig.API_BASE) || 'https://rapidcare-backend-mcg2.onrender.com/api/v1';
+var API_BASE = (window.RapidCareConfig && RapidCareConfig.API_BASE) || 'http://localhost:5000/api/v1';
 window.API_BASE = API_BASE; // Make accessible to global functions
 
 window.pricingConfig = {
