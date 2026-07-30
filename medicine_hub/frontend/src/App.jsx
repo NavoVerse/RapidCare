@@ -1,7 +1,7 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Search, X, Plus, Minus, Camera, Activity, ShieldCheck, Truck, Clock } from 'lucide-react';
-import axios from 'axios';
+import { ShoppingCart, Search, X, Plus, Minus, Camera, Activity, Star } from 'lucide-react';
+import { allProducts } from './products.js';
 import './App.css';
 
 // Components
@@ -21,12 +21,17 @@ function App() {
   const [oxygen, setOxygen] = useState(null);
   const [devices, setDevices] = useState([]);
   const [ayurveda, setAyurveda] = useState([]);
-  
+
   const [cart, setCart] = useState(() => JSON.parse(localStorage.getItem('rc-cart') || '[]'));
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isRxModalOpen, setIsRxModalOpen] = useState(false);
+
+  // Use local product data
+  useEffect(() => {
+    setMedicines(allProducts);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('rc-cart', JSON.stringify(cart));
@@ -36,22 +41,33 @@ function App() {
     fetchAll();
   }, []);
 
-  useEffect(() => {
-    fetchMedicines();
-  }, [activeCategory, searchQuery]);
+  // Filter products locally
+  const filteredMedicines = useMemo(() => {
+    let result = medicines;
+    if (activeCategory !== 'All') {
+      result = result.filter(p => p.category === activeCategory);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.molecule.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [medicines, activeCategory, searchQuery]);
 
   const fetchAll = async () => {
+    // kits, oxygen, devices, ayurveda still fetched — keep those working
     try {
-      const [k, o, d, a] = await Promise.all([
-        axios.get('https://rapidcare-backend-mcg2.onrender.com/api/kits'),
-        axios.get('https://rapidcare-backend-mcg2.onrender.com/api/oxygen'),
-        axios.get('https://rapidcare-backend-mcg2.onrender.com/api/devices'),
-        axios.get('https://rapidcare-backend-mcg2.onrender.com/api/ayurveda')
+      const res = await Promise.all([
+        fetch('https://rapidcare-backend-mcg2.onrender.com/api/kits').then(r => r.json()).catch(() => []),
+        fetch('https://rapidcare-backend-mcg2.onrender.com/api/oxygen').then(r => r.json()).catch(() => null),
+        fetch('https://rapidcare-backend-mcg2.onrender.com/api/devices').then(r => r.json()).catch(() => []),
+        fetch('https://rapidcare-backend-mcg2.onrender.com/api/ayurveda').then(r => r.json()).catch(() => [])
       ]);
-      setKits(k.data);
-      setOxygen(o.data);
-      setDevices(d.data);
-      setAyurveda(a.data);
+      setKits(res[0]); setOxygen(res[1]); setDevices(res[2]); setAyurveda(res[3]);
     } catch (err) {
       console.error('Error fetching data:', err);
     }
@@ -139,7 +155,7 @@ function App() {
               </div>
               <div className="prod-grid">
                 <AnimatePresence>
-                  {medicines.map(product => (
+                  {filteredMedicines.map(product => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </AnimatePresence>
@@ -227,28 +243,42 @@ const Stat = ({ num, label }) => (
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
+  const rating = (4 + Math.random() * 1).toFixed(1);
   return (
-    <motion.div 
+    <motion.div
       layout
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.25 }}
       className="prod-card"
     >
-      {product.rx && <div className="prod-badge rx">Rx Required</div>}
-      <div className={`prod-img ${product.color}`}>
-        <img src={product.img} alt={product.name} />
+      <div className="prod-img-wrap">
+        <div className={`prod-img ${product.rx ? 'rx-bg' : 'otc-bg'}`}>
+          <img src={product.img} alt={product.name} loading="lazy" />
+        </div>
+        {product.rx && <span className="prod-badge rx">Rx</span>}
+        <span className="prod-badge discount">-{product.discount}</span>
+        <button className="prod-wish" onClick={(e) => { e.stopPropagation(); }}>♡</button>
       </div>
       <div className="prod-body">
         <div className="prod-tag">{product.category}</div>
         <div className="prod-name">{product.name}</div>
         <div className="prod-mfr">{product.molecule}</div>
+        <div className="prod-rating">
+          <Star size={12} fill="#f5a623" color="#f5a623" />
+          <span>{rating}</span>
+          <span className="prod-rating-count">({Math.floor(Math.random() * 500 + 50)})</span>
+        </div>
+        <div className="prod-pack">{product.pack}</div>
         <div className="prod-foot">
           <div className="prod-price-wrap">
             <div className="prod-price">₹{product.price}</div>
-            <div className="prod-mrp">₹{product.mrp}</div>
+            <div className="prod-mrp">MRP <span>₹{product.mrp}</span></div>
           </div>
-          <button className="add-btn" onClick={() => addToCart(product)}>Add</button>
+          <button className="add-btn" onClick={() => addToCart(product)}>
+            <Plus size={14} /> Add
+          </button>
         </div>
       </div>
     </motion.div>

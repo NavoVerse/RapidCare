@@ -54,7 +54,7 @@ function animateCursor() {
 animateCursor();
 
 // Hover effect for interactive elements
-const interactables = document.querySelectorAll<HTMLElement>("button, .prod-card, .cat-pill, .sb-item, .cart-btn, .topbar-nav");
+const interactables = document.querySelectorAll<HTMLElement>("button, .prod-card, .cat, .sb-item, .cart-btn, .topbar");
 
 interactables.forEach((el) => {
     el.addEventListener("mouseenter", () => {
