@@ -105,11 +105,13 @@ function App() {
     }).filter(Boolean));
   };
 
+  const clearCart = () => setCart([]);
+
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, updateQty, setIsCartOpen, cartTotal, cartCount }}>
+    <CartContext.Provider value={{ cart, addToCart, updateQty, clearCart, setIsCartOpen, cartTotal, cartCount }}>
       <div className="hub">
         <Topbar cartCount={cartCount} onOpenCart={() => setIsCartOpen(true)} />
         
@@ -344,18 +346,72 @@ const Sidebar = ({ activeCategory, onSelectCategory }) => (
 );
 
 const CartSidebar = ({ isOpen, onClose }) => {
-  const { cart, updateQty, cartTotal } = useCart();
+  const { cart, updateQty, clearCart, cartTotal } = useCart();
+  const [loading, setLoading] = useState(false);
+
+  const handleCheckout = async () => {
+    if (!window.Razorpay) return alert('Razorpay SDK failed to load. Check your internet.');
+    setLoading(true);
+    try {
+      const res = await fetch('https://rapidcare-backend-mcg2.onrender.com/api/v1/payments/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: Math.round(cartTotal), currency: 'INR' }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || 'Order creation failed');
+
+      const options = {
+        key: data.key_id,
+        amount: data.order.amount,
+        currency: data.order.currency,
+        name: 'RapidCare Medicine Hub',
+        description: 'Medicines & Healthcare',
+        order_id: data.order.id,
+        prefill: { contact: '', email: '' },
+        theme: { color: '#004643' },
+        handler: async (response) => {
+          try {
+            await fetch('https://rapidcare-backend-mcg2.onrender.com/api/v1/payments/verify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                paymentDetails: { amount: Math.round(cartTotal) },
+              }),
+            });
+            clearCart();
+            onClose();
+            alert('✅ Payment successful! Your order is confirmed.');
+          } catch {
+            alert('Payment verified but failed to save. Contact support with ID: ' + response.razorpay_payment_id);
+          }
+        },
+        modal: { ondismiss: () => setLoading(false) },
+      };
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', () => alert('❌ Payment failed. Please try again.'));
+      rzp.open();
+    } catch (err) {
+      alert('Payment error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="cart-overlay" onClick={onClose} 
+            className="cart-overlay" onClick={onClose}
           />
         )}
       </AnimatePresence>
-      <motion.div 
+      <motion.div
         className="cart-sidebar"
         initial={{ x: '100%' }}
         animate={{ x: isOpen ? 0 : '100%' }}
@@ -390,7 +446,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
             <span>TOTAL</span>
             <span>₹{cartTotal}</span>
           </div>
-          <button className="checkout-btn">Checkout securely &rarr;</button>
+          <button className="checkout-btn" onClick={handleCheckout} disabled={loading || cart.length === 0}>
+            {loading ? 'Processing…' : 'Checkout securely →'}
+          </button>
         </div>
       </motion.div>
     </>
