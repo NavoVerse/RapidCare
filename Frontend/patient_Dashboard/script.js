@@ -288,8 +288,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (geoData && geoData.length > 0) {
                             const lat = geoData[0].lat;
                             const lng = geoData[0].lon;
-                            localStorage.setItem('userLat', lat);
-                            localStorage.setItem('userLng', lng);
+                            if (!localStorage.getItem('userLat') && !localStorage.getItem('userLng')) {
+                                localStorage.setItem('userLat', lat);
+                                localStorage.setItem('userLng', lng);
+                            }
                             console.log(`[Geocoding] Auto-populated GPS coordinates for home address: ${lat}, ${lng}`);
                         }
                     })
@@ -783,7 +785,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Load hospitals from backend MapAPI
+    // Serialize fetches so a location-change re-query runs after any in-flight
+    // fetch instead of racing it (prevents stale/empty results from winning).
+    let hospitalFetchChain = Promise.resolve();
+
     async function initHospitals(forced = false) {
+        const run = hospitalFetchChain.then(() => doInitHospitals(forced));
+        hospitalFetchChain = run.catch(() => {});
+        return run;
+    }
+
+    async function doInitHospitals(forced = false) {
         const storedHospitals = localStorage.getItem('hospitalData');
 
         if (!forced && storedHospitals) {
@@ -826,19 +838,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const userLat = localStorage.getItem('userLat') || 22.5726;
             const userLng = localStorage.getItem('userLng') || 88.3639;
             try {
-                const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];node(around:30000,${userLat},${userLng})[amenity=hospital];out;`;
+                // Query nodes, ways, AND relations (hospitals drawn as buildings are ways/relations, not nodes)
+                const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];(node(around:40000,${userLat},${userLng})[amenity=hospital];way(around:40000,${userLat},${userLng})[amenity=hospital];relation(around:40000,${userLat},${userLng})[amenity=hospital];);out center tags;`;
                 const osmRes = await fetch(overpassUrl);
                 if (osmRes.ok) {
                     const osmData = await osmRes.json();
                     if (osmData && osmData.elements) {
                         osmData.elements.forEach(el => {
                             const osmId = 'osm-' + el.id;
+                            const lat = parseFloat(el.lat ?? el.center?.lat);
+                            const lng = parseFloat(el.lon ?? el.center?.lon);
+                            if (isNaN(lat) || isNaN(lng)) return; // skip elements with no geometry
                             if (el.tags.name && !hospitals.some(h => h.name.toLowerCase().includes(el.tags.name.toLowerCase()) || el.tags.name.toLowerCase().includes(h.name.toLowerCase()))) {
                                 hospitals.push({
                                     id: osmId,
                                     name: el.tags.name || "General Hospital",
-                                    lat: parseFloat(el.lat),
-                                    lng: parseFloat(el.lon),
+                                    lat,
+                                    lng,
                                     status: "External",
                                     beds: "N/A",
                                     facilities: ["Emergency Services"],
@@ -853,6 +869,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             localStorage.setItem('hospitalData', JSON.stringify(hospitals));
+        }
+
+        // Show only hospitals near the user's detected location (matches the 40 km Overpass radius)
+        const locLat = parseFloat(localStorage.getItem('userLat'));
+        const locLng = parseFloat(localStorage.getItem('userLng'));
+        if (!isNaN(locLat) && !isNaN(locLng)) {
+            hospitals = hospitals.filter(h => {
+                const km = L.latLng(locLat, locLng).distanceTo(L.latLng(h.lat, h.lng)) / 1000;
+                return km <= 40;
+            });
         }
 
         // Clear existing markers
@@ -1390,8 +1416,15 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHospitalsList(lat, lng);
 
         // PERSISTENCE: Save to localStorage
+        const prevLat = localStorage.getItem('userLat');
+        const prevLng = localStorage.getItem('userLng');
         localStorage.setItem('userLat', lat);
         localStorage.setItem('userLng', lng);
+
+        // Refresh nearby hospitals when the location actually changed
+        if (parseFloat(prevLat) !== lat || parseFloat(prevLng) !== lng) {
+            initHospitals(true);
+        }
     }
 
     async function detectAutoLocation(forced = false) {
@@ -2020,8 +2053,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                     if (geoData && geoData.length > 0) {
                                         const lat = geoData[0].lat;
                                         const lng = geoData[0].lon;
-                                        localStorage.setItem('userLat', lat);
-                                        localStorage.setItem('userLng', lng);
+                                        if (!localStorage.getItem('userLat') && !localStorage.getItem('userLng')) {
+                                            localStorage.setItem('userLat', lat);
+                                            localStorage.setItem('userLng', lng);
+                                        }
                                         console.log(`[Geocoding] Coordinates updated for home address: ${lat}, ${lng}`);
                                     }
                                 })
