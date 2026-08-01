@@ -33,11 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const showForgotPasswordLink = document.getElementById('show-forgot-password');
     const backToLoginLink = document.getElementById('back-to-login');
 
+    const otpLoginView = document.getElementById('otp-login-view');
+    const showOtpLoginLink = document.getElementById('show-otp-login');
+    const backToLoginOtpLink = document.getElementById('back-to-login-otp');
+
     if (showLoginLink && showSignupLink && signupView && loginView && forgotPasswordView) {
         showLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
             signupView.style.display = 'none';
             forgotPasswordView.style.display = 'none';
+            if (otpLoginView) otpLoginView.style.display = 'none';
             loginView.style.display = 'block';
         });
 
@@ -45,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             loginView.style.display = 'none';
             forgotPasswordView.style.display = 'none';
+            if (otpLoginView) otpLoginView.style.display = 'none';
             signupView.style.display = 'block';
         });
 
@@ -52,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             loginView.style.display = 'none';
             signupView.style.display = 'none';
+            if (otpLoginView) otpLoginView.style.display = 'none';
             forgotPasswordView.style.display = 'block';
         });
 
@@ -59,8 +66,25 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             forgotPasswordView.style.display = 'none';
             signupView.style.display = 'none';
+            if (otpLoginView) otpLoginView.style.display = 'none';
             loginView.style.display = 'block';
         });
+
+        if (showOtpLoginLink && backToLoginOtpLink && otpLoginView) {
+            showOtpLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginView.style.display = 'none';
+                signupView.style.display = 'none';
+                forgotPasswordView.style.display = 'none';
+                otpLoginView.style.display = 'block';
+            });
+
+            backToLoginOtpLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                otpLoginView.style.display = 'none';
+                loginView.style.display = 'block';
+            });
+        }
     }
 
     const slides = document.querySelectorAll('.slide');
@@ -280,6 +304,92 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Password Reset error:', err);
             } finally {
                 btn.textContent = 'Reset Password';
+                btn.disabled = false;
+            }
+        });
+    }
+
+    // --- OTP LOGIN LOGIC ---
+    const otpStep1 = document.getElementById('otp-step-1');
+    const otpStep2 = document.getElementById('otp-step-2');
+    let otpEmailOrPhone = '';
+
+    if (otpStep1 && otpStep2) {
+        // Step 1: Request OTP
+        otpStep1.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const emailInput = document.getElementById('otp-email').value.trim();
+            if (!emailInput) return showToast('Please enter your email or phone', 'error');
+
+            const btn = otpStep1.querySelector('.create-btn');
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/request-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailInput })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    showToast('OTP sent successfully', 'success');
+                    otpEmailOrPhone = emailInput;
+                    otpStep1.style.display = 'none';
+                    otpStep2.style.display = 'block';
+                } else {
+                    showToast(data.error || 'Failed to send OTP', 'error');
+                }
+            } catch (err) {
+                showToast('Error: ' + err.message, 'error');
+                console.error('OTP Login Request error:', err);
+            } finally {
+                btn.textContent = 'Send OTP';
+                btn.disabled = false;
+            }
+        });
+
+        // Step 2: Verify OTP & Login
+        otpStep2.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const otp = document.getElementById('otp-code').value.trim();
+            if (!otp) return showToast('Please enter the OTP', 'error');
+
+            const btn = otpStep2.querySelector('.create-btn');
+            btn.textContent = 'Verifying...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/verify-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: otpEmailOrPhone, otp })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('rapidcare_token', data.token);
+                    localStorage.setItem('rapidcare_user', JSON.stringify(data.user));
+                    showToast(`Welcome back, ${data.user.name}!`, 'success');
+
+                    setTimeout(() => {
+                        if (data.user.role === 'driver') {
+                            window.location.href = '/driver_dashboard/';
+                        } else if (data.user.role === 'hospital') {
+                            window.location.href = '/hospital_registration/';
+                        } else {
+                            window.location.href = '/patient_Dashboard/';
+                        }
+                    }, 1500);
+                } else {
+                    showToast(data.error || 'Verification failed', 'error');
+                }
+            } catch (err) {
+                showToast('Error: ' + err.message, 'error');
+                console.error('OTP Login Verify error:', err);
+            } finally {
+                btn.textContent = 'Verify & Log in';
                 btn.disabled = false;
             }
         });

@@ -147,6 +147,8 @@
                         
                         <div style="text-align: right; margin-bottom: 24px; margin-top: -8px;">
                             <a href="#" id="show-forgot-password" style="font-size: 14px; color: var(--primary);">Forgot password?</a>
+                            <span style="color: var(--text-secondary); margin: 0 6px;">|</span>
+                            <a href="#" id="show-otp-login" style="font-size: 14px; color: var(--primary);">Login with OTP</a>
                         </div>
 
                         <button type="submit" class="create-btn">Log in</button>
@@ -172,6 +174,33 @@
                                 Apple
                             </button>
                         </div>
+                    </form>
+                </div>
+
+                <!-- OTP Login View -->
+                <div id="otp-login-view" style="display: none;">
+                    <div class="form-header">
+                        <h2>OTP Login</h2>
+                        <div class="theme-toggle" id="theme-toggle-otp">
+                        </div>
+                    </div>
+                    <p class="subtitle">Remembered? <a href="#" id="back-to-login-otp">Back to login</a></p>
+
+                    <!-- Step 1: Request OTP -->
+                    <form action="#" class="forgot-request-form" id="otp-step-1">
+                        <div class="input-group">
+                            <input type="text" id="otp-email" placeholder="Email / Phone" required>
+                        </div>
+                        <button type="submit" class="create-btn">Send OTP</button>
+                    </form>
+
+                    <!-- Step 2: Verify OTP and Login -->
+                    <form action="#" class="forgot-reset-form" id="otp-step-2" style="display: none;">
+                        <p class="subtitle" style="margin-bottom: 15px;">Enter the OTP sent to your email/phone</p>
+                        <div class="input-group">
+                            <input type="text" id="otp-code" placeholder="6-digit OTP" required maxlength="6">
+                        </div>
+                        <button type="submit" class="create-btn">Verify & Log in</button>
                     </form>
                 </div>
 
