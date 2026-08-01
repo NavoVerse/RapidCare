@@ -785,6 +785,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Load hospitals from backend MapAPI
+    // The public Overpass API is rate-limited/flaky (504 drops the CORS header,
+    // which browsers treat as a CORS block). Try several mirrors in order.
+    // overpass-api.de returns 406 for browser User-Agents (kills CORS), and
+    // overpass.osm.ch has stale/empty data. maps.mail.ru mirrors the full OSM
+    // dataset AND serves CORS headers, so it's the primary endpoint.
+    const OVERPASS_ENDPOINTS = [
+        'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+        'https://overpass-api.de/api/interpreter',
+        'https://overpass.osm.ch/api/interpreter'
+    ];
+
+    async function fetchOverpassHospitals(userLat, userLng) {
+        const query = `[out:json];(node(around:40000,${userLat},${userLng})[amenity=hospital];way(around:40000,${userLat},${userLng})[amenity=hospital];relation(around:40000,${userLat},${userLng})[amenity=hospital];);out center tags;`;
+        // overpass-api.de has real data but rate-limits (transient 504 → browser CORS error).
+        // Retry it a few times, then fall back to mirrors as a last resort.
+        for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+                const res = await fetch(`${OVERPASS_ENDPOINTS[0]}?data=${encodeURIComponent(query)}`);
+                if (res.ok) return await res.json();
+            } catch (err) {
+                console.warn(`[Overpass] attempt ${attempt + 1} failed:`, err.message);
+            }
+            await new Promise(r => setTimeout(r, 800 * (attempt + 1)));
+        }
+        for (const endpoint of OVERPASS_ENDPOINTS.slice(1)) {
+            try {
+                const res = await fetch(`${endpoint}?data=${encodeURIComponent(query)}`);
+                if (res.ok) return await res.json();
+            } catch (err) {
+                console.warn(`[Overpass] ${endpoint} failed:`, err.message);
+            }
+        }
+        return null;
+    }
+
     // Serialize fetches so a location-change re-query runs after any in-flight
     // fetch instead of racing it (prevents stale/empty results from winning).
     let hospitalFetchChain = Promise.resolve();
@@ -839,30 +874,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const userLng = localStorage.getItem('userLng') || 88.3639;
             try {
                 // Query nodes, ways, AND relations (hospitals drawn as buildings are ways/relations, not nodes)
-                const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];(node(around:40000,${userLat},${userLng})[amenity=hospital];way(around:40000,${userLat},${userLng})[amenity=hospital];relation(around:40000,${userLat},${userLng})[amenity=hospital];);out center tags;`;
-                const osmRes = await fetch(overpassUrl);
-                if (osmRes.ok) {
-                    const osmData = await osmRes.json();
-                    if (osmData && osmData.elements) {
-                        osmData.elements.forEach(el => {
-                            const osmId = 'osm-' + el.id;
-                            const lat = parseFloat(el.lat ?? el.center?.lat);
-                            const lng = parseFloat(el.lon ?? el.center?.lon);
-                            if (isNaN(lat) || isNaN(lng)) return; // skip elements with no geometry
-                            if (el.tags.name && !hospitals.some(h => h.name.toLowerCase().includes(el.tags.name.toLowerCase()) || el.tags.name.toLowerCase().includes(h.name.toLowerCase()))) {
-                                hospitals.push({
-                                    id: osmId,
-                                    name: el.tags.name || "General Hospital",
-                                    lat,
-                                    lng,
-                                    status: "External",
-                                    beds: "N/A",
-                                    facilities: ["Emergency Services"],
-                                    unregistered: true
-                                });
-                            }
-                        });
-                    }
+                const osmData = await fetchOverpassHospitals(userLat, userLng);
+                if (osmData && osmData.elements) {
+                    osmData.elements.forEach(el => {
+                        const osmId = 'osm-' + el.id;
+                        const lat = parseFloat(el.lat ?? el.center?.lat);
+                        const lng = parseFloat(el.lon ?? el.center?.lon);
+                        if (isNaN(lat) || isNaN(lng)) return; // skip elements with no geometry
+                        if (el.tags.name && !hospitals.some(h => h.name.toLowerCase().includes(el.tags.name.toLowerCase()) || el.tags.name.toLowerCase().includes(h.name.toLowerCase()))) {
+                            hospitals.push({
+                                id: osmId,
+                                name: el.tags.name || "General Hospital",
+                                lat,
+                                lng,
+                                status: "External",
+                                beds: "N/A",
+                                facilities: ["Emergency Services"],
+                                unregistered: true
+                            });
+                        }
+                    });
                 }
             } catch (osmErr) {
                 console.error('[Overpass API Error]', osmErr);
