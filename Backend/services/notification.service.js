@@ -20,8 +20,11 @@ const initTransporter = () => {
 
     // Graceful check for missing variables
     if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error('SMTP credentials missing in production. Set SMTP_HOST, SMTP_USER, SMTP_PASS.');
+        }
         console.warn('⚠️ SMTP credentials missing in .env. Falling back to Ethereal for testing.');
-        
+
         nodemailer.createTestAccount((err, account) => {
             if (err) {
                 console.error('❌ Failed to create a testing account: ' + err.message);
