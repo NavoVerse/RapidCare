@@ -516,8 +516,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Reverse geocoding failed:', error);
             }
 
-            // Refresh hospitals based on new location
-            initHospitals(true);
+            // Refresh hospitals based on new location (cache-aware)
+            initHospitals();
 
         }, (error) => {
             console.error('Geolocation error:', error);
@@ -832,10 +832,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function doInitHospitals(forced = false) {
         const storedHospitals = localStorage.getItem('hospitalData');
+        const locLat = parseFloat(localStorage.getItem('userLat'));
+        const locLng = parseFloat(localStorage.getItem('userLng'));
+        const cacheKey = (!isNaN(locLat) && !isNaN(locLng)) ? `${locLat.toFixed(2)},${locLng.toFixed(2)}` : '';
+        const cacheValid = storedHospitals && (cacheKey === '' || localStorage.getItem('hospitalDataKey') === cacheKey);
 
-        if (!forced && storedHospitals) {
+        if (!forced && cacheValid) {
+            // Instant: reuse hospitals already fetched for this area (within ~1 km)
             hospitals = JSON.parse(storedHospitals);
+        } else if (!forced && !cacheKey) {
+            // No location yet — don't fetch for a wrong default location; wait for
+            // updateUserLocation to fetch once GPS resolves.
+            hospitals = storedHospitals ? JSON.parse(storedHospitals) : [];
         } else {
+            const listEl = document.getElementById('hospitalListContainer');
+            if (listEl) {
+                listEl.innerHTML = '<p style="text-align: center; color: var(--text-muted); margin-top: 40px;">Finding nearby hospitals…</p>';
+            }
             try {
                 const response = await fetch(API_BASE + '/hospitals');
                 if (response.ok) {
@@ -900,11 +913,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             localStorage.setItem('hospitalData', JSON.stringify(hospitals));
+            if (cacheKey) localStorage.setItem('hospitalDataKey', cacheKey);
         }
 
         // Show only hospitals near the user's detected location (matches the 40 km Overpass radius)
-        const locLat = parseFloat(localStorage.getItem('userLat'));
-        const locLng = parseFloat(localStorage.getItem('userLng'));
         if (!isNaN(locLat) && !isNaN(locLng)) {
             hospitals = hospitals.filter(h => {
                 const km = L.latLng(locLat, locLng).distanceTo(L.latLng(h.lat, h.lng)) / 1000;
@@ -1444,18 +1456,14 @@ document.addEventListener('DOMContentLoaded', () => {
             .openPopup();
 
         overviewMap.setView([lat, lng], 13);
-        renderHospitalsList(lat, lng);
 
         // PERSISTENCE: Save to localStorage
-        const prevLat = localStorage.getItem('userLat');
-        const prevLng = localStorage.getItem('userLng');
         localStorage.setItem('userLat', lat);
         localStorage.setItem('userLng', lng);
 
-        // Refresh nearby hospitals when the location actually changed
-        if (parseFloat(prevLat) !== lat || parseFloat(prevLng) !== lng) {
-            initHospitals(true);
-        }
+        // Load hospitals for this location — instant from cache if we already
+        // fetched for this area, otherwise a single fetch with a loader.
+        initHospitals();
     }
 
     async function detectAutoLocation(forced = false) {
